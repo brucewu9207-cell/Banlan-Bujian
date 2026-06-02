@@ -1,0 +1,2225 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>斑斓部件 · HSK 3.0</title>
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<style>
+:root {
+  --bg-main:#b8cec4; --bg-wash:#c8d9d0;
+  --ink-dark:#2c2416; --ink-mid:#4a3f2f; --ink-light:#8a7a65;
+  --paper:#f5edd8; --paper-shadow:#e8dcc0;
+  --bamboo:#b5763a; --bamboo-light:#d4975a;
+  --mint:#6aaa8e; --mint-light:#8fc4ad;
+  --porcelain:#4a5e8a; --vermillion:#c84b2f;
+  --jade:#3a7a5a; --gold:#c8960a;
+  --radius:12px;
+  --shadow:0 4px 20px rgba(44,36,22,0.12);
+  --shadow-lg:0 8px 40px rgba(44,36,22,0.18);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Serif SC','STSong','宋体',serif;background:var(--bg-main);color:var(--ink-dark);min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:
+    radial-gradient(ellipse 55% 45% at 8% 12%, rgba(60,90,72,0.55) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 50% at 92% 78%, rgba(60,90,72,0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 38% 35% at 75% 15%, rgba(80,110,88,0.3) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(70,100,78,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 30% 28% at 50% 45%, rgba(90,120,95,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse 25% 20% at 60% 30%, rgba(50,80,60,0.2) 0%, transparent 45%);
+  pointer-events:none;z-index:0;filter:blur(2px)}
+.top-nav{display:none;padding:10px 32px;background:rgba(232,226,208,0.85);backdrop-filter:blur(10px);border-bottom:1.5px solid rgba(200,190,165,0.5);box-shadow:0 2px 16px rgba(30,50,35,0.12);padding:10px 32px}
+.nav-logo{display:flex;align-items:center;gap:12px}
+.nav-logo .logo-char{font-size:2rem;color:var(--vermillion);line-height:1;text-shadow:2px 2px 0 rgba(200,75,47,0.2)}
+.nav-logo h1{font-size:1.05rem;color:var(--ink-dark);letter-spacing:0.05em}
+.nav-logo p{font-size:0.7rem;color:var(--ink-light);font-style:italic;font-family:Georgia,serif}
+.mode-tabs{display:flex;gap:4px;background:var(--paper-shadow);border-radius:10px;padding:4px}
+.mode-tab{padding:8px 20px;border:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:0.85rem;transition:all .25s;color:var(--ink-mid);background:transparent}
+.mode-tab.active{background:var(--bamboo);color:var(--paper);box-shadow:0 2px 8px rgba(181,118,58,0.4)}
+.mode-tab:hover:not(.active){background:rgba(181,118,58,0.15)}
+.main-content{position:relative;z-index:1;padding:28px 32px;margin:0 auto;min-height:calc(100vh - 45px)}
+.card{background:#c4c4c4;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(120,120,120,0.5);backdrop-filter:blur(4px);color:#ffffff}
+
+/* 级别选择 */
+.level-select-screen{text-align:center;padding:14px;max-width:760px;margin:0 auto}
+.level-select-screen h2{font-size:1.5rem;color:#ffffff;margin-bottom:14px;letter-spacing:0.1em}
+.level-select-screen .subtitle{color:#ffffff;font-size:0.88rem;margin-bottom:14px;font-style:italic;font-family:Georgia,serif}
+.level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:680px;margin:0 auto}
+.level-btn{padding:18px 14px;border:2px solid rgba(140,140,140,0.5);border-radius:var(--radius);background:#c4c4c4;color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s}
+.level-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--bamboo-light)}
+.level-btn .level-num{font-size:1.6rem;font-weight:bold;color:#ffffff;display:block;line-height:1}
+.level-btn .level-label{font-size:0.72rem;color:#ffffff;margin-top:4px;display:block}
+.level-btn .level-count{font-size:0.68rem;color:rgba(255,255,255,0.7);margin-top:2px;display:block}
+
+/* 练习布局 — 左右等高 */
+
+
+
+.back-btn{padding:7px 15px;border:1.5px solid var(--paper-shadow);border-radius:8px;background:var(--paper);cursor:pointer;font-family:inherit;font-size:0.82rem;color:var(--ink-mid);transition:all .2s}
+.back-btn:hover{border-color:var(--bamboo);color:var(--bamboo)}
+.next-btn{background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:14px 28px;font-family:inherit;font-size:1.35rem;cursor:pointer;transition:all .2s;letter-spacing:0.08em}
+.next-btn:hover{background:rgba(20,40,30,0.75)}
+#skip-btn:hover{background:rgba(20,40,30,0.75)}
+
+
+/* ★ 左右等高的关键 */
+.practice-layout{display:flex;gap:22px;align-items:stretch;height:calc(100vh - 100px)}
+.char-panel{flex:3.885;padding:18px 22px;display:flex;flex-direction:column;overflow-y:auto}
+.structure-panel{flex:7.2;padding:12px 14px 8px;display:flex;flex-direction:column;overflow-y:auto}
+.word-panel{flex:2.59;padding:18px 22px;display:flex;flex-direction:column;overflow-y:auto}
+
+/* 左栏 */
+.char-display{text-align:center;padding:16px;background:transparent;border-radius:10px;border:none;margin-bottom:14px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'KaiTi','STKaiti','楷体',serif}
+.char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:240px;height:240px;background:var(--bg-main);border-radius:6px}
+.char-display #stroke-canvas svg{width:240px;height:240px;display:block}
+.char-display #stroke-canvas svg .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
+.char-display #stroke-canvas svg .stroke-path{stroke-linecap:round;stroke-linejoin:round}
+.char-display #stroke-canvas svg .stroke-num-circle{stroke:#fff;stroke-width:1.5}
+.char-display #stroke-canvas svg .stroke-num-text{fill:#fff;font-family:Arial,sans-serif;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.char-display .play-btn{position:absolute;bottom:8px;right:8px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s;z-index:5}
+.char-display .play-btn:hover{transform:scale(1.1);background:#fff}
+.char-display .play-btn svg{width:16px;height:16px;fill:#3a6b4e;margin-left:2px}
+.char-display .play-btn.playing svg{fill:#c84b2f}
+.char-display .char-step-label{display:none}
+.pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.pinyin-btn{padding:18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:2.3rem;color:#ffffff;transition:all .2s;letter-spacing:0.06em}
+.pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
+.pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
+.pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
+.pinyin-btn:disabled{cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.word-hint{
+  font-size:1.15rem;
+  color:var(--ink-mid);
+  line-height:1.4;
+  display:none;
+  text-align:center;
+  flex:1;
+}
+.word-hint.show{display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.spacer{flex:1}
+
+/* 右栏 */
+.structure-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:rgba(181,118,58,0.06);border-radius:8px;border:1.5px dashed var(--bamboo-light);margin-bottom:6px;flex-shrink:0}
+.structure-svg-wrap{flex-shrink:0;width:44px;height:44px}
+.structure-info{text-align:left}.structure-info h4{font-size:0.82rem;color:var(--bamboo);margin-bottom:2px}
+.structure-info p{font-size:0.68rem;color:var(--ink-light);line-height:1.4;font-family:Georgia,serif}
+
+/* ★ 拖拽画布 — 固定正方形 */
+/* ── 拖拽大方框：左右各半 ── */
+.drag-split-box{
+  display:flex;
+  flex:1;
+  min-height:0;
+  align-self:stretch;
+  border:none;
+  border-radius:12px;
+  overflow:hidden;
+  margin-bottom:0;
+  background:transparent;
+}
+.drag-left{
+  flex:1;
+  display:flex;
+  align-items:stretch;
+  justify-content:stretch;
+  min-height:0;
+  padding:10px;
+}
+.drag-canvas{
+  width:100%;
+  height:100%;
+  position:relative;
+  background:transparent;
+  border:none;
+  border-radius:0;
+  flex-shrink:0;
+}
+.drag-divider{
+  width:3px;
+  background:rgba(255,255,255,0.7);
+  flex-shrink:0;
+  margin:16px 0;
+}
+.drag-right{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  transition:opacity .4s ease;
+  padding:10px;
+}
+.drag-right .result-char{
+  font-size:7.8rem;
+  line-height:1;
+  display:block;
+  font-family:'KaiTi','STKaiti','楷体',serif;
+  color:rgba(20,40,30,0.55);
+  animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1);
+}
+.drag-right .result-label{
+  font-size:1.56rem;color:var(--jade);
+  font-family:Georgia,serif;font-style:italic;
+  text-align:center;
+}
+.drag-right .next-btn-inline{
+  margin-top:12px;padding:10px 22px;
+  background:var(--bamboo);color:var(--paper);
+  border:none;border-radius:10px;
+  font-family:inherit;font-size:0.88rem;
+  cursor:pointer;transition:all .2s;letter-spacing:0.06em;
+}
+.drag-right .next-btn-inline:hover{background:var(--bamboo-light)}
+/* 兼容旧 drag-canvas-wrap */
+.drag-canvas-wrap{display:none}
+.drag-canvas{width:100%;aspect-ratio:1/1;position:relative;background:transparent;border:none;border-radius:10px;overflow:hidden}
+.drop-zone{position:absolute;border:2px dashed rgba(255,255,255,0.6);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;background:rgba(255,255,255,0.1);overflow:hidden}
+.drop-zone.drag-over{border-color:var(--bamboo);background:rgba(181,118,58,0.12)}
+.drop-zone.filled{border-style:solid}
+.drop-zone.correct-placed{border-color:var(--jade)}
+.drop-zone.wrong-placed{border-color:var(--vermillion);background:rgba(200,75,47,0.07);animation:shake .3s}
+.zone-label{font-size:2.4rem;color:rgba(255,255,255,0.6);pointer-events:none;user-select:none}
+
+.components-pool{margin-bottom:8px;flex-shrink:0}
+.components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
+.comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
+.comp-chip{padding:14px 0;border-radius:12px;font-size:3.6rem;cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
+.comp-chip:active{cursor:grabbing;transform:scale(1.1)}
+.comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
+.comp-chip.dragging{opacity:.5}
+.merge-btn{display:none!important}
+.merge-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 20px rgba(181,118,58,0.45)}
+.merge-btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.merge-result{display:none;text-align:center;padding:22px;animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1)}
+.merge-result.show{display:block}
+@keyframes zoneFbPop{
+  0%{opacity:0;transform:scale(0.3)}
+  30%{opacity:1;transform:scale(1.15)}
+  70%{opacity:1;transform:scale(1)}
+  100%{opacity:0;transform:scale(0.9)}
+}
+@keyframes mergeIn{from{transform:scale(.5) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+.merge-result .result-char{font-size:5.5rem;line-height:1;display:block;margin-bottom:8px;font-family:'KaiTi','STKaiti','楷体',serif}
+.merge-result .result-label{font-size:0.82rem;color:var(--jade);font-family:Georgia,serif;font-style:italic}
+
+/* 查询模式 */
+.query-screen{padding:30px}
+.query-header{text-align:center;margin-bottom:28px}
+.query-header h2{font-size:1.4rem;color:var(--ink-dark);margin-bottom:5px;letter-spacing:0.1em}
+.query-header p{color:var(--ink-light);font-size:0.85rem;font-family:Georgia,serif;font-style:italic}
+.query-input-wrap{display:flex;gap:11px;max-width:380px;margin:0 auto 32px}
+.query-input{flex:1;padding:13px 16px;border:2px solid var(--paper-shadow);border-radius:10px;background:var(--paper);font-family:inherit;font-size:1.8rem;color:var(--ink-dark);text-align:center;outline:none;transition:border-color .2s;letter-spacing:0.1em;-webkit-ime-mode:active;ime-mode:active}
+.query-input:focus{border-color:var(--bamboo)}
+.query-btn{padding:13px 22px;background:var(--bamboo);color:var(--paper);border:none;border-radius:10px;font-family:inherit;font-size:0.88rem;cursor:pointer;transition:all .2s;letter-spacing:0.08em;white-space:nowrap}
+.query-btn:hover{background:var(--bamboo-light);transform:translateY(-1px)}
+.query-result{display:none;animation:fadeIn .4s}
+.query-result.show{display:block}
+.query-result-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:22px;align-items:start}
+.query-char-display{padding:28px;text-align:center}
+.query-char-big{font-size:6.5rem;line-height:1;color:var(--ink-dark);text-shadow:4px 4px 0 rgba(44,36,22,0.06);display:block;margin-bottom:10px;font-family:'KaiTi','STKaiti','楷体',serif}
+.query-char-pinyin{font-size:1.05rem;color:var(--bamboo);display:block;margin-bottom:4px;letter-spacing:0.05em}
+.query-char-meaning{font-size:0.8rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic}
+.query-detail-panel{padding:22px}
+.query-structure-badge{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;background:rgba(181,118,58,0.1);border-radius:8px;border:1px solid rgba(181,118,58,0.3);margin-bottom:18px}
+.badge-svg{width:32px;height:32px}
+.badge-text h4{font-size:0.88rem;color:var(--bamboo)}
+.badge-text p{font-size:0.7rem;color:var(--ink-light);font-family:Georgia,serif}
+.query-components h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.06em;font-family:Georgia,serif}
+.query-comp-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.query-comp-item{display:flex;flex-direction:column;align-items:center;padding:10px 14px;border-radius:10px;border:2px solid;background:var(--paper);min-width:68px}
+.query-comp-item .comp-char{font-size:1.7rem;line-height:1;margin-bottom:4px;font-family:'KaiTi','STKaiti','楷体',serif}
+.query-comp-item .comp-name{font-size:0.62rem;color:var(--ink-light);text-align:center;font-family:Georgia,serif}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink-dark);color:var(--paper);padding:11px 22px;border-radius:24px;font-size:0.88rem;z-index:1000;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--jade)}
+.toast.error{background:var(--vermillion)}
+
+/* 输入框hint文字 */
+.query-hint{text-align:center;font-size:0.78rem;color:var(--ink-light);margin-bottom:8px;font-family:Georgia,serif}
+
+@media(max-width:768px){
+  .main-content{padding:16px}
+  .practice-layout{flex-direction:column}
+  .query-result-grid{grid-template-columns:1fr}
+  .top-nav{padding:11px 16px}
+  .mode-tab{padding:6px 12px;font-size:0.78rem}
+}
+
+/* ══ 结构参考栏 ══ */
+.struct-bar{
+  position:relative;z-index:9;
+  background:rgba(20,40,30,0.35);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(255,255,255,0.12);
+}
+.struct-bar-header{
+  display:flex;align-items:center;justify-content:center;
+  padding:8px 28px;cursor:pointer;user-select:none;
+  transition:background .2s;
+  position:relative;
+}
+.struct-bar-header:hover{
+  background:rgba(255,255,255,0.07);
+}
+.struct-bar-title{display:flex;flex-direction:column;align-items:center;gap:2px}
+.struct-bar-icon{font-size:1.2rem;filter:grayscale(1) brightness(2)}
+.struct-bar-zh{font-size:1.69rem;font-weight:700;color:#ffffff;letter-spacing:0.1em}
+.struct-bar-en{font-size:0.94rem;color:#ffffff;font-family:Georgia,serif;font-style:italic}
+.struct-bar-chevron{width:18px;height:18px;color:#ffffff;transition:transform .3s;flex-shrink:0;position:absolute;right:28px;top:50%;transform:translateY(-50%)}
+.struct-bar-chevron.open{transform:translateY(-50%) rotate(180deg)}
+.struct-bar-body{
+  max-height:0;overflow:hidden;
+  transition:max-height .4s cubic-bezier(.4,0,.2,1);
+  background:rgba(20,40,30,0.25);
+}
+.struct-bar-body.open{max-height:320px}
+.struct-grid{
+  display:grid;
+  grid-template-columns:repeat(13,1fr);
+  gap:0;
+  padding:6px 0 8px;
+  width:100%;
+}
+.struct-card{
+  display:flex;flex-direction:column;align-items:center;
+  padding:6px 4px;
+  border-right:1px solid rgba(255,255,255,0.07);
+  cursor:default;
+  transition:background .2s;
+}
+.struct-card:hover{background:rgba(255,255,255,0.08);border-radius:6px}
+.struct-card:last-child{border-right:none}
+.struct-card:hover{background:rgba(255,255,255,0.07);border-radius:6px}
+.struct-card-num{
+  font-size:1.4rem;color:rgba(255,255,255,0.45);
+  font-family:Georgia,serif;margin-bottom:1px;line-height:1;font-weight:200;
+}
+.struct-card-svg{width:66px;height:66px;margin-bottom:3px;flex-shrink:0}
+.struct-card-name{font-size:0.72rem;font-weight:400;color:#ffffff;text-align:center;line-height:1.2;margin-bottom:1px;letter-spacing:0.01em}
+.struct-card-en{font-size:0.8rem;color:#ffffff;text-align:center;font-family:Georgia,serif;font-style:italic;font-weight:700;line-height:1.2;margin-bottom:2px}
+.struct-card-ex{font-size:0.78rem;color:rgba(240,240,240,0.85);text-align:center;line-height:1.4;font-weight:700;letter-spacing:0.04em}
+@media(max-width:900px){
+  .struct-grid{grid-template-columns:1fr 1fr}
+  .struct-bar-body.open{max-height:320px}
+}
+@media(max-width:500px){
+  .struct-grid{grid-template-columns:repeat(4,1fr)}
+  .struct-bar-body.open{max-height:900px}
+  .struct-bar-header{padding:10px 16px}
+}
+
+.step-title{
+  font-size:1.2rem;
+  letter-spacing:0.06em;
+  margin-bottom:12px;
+  padding:0 2px;
+  text-align:center;
+}
+.step-title-zh{font-family:Georgia,'STSong','宋体',serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase}
+.step-title-en{font-family:Georgia,serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase;margin-left:8px}
+
+.drag-right .retry-btn-inline{
+  margin-top:0;padding:10px 18px;
+  background:transparent;
+  color:var(--bamboo);
+  border:2px solid var(--bamboo);
+  border-radius:10px;
+  font-family:inherit;font-size:0.88rem;
+  cursor:pointer;transition:all .2s;letter-spacing:0.06em;
+}
+.drag-right .retry-btn-inline:hover{background:rgba(181,118,58,0.08)}
+.result-side .retry-btn-inline{
+  padding:10px 18px;
+  background:transparent;
+  color:var(--bamboo);
+  border:2px solid var(--bamboo);
+  border-radius:10px;
+  font-family:inherit;font-size:0.88rem;
+  cursor:pointer;transition:all .2s;letter-spacing:0.06em;
+}
+.result-side .retry-btn-inline:hover{background:rgba(181,118,58,0.08)}
+
+/* 墨绿晕染云团第二层 */
+body::after{
+  content:'';position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 35% 28% at 3% 35%, rgba(40,65,50,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 28% 22% at 95% 25%, rgba(40,65,50,0.3) 0%, transparent 55%),
+    radial-gradient(ellipse 32% 25% at 45% 88%, rgba(50,75,58,0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 20% 18% at 78% 55%, rgba(40,65,50,0.2) 0%, transparent 50%);
+  pointer-events:none;z-index:0;filter:blur(18px);
+}
+
+/* 装饰散点 */
+.ink-dots{position:fixed;inset:0;pointer-events:none;z-index:0}
+.ink-dot{position:absolute;border-radius:50%}
+
+
+
+.side-title-bar{
+  width:52px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:20px 0;
+}
+.side-title-vert{
+  writing-mode:vertical-rl;text-orientation:mixed;
+  font-size:2rem;font-weight:700;
+  color:transparent;
+  -webkit-text-stroke:1.2px rgba(44,36,22,0.65);
+  letter-spacing:0.2em;line-height:1;
+}
+.side-title-en{
+  writing-mode:vertical-rl;
+  font-size:0.55rem;color:var(--ink-light);
+  font-family:Georgia,serif;font-style:italic;
+  letter-spacing:0.1em;margin-top:10px;opacity:0.75;
+}
+
+/* 练习布局高度适配 */
+.practice-layout{
+  height:calc(100vh - var(--struct-h, 0px) - 56px) !important;
+}
+
+.struct-action-btn{
+  padding:8px 22px;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:9px;
+  background:rgba(20,40,30,0.55);
+  color:#ffffff;
+  font-family:inherit;
+  font-size:1.17rem;
+  cursor:pointer;
+  transition:all .2s;
+  letter-spacing:0.04em;
+  white-space:nowrap;
+}
+.struct-action-btn:hover{
+  background:rgba(20,40,30,0.75);
+}
+</style>
+</head>
+<body>
+<div class="ink-dots" aria-hidden="true">
+  <div class="ink-dot" style="width:5px;height:5px;top:18%;left:11%;background:#c84b2f;opacity:0.6"></div>
+  <div class="ink-dot" style="width:3px;height:3px;top:35%;right:7%;background:#c84b2f;opacity:0.5"></div>
+  <div class="ink-dot" style="width:4px;height:4px;bottom:25%;left:5%;background:#c84b2f;opacity:0.55"></div>
+  <div class="ink-dot" style="width:3px;height:3px;bottom:18%;right:15%;background:#c84b2f;opacity:0.45"></div>
+  <div class="ink-dot" style="width:6px;height:6px;top:62%;left:48%;background:#c84b2f;opacity:0.35"></div>
+  <div class="ink-dot" style="width:4px;height:4px;top:8%;right:30%;background:rgba(255,255,255,0.4)"></div>
+  <div class="ink-dot" style="width:3px;height:3px;bottom:40%;left:30%;background:rgba(255,255,255,0.3)"></div>
+</div>
+<nav class="top-nav">
+  <!-- 左：标题 -->
+  <div style="display:flex;flex-direction:column;justify-content:center">
+    <div style="display:flex;align-items:baseline;gap:14px">
+      <span style="font-size:3.45rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(44,36,22,0.7);letter-spacing:0.12em;line-height:1">斑斓部件</span>
+      <span style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic;letter-spacing:0.04em">Brilliant Components · HSK 3.0</span>
+    </div>
+  </div>
+  <!-- 右：模式切换 -->
+  <div style="display:flex;align-items:center">
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="switchMode('learn')">🎓 学习模式 / Learn</button>
+      <button class="mode-tab" onclick="switchMode('query')">🔍 查询模式 / Query</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══ 13种汉字结构参考栏 ══ -->
+<div class="struct-bar" id="struct-bar">
+  <div class="struct-bar-header" onclick="toggleStructBar()">
+    <div class="struct-bar-title" style="text-align:center">
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px">
+        <span class="struct-bar-zh">斑斓部件</span>
+        <span style="color:#ffffff;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
+      </div>
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:2px">
+        <span style="color:#ffffff;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: WU JUNHUA</span>
+        <span style="color:#8b2c2c;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
+      </div>
+    </div>
+    <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      反馈 / Feedback
+    </button>
+    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">折叠 / Collapse</button></div>
+    <button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();backToLevelSelect()" style="display:none;position:absolute;left:28px;top:50%;transform:translateY(-50%);background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">← 返回 / Back</button>
+    <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+  <div class="struct-bar-body open" id="struct-body">
+    <div class="struct-grid">
+      <div class="struct-card">
+        <div class="struct-card-num">1</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/></svg>
+        <div class="struct-card-name">独体字</div>
+        <div class="struct-card-en">Whole</div>
+        <div class="struct-card-ex">口、大</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">2</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="6" y="6" width="16" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+          <rect x="26" y="6" width="16" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">左右结构</div>
+        <div class="struct-card-en">Left-right</div>
+        <div class="struct-card-ex">你、好</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">3</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="6" y="6" width="36" height="16" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+          <rect x="6" y="26" width="36" height="16" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">上下结构</div>
+        <div class="struct-card-en">Top-bottom</div>
+        <div class="struct-card-ex">爸、家</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">4</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="4" y="6" width="12" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+          <rect x="18" y="6" width="12" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+          <rect x="32" y="6" width="12" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+        </svg>
+        <div class="struct-card-name">左中右结构</div>
+        <div class="struct-card-en">Left-center-right</div>
+        <div class="struct-card-ex">哪、掰</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">5</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="6" y="4" width="36" height="12" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+          <rect x="6" y="18" width="36" height="12" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+          <rect x="6" y="32" width="36" height="12" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+        </svg>
+        <div class="struct-card-name">上中下结构</div>
+        <div class="struct-card-en">Top-middle-bottom</div>
+        <div class="struct-card-ex">喜、梦</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">6</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M24,6 L42,6 L42,42 L6,42 L6,24" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="10" y="10" width="20" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">右上包围</div>
+        <div class="struct-card-en">Up-right surrounded</div>
+        <div class="struct-card-ex">可、司</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">7</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M6,24 L6,6 L42,6 L42,42" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="18" y="18" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">左上包围</div>
+        <div class="struct-card-en">Left-up surrounded</div>
+        <div class="struct-card-ex">厅、病</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">8</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M6,24 L6,42 L42,42" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="none" stroke-dasharray="3,2"/>
+          <rect x="14" y="6" width="28" height="28" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">左下包围</div>
+        <div class="struct-card-en">Left-down surrounded</div>
+        <div class="struct-card-ex">这、进</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">9</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M6,42 L6,6 L42,6 L42,42" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="14" y="22" width="20" height="18" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">左上右包围</div>
+        <div class="struct-card-en">Left-up-right surrounded</div>
+        <div class="struct-card-ex">同、间</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">10</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M6,6 L6,42 L42,42 L42,6" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="14" y="8" width="20" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">左右下包围</div>
+        <div class="struct-card-en">Left-right-down surrounded</div>
+        <div class="struct-card-ex">凶、幽</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">11</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <path d="M42,6 L6,6 L6,42 L42,42" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="18" y="14" width="22" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
+        </svg>
+        <div class="struct-card-name">上左下包围</div>
+        <div class="struct-card-en">Top-left-bottom surrounded</div>
+        <div class="struct-card-ex">巨、区</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">12</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="6" y="6" width="36" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
+          <rect x="15" y="15" width="18" height="18" rx="1" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.28)"/>
+        </svg>
+        <div class="struct-card-name">全包围</div>
+        <div class="struct-card-en">Overall surrounded</div>
+        <div class="struct-card-ex">回、国</div></div>
+      <div class="struct-card">
+        <div class="struct-card-num">13</div>
+        <svg class="struct-card-svg" viewBox="0 0 48 48">
+          <rect x="6" y="6" width="32" height="32" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)" stroke-dasharray="3,2"/>
+          <rect x="12" y="12" width="32" height="32" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)" stroke-dasharray="3,2"/>
+        </svg>
+        <div class="struct-card-name">叠加结构</div>
+        <div class="struct-card-en">Overlaid</div>
+        <div class="struct-card-ex">为、书</div></div>
+    </div>
+  </div>
+</div>
+<!-- ══ end 结构参考栏 ══ -->
+
+<div class="main-content">
+
+  <!-- 学习模式 -->
+  <div id="learn-mode">
+    <div id="level-select" class="card level-select-screen">
+      <h2>选择学习级别 · Choose Your Level</h2>
+      
+      <div class="level-grid">
+        <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-label">入门 · Beginner</span><span class="level-count">Available ✓</span></button>
+        <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-label">基础 · Elementary</span><span class="level-count">Available ✓</span></button>
+        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span><span class="level-label">初级 · Pre-intermediate</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(4)"><span class="level-num">HSK 4</span><span class="level-label">中级 · Intermediate</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(5)"><span class="level-num">HSK 5</span><span class="level-label">中高级 · Upper-inter</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(6)"><span class="level-num">HSK 6</span><span class="level-label">高级 · Advanced</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(7)"><span class="level-num">HSK 7</span><span class="level-label">专业 · Professional</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(8)"><span class="level-num">HSK 8</span><span class="level-label">精通 · Mastery</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(9)"><span class="level-num">HSK 9</span><span class="level-label">卓越 · Excellence</span><span class="level-count">Coming soon</span></button>
+      </div>
+    </div>
+
+    <div id="practice-screen" style="display:none">
+      
+
+      <div class="practice-layout">
+        <!-- 左栏：Step 1 -->
+        <div class="card char-panel">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">
+            <div class="step-title" style="margin-bottom:0;white-space:nowrap"><span class="step-title-zh">① 选择拼音</span><span class="step-title-en">Choose Pinyin</span></div>
+          </div>
+          <div class="char-display">
+            <span class="main-char" id="main-char">字</span>
+            <div id="stroke-canvas"></div>
+            <button class="play-btn" id="play-btn" onclick="playStrokes()" title="Play stroke order">
+              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+          </div>
+          <div class="pinyin-section">
+            <div class="pinyin-options" id="pinyin-options"></div>
+          </div>
+          <div id="char-info" style="display:none;margin-top:14px;padding:13px;background:rgba(20,40,30,0.55);border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);font-size:0.96rem;color:#ffffff;line-height:1.7;text-align:center"></div>
+          <div class="spacer"></div>
+          <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
+            Skip · 我已认识 →
+          </button>
+        </div>
+        <!-- 中栏：例词 -->
+        <div class="card word-panel" id="word-panel">
+          <div class="step-title"><span class="step-title-zh">例词</span><span class="step-title-en">Example Word</span></div>
+          <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
+          <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
+            <div style="font-size:2.2rem;margin-bottom:10px">🔒</div>
+            <p style="font-size:0.88rem;text-align:center">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Complete Step 1 first</span></p>
+          </div>
+        </div>
+        <!-- 右栏：Step 2 -->
+        <div class="card structure-panel" id="structure-panel">
+          <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:2.2rem;margin-bottom:10px">🔒</div>
+            <p style="font-size:0.88rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Complete Step 1 first</span></p>
+          </div>
+          <div id="drag-content" style="display:none;flex:1;flex-direction:column;height:100%;min-height:0">
+            <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
+            <div class="drag-split-box">
+              <div class="drag-left">
+                <div class="drag-canvas" id="drag-canvas"></div>
+              </div>
+              <div class="drag-divider"></div>
+              <div class="drag-right" id="result-side" style="opacity:0;pointer-events:none">
+                <span class="result-char" id="result-char"></span>
+                <span class="result-label">✓ Perfect! 合并成功！</span>
+              </div>
+            </div>
+            <div class="components-pool" style="flex:1;display:flex;flex-direction:column;min-height:0">
+              
+              <div class="comp-options" id="comp-options"></div>
+            </div>
+            <div id="next-btn-wrap" style="display:none;padding:8px 0 4px">
+              <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字 · Next →</button>
+            </div>
+            <div id="merge-result" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// 汉字数据库 HSK1
+// ============================================================
+const CHAR_DB = {
+  '一':{py:'yī',en:'one',structure:'whole',components:['一'],words:[{w:'一个',py:'yī gè',en:'one (measure)'}]},
+  '二':{py:'èr',en:'two',structure:'whole',components:['二'],words:[{w:'二月',py:'èr yuè',en:'February'}]},
+  '三':{py:'sān',en:'three',structure:'whole',components:['三'],words:[{w:'三月',py:'sān yuè',en:'March'}]},
+  '四':{py:'sì',en:'four',structure:'whole',components:['四'],words:[{w:'四月',py:'sì yuè',en:'April'}]},
+  '五':{py:'wǔ',en:'five',structure:'whole',components:['五'],words:[{w:'五月',py:'wǔ yuè',en:'May'}]},
+  '六':{py:'liù',en:'six',structure:'whole',components:['六'],words:[{w:'六月',py:'liù yuè',en:'June'}]},
+  '七':{py:'qī',en:'seven',structure:'whole',components:['七'],words:[{w:'七月',py:'qī yuè',en:'July'}]},
+  '八':{py:'bā',en:'eight',structure:'whole',components:['八'],words:[{w:'八月',py:'bā yuè',en:'August'}]},
+  '九':{py:'jiǔ',en:'nine',structure:'whole',components:['九'],words:[{w:'九月',py:'jiǔ yuè',en:'September'}]},
+  '十':{py:'shí',en:'ten',structure:'whole',components:['十'],words:[{w:'十月',py:'shí yuè',en:'October'}]},
+  '口':{py:'kǒu',en:'mouth',structure:'whole',components:['口'],words:[{w:'口语',py:'kǒu yǔ',en:'spoken language'}]},
+  '大':{py:'dà',en:'big',structure:'whole',components:['大'],words:[{w:'大学',py:'dà xué',en:'university'}]},
+  '小':{py:'xiǎo',en:'small',structure:'whole',components:['小'],words:[{w:'小学',py:'xiǎo xué',en:'primary school'}]},
+  '日':{py:'rì',en:'sun / day',structure:'whole',components:['日'],words:[{w:'日本',py:'Rì běn',en:'Japan'},{w:'生日',py:'shēng rì',en:'birthday'}]},
+  '月':{py:'yuè',en:'moon / month',structure:'whole',components:['月'],words:[{w:'月亮',py:'yuè liang',en:'moon'},{w:'月份',py:'yuè fèn',en:'month'}]},
+  '人':{py:'rén',en:'person',structure:'whole',components:['人'],words:[{w:'人们',py:'rén men',en:'people'}]},
+  '女':{py:'nǚ',en:'female',structure:'whole',components:['女'],words:[{w:'女人',py:'nǚ rén',en:'woman'}]},
+  '子':{py:'zǐ',en:'child',structure:'whole',components:['子'],words:[{w:'子女',py:'zǐ nǚ',en:'children'}]},
+  '工':{py:'gōng',en:'work',structure:'whole',components:['工'],words:[{w:'工作',py:'gōng zuò',en:'work'}]},
+  '手':{py:'shǒu',en:'hand',structure:'whole',components:['手'],words:[{w:'手机',py:'shǒu jī',en:'mobile phone'}]},
+  '火':{py:'huǒ',en:'fire',structure:'whole',components:['火'],words:[{w:'火车',py:'huǒ chē',en:'train'}]},
+  '水':{py:'shuǐ',en:'water',structure:'whole',components:['水'],words:[{w:'水果',py:'shuǐ guǒ',en:'fruit'}]},
+  '牛':{py:'niú',en:'cow / ox',structure:'whole',components:['牛'],words:[{w:'牛奶',py:'niú nǎi',en:'milk'}]},
+  '米':{py:'mǐ',en:'rice / meter',structure:'whole',components:['米'],words:[{w:'米饭',py:'mǐ fàn',en:'cooked rice'}]},
+  '天':{py:'tiān',en:'sky / day',structure:'whole',components:['天'],words:[{w:'天气',py:'tiān qì',en:'weather'},{w:'今天',py:'jīn tiān',en:'today'}]},
+  '中':{py:'zhōng',en:'middle / China',structure:'whole',components:['中'],words:[{w:'中国',py:'Zhōng guó',en:'China'},{w:'中间',py:'zhōng jiān',en:'middle'}]},
+  '上':{py:'shàng',en:'up / on',structure:'whole',components:['上'],words:[{w:'上面',py:'shàng miàn',en:'above'},{w:'上课',py:'shàng kè',en:'go to class'}]},
+  '下':{py:'xià',en:'down / below',structure:'whole',components:['下'],words:[{w:'下面',py:'xià miàn',en:'below'},{w:'下雨',py:'xià yǔ',en:'it rains'}]},
+  '不':{py:'bù',en:'not / no',structure:'whole',components:['不'],words:[{w:'不是',py:'bù shì',en:'is not'},{w:'不好',py:'bù hǎo',en:'not good'}]},
+  '也':{py:'yě',en:'also / too',structure:'whole',components:['也'],words:[{w:'也是',py:'yě shì',en:'also is'}]},
+  '来':{py:'lái',en:'to come',structure:'whole',components:['来'],words:[{w:'回来',py:'huí lái',en:'come back'}]},
+  '去':{py:'qù',en:'to go',structure:'whole',components:['去'],words:[{w:'出去',py:'chū qù',en:'go out'}]},
+  '出':{py:'chū',en:'to go out',structure:'whole',components:['出'],words:[{w:'出来',py:'chū lái',en:'come out'}]},
+  '文':{py:'wén',en:'language / writing',structure:'whole',components:['文'],words:[{w:'文化',py:'wén huà',en:'culture'}]},
+  '儿':{py:'ér',en:'child / son',structure:'whole',components:['儿'],words:[{w:'儿子',py:'ér zi',en:'son'}]},
+  '么':{py:'me',en:'particle',structure:'whole',components:['么'],words:[{w:'什么',py:'shén me',en:'what'}]},
+  '了':{py:'le',en:'completion particle',structure:'whole',components:['了'],words:[{w:'好了',py:'hǎo le',en:'done / alright'}]},
+  '两':{py:'liǎng',en:'two / both',structure:'whole',components:['两'],words:[{w:'两个',py:'liǎng ge',en:'two of'}]},
+  '半':{py:'bàn',en:'half',structure:'whole',components:['半'],words:[{w:'半天',py:'bàn tiān',en:'half a day'}]},
+  '千':{py:'qiān',en:'thousand',structure:'whole',components:['千'],words:[{w:'千万',py:'qiān wàn',en:'never / ten million'}]},
+  '元':{py:'yuán',en:'yuan (currency)',structure:'whole',components:['元'],words:[{w:'元旦',py:'Yuán Dàn',en:"New Year's Day"}]},
+  '生':{py:'shēng',en:'student / give birth',structure:'whole',components:['生'],words:[{w:'学生',py:'xué shēng',en:'student'},{w:'生日',py:'shēng rì',en:'birthday'}]},
+  '开':{py:'kāi',en:'to open / start',structure:'whole',components:['开'],words:[{w:'开始',py:'kāi shǐ',en:'to start'}]},
+  '关':{py:'guān',en:'to close / about',structure:'whole',components:['关'],words:[{w:'关系',py:'guān xi',en:'relationship'}]},
+  '电':{py:'diàn',en:'electricity',structure:'whole',components:['电'],words:[{w:'电话',py:'diàn huà',en:'telephone'},{w:'电视',py:'diàn shì',en:'TV'}]},
+  '雨':{py:'yǔ',en:'rain',structure:'whole',components:['雨'],words:[{w:'下雨',py:'xià yǔ',en:'it rains'}]},
+  '门':{py:'mén',en:'door / gate',structure:'whole',components:['门'],words:[{w:'门口',py:'mén kǒu',en:'doorway'}]},
+  '书':{py:'shū',en:'book',structure:'ov',components:['书'],words:[{w:'读书',py:'dú shū',en:'read / study'}]},
+  '为':{py:'wèi',en:'for / because of',structure:'ov',components:['为'],words:[{w:'因为',py:'yīn wèi',en:'because'},{w:'为了',py:'wèi le',en:'in order to'}]},
+  // ── 左右结构 ──
+  '你':{py:'nǐ',en:'you',structure:'lr',components:['亻','尔'],compNames:['人旁','尔'],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
+  '好':{py:'hǎo',en:'good',structure:'lr',components:['女','子'],compNames:['女','子'],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
+  '妈':{py:'mā',en:'mother',structure:'lr',components:['女','马'],compNames:['女旁','马'],words:[{w:'妈妈',py:'māma',en:'mother; mom',lv:1}]},
+  '姐':{py:'jiě',en:'elder sister',structure:'lr',components:['女','且'],compNames:['女旁','且'],words:[{w:'姐姐',py:'jiějie',en:'elder sister',lv:1}]},
+  '妹':{py:'mèi',en:'younger sister',structure:'lr',components:['女','未'],compNames:['女旁','未'],words:[{w:'妹妹',py:'mèimei',en:'younger sister',lv:1}]},
+  '他':{py:'tā',en:'he / him',structure:'lr',components:['亻','也'],compNames:['人旁','也'],words:[{w:'他们',py:'tāmen',en:'they (male)',lv:1}]},
+  '她':{py:'tā',en:'she / her',structure:'lr',components:['女','也'],compNames:['女旁','也'],words:[{w:'她们',py:'tāmen',en:'they (female)',lv:1}]},
+  '们':{py:'men',en:'plural marker',structure:'lr',components:['亻','门'],compNames:['人旁','门'],words:[{w:'我们',py:'wǒmen',en:'we; us',lv:1}]},
+  '时':{py:'shí',en:'time',structure:'lr',components:['日','寸'],compNames:['日','寸'],words:[{w:'时候',py:'shíhou',en:'time; moment',lv:1}]},
+  '明':{py:'míng',en:'bright / clear',structure:'lr',components:['日','月'],compNames:['日','月'],words:[{w:'明天',py:'míngtiān',en:'tomorrow',lv:1}]},
+  '吃':{py:'chī',en:'to eat',structure:'lr',components:['口','乞'],compNames:['口旁','乞'],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
+  '吗':{py:'ma',en:'question particle',structure:'lr',components:['口','马'],compNames:['口旁','马'],words:[{w:'是吗',py:'shì ma',en:'is that so?',lv:1}]},
+  '吧':{py:'ba',en:'suggestion particle',structure:'lr',components:['口','巴'],compNames:['口旁','巴'],words:[{w:'好吧',py:'hǎo ba',en:'alright then',lv:1}]},
+  '喝':{py:'hē',en:'to drink',structure:'lr',components:['口','曷'],compNames:['口旁','曷'],words:[{w:'喝水',py:'hē shuǐ',en:'drink water',lv:1}]},
+  '说':{py:'shuō',en:'to speak',structure:'lr',components:['讠','兑'],compNames:['言旁','兑'],words:[{w:'说话',py:'shuō huà',en:'speak; talk',lv:1}]},
+  '读':{py:'dú',en:'to read',structure:'lr',components:['讠','卖'],compNames:['言旁','卖'],words:[{w:'读书',py:'dú shū',en:'read; study',lv:1}]},
+  '请':{py:'qǐng',en:'please / invite',structure:'lr',components:['讠','青'],compNames:['言旁','青'],words:[{w:'请问',py:'qǐngwèn',en:'excuse me; may I ask',lv:1}]},
+  '谢':{py:'xiè',en:'to thank',structure:'lr',components:['讠','射'],compNames:['言旁','射'],words:[{w:'谢谢',py:'xièxie',en:'thank you',lv:1}]},
+  '认':{py:'rèn',en:'to recognize',structure:'lr',components:['讠','人'],compNames:['言旁','忍'],words:[{w:'认识',py:'rènshi',en:'know sb.; recognize',lv:1}]},
+  '语':{py:'yǔ',en:'language',structure:'lr',components:['讠','吾'],compNames:['言旁','吾'],words:[{w:'语言',py:'yǔyán',en:'language',lv:2}]},
+  '话':{py:'huà',en:'speech / word',structure:'lr',components:['讠','舌'],compNames:['言旁','舌'],words:[{w:'电话',py:'diànhuà',en:'telephone',lv:1}]},
+  '汉':{py:'hàn',en:'Chinese / Han',structure:'lr',components:['氵','又'],compNames:['水旁','又'],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
+  '没':{py:'méi',en:'not / without',structure:'lr',components:['氵','殳'],compNames:['水旁','殳'],words:[{w:'没有',py:'méiyǒu',en:'don\'t have; there is no',lv:1}]},
+  '打':{py:'dǎ',en:'to hit / play',structure:'lr',components:['扌','丁'],compNames:['手旁','丁'],words:[{w:'打电话',py:'dǎ diànhuà',en:'make a phone call',lv:1}]},
+  '找':{py:'zhǎo',en:'to look for',structure:'lr',components:['扌','戈'],compNames:['手旁','戈'],words:[{w:'找到',py:'zhǎodào',en:'find; found',lv:2}]},
+  '玩':{py:'wán',en:'to play',structure:'lr',components:['王','元'],compNames:['王旁','元'],words:[{w:'玩儿',py:'wánr',en:'play; have fun',lv:1}]},
+  '在':{py:'zài',en:'at / in / on',structure:'lr',components:['才','土'],compNames:['才','土'],words:[{w:'现在',py:'xiànzài',en:'now',lv:1}]},
+  '忙':{py:'máng',en:'busy',structure:'lr',components:['忄','亡'],compNames:['心旁','亡'],words:[{w:'帮忙',py:'bāng máng',en:'help; do a favor',lv:1}]},
+  '我':{py:'wǒ',en:'I / me',structure:'whole',components:['我'],compNames:['我'],words:[{w:'我们',py:'wǒ men',en:'we/us'}]},
+  '很':{py:'hěn',en:'very',structure:'lr',components:['彳','艮'],compNames:['双人旁','艮'],words:[{w:'很好',py:'hěn hǎo',en:'very good',lv:1}]},
+  '对':{py:'duì',en:'correct / towards',structure:'lr',components:['又','寸'],compNames:['又','寸'],words:[{w:'对不起',py:'duìbuqǐ',en:'sorry; excuse me',lv:1}]},
+  '什':{py:'shén',en:'what (in 什么)',structure:'lr',components:['亻','十'],compNames:['人旁','十'],words:[{w:'什么',py:'shénme',en:'what',lv:1}]},
+  '那':{py:'nà',en:'that',structure:'whole',components:['那'],compNames:['那'],words:[{w:'那么',py:'nàme',en:'then; in that way',lv:1}]},
+  '哪':{py:'nǎ',en:'which',structure:'lr',components:['口','那'],compNames:['口旁','那'],words:[{w:'哪里',py:'nǎlǐ',en:'where',lv:1}]},
+  '钱':{py:'qián',en:'money',structure:'lr',components:['钅','戋'],compNames:['金旁','戋'],words:[{w:'钱包',py:'qiánbāo',en:'wallet',lv:2}]},
+  '钟':{py:'zhōng',en:'clock / bell',structure:'lr',components:['钅','中'],compNames:['金旁','中'],words:[{w:'钟表',py:'zhōngbiǎo',en:'clock; watch',lv:2}]},
+  '饭':{py:'fàn',en:'meal / rice',structure:'lr',components:['饣','反'],compNames:['食旁','反'],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
+  '冷':{py:'lěng',en:'cold',structure:'lr',components:['冫','令'],compNames:['冰旁','令'],words:[{w:'冷静',py:'lěngjìng',en:'calm; cool-headed',lv:3}]},
+  '睡':{py:'shuì',en:'to sleep',structure:'lr',components:['目','垂'],compNames:['目旁','垂'],words:[{w:'睡觉',py:'shuìjiào',en:'sleep',lv:1}]},
+  '知':{py:'zhī',en:'to know',structure:'lr',components:['矢','口'],compNames:['矢','口'],words:[{w:'知道',py:'zhīdào',en:'know',lv:1}]},
+  '住':{py:'zhù',en:'to live',structure:'lr',components:['亻','主'],compNames:['人旁','主'],words:[{w:'住在',py:'zhù zài',en:'live at',lv:1}]},
+  '作':{py:'zuò',en:'to do / make',structure:'lr',components:['亻','乍'],compNames:['人旁','乍'],words:[{w:'工作',py:'gōngzuò',en:'work; job',lv:1}]},
+  '做':{py:'zuò',en:'to do (colloquial)',structure:'lr',components:['亻','故'],compNames:['人旁','故'],words:[{w:'做饭',py:'zuò fàn',en:'cook',lv:1}]},
+  '朋':{py:'péng',en:'friend',structure:'lr',components:['月','月'],compNames:['月(左)','月(右)'],words:[{w:'朋友',py:'péngyou',en:'friend',lv:1}]},
+  '以':{py:'yǐ',en:'by means of',structure:'whole',components:['以'],compNames:['以'],words:[{w:'可以',py:'kě yǐ',en:'can/may'}]},
+  '校':{py:'xiào',en:'school',structure:'lr',components:['木','交'],compNames:['木旁','交'],words:[{w:'学校',py:'xuéxiào',en:'school',lv:1}]},
+  '课':{py:'kè',en:'class / lesson',structure:'lr',components:['讠','果'],compNames:['言旁','果'],words:[{w:'上课',py:'shàng kè',en:'go to class',lv:1}]},
+  // ── 上下结构 ──
+  '爸':{py:'bà',en:'father',structure:'tb',components:['父','巴'],compNames:['父','巴'],words:[{w:'爸爸',py:'bàba',en:'father; dad',lv:1}]},
+  '家':{py:'jiā',en:'home / family',structure:'tb',components:['宀','豕'],compNames:['宝盖','豕'],words:[{w:'家庭',py:'jiātíng',en:'family',lv:2}]},
+  '客':{py:'kè',en:'guest',structure:'tb',components:['宀','各'],compNames:['宝盖','各'],words:[{w:'客人',py:'kèrén',en:'guest',lv:2}]},
+  '字':{py:'zì',en:'character',structure:'tb',components:['宀','子'],compNames:['宝盖','子'],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
+  '学':{py:'xué',en:'to study',structure:'tmb',components:['⺌','冖','子'],compNames:['小字头','秃宝盖','子'],words:[{w:'学习',py:'xuéxí',en:'study; learn',lv:1}]},
+  '早':{py:'zǎo',en:'early / morning',structure:'tb',components:['日','十'],compNames:['日','十'],words:[{w:'早上',py:'zǎoshang',en:'morning',lv:1}]},
+  '星':{py:'xīng',en:'star',structure:'tb',components:['日','生'],compNames:['日','生'],words:[{w:'星期',py:'xīngqī',en:'week',lv:1}]},
+  '是':{py:'shì',en:'to be',structure:'tb',components:['日','疋'],compNames:['日','疋'],words:[{w:'是的',py:'shì de',en:'yes; that\'s right',lv:1}]},
+  '名':{py:'míng',en:'name / famous',structure:'tb',components:['夕','口'],compNames:['夕','口'],words:[{w:'名字',py:'míngzi',en:'name',lv:1}]},
+  '多':{py:'duō',en:'many / much',structure:'tb',components:['夕','夕'],compNames:['夕(上)','夕(下)'],words:[{w:'多少',py:'duōshao',en:'how many; how much',lv:1}]},
+  '高':{py:'gāo',en:'tall / high',structure:'whole',components:['高'],compNames:['高'],words:[{w:'高兴',py:'gāoxìng',en:'happy; glad',lv:1}]},
+  '想':{py:'xiǎng',en:'to think / want',structure:'tb',components:['相','心'],compNames:['相','心'],words:[{w:'想法',py:'xiǎngfǎ',en:'idea; thought',lv:2}]},
+  '思':{py:'sī',en:'to think',structure:'tb',components:['田','心'],compNames:['田','心'],words:[{w:'意思',py:'yìsi',en:'meaning',lv:1}]},
+  '男':{py:'nán',en:'male',structure:'tb',components:['田','力'],compNames:['田','力'],words:[{w:'男人',py:'nánrén',en:'man',lv:1}]},
+  '看':{py:'kàn',en:'to look / watch',structure:'tb',components:['手','目'],compNames:['手','目'],words:[{w:'看书',py:'kàn shū',en:'read a book',lv:1}]},
+  '花':{py:'huā',en:'flower',structure:'tb',components:['艹','化'],compNames:['草头','化'],words:[{w:'花儿',py:'huār',en:'flower',lv:1}]},
+  '茶':{py:'chá',en:'tea',structure:'tb',components:['艹','余'],compNames:['草头','余'],words:[{w:'茶叶',py:'cháyè',en:'tea leaves',lv:2}]},
+  '菜':{py:'cài',en:'vegetable / dish',structure:'tb',components:['艹','采'],compNames:['草头','采'],words:[{w:'蔬菜',py:'shūcài',en:'vegetable',lv:2}]},
+  '分':{py:'fēn',en:'minute / divide',structure:'tb',components:['八','刀'],compNames:['八','刀'],words:[{w:'分钟',py:'fēnzhōng',en:'minute',lv:1}]},
+  '热':{py:'rè',en:'hot',structure:'tb',components:['执','灬'],compNames:['执','灬'],words:[{w:'热情',py:'rèqíng',en:'enthusiastic; warm',lv:2}]},
+  '点':{py:'diǎn',en:"o'clock / dot",structure:'tb',components:['占','灬'],compNames:['占','灬'],words:[{w:'一点儿',py:'yīdiǎnr',en:'a little; a bit',lv:1}]},
+  '年':{py:'nián',en:'year',structure:'whole',components:['年'],compNames:['年'],compNames:['年'],words:[{w:'今年',py:'jīnnián',en:'this year',lv:1}]},
+  '百':{py:'bǎi',en:'hundred',structure:'tb',components:['一','白'],compNames:['一','白'],words:[{w:'百分之',py:'bǎi fēn zhī',en:'percent',lv:2}]},
+  '会':{py:'huì',en:'can / meeting',structure:'tb',components:['人','云'],compNames:['人','云'],words:[{w:'开会',py:'kāi huì',en:'hold a meeting',lv:1}]},
+  '雪':{py:'xuě',en:'snow',structure:'tb',components:['雨','彐'],compNames:['雨字头','彐(下部)'],compNames:['雨字头','彐(下部)'],words:[{w:'下雪',py:'xià xuě',en:'it snows',lv:1}]},
+  '喜':{py:'xǐ',en:'happy / like',structure:'tb',components:['壴','口'],compNames:['壴(上部)','口'],words:[{w:'喜欢',py:'xǐhuan',en:'like; be fond of',lv:1}]},
+  '班':{py:'bān',en:'class / shift',structure:'lcr',components:['王','刀','王'],compNames:['王','刀','王'],words:[{w:'上班',py:'shàng bān',en:'go to work',lv:1}]},
+  // ── 全包围 ──
+  '国':{py:'guó',en:'country',structure:'full',components:['囗','玉'],compNames:['国框','玉'],words:[{w:'中国',py:'Zhōngguó',en:'China',lv:1}]},
+  '回':{py:'huí',en:'to return',structure:'full',components:['囗','口'],compNames:['大口','小口'],words:[{w:'回来',py:'huí lái',en:'come back',lv:1}]},
+  '因':{py:'yīn',en:'cause / because',structure:'full',components:['囗','大'],compNames:['国框','大'],words:[{w:'因为',py:'yīnwèi',en:'because',lv:1}]},
+  // ── 左上右包围 ──
+  '同':{py:'tóng',en:'same / together',structure:'whole',components:['同'],compNames:['同'],words:[{w:'同学',py:'tóngxué',en:'classmate',lv:1}]},
+  '间':{py:'jiān',en:'between / room',structure:'lur',components:['门','日'],compNames:['门框','日'],words:[{w:'时间',py:'shíjiān',en:'time',lv:1}]},
+  '问':{py:'wèn',en:'to ask',structure:'lur',components:['门','口'],compNames:['门框','口'],words:[{w:'问题',py:'wèntí',en:'question; problem',lv:1}]},
+  // ── 右上包围 ──
+  '可':{py:'kě',en:'can / may',structure:'ur',components:['丁','口'],compNames:['丁','口'],words:[{w:'可以',py:'kěyǐ',en:'can; may',lv:1}]},
+  '司':{py:'sī',en:'manage / company',structure:'whole',components:['司'],compNames:['司'],words:[{w:'公司',py:'gōng sī',en:'company'}]},
+  // ── 左上包围 ──
+  '病':{py:'bìng',en:'illness',structure:'lu',components:['疒','丙'],compNames:['疒旁','丙'],words:[{w:'生病',py:'shēng bìng',en:'get sick',lv:1}]},
+  '房':{py:'fáng',en:'room / house',structure:'lu',components:['户','方'],compNames:['户框','方'],words:[{w:'房间',py:'fángjiān',en:'room',lv:1}]},
+  // ── 左下包围 ──
+  '这':{py:'zhè',en:'this',structure:'ld',components:['辶','文'],compNames:['走之旁','文'],words:[{w:'这里',py:'zhèlǐ',en:'here',lv:1}]},
+  '进':{py:'jìn',en:'to enter',structure:'ld',components:['辶','井'],compNames:['走之旁','井'],words:[{w:'进来',py:'jìn lái',en:'come in',lv:1}]},
+  '还':{py:'hái',en:'still / also',structure:'ld',components:['辶','不'],compNames:['走之旁','不'],words:[{w:'还是',py:'háishi',en:'still; or',lv:1}]},
+  '几':{py:'jǐ',en:'how many; several',structure:'whole',components:['几'],compNames:['几'],words:[{w:'几个',py:'jǐ ge',en:'how many'}]},
+  '个':{py:'gè',en:'(general measure word)',structure:'whole',components:['个'],compNames:['个'],words:[{w:'一个',py:'yī ge',en:'one (item)'}]},
+  '块':{py:'kuài',en:'piece',structure:'lr',components:['土','夬'],compNames:['土旁','夬'],words:[{w:'一块',py:'yī kuài',en:'one piece/yuan',lv:1}]},
+  '岁':{py:'suì',en:'years (of age)',structure:'tb',components:['山','夕'],compNames:['山','夕'],words:[{w:'几岁',py:'jǐ suì',en:'how old',lv:1}]},
+  '零':{py:'líng',en:'zero',structure:'tb',components:['雨','令'],compNames:['雨字头','令'],words:[{w:'零下',py:'líng xià',en:'below zero',lv:1}]},
+  '东':{py:'dōng',en:'east',structure:'whole',components:['东'],compNames:['东'],words:[{w:'东西',py:'dōng xi',en:'thing'}]},
+  '西':{py:'xī',en:'west',structure:'whole',components:['西'],compNames:['西'],words:[{w:'东西',py:'dōng xi',en:'thing'}]},
+  '里':{py:'lǐ',en:'inside',structure:'whole',components:['里'],compNames:['里'],words:[{w:'哪里',py:'nǎ lǐ',en:'where'}]},
+  '外':{py:'wài',en:'outside',structure:'lr',components:['夕','卜'],compNames:['夕','卜'],words:[{w:'外面',py:'wài miàn',en:'outside',lv:1}]},
+  '前':{py:'qián',en:'front; before',structure:'tb',components:['丷','刖'],compNames:['丷','刖'],words:[{w:'前面',py:'qián miàn',en:'front',lv:1}]},
+  '后':{py:'hòu',en:'back; after',structure:'lu',components:['厂','口'],compNames:['厂旁','口'],words:[{w:'后面',py:'hòu miàn',en:'behind',lv:1}]},
+  '边':{py:'biān',en:'side; edge',structure:'ld',components:['辶','力'],compNames:['走之旁','力'],words:[{w:'旁边',py:'páng biān',en:'beside',lv:1}]},
+  '面':{py:'miàn',en:'face; side; noodle',structure:'whole',components:['面'],compNames:['面'],words:[{w:'前面',py:'qián miàn',en:'front'}]},
+  '今':{py:'jīn',en:'today; now',structure:'whole',components:['今'],compNames:['今'],words:[{w:'今天',py:'jīn tiān',en:'today'}]},
+  '晚':{py:'wǎn',en:'late; evening',structure:'lr',components:['日','免'],compNames:['日旁','免'],words:[{w:'晚上',py:'wǎn shang',en:'evening',lv:1}]},
+  '昨':{py:'zuó',en:'yesterday',structure:'lr',components:['日','乍'],compNames:['日旁','乍'],words:[{w:'昨天',py:'zuó tiān',en:'yesterday',lv:1}]},
+  '期':{py:'qī',en:'period; week',structure:'lr',components:['其','月'],compNames:['其','月'],words:[{w:'星期',py:'xīng qī',en:'week',lv:1}]},
+  '候':{py:'hòu',en:'time; wait',structure:'lr',components:['亻','侯'],compNames:['人旁','侯'],words:[{w:'时候',py:'shí hou',en:'time',lv:1}]},
+  '现':{py:'xiàn',en:'present; now',structure:'lr',components:['王','见'],compNames:['王旁','见'],words:[{w:'现在',py:'xiàn zài',en:'now',lv:1}]},
+  '它':{py:'tā',en:'it',structure:'tb',components:['宀','匕'],compNames:['宝盖','匕'],words:[{w:'它们',py:'tā men',en:'they (non-human)',lv:1}]},
+  '您':{py:'nín',en:'you (respectful)',structure:'tb',components:['你','心'],compNames:['你','心'],words:[{w:'您好',py:'nín hǎo',en:'hello (polite)',lv:1}]},
+  '呢':{py:'ne',en:'(question particle)',structure:'lr',components:['口','尼'],compNames:['口旁','尼'],words:[{w:'你呢',py:'nǐ ne',en:'and you?',lv:1}]},
+  '些':{py:'xiē',en:'some; few',structure:'tb',components:['此','二'],compNames:['此','二'],words:[{w:'一些',py:'yī xiē',en:'some',lv:1}]},
+  '只':{py:'zhī',en:'only; (measure)',structure:'tb',components:['口','八'],compNames:['口','八'],words:[{w:'一只',py:'yī zhī',en:'one (animal)',lv:1}]},
+  '买':{py:'mǎi',en:'to buy',structure:'tb',components:['乛','头'],compNames:['乛','头'],words:[{w:'买东西',py:'mǎi dōng xi',en:'go shopping',lv:1}]},
+  '卖':{py:'mài',en:'to sell',structure:'tb',components:['十','买'],compNames:['十','买'],words:[{w:'卖东西',py:'mài dōng xi',en:'sell things',lv:2}]},
+  '叫':{py:'jiào',en:'to call; be called',structure:'lr',components:['口','丩'],compNames:['口旁','丩'],words:[{w:'叫做',py:'jiào zuò',en:'be called',lv:1}]},
+  '听':{py:'tīng',en:'to listen',structure:'lr',components:['口','斤'],compNames:['口旁','斤'],words:[{w:'听说',py:'tīng shuō',en:'hear that',lv:1}]},
+  '唱':{py:'chàng',en:'to sing',structure:'lr',components:['口','昌'],compNames:['口旁','昌'],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
+  '坐':{py:'zuò',en:'to sit',structure:'tb',components:['从','土'],compNames:['从','土'],words:[{w:'请坐',py:'qǐng zuò',en:'please sit',lv:1}]},
+  '穿':{py:'chuān',en:'to wear',structure:'tb',components:['穴','牙'],compNames:['穴字头','牙'],words:[{w:'穿衣服',py:'chuān yī fu',en:'wear clothes',lv:1}]},
+  '能':{py:'néng',en:'can; able to',structure:'whole',components:['能'],compNames:['能'],words:[{w:'能够',py:'néng gòu',en:'be able to',lv:1}]},
+  '要':{py:'yào',en:'want; need',structure:'tb',components:['西','女'],compNames:['西','女'],words:[{w:'要是',py:'yào shi',en:'if',lv:1}]},
+  '见':{py:'jiàn',en:'to see',structure:'whole',components:['见'],compNames:['见'],words:[{w:'见面',py:'jiàn miàn',en:'meet'}]},
+  '到':{py:'dào',en:'to arrive',structure:'lr',components:['至','刂'],compNames:['至','刂'],words:[{w:'到家',py:'dào jiā',en:'arrive home',lv:1}]},
+  '飞':{py:'fēi',en:'to fly',structure:'whole',components:['飞'],compNames:['飞'],words:[{w:'飞机',py:'fēi jī',en:'airplane'}]},
+  '起':{py:'qǐ',en:'to rise; get up',structure:'ld',components:['走','己'],compNames:['走旁','己'],words:[{w:'起来',py:'qǐ lái',en:'get up',lv:1}]},
+  '写':{py:'xiě',en:'to write',structure:'tb',components:['冖','与'],compNames:['秃宝盖','与'],words:[{w:'写字',py:'xiě zì',en:'write',lv:1}]},
+  '识':{py:'shí',en:'to know; recognize',structure:'lr',components:['讠','只'],compNames:['言旁','只'],words:[{w:'认识',py:'rèn shi',en:'know',lv:1}]},
+  '视':{py:'shì',en:'to see; vision',structure:'lr',components:['礻','见'],compNames:['示旁','见'],words:[{w:'电视',py:'diàn shì',en:'TV',lv:1}]},
+  '觉':{py:'jué',en:'to feel; sense',structure:'tmb',components:['⺌','冖','见'],compNames:['小字头','秃宝盖','见'],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
+  '谁':{py:'shéi',en:'who',structure:'lr',components:['讠','隹'],compNames:['言旁','隹'],words:[{w:'是谁',py:'shì shéi',en:'who is it',lv:1}]},
+  '得':{py:'de',en:'(structural particle)',structure:'lr',components:['彳','㝵'],compNames:['双人旁','㝵'],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
+  '兴':{py:'xìng',en:'interest; mood',structure:'tmb',components:['⺌','一','八'],compNames:['小字头','一','八'],words:[{w:'高兴',py:'gāo xìng',en:'happy',lv:1}]},
+  '休':{py:'xiū',en:'rest',structure:'lr',components:['亻','木'],compNames:['人旁','木'],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
+  '息':{py:'xī',en:'breath; rest',structure:'tb',components:['自','心'],compNames:['自','心'],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
+  '爱':{py:'ài',en:'to love',structure:'tb',components:['爫','友'],compNames:['爪字头','友'],words:[{w:'爱好',py:'ài hào',en:'hobby',lv:1}]},
+  '欢':{py:'huān',en:'happy; joyful',structure:'lr',components:['又','欠'],compNames:['又','欠'],words:[{w:'喜欢',py:'xǐ huan',en:'like',lv:1}]},
+  '正':{py:'zhèng',en:'right; just',structure:'whole',components:['正'],compNames:['正'],words:[{w:'正在',py:'zhèng zài',en:'be doing',lv:1}]},
+  '真':{py:'zhēn',en:'true; really',structure:'whole',components:['真'],compNames:['真'],words:[{w:'真的',py:'zhēn de',en:'really',lv:1}]},
+  '再':{py:'zài',en:'again',structure:'whole',components:['再'],compNames:['再'],words:[{w:'再见',py:'zài jiàn',en:'goodbye'}]},
+  '怎':{py:'zěn',en:'how',structure:'tb',components:['乍','心'],compNames:['乍','心'],words:[{w:'怎么',py:'zěn me',en:'how',lv:1}]},
+  '床':{py:'chuáng',en:'bed',structure:'lu',components:['广','木'],compNames:['广字旁','木'],words:[{w:'起床',py:'qǐ chuáng',en:'get up',lv:1}]},
+  '桌':{py:'zhuō',en:'table',structure:'tmb',components:['卜','日','木'],compNames:['卜','日','木'],words:[{w:'桌子',py:'zhuō zi',en:'table',lv:1}]},
+  '椅':{py:'yǐ',en:'chair',structure:'lr',components:['木','奇'],compNames:['木旁','奇'],words:[{w:'椅子',py:'yǐ zi',en:'chair',lv:1}]},
+  '杯':{py:'bēi',en:'cup',structure:'lr',components:['木','不'],compNames:['木旁','不'],words:[{w:'杯子',py:'bēi zi',en:'cup',lv:1}]},
+  '本':{py:'běn',en:'book; root',structure:'whole',components:['本'],compNames:['本'],words:[{w:'本子',py:'běn zi',en:'notebook',lv:1}]},
+  '机':{py:'jī',en:'machine',structure:'lr',components:['木','几'],compNames:['木旁','几'],words:[{w:'飞机',py:'fēi jī',en:'airplane',lv:1}]},
+  '车':{py:'chē',en:'vehicle',structure:'whole',components:['车'],compNames:['车'],words:[{w:'汽车',py:'qì chē',en:'car'}]},
+  '衣':{py:'yī',en:'clothing',structure:'whole',components:['衣'],compNames:['衣'],words:[{w:'衣服',py:'yī fu',en:'clothes'}]},
+  '服':{py:'fú',en:'clothes; service',structure:'lr',components:['月','㔾'],compNames:['月旁','㔾'],words:[{w:'衣服',py:'yī fu',en:'clothes',lv:1}]},
+  '果':{py:'guǒ',en:'fruit; result',structure:'whole',components:['果'],compNames:['果'],words:[{w:'水果',py:'shuǐ guǒ',en:'fruit'}]},
+  '苹':{py:'píng',en:'apple (in 苹果)',structure:'tb',components:['艹','平'],compNames:['草头','平'],words:[{w:'苹果',py:'píng guǒ',en:'apple',lv:1}]},
+  '蛋':{py:'dàn',en:'egg',structure:'tb',components:['疋','虫'],compNames:['疋','虫'],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
+  '鸡':{py:'jī',en:'chicken',structure:'lr',components:['又','鸟'],compNames:['又','鸟'],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
+  '狗':{py:'gǒu',en:'dog',structure:'lr',components:['犭','句'],compNames:['犬旁','句'],words:[{w:'小狗',py:'xiǎo gǒu',en:'puppy',lv:1}]},
+  '猫':{py:'māo',en:'cat',structure:'lr',components:['犭','苗'],compNames:['犬旁','苗'],words:[{w:'小猫',py:'xiǎo māo',en:'kitten',lv:1}]},
+  '题':{py:'tí',en:'topic; question',structure:'lr',components:['是','页'],compNames:['是','页'],words:[{w:'问题',py:'wèn tí',en:'question',lv:1}]},
+  '事':{py:'shì',en:'matter; affair',structure:'whole',components:['事'],compNames:['事'],words:[{w:'事情',py:'shì qing',en:'matter',lv:1}]},
+  '影':{py:'yǐng',en:'shadow; movie',structure:'lr',components:['景','彡'],compNames:['景','彡'],words:[{w:'电影',py:'diàn yǐng',en:'movie',lv:1}]},
+  '院':{py:'yuàn',en:'courtyard; institute',structure:'lr',components:['阝','完'],compNames:['阝旁','完'],words:[{w:'医院',py:'yī yuàn',en:'hospital',lv:1}]},
+  '医':{py:'yī',en:'medicine; doctor',structure:'tlb',components:['匚','矢'],compNames:['匚','矢'],words:[{w:'医生',py:'yī shēng',en:'doctor',lv:1}]},
+  '商':{py:'shāng',en:'commerce',structure:'tb',components:['亠','㕯'],compNames:['亠','㕯'],words:[{w:'商店',py:'shāng diàn',en:'shop',lv:1}]},
+  '士':{py:'shì',en:'scholar; gentleman',structure:'whole',components:['士'],compNames:['士'],words:[{w:'女士',py:'nǚ shì',en:'lady',lv:1}]},
+  '市':{py:'shì',en:'market; city',structure:'whole',components:['市'],compNames:['市'],words:[{w:'市场',py:'shì chǎng',en:'market'}]},
+  '友':{py:'yǒu',en:'friend',structure:'lu',components:['ナ','又'],compNames:['ナ','又'],words:[{w:'朋友',py:'péng yǒu',en:'friend',lv:1}]},
+  '哥':{py:'gē',en:'elder brother',structure:'tb',components:['可','可'],compNames:['可(上)','可(下)'],words:[{w:'哥哥',py:'gē ge',en:'elder brother',lv:1}]},
+  '弟':{py:'dì',en:'younger brother',structure:'whole',components:['弟'],compNames:['弟'],words:[{w:'弟弟',py:'dì di',en:'younger brother'}]},
+  '奶':{py:'nǎi',en:'milk; grandma',structure:'lr',components:['女','乃'],compNames:['女旁','乃'],words:[{w:'牛奶',py:'niú nǎi',en:'milk',lv:1}]},
+  '老':{py:'lǎo',en:'old',structure:'whole',components:['老'],compNames:['老'],words:[{w:'老师',py:'lǎo shī',en:'teacher',lv:1}]},
+  '师':{py:'shī',en:'teacher; master',structure:'lr',components:['丿','帀'],compNames:['丿','帀'],words:[{w:'老师',py:'lǎo shī',en:'teacher',lv:1}]},
+  '孩':{py:'hái',en:'child',structure:'lr',components:['子','亥'],compNames:['子旁','亥'],words:[{w:'孩子',py:'hái zi',en:'child',lv:1}]},
+  '脑':{py:'nǎo',en:'brain',structure:'lr',components:['月','㘝'],compNames:['月旁','㘝'],words:[{w:'电脑',py:'diàn nǎo',en:'computer',lv:1}]},
+  '白':{py:'bái',en:'white',structure:'whole',components:['白'],compNames:['白'],words:[{w:'白色',py:'bái sè',en:'white color',lv:1}]},
+  '号':{py:'hào',en:'number',structure:'tb',components:['口','丂'],compNames:['口','丂'],words:[{w:'号码',py:'hào mǎ',en:'number',lv:1}]},
+  '气':{py:'qì',en:'air; gas',structure:'whole',components:['气'],compNames:['气'],words:[{w:'天气',py:'tiān qì',en:'weather'}]},
+  '亮':{py:'liàng',en:'bright',structure:'tmb',components:['亠','口','几'],compNames:['亠','口','几'],words:[{w:'月亮',py:'yuè liang',en:'moon',lv:1}]},
+  '漂':{py:'piào',en:'pretty (in 漂亮)',structure:'lr',components:['氵','票'],compNames:['水旁','票'],words:[{w:'漂亮',py:'piào liang',en:'pretty',lv:1}]},
+  '贵':{py:'guì',en:'expensive',structure:'tb',components:['中','贝'],compNames:['中','贝'],words:[{w:'贵姓',py:'guì xìng',en:'(your) surname',lv:1}]},
+  '便':{py:'pián',en:'cheap (in 便宜)',structure:'lr',components:['亻','更'],compNames:['人旁','更'],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
+  '宜':{py:'yí',en:'suitable; (in 便宜)',structure:'tb',components:['宀','且'],compNames:['宝盖','且'],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
+  '新':{py:'xīn',en:'new',structure:'lr',components:['亲','斤'],compNames:['亲','斤'],words:[{w:'新年',py:'xīn nián',en:'New Year',lv:1}]},
+  '超':{py:'chāo',en:'exceed; super',structure:'ld',components:['走','召'],compNames:['走旁','召'],words:[{w:'超市',py:'chāo shì',en:'supermarket',lv:1}]},
+  '太':{py:'tài',en:'too; very',structure:'whole',components:['太'],compNames:['太'],words:[{w:'太好了',py:'tài hǎo le',en:'great!',lv:1}]},
+  '少':{py:'shǎo',en:'few; little',structure:'whole',components:['少'],compNames:['少'],words:[{w:'多少',py:'duō shao',en:'how many',lv:1}]},
+  '非':{py:'fēi',en:'not; non-',structure:'whole',components:['非'],compNames:['非'],words:[{w:'非常',py:'fēi cháng',en:'very',lv:1}]},
+  '常':{py:'cháng',en:'often; usual',structure:'tmb',components:['⺌','冖','巾'],compNames:['小字头','秃宝盖','巾'],words:[{w:'非常',py:'fēi cháng',en:'very',lv:1}]},
+  '和':{py:'hé',en:'and; with',structure:'lr',components:['禾','口'],compNames:['禾','口'],words:[{w:'我和你',py:'wǒ hé nǐ',en:'me and you',lv:1}]},
+  '都':{py:'dōu',en:'all',structure:'lr',components:['者','阝'],compNames:['者','阝旁'],words:[{w:'都是',py:'dōu shì',en:'all are',lv:1}]},
+  '给':{py:'gěi',en:'give; for',structure:'lr',components:['纟','合'],compNames:['纟旁','合'],words:[{w:'给你',py:'gěi nǐ',en:'give you',lv:1}]},
+  '系':{py:'xì',en:'system; tie',structure:'whole',components:['系'],compNames:['系'],words:[{w:'关系',py:'guān xì',en:'relationship'}]},
+  '第':{py:'dì',en:'(ordinal prefix)',structure:'tb',components:['竹','弟'],compNames:['竹字头','弟'],words:[{w:'第一',py:'dì yī',en:'first',lv:1}]},
+  '先':{py:'xiān',en:'first; earlier',structure:'whole',components:['先'],compNames:['先'],words:[{w:'先生',py:'xiān sheng',en:'mister',lv:1}]},
+  '公':{py:'gōng',en:'public; male',structure:'tb',components:['八','厶'],compNames:['八','厶'],words:[{w:'公司',py:'gōng sī',en:'company',lv:1}]},
+  '件':{py:'jiàn',en:'(measure for items)',structure:'lr',components:['亻','牛'],compNames:['人旁','牛'],words:[{w:'一件',py:'yī jiàn',en:'one (item)',lv:1}]},
+  '条':{py:'tiáo',en:'(measure for long things)',structure:'tb',components:['夂','木'],compNames:['夂','木'],words:[{w:'一条',py:'yī tiáo',en:'one (strip)',lv:1}]},
+  '样':{py:'yàng',en:'kind; manner',structure:'lr',components:['木','羊'],compNames:['木旁','羊'],words:[{w:'这样',py:'zhè yàng',en:'like this',lv:1}]},
+  '租':{py:'zū',en:'to rent',structure:'lr',components:['禾','且'],compNames:['禾旁','且'],words:[{w:'出租车',py:'chū zū chē',en:'taxi',lv:1}]},
+  '道':{py:'dào',en:'way; road',structure:'ld',components:['辶','首'],compNames:['走之旁','首'],words:[{w:'知道',py:'zhī dào',en:'know',lv:1}]},
+  '喂':{py:'wèi',en:'hello (phone)',structure:'lr',components:['口','畏'],compNames:['口旁','畏'],words:[{w:'喂',py:'wèi',en:'hello (phone)',lv:1}]},
+  '包':{py:'bāo',en:'bag; wrap',structure:'lu',components:['勹','巳'],compNames:['勹','巳'],words:[{w:'书包',py:'shū bāo',en:'schoolbag',lv:1}]},
+  '歌':{py:'gē',en:'song',structure:'lr',components:['哥','欠'],compNames:['哥','欠'],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
+  '习':{py:'xí',en:'study; practice',structure:'whole',components:['习'],words:[{w:'学习',py:'xué xí',en:'study; learn'}]},
+  '午':{py:'wǔ',en:'noon',structure:'whole',components:['午'],words:[{w:'中午',py:'zhōng wǔ',en:'noon',lv:1}]},
+  '有':{py:'yǒu',en:'have; there is',structure:'lu',components:['ナ','月'],compNames:['ナ','月'],words:[{w:'没有',py:'méi yǒu',en:"don't have",lv:1}]},
+  '的':{py:'de',en:'(possessive particle)',structure:'lr',components:['白','勺'],compNames:['白旁','勺'],words:[{w:'我的',py:'wǒ de',en:'my',lv:1}]},
+  '万':{py:'wàn',en:'ten thousand',structure:'whole',components:['万'],compNames:['万'],words:[{w:'一万',py:'yī wàn',en:'10,000',lv:2}]},
+  '丈':{py:'zhàng',en:'unit of length',structure:'whole',components:['丈'],compNames:['丈'],words:[{w:'丈夫',py:'zhàngfu',en:'husband',lv:2}]},
+  '次':{py:'cì',en:'time / order',structure:'lr',components:['冫','欠'],compNames:['冰旁','欠'],words:[{w:'第一次',py:'dì yī cì',en:'first time',lv:2}]},
+  '已':{py:'yǐ',en:'already',structure:'whole',components:['已'],compNames:['已'],words:[{w:'已经',py:'yǐjīng',en:'already',lv:2}]},
+  '经':{py:'jīng',en:'pass through',structure:'lr',components:['纟','圣'],compNames:['绞丝旁','圣'],words:[{w:'已经',py:'yǐjīng',en:'already',lv:2}]},
+  '最':{py:'zuì',en:'most',structure:'tb',components:['日','取'],compNames:['日','取'],words:[{w:'最好',py:'zuì hǎo',en:'best',lv:2}]},
+  '左':{py:'zuǒ',en:'left',structure:'lu',components:['ナ','工'],compNames:['ナ','工'],words:[{w:'左边',py:'zuǒ biān',en:'left side',lv:2}]},
+  '右':{py:'yòu',en:'right',structure:'lu',components:['ナ','口'],compNames:['ナ','口'],words:[{w:'右边',py:'yòu biān',en:'right side',lv:2}]},
+  '旁':{py:'páng',en:'side',structure:'tb',components:['立','方'],compNames:['立','方'],words:[{w:'旁边',py:'pángbiān',en:'beside',lv:2}]},
+  '远':{py:'yuǎn',en:'far',structure:'ld',components:['辶','元'],compNames:['走之旁','元'],words:[{w:'远近',py:'yuǎnjìn',en:'distance',lv:2}]},
+  '近':{py:'jìn',en:'near',structure:'ld',components:['辶','斤'],compNames:['走之旁','斤'],words:[{w:'附近',py:'fùjìn',en:'nearby',lv:2}]},
+  '过':{py:'guò',en:'pass; cross',structure:'ld',components:['辶','寸'],compNames:['走之旁','寸'],words:[{w:'过去',py:'guòqù',en:'past',lv:2}]},
+  '己':{py:'jǐ',en:'self',structure:'whole',components:['己'],compNames:['己'],words:[{w:'自己',py:'zìjǐ',en:'oneself',lv:2}]},
+  '自':{py:'zì',en:'self / from',structure:'whole',components:['自'],compNames:['自'],words:[{w:'自己',py:'zìjǐ',en:'oneself',lv:2}]},
+  '从':{py:'cóng',en:'from',structure:'lr',components:['人','人'],compNames:['人(左)','人(右)'],words:[{w:'从来',py:'cónglái',en:'always; ever',lv:2}]},
+  '介':{py:'jiè',en:'introduce',structure:'whole',components:['介'],compNames:['介'],words:[{w:'介绍',py:'jièshào',en:'introduce',lv:2}]},
+  '绍':{py:'shào',en:'connect; introduce',structure:'lr',components:['纟','召'],compNames:['绞丝旁','召'],words:[{w:'介绍',py:'jièshào',en:'introduce',lv:2}]},
+  '动':{py:'dòng',en:'move',structure:'lr',components:['云','力'],compNames:['云','力'],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
+  '运':{py:'yùn',en:'transport; luck',structure:'ld',components:['辶','云'],compNames:['走之旁','云'],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
+  '走':{py:'zǒu',en:'walk',structure:'whole',components:['走'],compNames:['走'],words:[{w:'走路',py:'zǒu lù',en:'walk',lv:2}]},
+  '跑':{py:'pǎo',en:'run',structure:'lr',components:['足','包'],compNames:['足旁','包'],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
+  '步':{py:'bù',en:'step',structure:'tb',components:['止','少'],compNames:['止','少'],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
+  '跳':{py:'tiào',en:'jump',structure:'lr',components:['足','兆'],compNames:['足旁','兆'],words:[{w:'跳舞',py:'tiàowǔ',en:'dance',lv:2}]},
+  '舞':{py:'wǔ',en:'dance',structure:'whole',components:['舞'],compNames:['舞'],words:[{w:'跳舞',py:'tiàowǔ',en:'dance',lv:2}]},
+  '踢':{py:'tī',en:'kick',structure:'lr',components:['足','易'],compNames:['足旁','易'],words:[{w:'踢球',py:'tī qiú',en:'play soccer',lv:2}]},
+  '足':{py:'zú',en:'foot',structure:'whole',components:['足'],compNames:['足'],words:[{w:'足球',py:'zúqiú',en:'soccer',lv:2}]},
+  '跟':{py:'gēn',en:'follow; with',structure:'lr',components:['足','艮'],compNames:['足旁','艮'],words:[{w:'跟着',py:'gēnzhe',en:'follow',lv:2}]},
+  '路':{py:'lù',en:'road',structure:'lr',components:['足','各'],compNames:['足旁','各'],words:[{w:'走路',py:'zǒu lù',en:'walk',lv:2}]},
+  '游':{py:'yóu',en:'swim; tour',structure:'lr',components:['氵','斿'],compNames:['水旁','斿'],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
+  '泳':{py:'yǒng',en:'swim',structure:'lr',components:['氵','永'],compNames:['水旁','永'],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
+  '洗':{py:'xǐ',en:'wash',structure:'lr',components:['氵','先'],compNames:['水旁','先'],words:[{w:'洗澡',py:'xǐzǎo',en:'shower',lv:2}]},
+  '送':{py:'sòng',en:'send; give',structure:'ld',components:['辶','关'],compNames:['走之旁','关'],words:[{w:'送礼',py:'sòng lǐ',en:'give gift',lv:2}]},
+  '画':{py:'huà',en:'paint',structure:'whole',components:['画'],compNames:['画'],words:[{w:'画画',py:'huà huà',en:'paint',lv:2}]},
+  '笑':{py:'xiào',en:'laugh',structure:'tb',components:['竹','夭'],compNames:['竹字头','夭'],words:[{w:'笑话',py:'xiàohua',en:'joke',lv:2}]},
+  '让':{py:'ràng',en:'let; allow',structure:'lr',components:['讠','上'],compNames:['言旁','上'],words:[{w:'让步',py:'ràngbù',en:'concede',lv:2}]},
+  '告':{py:'gào',en:'tell',structure:'tb',components:['牛','口'],compNames:['牛','口'],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
+  '诉':{py:'sù',en:'tell',structure:'lr',components:['讠','斥'],compNames:['言旁','斥'],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
+  '记':{py:'jì',en:'record; remember',structure:'lr',components:['讠','己'],compNames:['言旁','己'],words:[{w:'记得',py:'jì de',en:'remember',lv:2}]},
+  '忘':{py:'wàng',en:'forget',structure:'tb',components:['亡','心'],compNames:['亡','心'],words:[{w:'忘记',py:'wàngjì',en:'forget',lv:2}]},
+  '懂':{py:'dǒng',en:'understand',structure:'lr',components:['忄','董'],compNames:['心旁','董'],words:[{w:'懂得',py:'dǒng de',en:'understand',lv:2}]},
+  '希':{py:'xī',en:'hope',structure:'tb',components:['乂','巾'],compNames:['乂','巾'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
+  '望':{py:'wàng',en:'look; hope',structure:'tb',components:['亡月','王'],compNames:['亡月','王'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
+  '帮':{py:'bāng',en:'help',structure:'tb',components:['邦','巾'],compNames:['邦','巾'],words:[{w:'帮忙',py:'bāngmáng',en:'help',lv:2}]},
+  '拿':{py:'ná',en:'take',structure:'tb',components:['合','手'],compNames:['合','手'],words:[{w:'拿走',py:'ná zǒu',en:'take away',lv:2}]},
+  '教':{py:'jiāo',en:'teach',structure:'lr',components:['孝','攵'],compNames:['孝','攵'],words:[{w:'教学',py:'jiāoxué',en:'teach',lv:2}]},
+  '考':{py:'kǎo',en:'test; exam',structure:'whole',components:['考'],compNames:['考'],words:[{w:'考试',py:'kǎoshì',en:'exam',lv:2}]},
+  '试':{py:'shì',en:'try; test',structure:'lr',components:['讠','式'],compNames:['言旁','式'],words:[{w:'考试',py:'kǎoshì',en:'exam',lv:2}]},
+  '比':{py:'bǐ',en:'compare',structure:'whole',components:['比'],compNames:['比'],words:[{w:'比较',py:'bǐjiào',en:'compare',lv:2}]},
+  '坏':{py:'huài',en:'bad; broken',structure:'lr',components:['土','不'],compNames:['土旁','不'],words:[{w:'坏人',py:'huài rén',en:'bad person',lv:2}]},
+  '错':{py:'cuò',en:'wrong',structure:'lr',components:['钅','昔'],compNames:['金旁','昔'],words:[{w:'错误',py:'cuòwù',en:'mistake',lv:2}]},
+  '夫':{py:'fū',en:'man; husband',structure:'whole',components:['夫'],compNames:['夫'],words:[{w:'丈夫',py:'zhàngfu',en:'husband',lv:2}]},
+  '妻':{py:'qī',en:'wife',structure:'tb',components:['一肀','女'],compNames:['上部','女'],words:[{w:'妻子',py:'qīzi',en:'wife',lv:2}]},
+  '爷':{py:'yé',en:'grandfather',structure:'tb',components:['父','卩'],compNames:['父','卩'],words:[{w:'爷爷',py:'yéye',en:'grandpa',lv:2}]},
+  '姓':{py:'xìng',en:'surname',structure:'lr',components:['女','生'],compNames:['女旁','生'],words:[{w:'姓名',py:'xìngmíng',en:'name',lv:2}]},
+  '店':{py:'diàn',en:'shop',structure:'lu',components:['广','占'],compNames:['广字旁','占'],words:[{w:'商店',py:'shāngdiàn',en:'shop',lv:2}]},
+  '馆':{py:'guǎn',en:'building; hall',structure:'lr',components:['饣','官'],compNames:['食旁','官'],words:[{w:'图书馆',py:'túshūguǎn',en:'library',lv:2}]},
+  '楼':{py:'lóu',en:'building',structure:'lr',components:['木','娄'],compNames:['木旁','娄'],words:[{w:'楼上',py:'lóushàng',en:'upstairs',lv:2}]},
+  '室':{py:'shì',en:'room',structure:'tb',components:['宀','至'],compNames:['宝盖','至'],words:[{w:'教室',py:'jiàoshì',en:'classroom',lv:2}]},
+  '场':{py:'chǎng',en:'field; place',structure:'lr',components:['土','昜'],compNames:['土旁','昜'],words:[{w:'机场',py:'jīchǎng',en:'airport',lv:2}]},
+  '站':{py:'zhàn',en:'station; stand',structure:'lr',components:['立','占'],compNames:['立旁','占'],words:[{w:'车站',py:'chēzhàn',en:'station',lv:2}]},
+  '地':{py:'dì',en:'ground; place',structure:'lr',components:['土','也'],compNames:['土旁','也'],words:[{w:'地方',py:'dìfāng',en:'place',lv:2}]},
+  '体':{py:'tǐ',en:'body',structure:'lr',components:['亻','本'],compNames:['人旁','本'],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
+  '身':{py:'shēn',en:'body',structure:'whole',components:['身'],compNames:['身'],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
+  '眼':{py:'yǎn',en:'eye',structure:'lr',components:['目','艮'],compNames:['目旁','艮'],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
+  '睛':{py:'jīng',en:'eyeball',structure:'lr',components:['目','青'],compNames:['目旁','青'],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
+  '头':{py:'tóu',en:'head',structure:'whole',components:['头'],compNames:['头'],words:[{w:'头发',py:'tóufa',en:'hair',lv:2}]},
+  '疼':{py:'téng',en:'pain',structure:'lu',components:['疒','冬'],compNames:['病字旁','冬'],words:[{w:'头疼',py:'tóuténg',en:'headache',lv:2}]},
+  '药':{py:'yào',en:'medicine',structure:'tb',components:['艹','约'],compNames:['草头','约'],words:[{w:'吃药',py:'chī yào',en:'take medicine',lv:2}]},
+  '票':{py:'piào',en:'ticket',structure:'tb',components:['覀','示'],compNames:['覀','示'],words:[{w:'车票',py:'chēpiào',en:'ticket',lv:2}]},
+  '酒':{py:'jiǔ',en:'wine',structure:'lr',components:['氵','酉'],compNames:['水旁','酉'],words:[{w:'喝酒',py:'hē jiǔ',en:'drink alcohol',lv:2}]},
+  '咖':{py:'kā',en:'coffee (in 咖啡)',structure:'lr',components:['口','加'],compNames:['口旁','加'],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
+  '啡':{py:'fēi',en:'coffee (in 咖啡)',structure:'lr',components:['口','非'],compNames:['口旁','非'],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
+  '肉':{py:'ròu',en:'meat',structure:'whole',components:['肉'],compNames:['肉'],words:[{w:'牛肉',py:'niúròu',en:'beef',lv:2}]},
+  '鱼':{py:'yú',en:'fish',structure:'whole',components:['鱼'],compNames:['鱼'],words:[{w:'鱼肉',py:'yú ròu',en:'fish',lv:2}]},
+  '鸟':{py:'niǎo',en:'bird',structure:'whole',components:['鸟'],compNames:['鸟'],words:[{w:'小鸟',py:'xiǎo niǎo',en:'small bird',lv:2}]},
+  '篮':{py:'lán',en:'basket',structure:'tb',components:['竹','监'],compNames:['竹字头','监'],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
+  '球':{py:'qiú',en:'ball',structure:'lr',components:['王','求'],compNames:['王旁','求'],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
+  '笔':{py:'bǐ',en:'pen',structure:'tb',components:['竹','毛'],compNames:['竹字头','毛'],words:[{w:'铅笔',py:'qiānbǐ',en:'pencil',lv:2}]},
+  '裤':{py:'kù',en:'pants',structure:'lr',components:['衤','库'],compNames:['衣旁','库'],words:[{w:'裤子',py:'kùzi',en:'pants',lv:2}]},
+  '词':{py:'cí',en:'word',structure:'lr',components:['讠','司'],compNames:['言旁','司'],words:[{w:'词语',py:'cíyǔ',en:'word',lv:2}]},
+  '网':{py:'wǎng',en:'net',structure:'whole',components:['网'],compNames:['网'],words:[{w:'网络',py:'wǎngluò',en:'internet',lv:2}]},
+  '铁':{py:'tiě',en:'iron',structure:'lr',components:['钅','失'],compNames:['金旁','失'],words:[{w:'地铁',py:'dìtiě',en:'subway',lv:2}]},
+  '位':{py:'wèi',en:'position; (measure)',structure:'lr',components:['亻','立'],compNames:['人旁','立'],words:[{w:'一位',py:'yī wèi',en:'one (person)',lv:2}]},
+  '别':{py:'bié',en:'other; do not',structure:'lr',components:['另','刂'],compNames:['另','刀旁'],words:[{w:'别的',py:'bié de',en:'other',lv:2}]},
+  '但':{py:'dàn',en:'but',structure:'lr',components:['亻','旦'],compNames:['人旁','旦'],words:[{w:'但是',py:'dànshì',en:'but',lv:2}]},
+  '准':{py:'zhǔn',en:'accurate; allow',structure:'lr',components:['冫','隹'],compNames:['冰旁','隹'],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
+  '备':{py:'bèi',en:'prepare',structure:'tb',components:['夂','田'],compNames:['夂','田'],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
+  '完':{py:'wán',en:'finish',structure:'tb',components:['宀','元'],compNames:['宝盖','元'],words:[{w:'完成',py:'wánchéng',en:'complete',lv:2}]},
+  '始':{py:'shǐ',en:'begin',structure:'lr',components:['女','台'],compNames:['女旁','台'],words:[{w:'开始',py:'kāishǐ',en:'begin',lv:2}]},
+  '就':{py:'jiù',en:'just; precisely',structure:'lr',components:['京','尤'],compNames:['京','尤'],words:[{w:'就是',py:'jiùshì',en:'just is',lv:2}]},
+  '快':{py:'kuài',en:'fast',structure:'lr',components:['忄','夬'],compNames:['心旁','夬'],words:[{w:'快乐',py:'kuàilè',en:'happy',lv:2}]},
+  '慢':{py:'màn',en:'slow',structure:'lr',components:['忄','曼'],compNames:['心旁','曼'],words:[{w:'慢慢',py:'mànmàn',en:'slowly',lv:2}]},
+  '累':{py:'lèi',en:'tired',structure:'tb',components:['田','糸'],compNames:['田','糸'],words:[{w:'很累',py:'hěn lèi',en:'very tired',lv:2}]},
+  '舒':{py:'shū',en:'comfortable',structure:'lr',components:['舍','予'],compNames:['舍','予'],words:[{w:'舒服',py:'shūfu',en:'comfortable',lv:2}]},
+  '情':{py:'qíng',en:'feeling',structure:'lr',components:['忄','青'],compNames:['心旁','青'],words:[{w:'心情',py:'xīnqíng',en:'mood',lv:2}]},
+  '意':{py:'yì',en:'meaning; intent',structure:'tb',components:['音','心'],compNames:['音','心'],words:[{w:'意思',py:'yìsi',en:'meaning',lv:2}]},
+  '晴':{py:'qíng',en:'clear; sunny',structure:'lr',components:['日','青'],compNames:['日旁','青'],words:[{w:'晴天',py:'qíngtiān',en:'sunny day',lv:2}]},
+  '阴':{py:'yīn',en:'cloudy; shade',structure:'lr',components:['阝','月'],compNames:['阝旁','月'],words:[{w:'阴天',py:'yīntiān',en:'cloudy',lv:2}]},
+  '虽':{py:'suī',en:'although',structure:'tb',components:['口','虫'],compNames:['口','虫'],words:[{w:'虽然',py:'suīrán',en:'although',lv:2}]},
+  '然':{py:'rán',en:'thus; -ly',structure:'tb',components:['犬肉','灬'],compNames:['上部','四点底'],words:[{w:'当然',py:'dāngrán',en:'of course',lv:2}]},
+  '色':{py:'sè',en:'color',structure:'tb',components:['⺈','巴'],compNames:['⺈','巴'],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
+  '颜':{py:'yán',en:'face; color',structure:'lr',components:['彦','页'],compNames:['彦','页'],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
+  '红':{py:'hóng',en:'red',structure:'lr',components:['纟','工'],compNames:['绞丝旁','工'],words:[{w:'红色',py:'hóngsè',en:'red color',lv:2}]},
+  '绿':{py:'lǜ',en:'green',structure:'lr',components:['纟','录'],compNames:['绞丝旁','录'],words:[{w:'绿色',py:'lǜsè',en:'green color',lv:2}]},
+  '黑':{py:'hēi',en:'black',structure:'whole',components:['黑'],compNames:['黑'],words:[{w:'黑色',py:'hēisè',en:'black color',lv:2}]},
+  '周':{py:'zhōu',en:'week; circle',structure:'lur',components:['冂','吉'],compNames:['冂','吉'],words:[{w:'周末',py:'zhōumò',en:'weekend',lv:2}]},
+  '所':{py:'suǒ',en:'place; that which',structure:'lr',components:['户','斤'],compNames:['户','斤'],words:[{w:'所以',py:'suǒyǐ',en:'so',lv:2}]},
+  '往':{py:'wǎng',en:'toward; go to',structure:'lr',components:['彳','主'],compNames:['双人旁','主'],words:[{w:'前往',py:'qiánwǎng',en:'go to',lv:2}]},
+  '离':{py:'lí',en:'leave; away from',structure:'whole',components:['离'],compNames:['离'],words:[{w:'离开',py:'líkāi',en:'leave',lv:2}]},
+  '旅':{py:'lǚ',en:'travel',structure:'lr',components:['方','㫃'],compNames:['方','㫃'],words:[{w:'旅游',py:'lǚyóu',en:'travel',lv:2}]},
+  '交':{py:'jiāo',en:'cross; exchange',structure:'whole',components:['交'],compNames:['交'],words:[{w:'交通',py:'jiāotōng',en:'traffic',lv:2}]},
+  '等':{py:'děng',en:'wait; rank',structure:'tb',components:['竹','寺'],compNames:['竹字头','寺'],words:[{w:'等等',py:'děng děng',en:'wait',lv:2}]},
+  '留':{py:'liú',en:'stay; remain',structure:'tb',components:['卯','田'],compNames:['卯','田'],words:[{w:'留学',py:'liúxué',en:'study abroad',lv:2}]},
+  '啊':{py:'a',en:'(exclamation)',structure:'lr',components:['口','阿'],compNames:['口旁','阿'],words:[{w:'好啊',py:'hǎo a',en:'good!',lv:2}]},
+  '乐':{py:'lè',en:'happy',structure:'whole',components:['乐'],compNames:['乐'],words:[{w:'快乐',py:'kuàilè',en:'happy',lv:2}]},
+  '每':{py:'měi',en:'every',structure:'tb',components:['𠂉','母'],compNames:['𠂉','母'],words:[{w:'每天',py:'měi tiān',en:'every day',lv:2}]},
+  '表':{py:'biǎo',en:'watch; form',structure:'whole',components:['表'],compNames:['表'],words:[{w:'手表',py:'shǒubiǎo',en:'watch',lv:2}]},
+  '着':{py:'zhe',en:'(particle)',structure:'tb',components:['⺶','目'],compNames:['⺶','目'],words:[{w:'看着',py:'kàn zhe',en:'looking',lv:2}]},
+  '长':{py:'cháng',en:'long',structure:'whole',components:['长'],compNames:['长'],words:[{w:'很长',py:'hěn cháng',en:'very long',lv:2}]},
+};
+
+const STRUCTURES={
+  whole:{zh:'独体字',en:'Whole Character',desc:'A single indivisible unit',layout:'whole'},
+  lr:   {zh:'左右结构',en:'Left-Right',desc:'Two parts side by side',layout:'lr'},
+  tb:   {zh:'上下结构',en:'Top-Bottom',desc:'One part above the other',layout:'tb'},
+  lcr:  {zh:'左中右结构',en:'Left-Center-Right',desc:'Three parts side by side',layout:'lcr'},
+  tmb:  {zh:'上中下结构',en:'Top-Middle-Bottom',desc:'Three parts stacked',layout:'tmb'},
+  ur:   {zh:'右上包围',en:'Up-Right Surrounded',desc:'Outer part wraps from upper-right',layout:'ur'},
+  lu:   {zh:'左上包围',en:'Left-Up Surrounded',desc:'Outer part wraps from upper-left',layout:'lu'},
+  ld:   {zh:'左下包围',en:'Left-Down Surrounded',desc:'Outer part wraps from lower-left',layout:'ld'},
+  lur:  {zh:'左上右包围',en:'Left-Up-Right',desc:'Three-sided, open at bottom',layout:'lur'},
+  lrd:  {zh:'左右下包围',en:'Left-Right-Down',desc:'Three-sided, open at top',layout:'lrd'},
+  tlb:  {zh:'上左下包围',en:'Top-Left-Bottom',desc:'Three-sided, open at right',layout:'tlb'},
+  full: {zh:'全包围',en:'Overall Surrounded',desc:'Outer part completely encloses inner',layout:'full'},
+  ov:   {zh:'叠加结构',en:'Overlaid',desc:'Parts overlap each other',layout:'ov'},
+};
+
+function makeStructureSVG(layout,size=60){
+  const s=size,p=5,c='#b5763a',w=2;
+  const d={
+    whole:`<rect x="${p}" y="${p}" width="${s-p*2}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.1)" rx="3"/>`,
+    lr:`<rect x="${p}" y="${p}" width="${(s-p*2)*.44}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(200,75,47,0.1)" rx="3"/>
+        <rect x="${p+(s-p*2)*.56}" y="${p}" width="${(s-p*2)*.44}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="3"/>`,
+    tb:`<rect x="${p}" y="${p}" width="${s-p*2}" height="${(s-p*2)*.44}" stroke="${c}" stroke-width="${w}" fill="rgba(200,75,47,0.1)" rx="3"/>
+        <rect x="${p}" y="${p+(s-p*2)*.56}" width="${s-p*2}" height="${(s-p*2)*.44}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="3"/>`,
+    lcr:`<rect x="${p}" y="${p}" width="${(s-p*2)*.28}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(200,75,47,0.1)" rx="2"/>
+         <rect x="${p+(s-p*2)*.36}" y="${p}" width="${(s-p*2)*.28}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>
+         <rect x="${p+(s-p*2)*.72}" y="${p}" width="${(s-p*2)*.28}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(58,122,90,0.1)" rx="2"/>`,
+    tmb:`<rect x="${p}" y="${p}" width="${s-p*2}" height="${(s-p*2)*.28}" stroke="${c}" stroke-width="${w}" fill="rgba(200,75,47,0.1)" rx="2"/>
+         <rect x="${p}" y="${p+(s-p*2)*.36}" width="${s-p*2}" height="${(s-p*2)*.28}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>
+         <rect x="${p}" y="${p+(s-p*2)*.72}" width="${s-p*2}" height="${(s-p*2)*.28}" stroke="${c}" stroke-width="${w}" fill="rgba(58,122,90,0.1)" rx="2"/>`,
+    ur:`<path d="M${s*.5},${p} L${s-p},${p} L${s-p},${s-p} L${p},${s-p} L${p},${s*.45}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.08)" stroke-dasharray="3,2"/>
+        <rect x="${s*.15}" y="${s*.15}" width="${s*.5}" height="${s*.55}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>`,
+    lu:`<path d="M${p},${s*.55} L${p},${p} L${s-p},${p} L${s-p},${s*.4}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.08)" stroke-dasharray="3,2"/>
+        <rect x="${s*.3}" y="${s*.3}" width="${s*.55}" height="${s*.55}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>`,
+    ld:`<path d="M${p},${s*.45} L${p},${s-p} L${s*.6},${s-p}" stroke="${c}" stroke-width="${w}" fill="none" stroke-dasharray="3,2"/>
+        <rect x="${s*.3}" y="${p}" width="${s*.6}" height="${s*.62}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>`,
+    lur:`<path d="M${p},${s-p} L${p},${p} L${s-p},${p} L${s-p},${s-p}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.08)" stroke-dasharray="3,2"/>
+         <rect x="${s*.25}" y="${s*.38}" width="${s*.5}" height="${s*.48}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.1)" rx="2"/>`,
+    full:`<rect x="${p}" y="${p}" width="${s-p*2}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.08)" rx="3"/>
+          <rect x="${s*.28}" y="${s*.28}" width="${s*.44}" height="${s*.44}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.15)" rx="2"/>`,
+    ov:`<rect x="${p}" y="${p}" width="${s-p*2}" height="${s-p*2}" stroke="${c}" stroke-width="${w}" fill="rgba(181,118,58,0.08)" rx="3" stroke-dasharray="3,2"/>
+        <rect x="${s*.12}" y="${s*.12}" width="${s-p*2-s*.04}" height="${s-p*2-s*.04}" stroke="${c}" stroke-width="${w}" fill="rgba(74,94,138,0.12)" rx="3" stroke-dasharray="3,2"/>`,
+  };
+  return `<svg viewBox="0 0 ${s} ${s}" xmlns="http://www.w3.org/2000/svg">${d[layout]||d.whole}</svg>`;
+}
+
+const COMP_COLORS=[
+  {border:'#d04848',text:'#d04848',bg:'rgba(208,72,72,0.1)'},
+  {border:'#e08a3c',text:'#e08a3c',bg:'rgba(224,138,60,0.1)'},
+  {border:'#4a9d6a',text:'#4a9d6a',bg:'rgba(74,157,106,0.1)'},
+  {border:'#2e8a9a',text:'#2e8a9a',bg:'rgba(46,138,154,0.1)'},
+  {border:'#5d5fb0',text:'#5d5fb0',bg:'rgba(93,95,176,0.1)'},
+  {border:'#a8418a',text:'#a8418a',bg:'rgba(168,65,138,0.1)'},
+];
+
+// 拖拽落位区专用配色：统一用反馈按钮的深墨绿色
+const ZONE_COLORS=[
+  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
+  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
+  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
+];
+
+let state={mode:'learn',currentChar:null,pinyinDone:false,droppedComponents:{},sessionChars:[],sessionIndex:0,failedQueue:[],currentCharFailed:false,currentLevel:1};
+const HSK_LEVEL_CHARS = {
+  1: ['一','七','三','上','下','不','东','两','个','中','么','九','也','习','书','买','了','事','二','五','些','亮','人','什','今','他','以','们','件','休','会','住','作','你','便','候','做','儿','元','先','八','公','六','关','兴','再','写','冷','几','出','分','到','前','包','医','十','千','午','半','卖','去','友','口','只','叫','可','号','司','吃','同','名','后','吗','吧','听','呢','和','哥','哪','唱','商','喂','喜','喝','四','回','国','在','坐','块','士','外','多','大','天','太','女','奶','她','好','妈','妹','姐','子','字','学','孩','它','宜','客','家','对','小','少','岁','工','市','师','常','年','床','开','弟','影','很','得','忙','怎','息','您','想','我','房','手','打','找','文','新','日','早','时','明','星','昨','是','晚','月','有','朋','服','期','本','机','条','来','杯','果','校','样','桌','椅','欢','歌','正','气','水','汉','没','漂','火','点','热','爱','爸','牛','狗','猫','玩','现','班','生','电','男','病','白','百','的','看','真','睡','知','租','穿','第','米','系','给','老','能','脑','苹','茶','菜','蛋','衣','西','要','见','视','觉','认','识','话','语','说','请','读','课','谁','谢','贵','起','超','车','边','还','这','道','那','都','里','钟','钱','问','间','院','雨','雪','零','非','面','题','飞','饭','高','鸡'],
+  2: ['万','丈','为','乐','交','介','从','但','位','体','准','别','动','右','告','周','咖','啊','啡','因','地','场','坏','备','夫','头','妻','始','姓','完','室','就','左','己','已','希','帮','店','往','忘','快','思','情','意','慢','懂','所','拿','教','旁','旅','晴','最','望','楼','次','步','每','比','泳','洗','游','然','爷','球','画','留','疼','眼','着','睛','票','离','站','笑','笔','等','篮','累','红','绍','经','绿','网','考','肉','自','舒','舞','色','花','药','虽','表','裤','让','记','诉','词','试','走','足','跑','跟','路','跳','踢','身','过','运','近','进','远','送','酒','铁','错','长','门','阴','颜','馆','鱼','鸟','黑'],
+};
+const HSK1_CHARS=Object.keys(CHAR_DB);  // 兼容老代码
+
+
+function updateStructHeight(){
+  const bar=document.getElementById('struct-bar');
+  const h=bar?bar.offsetHeight:0;
+  document.documentElement.style.setProperty('--struct-h', h+'px');
+}
+
+function toggleStructBar(){
+  const body=document.getElementById('struct-body');
+  const chevron=document.getElementById('struct-chevron');
+  body.classList.toggle('open');
+  chevron.classList.toggle('open');
+  // 同步切换按钮文字
+  const btn=document.getElementById('toggle-struct-btn');
+  if(btn){
+    btn.textContent = body.classList.contains('open') ? '折叠 / Collapse' : '展开 / Expand';
+  }
+  setTimeout(updateStructHeight, 420);
+}
+
+window.addEventListener('load', updateStructHeight);
+
+function switchMode(mode){
+  state.mode='learn';
+  document.getElementById('learn-mode').style.display='block';
+}
+
+function startLevel(level){
+  if(level>2){showToast('HSK'+level+' 字库扩展中，敬请期待！','error');return;}
+  // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
+  const levelChars = HSK_LEVEL_CHARS[level] || [];
+  const practiceChars = levelChars.filter(c=>CHAR_DB[c]&&CHAR_DB[c].structure!=='whole'&&CHAR_DB[c].structure!=='ov');
+  if(practiceChars.length===0){showToast('HSK'+level+' 字库扩展中，敬请期待！','error');return;}
+  state.currentLevel = level;
+  state.sessionChars=practiceChars.sort(()=>Math.random()-0.5);
+  state.sessionIndex=0;
+  state.failedQueue=[];
+  state.currentCharFailed=false;
+  document.getElementById('level-select').style.display='none';
+  document.getElementById('practice-screen').style.display='block';
+  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='block';
+  loadCharacter(state.sessionChars[0]);
+}
+
+function backToLevelSelect(){
+  document.getElementById('level-select').style.display='block';
+  document.getElementById('practice-screen').style.display='none';
+  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='none';
+}
+
+function loadCharacter(char){
+  const data=CHAR_DB[char];
+  if(!data)return;
+  // ★ 跳过独体字（whole/ov），自动加载下一个
+  if(data.structure==='whole'||data.structure==='ov'){
+    state.sessionIndex++;
+    if(state.sessionIndex<state.sessionChars.length){
+      loadCharacter(state.sessionChars[state.sessionIndex]);
+    } else {
+      showToast('🎉 全部完成！Session complete!','success');
+      setTimeout(backToLevelSelect,1500);
+    }
+    return;
+  }
+  state.currentChar=char;
+  state.pinyinDone=false;
+  state.droppedComponents={};
+  state.currentCharFailed=false;
+
+  // 隐藏 fallback 文本，渲染笔画 SVG
+  document.getElementById('main-char').textContent=char;
+  renderStrokes(char);
+  
+  const wh=document.getElementById('word-hint');
+  wh.classList.remove('show');
+  wh.innerHTML='';
+  wh.style.display='none';
+  const wl2=document.getElementById('word-locked');
+  if(wl2) wl2.style.display='flex';
+  document.getElementById('char-info').style.display='none';
+  renderPinyinOptions(char,data);
+  document.getElementById('locked-overlay').style.display='flex';
+  document.getElementById('drag-content').style.display='none';
+  const nbw2=document.getElementById('next-btn-wrap');
+  if(nbw2) nbw2.style.display='none';
+  const sb2=document.getElementById('skip-btn');
+  if(sb2) sb2.style.display='block';
+  const rs=document.getElementById('result-side');
+  if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+}
+
+function renderPinyinOptions(char,data){
+  const container=document.getElementById('pinyin-options');
+  container.innerHTML='';
+  const allPy=[...new Set(Object.values(CHAR_DB).map(d=>d.py))].filter(p=>p!==data.py);
+  const distractors=allPy.sort(()=>Math.random()-0.5).slice(0,3);
+  const options=[...distractors,data.py].sort(()=>Math.random()-0.5);
+  options.forEach(py=>{
+    const btn=document.createElement('button');
+    btn.className='pinyin-btn';btn.textContent=py;
+    btn.onclick=()=>checkPinyin(btn,py,data.py,data,char);
+    container.appendChild(btn);
+  });
+}
+
+function checkPinyin(btn,chosen,correct,data,char){
+  document.querySelectorAll('.pinyin-btn').forEach(b=>b.disabled=true);
+  if(chosen===correct){
+    btn.classList.add('correct');
+    // 在拼音按钮文字后追加 ☑️ 勾标
+    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
+    playCorrectSound();
+    const sb=document.getElementById('skip-btn');
+    if(sb) sb.style.display='none';
+    if(data.words&&data.words.length>0){
+      const hint=document.getElementById('word-hint');
+      hint.innerHTML=data.words.map(w=>{
+    const lvBadge=w.lv?`<span style="display:inline-block;padding:4px 16px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:1.4rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.12em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
+    return `<div style="text-align:center">
+      <div style="margin-bottom:6px">${lvBadge}</div>
+      <div style="font-size:5.1rem;font-family:'KaiTi','STKaiti','楷体',serif;color:rgba(20,40,30,0.55);letter-spacing:0.08em;line-height:1.1">${w.w}</div>
+      <div style="font-size:2.4rem;color:rgba(20,40,30,0.55);margin-top:6px;letter-spacing:0.06em">${w.py}</div>
+      <div style="font-size:1.8rem;color:rgba(20,40,30,0.55);margin-top:4px;font-style:italic;font-family:Georgia,serif">${w.en}</div>
+    </div>`;
+  }).join('');
+      hint.style.display='flex';
+      hint.classList.add('show');
+      const wl=document.getElementById('word-locked');
+      if(wl) wl.style.display='none';
+    }
+    const info=document.getElementById('char-info');
+    info.innerHTML=`<strong style="font-size:2.16rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.62rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
+    info.style.display='block';info.style.fontSize='0.96rem';info.style.padding='16px 18px';info.style.textAlign='center';info.style.borderRadius='12px';
+    
+    setTimeout(()=>unlockDragSection(char,data),600);
+  } else {
+    // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
+    btn.classList.add('wrong');
+    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✗</span>';
+    playWrongSound();
+    state.currentCharFailed=true; // 标记本字失败
+    setTimeout(()=>{
+      document.querySelectorAll('.pinyin-btn').forEach(b=>{ if(b!==btn) b.disabled=false; });
+    },300);
+  }
+}
+
+function unlockDragSection(char,data){
+  state.pinyinDone=true;
+  document.getElementById('locked-overlay').style.display='none';
+  document.getElementById('drag-content').style.display='flex';
+  renderDragZones(char,data);
+  renderCompPool(char,data);
+}
+
+// ★ 包围结构类型集合
+const ENCLOSURE_STRUCTS=new Set(['full','lur','lu','ld','ur','tlb','lrd']);
+
+// ★ 拖拽区域 — 按编号严格对应部件，包围结构用内外嵌套层次
+function renderDragZones(char,data){
+  const canvas=document.getElementById('drag-canvas');
+  canvas.innerHTML='';
+  const isWhole=data.structure==='whole'||data.components.length===1;
+  const isEnclosure=ENCLOSURE_STRUCTS.has(data.structure);
+  const zones=isWhole?[{x:10,y:10,w:80,h:80}]:getZonePositions(data.structure,data.components.length);
+  zones.forEach((zone,i)=>{
+    const div=document.createElement('div');
+    div.className='drop-zone';
+    div.id='zone-'+i;
+    div.innerHTML=`<span class="zone-label">${isWhole?'放这里':(i+1)}</span>`;
+    div.style.cssText=`left:${zone.x}%;top:${zone.y}%;width:${zone.w}%;height:${zone.h}%`;
+    // 默认就用 ZONE_COLORS 的墨绿色（拖拽前可见）
+    if(!isWhole && !isEnclosure){
+      const zc = ZONE_COLORS[i % ZONE_COLORS.length];
+      div.style.background = zc.bg;
+      div.style.borderColor = zc.border;
+      div.style.borderStyle = 'solid';
+      div.style.borderWidth = '2px';
+    }
+    // 包围结构外框 = 虚线（位于背景，z低），内框 = 实线（叠在上方，z高）
+    if(isEnclosure){
+      if(i===0){
+        // 外框：虚线（深墨绿淡色，与卡片背景有对比）
+        div.style.borderStyle='dashed';
+        div.style.borderWidth='3px';
+        div.style.borderColor='rgba(20,40,30,0.55)';
+        div.style.background='rgba(20,40,30,0.3)';
+        div.style.zIndex='1';
+      } else {
+        // 内框：实线 + 阴影，浮在外框上方（深墨绿色）
+        div.style.borderStyle='solid';
+        div.style.borderWidth='2.5px';
+        div.style.borderColor='rgba(255,255,255,0.4)';
+        div.style.background='rgba(20,40,30,0.55)';
+        div.style.boxShadow='0 2px 10px rgba(0,0,0,0.15)';
+        div.style.zIndex='2';
+      }
+    }
+    div.dataset.zoneIndex=i;
+    div.dataset.expectedIndex=i;
+    div.addEventListener('dragover',e=>{e.preventDefault();div.classList.add('drag-over')});
+    div.addEventListener('dragleave',()=>div.classList.remove('drag-over'));
+    div.addEventListener('drop',e=>{
+      e.preventDefault();
+      div.classList.remove('drag-over');
+      handleDrop(div,i,data);
+    });
+    canvas.appendChild(div);
+  });
+}
+
+function getZonePositions(layout,count){
+  const presets={
+    lr:[{x:3,y:3,w:45,h:94},{x:52,y:3,w:45,h:94}],
+    tb:[{x:3,y:3,w:94,h:45},{x:3,y:52,w:94,h:45}],
+    lcr:[{x:2,y:3,w:29,h:94},{x:35,y:3,w:29,h:94},{x:68,y:3,w:29,h:94}],
+    tmb:[{x:3,y:2,w:94,h:29},{x:3,y:35,w:94,h:29},{x:3,y:68,w:94,h:29}],
+    // 全包围：外大虚线，内小实心居中嵌套
+    full:[{x:3,y:3,w:94,h:94},{x:28,y:28,w:44,h:44}],
+    // 其他包围结构：外框=覆盖整个区域(虚线表示"包围范围")，内框=位于被包围的位置(实心独立)
+    ur:[{x:3,y:3,w:94,h:94},{x:6,y:58,w:38,h:38}],     // 右上包围：内框推到左下角
+    lu:[{x:3,y:3,w:94,h:94},{x:58,y:58,w:38,h:38}],     // 左上包围：内框推到右下角
+    ld:[{x:3,y:3,w:94,h:94},{x:58,y:6,w:38,h:38}],      // 左下包围：内框推到右上角
+    lur:[{x:3,y:3,w:94,h:94},{x:32,y:60,w:35,h:35}],    // 左上右包围：内框下方居中靠下
+    lrd:[{x:3,y:3,w:94,h:94},{x:32,y:6,w:35,h:35}],     // 左右下包围：内框上方居中靠上
+    tlb:[{x:3,y:3,w:94,h:94},{x:60,y:32,w:35,h:35}],    // 上左下包围：内框右侧居中靠右
+    ov:[{x:3,y:3,w:94,h:94}],
+    whole:[{x:3,y:3,w:94,h:94}],
+  };
+  return (presets[layout]||presets.lr).slice(0,Math.max(count,1));
+}
+
+
+const SIMILAR_COMPS = {
+  // 横系
+  '一':['二','三','上','下','工','土'],
+  '二':['一','三','工','土','王'],
+  '三':['二','一','王','土','工'],
+  // 口系
+  '口':['日','目','田','四','囗','白'],
+  '日':['口','目','月','白','田','囗'],
+  '月':['日','目','用','门','囗','四'],
+  '目':['日','口','田','四','囗','白'],
+  '田':['口','日','目','四','囗','白'],
+  '囗':['口','日','目','田','四'],
+  '白':['日','口','目','田','自'],
+  // 木系
+  '木':['本','末','米','火','水','禾'],
+  '米':['木','禾','火','水','来','未'],
+  '未':['木','末','米','禾','来','本'],
+  '来':['米','木','未','禾','本','末'],
+  '果':['日','田','木','禾','采','東'],
+  '采':['果','木','禾','未','米','来'],
+  // 人系
+  '人':['入','八','儿','亻','大','文'],
+  '亻':['人','彳','丨','儿','入'],
+  '彳':['亻','人','行','彡'],
+  '儿':['人','八','几','亻','入'],
+  '八':['人','入','儿','丷','小'],
+  // 水火系
+  '水':['氵','火','灬','永','冫'],
+  '氵':['水','冫','火','灬','丶'],
+  '火':['灬','水','氵','炎','木'],
+  '灬':['火','水','氵','冫'],
+  '冫':['氵','水','灬','冰'],
+  // 手系
+  '手':['扌','又','才','爪','攵'],
+  '扌':['手','才','又','攵'],
+  '又':['扌','手','父','攵','叉'],
+  '才':['扌','手','寸','干','土'],
+  '寸':['才','土','干','寺','又'],
+  // 言系
+  '讠':['言','辶','钅','饣','氵'],
+  // 金钱系
+  '钅':['讠','金','戋','饣','针'],
+  '饣':['食','钅','讠','飠'],
+  // 草木系
+  '艹':['草','茅','苗','++','廾'],
+  // 心系
+  '心':['忄','必','志','忘'],
+  '忄':['心','必','情','忘'],
+  // 土系
+  '土':['士','工','干','才','寸','王'],
+  '王':['土','玉','主','工','干','壬'],
+  '玉':['王','主','土','壬','干'],
+  '主':['王','玉','土','立','注'],
+  // 女子系
+  '女':['子','母','氏','女'],
+  '子':['女','孑','了','孙','子'],
+  '宀':['冖','亠','穴','宁'],
+  '冖':['宀','亠','冂','几'],
+  '冂':['冖','门','几','口','囗'],
+  // 目视系
+  '见':['贝','目','见','几'],
+  // 门系
+  '门':['冂','冖','囗','月','用'],
+  // 马牛系
+  '马':['牛','鸟','乌','鱼'],
+  '牛':['马','午','牟','年'],
+  // 父系
+  '父':['文','夂','爻','攵','又'],
+  '文':['父','夂','攵','又','方'],
+  '方':['文','父','夂','万','力'],
+  // 力刀系
+  '力':['刀','刁','勺','乃','刃'],
+  '刀':['力','刁','勺','乃','匕'],
+  // 大天系
+  '大':['天','太','夫','人','火'],
+  '天':['大','太','夫','夭','元'],
+  '元':['天','大','云','无','兀'],
+  '云':['元','云','八','允','去'],
+  // 上下系
+  '上':['下','土','工','止','止'],
+  '下':['上','土','工','卜','不'],
+  // 日期相关
+  '生':['牛','年','产','先','走'],
+  '年':['牛','生','午','平','干'],
+  // 耳旁
+  '阝':['卩','耳','邑','队'],
+  // 走之
+  '辶':['走','辶','廴','建'],
+  // 疒旁
+  '疒':['广','庄','广','疗'],
+  // 雨系
+  '雨':['彐','雷','云','霜'],
+  // 食系
+  '食':['饣','良','飠'],
+  // 矢系
+  '矢':['矣','矢','矢','族'],
+  // 艮系
+  '艮':['良','艮','跟','根'],
+  // 豕系
+  '豕':['犬','豚','逐','象'],
+  // 执故乍系
+  '执':['执','势','挚'],
+  '故':['乍','攻','放','故'],
+  '乍':['乍','炸','诈','乍'],
+  // 彐壴系
+  '彐':['彑','彐','肀'],
+  '壴':['壴','豆','鼓'],
+  // 射殳系
+  '射':['寺','寺','寸','矮'],
+  '殳':['殳','役','投','设'],
+  // 曷系
+  '曷':['曷','渴','葛','褐'],
+  // 其他
+  '且':['目','旦','且','祖'],
+  '各':['各','格','落','略'],
+  '吾':['吾','悟','吾','我'],
+  '令':['命','今','令','令'],
+  '兑':['兑','悦','脱','税'],
+  '占':['点','站','战','沾'],
+  '余':['余','徐','涂','斜'],
+  '青':['青','情','清','晴'],
+  '相':['相','箱','霜','桑'],
+  '反':['反','返','板','版'],
+  '井':['井','阱','井','耕'],
+  '舌':['舌','活','括','刮'],
+  '丙':['丙','柄','炳','两'],
+  '丁':['丁','盯','叮','订'],
+  '乞':['乞','乙','气','乞'],
+  '巴':['巴','把','巴','色'],
+  '马':['马','马','骑','驾'],
+  '戈':['戈','戒','我','或'],
+  '戋':['戋','浅','残','线'],
+  '垂':['垂','捶','锤','陲'],
+  '疋':['疋','疋','疏','匹'],
+  '户':['户','扇','启','所'],
+  '亡':['亡','芒','茫','盲'],
+  '尔':['尔','泥','弥','尔'],
+  '豕':['豕','象','犬','逐'],
+  '彐':['彑','彐','录','彗'],
+  '灬':['火','执','点','黑'],
+};
+
+function renderCompPool(char,data){
+  const pool=document.getElementById('comp-options');pool.innerHTML='';
+  const correctComps=data.components; // 正确部件数组（可含重复）
+
+  // ★ 双层过滤：
+  //   黑名单 = CHAR_DB 中所有合体字（structure != whole/ov）
+  //   白名单 = CHAR_DB 独体字 + components 数组所有字符 + 标准偏旁兜底
+  //          + SIMILAR_COMPS 表所有 value 里的字符（已人工审核的真部件）
+  const COMPOUND_CHARS = new Set();
+  const PARTS_WHITELIST = new Set();
+  Object.entries(CHAR_DB).forEach(([ch,d])=>{
+    if(d.structure==='whole'||d.structure==='ov'){
+      PARTS_WHITELIST.add(ch);
+    } else {
+      COMPOUND_CHARS.add(ch);
+    }
+    (d.components||[]).forEach(c=>PARTS_WHITELIST.add(c));
+  });
+  // SIMILAR_COMPS 表里的所有干扰字符（人工审核过的真部件），加入白名单
+  Object.values(SIMILAR_COMPS).forEach(arr=>arr.forEach(c=>PARTS_WHITELIST.add(c)));
+  // 兜底：常用偏旁
+  ['亻','彳','氵','扌','钅','饣','讠','艹','宀','冖','冂','凵','勹','匚','疒','广','辶','阝','纟','犭','礻','衤','忄','灬','爫','⺌','⻊'].forEach(p=>PARTS_WHITELIST.add(p));
+
+  // ★ 形近干扰项生成：优先从 SIMILAR_COMPS 取，必须通过白名单 + 黑名单双重过滤
+  const distractorCount=Math.max(6-correctComps.length,0);
+  const passFilter=(s)=>
+    !correctComps.includes(s)
+    &&!COMPOUND_CHARS.has(s)       // 不能是合体字
+    &&PARTS_WHITELIST.has(s);       // 必须在白名单中
+  const similarCandidates=[];
+  correctComps.forEach(comp=>{
+    const sims=(SIMILAR_COMPS[comp]||[]).filter(s=>passFilter(s)&&!similarCandidates.includes(s));
+    similarCandidates.push(...sims);
+  });
+  const shuffledSimilar=[...new Set(similarCandidates)].sort(()=>Math.random()-0.5);
+  let distractors=shuffledSimilar.slice(0,distractorCount);
+  // 不足时从白名单随机补充
+  if(distractors.length<distractorCount){
+    const pool=[...PARTS_WHITELIST].filter(c=>passFilter(c)&&!distractors.includes(c));
+    const extra=pool.sort(()=>Math.random()-0.5).slice(0,distractorCount-distractors.length);
+    distractors=[...distractors,...extra];
+  }
+
+  // ★ 构建entries：正确部件各自带独立correctIndex，干扰项=-1
+  const correctEntries=correctComps.map((comp,idx)=>({comp,correctIndex:idx,isCorrect:true}));
+  const distractorEntries=distractors.map(comp=>({comp,correctIndex:-1,isCorrect:false}));
+
+  // ★ 先shuffle干扰项，再插入正确部件到随机位置，保证正确部件一定出现
+  const shuffledDistractors=[...distractorEntries].sort(()=>Math.random()-0.5);
+  // 将正确部件随机插入干扰项中
+  const allEntries=[...shuffledDistractors];
+  correctEntries.forEach(entry=>{
+    const pos=Math.floor(Math.random()*(allEntries.length+1));
+    allEntries.splice(pos,0,entry);
+  });
+
+  allEntries.forEach((entry,i)=>{
+    const col=COMP_COLORS[i%COMP_COLORS.length];
+    const chip=document.createElement('div');
+    chip.className='comp-chip';
+    // 特殊部件用宋体确保渲染
+    const specialComps=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌']);
+    if(specialComps.has(entry.comp)){
+      chip.style.fontFamily="'SimSun','宋体','STSong',serif";
+      chip.style.fontSize='2.6rem';
+    }
+    chip.textContent=entry.comp;
+    chip.draggable=true;
+    chip.dataset.comp=entry.comp;
+    chip.dataset.correctIndex=entry.correctIndex;
+    chip.id='chip-'+i;
+
+    // ★ 正确部件用对应zone的颜色，干扰项用其他颜色
+    const chipCol=entry.isCorrect
+      ? COMP_COLORS[entry.correctIndex%COMP_COLORS.length]
+      : COMP_COLORS[(entry.correctIndex+3+i)%COMP_COLORS.length];
+    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#ffffff;background:#c4c4c4;border-width:1.5px`;
+
+    chip.addEventListener('dragstart',e=>{
+      e.dataTransfer.setData('text/plain',entry.comp);
+      window._draggingComp=entry.comp;
+      window._draggingChipId='chip-'+i;
+      window._draggingCompIndex=entry.correctIndex;
+      chip.classList.add('dragging');
+    });
+    chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
+    pool.appendChild(chip);
+  });
+}
+
+// ★ 严格验证：拖入区域的部件必须是该区域对应的正确部件
+function handleDrop(zoneEl,zoneIdx,data){
+  const comp=window._draggingComp;
+  const compIndex=window._draggingCompIndex; // 该部件在 correctComps 中的位置
+  if(comp===undefined||comp===null)return;
+
+  const correctComps=data.components;
+  const isWhole=data.structure==='whole'||correctComps.length===1;
+
+  // ★ 独体字：只需是正确部件
+  if(isWhole){
+    if(!correctComps.includes(comp)){
+      showWrongDrop(zoneEl,'这个部件不正确 / Wrong component!');return;
+    }
+  } else {
+    // ★ 非独体字：部件必须是正确的，且要放到对应"该部件应在"的位置
+    if(compIndex===-1){
+      showWrongDrop(zoneEl,'这个部件不属于此字 / Not a component!');return;
+    }
+    if(zoneIdx>=correctComps.length){
+      showWrongDrop(zoneEl,'该格子无需放置部件 / No component needed here!');return;
+    }
+    // 如果该字有重复部件（如 朋=月+月），相同字符的部件可互换位置
+    // 检查：correctComps[zoneIdx] 是否就是当前拖入的部件
+    if(correctComps[zoneIdx]!==comp){
+      showWrongDrop(zoneEl,'位置不对！请放到正确的格子 / Wrong position!');return;
+    }
+  }
+
+  // 已放置检查
+  if(state.droppedComponents[zoneIdx]!==undefined){
+    showToast('该位置已有部件 / Already filled!','error');return;
+  }
+
+  // ✓ 正确放置
+  state.droppedComponents[zoneIdx]=comp;
+  const colIdx=compIndex>=0?compIndex:(Object.keys(state.droppedComponents).length-1);
+  const col=COMP_COLORS[colIdx%COMP_COLORS.length];
+  const specialComps2=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌']);
+  const isEnclosureZone=ENCLOSURE_STRUCTS.has(data.structure);
+  // 所有包围结构的外框都半透明（嵌套布局），避免遮挡内框
+  // 包围结构外框 — 字号略大但不再半透明，让两个部件都清晰可见
+  const isOuterEnclosure=isEnclosureZone&&zoneIdx===0;
+  const compFontSize=isOuterEnclosure?'5.5rem':'4.5rem';
+  const compOpacity='1'; // 全部完全不透明
+  const compFontFamily="'KaiTi','STKaiti','楷体','SimSun','宋体','STSong',serif";
+  // 字符用绝对定位居中，不影响 zone 尺寸（颜色用 ZONE_COLORS 而不是 COMP_COLORS）
+  const zoneCol = ZONE_COLORS[zoneIdx % ZONE_COLORS.length];
+  zoneEl.innerHTML=`<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${compFontSize};color:${zoneCol.text};font-family:${compFontFamily};opacity:${compOpacity};pointer-events:none;line-height:1">${comp}</span>`;
+  zoneEl.style.position='absolute'; // 保持绝对定位
+  zoneEl.style.borderColor=ZONE_COLORS[zoneIdx % ZONE_COLORS.length].border;
+  zoneEl.style.background=zoneCol.bg; // 填入后用对应 zone 的墨绿色
+  zoneEl.style.borderStyle='solid';
+  zoneEl.classList.add('filled','correct-placed');
+  playCorrectSound();
+
+  // ★ 用 chipId 精确标记已用（支持相同部件的不同chip）
+  const usedChip=document.getElementById(window._draggingChipId);
+  if(usedChip) usedChip.classList.add('used');
+
+  // 在 zone 上浮现 ✓ 符号（深墨绿，700ms 自动消失）
+  showZoneFeedback(zoneEl, '✓', '#ffffff');
+
+  // 检查是否全部放完
+  const needed=isWhole?1:correctComps.length;
+  if(Object.keys(state.droppedComponents).length>=needed){
+    setTimeout(()=>mergeCharacter(), 350);
+  }
+}
+
+function showWrongDrop(zoneEl,msg){
+  zoneEl.classList.add('wrong-placed');
+  setTimeout(()=>zoneEl.classList.remove('wrong-placed'),500);
+  // 在 zone 上浮现 ✗ 符号（猪肝红，700ms 自动消失）
+  showZoneFeedback(zoneEl, '✗', '#8b2c2c');
+  playWrongSound();
+  state.currentCharFailed=true; // 标记本字失败
+}
+
+// 在指定 zone 上短暂浮现一个符号（✓ 或 ✗），700ms 后自动消失
+function showZoneFeedback(zoneEl, symbol, color){
+  const fb = document.createElement('div');
+  fb.textContent = symbol;
+  // 位置：zone 顶部（部件上方），不与部件重叠
+  fb.style.cssText = `
+    position:absolute;top:4px;left:0;right:0;display:flex;align-items:flex-start;justify-content:center;
+    font-size:3.5rem;color:${color};font-weight:700;line-height:1;
+    pointer-events:none;z-index:99;
+    text-shadow:0 2px 6px rgba(0,0,0,0.3);
+    animation:zoneFbPop 0.7s ease-out forwards;
+  `;
+  zoneEl.appendChild(fb);
+  setTimeout(()=>fb.remove(), 700);
+}
+
+
+// 重新做当前字
+function retryCharacter(){
+  // 回退进度
+  state.sessionIndex=Math.max(0,state.sessionIndex-1);
+  const char=state.sessionChars[state.sessionIndex];
+  // 重置右栏结果
+  const rs=document.getElementById('result-side');
+  if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+  // 重新加载（跳过拼音，直接解锁拖拽）
+  loadCharacter(char);
+}
+
+// 🎉 全屏撒花庆祝
+function openFeedback(){
+  const m = document.getElementById('feedback-modal');
+  const iframe = document.getElementById('feedback-iframe');
+  const loading = document.getElementById('feedback-loading');
+  const tip = document.getElementById('feedback-loading-tip');
+  if(m) m.style.display = 'flex';
+  if(loading) loading.style.display = 'flex';
+  if(tip) tip.style.display = 'none';
+  // 首次设置 src 触发加载
+  if(iframe && !iframe.dataset.loaded){
+    iframe.src = 'https://forms.office.com/Pages/ResponsePage.aspx?id=GDmBaUijT0KBaEskboYkXP-XIYLvRYFDp-c9F9Ke3EJUQlNDOUtESE4wVVJKQ1VXTFcyRkpEVENFRy4u&embed=true';
+    iframe.onload = function(){
+      iframe.dataset.loaded = '1';
+      // iframe 加载完成（注意：跨域 iframe 的 onload 在 X-Frame-Options 拒绝时不会触发）
+      if(loading) loading.style.display = 'none';
+    };
+    // 3秒后若 onload 还没触发，说明被微软的 X-Frame-Options 拒绝了 — 显示备用提示
+    setTimeout(()=>{
+      if(!iframe.dataset.loaded && tip) tip.style.display = 'block';
+    }, 3000);
+  } else if(iframe && iframe.dataset.loaded){
+    // 已加载过，直接隐藏 loading
+    if(loading) loading.style.display = 'none';
+  }
+}
+function closeFeedback(ev){
+  // 点击遮罩或关闭按钮关闭，点击内容区不关闭
+  if(ev && ev.target.id !== 'feedback-modal' && !ev.target.matches('button')) return;
+  document.getElementById('feedback-modal').style.display = 'none';
+}
+
+// ══ 提示音（Web Audio API 合成，无外部依赖） ══
+let _audioCtx = null;
+function getAudioCtx(){
+  if(!_audioCtx){
+    try{ _audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return null; }
+  }
+  return _audioCtx;
+}
+function playTone(frequencies, duration, type='sine'){
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  // 解决浏览器自动播放策略：如果 suspended 则 resume
+  if(ctx.state === 'suspended') ctx.resume();
+  const now = ctx.currentTime;
+  frequencies.forEach((freq, i)=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.value = freq;
+    // 短促包络：快速起+缓慢落
+    const startAt = now + i * 0.08;
+    gain.gain.setValueAtTime(0, startAt);
+    gain.gain.linearRampToValueAtTime(0.18, startAt + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + duration + 0.05);
+  });
+}
+function playCorrectSound(){
+  // 上行清脆双音：E5 → G5（明亮、积极）
+  playTone([659.25, 783.99], 0.18, 'sine');
+}
+function playWrongSound(){
+  // 下行低沉双音：A4 → F4（柔和提示错误，不刺耳）
+  playTone([440, 349.23], 0.22, 'triangle');
+}
+
+// 🎺 胜利号角音效：C5→E5→G5→C6 上行 + C6 延音收尾
+function playFanfare(){
+  const ctx = getAudioCtx();
+  if(!ctx) return;
+  if(ctx.state === 'suspended') ctx.resume();
+  const now = ctx.currentTime;
+  const notes = [523.25, 659.25, 783.99, 1046.5]; // C5, E5, G5, C6
+  const noteDur = 0.15;
+  const gap = 0.09;
+  notes.forEach((freq, i)=>{
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'triangle'; // 三角波，号角质感
+    osc.frequency.value = freq;
+    const startAt = now + i * gap;
+    gain.gain.setValueAtTime(0, startAt);
+    gain.gain.linearRampToValueAtTime(0.22, startAt + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.001, startAt + noteDur);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(startAt);
+    osc.stop(startAt + noteDur + 0.05);
+  });
+  // 高音 C6 延续，更有气势
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  osc2.type = 'triangle';
+  osc2.frequency.value = 1046.5;
+  const finalStart = now + 4 * gap;
+  gain2.gain.setValueAtTime(0, finalStart);
+  gain2.gain.linearRampToValueAtTime(0.25, finalStart + 0.02);
+  gain2.gain.exponentialRampToValueAtTime(0.001, finalStart + 0.5);
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+  osc2.start(finalStart);
+  osc2.stop(finalStart + 0.55);
+}
+
+function celebrate(){
+  playFanfare(); // 🎺 胜利号角与撒花同时
+  if(typeof confetti !== 'function') return; // CDN 未加载时静默跳过
+  const colors = ['#c84b2f','#3a7a5a','#b5763a','#4a5e8a','#c8960a','#7b2cbf'];
+  // 第一波：中央爆发
+  confetti({
+    particleCount: 120,
+    spread: 100,
+    startVelocity: 50,
+    origin: { x: 0.5, y: 0.55 },
+    colors: colors,
+    zIndex: 9999,
+  });
+  // 第二波：左下角斜射
+  setTimeout(()=>{
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      startVelocity: 55,
+      angle: 60,
+      origin: { x: 0, y: 0.8 },
+      colors: colors,
+      zIndex: 9999,
+    });
+  }, 200);
+  // 第三波：右下角斜射
+  setTimeout(()=>{
+    confetti({
+      particleCount: 80,
+      spread: 70,
+      startVelocity: 55,
+      angle: 120,
+      origin: { x: 1, y: 0.8 },
+      colors: colors,
+      zIndex: 9999,
+    });
+  }, 400);
+}
+
+function mergeCharacter(){
+  const char=state.currentChar;
+  document.getElementById('result-char').textContent=char;
+  const side=document.getElementById('result-side');
+  side.style.opacity='1';side.style.pointerEvents='auto';
+  const nbw=document.getElementById('next-btn-wrap');
+  if(nbw) nbw.style.display='block';
+  // 🎉 撒花庆祝（覆盖全屏，三波）
+  celebrate();
+  side.style.animation='none';
+  void side.offsetWidth;
+  side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
+  state.sessionIndex++;
+}
+
+// ══ 笔画渲染（彩虹色静态 + 动画播放） ══
+const RAINBOW_COLORS = ['#e63946','#f4a261','#e9c46a','#2a9d8f','#264653','#7b2cbf','#9d4edd'];
+let _hanziWriter = null;
+let _isPlaying = false;
+
+async function renderStrokes(char){
+  const canvas = document.getElementById('stroke-canvas');
+  const mainChar = document.getElementById('main-char');
+  if(!canvas) return;
+
+  canvas.innerHTML = '';
+  if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
+  _isPlaying = false;
+  document.getElementById('play-btn').classList.remove('playing');
+
+  try{
+    const data = await HanziWriter.loadCharacterData(char);
+    if(!data || !data.strokes){
+      mainChar.style.display = 'block';
+      canvas.style.display = 'none';
+      return;
+    }
+    mainChar.style.display = 'none';
+    canvas.style.display = 'flex';
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS,'svg');
+    svg.setAttribute('viewBox','0 0 1024 1024');
+
+    // ── 米字格（4 条灰色虚线） ──
+    const gridG = document.createElementNS(svgNS,'g');
+    gridG.setAttribute('class','grid');
+    const lines = [
+      [0,512,1024,512],     // 横
+      [512,0,512,1024],     // 竖
+      [0,0,1024,1024],      // 左上→右下斜
+      [1024,0,0,1024],      // 右上→左下斜
+    ];
+    lines.forEach(([x1,y1,x2,y2])=>{
+      const ln = document.createElementNS(svgNS,'line');
+      ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);
+      ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);
+      ln.setAttribute('class','grid-line');
+      gridG.appendChild(ln);
+    });
+    // 外框
+    const box = document.createElementNS(svgNS,'rect');
+    box.setAttribute('x',0);box.setAttribute('y',0);
+    box.setAttribute('width',1024);box.setAttribute('height',1024);
+    box.setAttribute('class','grid-line');
+    gridG.appendChild(box);
+    svg.appendChild(gridG);
+
+    // ── 笔画（彩虹色，需要翻转 Y 轴） ──
+    const strokesG = document.createElementNS(svgNS,'g');
+    strokesG.setAttribute('transform','translate(0,900) scale(1,-1)');
+    data.strokes.forEach((d,i)=>{
+      const p = document.createElementNS(svgNS,'path');
+      p.setAttribute('d', d);
+      p.setAttribute('fill', RAINBOW_COLORS[i % RAINBOW_COLORS.length]);
+      p.setAttribute('class','stroke-path');
+      strokesG.appendChild(p);
+    });
+    svg.appendChild(strokesG);
+
+    // ── 笔画编号（每笔起点附近，用 medians 数据） ──
+    if(data.medians && data.medians.length){
+      const numG = document.createElementNS(svgNS,'g');
+      // 编号也要 Y 轴翻转
+      numG.setAttribute('transform','translate(0,900) scale(1,-1)');
+      data.medians.forEach((m,i)=>{
+        if(!m || !m.length) return;
+        // 取笔画中点（medians 数组的中间元素）作为编号位置
+        const midIdx = Math.floor(m.length/2);
+        const [cx, cy] = m[midIdx];
+        const color = RAINBOW_COLORS[i % RAINBOW_COLORS.length];
+        // 圆形背景（用笔画同色）
+        const circle = document.createElementNS(svgNS,'circle');
+        circle.setAttribute('cx',cx);
+        circle.setAttribute('cy',cy);
+        circle.setAttribute('r',30);
+        circle.setAttribute('fill',color);
+        circle.setAttribute('class','stroke-num-circle');
+        numG.appendChild(circle);
+        // 数字文本（需要再次翻转回正向，否则字会倒）
+        const text = document.createElementNS(svgNS,'text');
+        text.setAttribute('x',cx);
+        text.setAttribute('y',cy);
+        text.setAttribute('font-size','40');
+        text.setAttribute('class','stroke-num-text');
+        text.setAttribute('transform',`scale(1,-1) translate(0,${-cy*2})`);
+        text.textContent = (i+1).toString();
+        numG.appendChild(text);
+      });
+      svg.appendChild(numG);
+    }
+
+    canvas.appendChild(svg);
+    canvas.dataset.char = char;
+  }catch(err){
+    console.warn('Stroke data unavailable for', char, err);
+    mainChar.style.display = 'block';
+    canvas.style.display = 'none';
+  }
+}
+
+async function playStrokes(){
+  if(_isPlaying) return;
+  const canvas = document.getElementById('stroke-canvas');
+  const char = canvas.dataset.char;
+  if(!char) return;
+
+  const btn = document.getElementById('play-btn');
+  btn.classList.add('playing');
+  _isPlaying = true;
+
+  // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
+  canvas.innerHTML = `
+    <div style="position:relative;width:240px;height:240px">
+      <div id="hw-target" style="position:absolute;inset:0"></div>
+      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:240px;height:240px;pointer-events:none"></svg>
+    </div>`;
+
+  try{
+    // 拉取数据用于绘制数字
+    const data = await HanziWriter.loadCharacterData(char);
+    const overlay = document.getElementById('num-overlay');
+    const svgNS = 'http://www.w3.org/2000/svg';
+
+    // 米字格（与静态一致）
+    const gridG = document.createElementNS(svgNS,'g');
+    const lines = [[0,512,1024,512],[512,0,512,1024],[0,0,1024,1024],[1024,0,0,1024]];
+    lines.forEach(([x1,y1,x2,y2])=>{
+      const ln = document.createElementNS(svgNS,'line');
+      ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);
+      ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);
+      ln.setAttribute('class','grid-line');
+      gridG.appendChild(ln);
+    });
+    const box = document.createElementNS(svgNS,'rect');
+    box.setAttribute('x',0);box.setAttribute('y',0);
+    box.setAttribute('width',1024);box.setAttribute('height',1024);
+    box.setAttribute('class','grid-line');
+    gridG.appendChild(box);
+    overlay.appendChild(gridG);
+
+    // 数字一开始就全部显示
+    const numG = document.createElementNS(svgNS,'g');
+    numG.setAttribute('transform','translate(0,900) scale(1,-1)');
+    if(data && data.medians && data.medians.length){
+      data.medians.forEach((m,i)=>{
+        if(!m || !m.length) return;
+        const midIdx = Math.floor(m.length/2);
+        const [cx, cy] = m[midIdx];
+        const color = RAINBOW_COLORS[i % RAINBOW_COLORS.length];
+        const g = document.createElementNS(svgNS,'g');
+        const circle = document.createElementNS(svgNS,'circle');
+        circle.setAttribute('cx',cx);
+        circle.setAttribute('cy',cy);
+        circle.setAttribute('r',30);
+        circle.setAttribute('fill',color);
+        circle.setAttribute('class','stroke-num-circle');
+        g.appendChild(circle);
+        const text = document.createElementNS(svgNS,'text');
+        text.setAttribute('x',cx);
+        text.setAttribute('y',cy);
+        text.setAttribute('font-size','40');
+        text.setAttribute('class','stroke-num-text');
+        text.setAttribute('transform',`scale(1,-1) translate(0,${-cy*2})`);
+        text.textContent = (i+1).toString();
+        g.appendChild(text);
+        numG.appendChild(g);
+      });
+      overlay.appendChild(numG);
+    }
+
+    _hanziWriter = HanziWriter.create('hw-target', char, {
+      width: 240,
+      height: 240,
+      padding: 8,
+      strokeColor: '#1f2c25',
+      showOutline: true,
+      outlineColor: '#8a8a8a',
+      strokeAnimationSpeed: 1,
+      delayBetweenStrokes: 200,
+      onLoadCharDataError: (err)=>console.warn('Load error',err),
+    });
+    await new Promise(resolve => _hanziWriter.animateCharacter({
+      onComplete: resolve
+    }));
+    setTimeout(()=>{
+      btn.classList.remove('playing');
+      _isPlaying = false;
+      renderStrokes(char);
+    }, 600);
+  }catch(err){
+    console.warn('Animation failed', err);
+    btn.classList.remove('playing');
+    _isPlaying = false;
+    renderStrokes(char);
+  }
+}
+
+function skipCharacter(){
+  // 跳过当前字：先递增 index，再加载下一字
+  state.sessionIndex++;
+  nextCharacter();
+}
+
+function nextCharacter(){
+  // 如果本字失败过，把它插入到 5 个字之后的位置（间隔重复）
+  if(state.currentCharFailed && state.currentChar){
+    const failedChar = state.currentChar;
+    const insertAt = state.sessionIndex + 5; // 5个字后
+    if(insertAt <= state.sessionChars.length){
+      state.sessionChars.splice(insertAt, 0, failedChar);
+    } else {
+      // 如果剩余不足5个，追加到末尾
+      state.sessionChars.push(failedChar);
+    }
+    state.currentCharFailed=false; // 已处理
+  }
+  // 无限循环：到底了重新随机洗牌
+  if(state.sessionIndex>=state.sessionChars.length){
+    const lvChars = HSK_LEVEL_CHARS[state.currentLevel] || HSK_LEVEL_CHARS[1];
+    const practiceChars=lvChars.filter(c=>CHAR_DB[c]&&CHAR_DB[c].structure!=='whole'&&CHAR_DB[c].structure!=='ov');
+    state.sessionChars=practiceChars.sort(()=>Math.random()-0.5);
+    state.sessionIndex=0;
+  }
+  loadCharacter(state.sessionChars[state.sessionIndex]);
+}
+
+document.addEventListener('dragstart',e=>{
+  if(e.target.dataset&&e.target.dataset.comp){
+    window._draggingComp=e.target.dataset.comp;
+    window._draggingChipId=e.target.id||null;
+    window._draggingCompIndex=parseInt(e.target.dataset.correctIndex??e.target.dataset.compIndex??'-1');
+  }
+});
+document.addEventListener('dragend',()=>{window._draggingComp=null;window._draggingCompIndex=-1;window._draggingChipId=null;});
+
+// ============================================================
+// 查询模式 — 修复输入
+// ============================================================
+function handleQueryInput(input){
+  // 只保留最后一个汉字（兼容输入法）
+  const val=input.value;
+  const cjk=val.match(/[\u4e00-\u9fa5]/g);
+  if(cjk&&cjk.length>0){
+    input.value=cjk[cjk.length-1];
+  } else {
+    // 保留原值，等用户继续输入
+  }
+}
+
+function queryCharacter(){
+  const input=document.getElementById('query-input');
+  const raw=input.value;
+  // 提取第一个汉字
+  const match=raw.match(/[\u4e00-\u9fa5]/);
+  const char=match?match[0]:'';
+  if(!char){showToast('请输入一个汉字 / Enter a Chinese character','error');return;}
+  input.value=char;
+
+  const data=CHAR_DB[char];
+  if(!data){
+    showToast('暂无该字数据，字库持续扩充中 / Not in database yet','error');
+    document.getElementById('query-result').classList.remove('show');
+    return;
+  }
+  const struct=STRUCTURES[data.structure]||STRUCTURES.whole;
+  document.getElementById('q-char-big').textContent=char;
+  document.getElementById('q-char-pinyin').textContent=data.py;
+  document.getElementById('q-char-meaning').textContent=data.en;
+  document.getElementById('q-struct-svg').innerHTML=makeStructureSVG(struct.layout,32);
+  document.getElementById('q-struct-name').textContent=struct.zh;
+  document.getElementById('q-struct-desc').textContent=struct.en;
+  const compList=document.getElementById('q-comp-list');compList.innerHTML='';
+  data.components.forEach((comp,i)=>{
+    const col=COMP_COLORS[i%COMP_COLORS.length];
+    const name=(data.compNames&&data.compNames[i])?data.compNames[i]:comp;
+    const item=document.createElement('div');
+    item.className='query-comp-item';
+    item.style.cssText=`border-color:${col.border};background:${col.bg}`;
+    item.innerHTML=`<span class="comp-char" style="color:${col.text}">${comp}</span><span class="comp-name" style="color:${col.text}">${name}</span>`;
+    compList.appendChild(item);
+  });
+  renderQuerySVG(char,data,struct);
+  document.getElementById('query-result').classList.add('show');
+}
+
+function renderQuerySVG(char,data,struct){
+  const svgWrap=document.getElementById('q-svg-visual');
+  const comps=data.components;
+  const size=200;
+
+  // ★ 格子数直接用部件数（数据库已保证结构与部件数一致）
+  const isWhole=data.structure==='whole'||comps.length===1;
+  const zoneCount=isWhole?1:comps.length;
+  const zones=getZonePositions(data.structure,zoneCount);
+
+  // 字号按格子数决定
+  const fontSize=zoneCount===1?90:zoneCount<=2?60:42;
+
+  let rects='',texts='';
+  // 先画所有格子（包括空格子）
+  zones.forEach((z,i)=>{
+    const comp=comps[i];
+    const col=comp?COMP_COLORS[i%COMP_COLORS.length]:{border:'rgba(181,118,58,0.2)',bg:'rgba(245,237,216,0.3)',text:'transparent'};
+    rects+=`<rect x="${z.x/100*size}" y="${z.y/100*size}" width="${z.w/100*size}" height="${z.h/100*size}" fill="${col.bg}" rx="5" stroke="${col.border}" stroke-width="3.2" stroke-dasharray="5,3"/>`;
+    if(comp){
+      const cx=(z.x+z.w/2)/100*size;
+      const cy=(z.y+z.h/2)/100*size+fontSize*.36;
+      const specials=new Set(['冖','彐','壴','冂','疒','亠','勹']);
+      const ff=specials.has(comp)?"SimSun, 宋体, serif":"KaiTi, 楷体, STKaiti, serif";
+      texts+=`<text x="${cx}" y="${cy}" text-anchor="middle" font-size="${fontSize}" fill="${col.text}" font-family="${ff}" opacity="0.9">${comp}</text>`;
+    }
+  });
+
+  svgWrap.innerHTML=`<svg viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg" style="max-width:200px;display:block;margin:0 auto"><rect width="${size}" height="${size}" fill="rgba(245,237,216,0.3)" rx="10"/>${rects}${texts}</svg>`;
+}
+
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');t.textContent=msg;
+  t.className='toast show '+(type||'');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.className='toast',2400);
+}
+
+switchMode('learn');
+</script>
+
+<!-- 反馈弹窗（嵌入 Microsoft Forms） -->
+<div id="feedback-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px" onclick="closeFeedback(event)">
+  <div style="background:var(--paper);border-radius:16px;padding:0;max-width:760px;width:100%;height:90vh;max-height:780px;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;display:flex;flex-direction:column;overflow:hidden" onclick="event.stopPropagation()">
+    <!-- 顶部条 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3a7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span style="font-size:1.15rem;color:var(--ink-dark);font-weight:700">用户反馈 · Feedback</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <a id="feedback-newtab-link" href="https://forms.office.com/Pages/ResponsePage.aspx?id=GDmBaUijT0KBaEskboYkXP-XIYLvRYFDp-c9F9Ke3EJUQlNDOUtESE4wVVJKQ1VXTFcyRkpEVENFRy4u" target="_blank" rel="noopener" style="font-size:0.88rem;color:#ffffff;background:rgba(20,40,30,0.55);text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-family:inherit;letter-spacing:0.04em;transition:all .2s" onmouseover="this.style.background='rgba(20,40,30,0.85)'" onmouseout="this.style.background='rgba(20,40,30,0.55)'">在新窗口打开 / Open in new tab ↗</a>
+        <button onclick="closeFeedback()" style="width:32px;height:32px;border:none;background:transparent;font-size:1.6rem;cursor:pointer;color:var(--ink-light);border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.06)'" onmouseout="this.style.background='transparent'">×</button>
+      </div>
+    </div>
+    <!-- 容器：iframe + 加载提示/备用 -->
+    <div style="position:relative;flex:1;background:#fff">
+      <!-- 加载提示 -->
+      <div id="feedback-loading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:#fff;z-index:1">
+        <div style="font-size:0.95rem;color:var(--ink-light);margin-bottom:8px">正在加载反馈表单...</div>
+        <div style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic">Loading feedback form...</div>
+        <div id="feedback-loading-tip" style="display:none;margin-top:24px;max-width:480px;padding:18px;background:rgba(181,118,58,0.08);border:1.5px dashed rgba(181,118,58,0.3);border-radius:10px;color:var(--ink-mid);line-height:1.7">
+          <div style="margin-bottom:10px">表单未能在此显示？请点击右上角的</div>
+          <div style="margin-bottom:10px;font-style:italic;font-family:Georgia,serif">Form not loading? Please click</div>
+          <div style="font-weight:700;color:var(--bamboo)">「在新窗口打开 / Open in new tab ↗」</div>
+        </div>
+      </div>
+      <!-- Microsoft Forms iframe -->
+      <iframe id="feedback-iframe" src="" width="100%" height="100%" style="border:none;width:100%;height:100%;background:#fff;display:block" frameborder="0" marginwidth="0" marginheight="0" allowfullscreen webkitallowfullscreen mozallowfullscreen msallowfullscreen></iframe>
+    </div>
+  </div>
+</div>
+</body>
+</html>

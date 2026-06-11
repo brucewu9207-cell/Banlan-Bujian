@@ -34,6 +34,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .nav-logo .logo-char{font-size:2rem;color:var(--vermillion);line-height:1;text-shadow:2px 2px 0 rgba(200,75,47,0.2)}
 .nav-logo h1{font-size:1.05rem;color:var(--ink-dark);letter-spacing:0.05em}
 .nav-logo p{font-size:0.7rem;color:var(--ink-light);font-style:italic;font-family:Georgia,serif}
+.app-logo{height:48px;width:auto;flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.15))}
 .mode-tabs{display:flex;gap:4px;background:var(--paper-shadow);border-radius:10px;padding:4px}
 .mode-tab{padding:8px 20px;border:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:0.85rem;transition:all .25s;color:var(--ink-mid);background:transparent}
 .mode-tab.active{background:var(--bamboo);color:var(--paper);box-shadow:0 2px 8px rgba(181,118,58,0.4)}
@@ -42,11 +43,27 @@ body::before{content:'';position:fixed;inset:0;background:
 .card{background:#c4c4c4;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(120,120,120,0.5);backdrop-filter:blur(4px);color:#ffffff}
 
 /* 级别选择 */
-.level-select-screen{text-align:center;padding:14px;max-width:760px;margin:0 auto}
+/* ══ 首页：二选一入口 ══ */
+.home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
+.home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto}
+.home-entry{display:flex;flex-direction:column;align-items:center;padding:34px 26px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:268px;text-align:center}
+.home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
+.home-entry-icon{font-size:2.6rem;margin-bottom:14px}
+.home-entry-zh{font-size:1.7rem;font-weight:700;letter-spacing:0.08em;margin-bottom:4px}
+.home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
+.home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}
+.home-entry-input{cursor:default}
+.home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
+.teacher-input{flex:1;min-width:0;padding:12px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
+.teacher-input:focus{border-color:var(--bamboo-light)}
+.teacher-go{padding:12px 16px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;cursor:pointer;white-space:nowrap;transition:all .2s}
+.teacher-go:hover{background:var(--bamboo-light)}
+.level-select-screen{position:relative;text-align:center;padding:14px;max-width:760px;margin:0 auto;background:transparent;border:none;box-shadow:none;backdrop-filter:none}
 .level-select-screen h2{font-size:1.5rem;color:#ffffff;margin-bottom:14px;letter-spacing:0.1em}
 .level-select-screen .subtitle{color:#ffffff;font-size:0.88rem;margin-bottom:14px;font-style:italic;font-family:Georgia,serif}
 .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:680px;margin:0 auto}
-.level-btn{padding:18px 14px;border:2px solid rgba(140,140,140,0.5);border-radius:var(--radius);background:#c4c4c4;color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s}
+.level-btn{padding:18px 14px;border:2px solid rgba(255,255,255,0.25);border-radius:var(--radius);background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s}
 .level-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--bamboo-light)}
 .level-btn .level-num{font-size:1.6rem;font-weight:bold;color:#ffffff;display:block;line-height:1}
 .level-btn .level-label{font-size:0.72rem;color:#ffffff;margin-top:4px;display:block}
@@ -66,11 +83,24 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ★ 左右等高的关键 */
 .practice-layout{display:flex;gap:22px;align-items:stretch;height:calc(100vh - 100px)}
 .char-panel{flex:3.885;padding:18px 22px;display:flex;flex-direction:column;overflow-y:auto}
-.structure-panel{flex:7.2;padding:12px 14px 8px;display:flex;flex-direction:column;overflow-y:auto}
-.word-panel{flex:2.59;padding:18px 22px;display:flex;flex-direction:column;overflow-y:auto}
+.structure-panel{flex:5.9;padding:18px 14px 8px;display:flex;flex-direction:column;overflow-y:auto;order:2}
+.word-panel{flex:3.885;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding:0;order:3}
+/* 中栏上下两个独立方框 */
+.write-box{padding:18px 22px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.word-box{padding:18px 22px;display:flex;flex-direction:column;flex:1;min-height:0}
+/* 书写练习字台：白底 + 米字格 + HanziWriter + 打勾层 */
+.write-stage{position:relative;width:240px;height:240px;background:#ffffff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.12)}
+.write-grid{position:absolute;inset:0;width:240px;height:240px;pointer-events:none;z-index:1}
+.write-grid .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
+#write-target{position:absolute;inset:0;width:240px;height:240px;z-index:2;background:transparent;touch-action:none}
+.write-check{position:absolute;top:6px;right:6px;display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#2a9d8f;font-size:1.3rem;color:#fff;font-weight:700;pointer-events:none;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
+.write-check.show{display:flex;animation:fadeIn .3s}
+.write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
+.write-reset-btn{margin-top:8px;padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.85rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
+.write-reset-btn:hover{background:rgba(20,40,30,0.78);transform:translateY(-2px)}
 
 /* 左栏 */
-.char-display{text-align:center;padding:16px;background:transparent;border-radius:10px;border:none;margin-bottom:14px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'KaiTi','STKaiti','楷体',serif}
 .char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:240px;height:240px;background:#ffffff;border-radius:6px}
 .char-display #stroke-canvas svg{width:240px;height:240px;display:block}
@@ -79,13 +109,29 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display #stroke-canvas svg .stroke-num-circle{stroke:#fff;stroke-width:1.5}
 .char-display #stroke-canvas svg .stroke-num-text{fill:#fff;font-family:Arial,sans-serif;font-weight:700;text-anchor:middle;dominant-baseline:central;pointer-events:none}
 .char-display .play-btn{position:absolute;bottom:8px;right:8px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s;z-index:5}
+.char-display .step-btn{position:absolute;bottom:52px;right:8px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.92);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.2);transition:all .2s;z-index:5}
+.char-display .step-btn:hover{transform:scale(1.1);background:#fff}
+.char-display .step-btn svg{width:15px;height:15px;fill:#3a6b4e}
+/* 汉字下方的笔顺控制按钮（播放 / 下一笔） */
+.stroke-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.stroke-ctrl-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.95rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
+.stroke-ctrl-btn:hover{background:#8b2c2c;transform:translateY(-2px)}
+.stroke-ctrl-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
+.stroke-ctrl-btn .ctrl-en{font-family:Georgia,serif;font-style:italic;font-size:0.82rem;opacity:0.85}
+.stroke-ctrl-btn.playing{background:var(--bamboo)}
+.stroke-ctrl-btn.playing svg{fill:#fff}
+/* 播放圆钮：纯圆、白三角，划过变猪肝红 */
+.play-circle-btn{width:50px;height:50px;border-radius:50%;border:none;background:rgba(20,40,30,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,0.18);padding:0}
+.play-circle-btn svg{width:22px;height:22px;fill:#fff;margin-left:3px}
+.play-circle-btn:hover{background:#8b2c2c;transform:scale(1.08)}
+.play-circle-btn.playing{background:var(--bamboo)}
 .char-display .play-btn:hover{transform:scale(1.1);background:#fff}
 .char-display .play-btn svg{width:16px;height:16px;fill:#3a6b4e;margin-left:2px}
 .char-display .play-btn.playing svg{fill:#c84b2f}
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.pinyin-btn{padding:18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:2.3rem;color:#ffffff;transition:all .2s;letter-spacing:0.06em}
+.pinyin-btn{padding:10px 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:2.3rem;color:#ffffff;transition:all .2s;letter-spacing:0.06em}
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -248,6 +294,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .main-content{padding:16px}
   .practice-layout{flex-direction:column}
   .query-result-grid{grid-template-columns:1fr}
+  .home-grid{grid-template-columns:1fr}
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
 }
@@ -273,6 +320,14 @@ body::before{content:'';position:fixed;inset:0;background:
 .struct-bar-zh{font-size:1.69rem;font-weight:700;color:#ffffff;letter-spacing:0.1em}
 .struct-bar-en{font-size:0.94rem;color:#ffffff;font-family:Georgia,serif;font-style:italic}
 .struct-bar-chevron{width:18px;height:18px;color:#ffffff;transition:transform .3s;flex-shrink:0;position:absolute;right:28px;top:50%;transform:translateY(-50%)}
+.qr-chevron{transition:transform .3s}
+#qr-btn.open .qr-chevron{transform:rotate(180deg)}
+.qr-popover{position:absolute;left:28px;top:100%;margin-top:10px;z-index:1000;background:var(--paper,#f5edd8);border:1px solid rgba(255,255,255,0.55);border-radius:14px;padding:16px 16px 12px;box-shadow:0 14px 40px rgba(20,40,30,0.35);text-align:center;transform-origin:top left;opacity:0;visibility:hidden;transform:scaleY(0.85) translateY(-6px);transition:opacity .22s ease,transform .22s ease}
+.qr-popover.open{opacity:1;visibility:visible;transform:none}
+.qr-title{font-family:Georgia,serif;font-size:0.82rem;font-weight:700;color:#8b2c2c;letter-spacing:0.08em;margin-bottom:10px}
+.qr-img{display:block;width:182px;height:182px;border-radius:8px;margin:0 auto}
+.qr-url{display:block;font-family:Georgia,serif;font-size:0.78rem;color:#8b2c2c;margin-top:8px;letter-spacing:0.03em;text-decoration:underline;cursor:pointer}
+.qr-url:hover{color:#c84b2f}
 .struct-bar-chevron.open{transform:translateY(-50%) rotate(180deg)}
 .struct-bar-body{
   max-height:0;overflow:hidden;
@@ -418,10 +473,18 @@ body::after{
 </div>
 <nav class="top-nav">
   <!-- 左：标题 -->
-  <div style="display:flex;flex-direction:column;justify-content:center">
-    <div style="display:flex;align-items:baseline;gap:14px">
-      <span style="font-size:3.45rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(44,36,22,0.7);letter-spacing:0.12em;line-height:1">斑斓部件</span>
-      <span style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic;letter-spacing:0.04em">Brilliant Components · HSK 3.0</span>
+  <div style="display:flex;align-items:center;gap:16px">
+    <!-- App Logo：复刻参考图——深橄榄底 + 两个白色竖排部件方块 -->
+    <svg class="app-logo" viewBox="0 0 62 40" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo">
+      <rect x="0" y="0" width="62" height="40" rx="7" fill="#55675a"/>
+      <rect x="16" y="7" width="13" height="26" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/>
+      <rect x="33" y="7" width="13" height="26" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/>
+    </svg>
+    <div style="display:flex;flex-direction:column;justify-content:center">
+      <div style="display:flex;align-items:baseline;gap:14px">
+        <span style="font-size:3.45rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(44,36,22,0.7);letter-spacing:0.12em;line-height:1">斑斓部件</span>
+        <span style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic;letter-spacing:0.04em">Brilliant Components · HSK 3.0</span>
+      </div>
     </div>
   </div>
   <!-- 右：模式切换 -->
@@ -437,13 +500,14 @@ body::after{
 <div class="struct-bar" id="struct-bar">
   <div class="struct-bar-header" onclick="toggleStructBar()">
     <div class="struct-bar-title" style="text-align:center">
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+        <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
         <span class="struct-bar-zh">斑斓部件</span>
         <span style="color:#ffffff;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
       </div>
-      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:2px">
-        <span style="color:#ffffff;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: WU JUNHUA</span>
-        <span style="color:#8b2c2c;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
+      <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:9px">
+        <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: Mozhou</span>
+        <span style="color:#8b2c2c;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
     <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
@@ -451,7 +515,8 @@ body::after{
       反馈 / Feedback
     </button>
     <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">折叠 / Collapse</button></div>
-    <button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();backToLevelSelect()" style="display:none;position:absolute;left:28px;top:50%;transform:translateY(-50%);background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">← 返回 / Back</button>
+    <div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div>
+    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="display:none;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">← 返回 / Back</button><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
   <div class="struct-bar-body open" id="struct-body">
@@ -581,9 +646,29 @@ body::after{
 
   <!-- 学习模式 -->
   <div id="learn-mode">
-    <div id="level-select" class="card level-select-screen">
-      <h2>选择学习级别 · Choose Your Level</h2>
-      
+    <!-- ══ 首页：二选一入口 ══ -->
+    <div id="home-screen" class="home-screen">
+      <div class="home-grid">
+        <!-- 入口 A：HSK 分级挑战 -->
+        <button class="home-entry" onclick="showLevelSelect()">
+          <div class="home-entry-icon">🎯</div>
+          <div class="home-entry-zh">HSK分级挑战</div>
+          <div class="home-entry-en">HSK Level Challenge</div>
+        </button>
+        <!-- 入口 B：请输入字/词 -->
+        <div class="home-entry home-entry-input">
+          <div class="home-entry-icon">✏️</div>
+          <div class="home-entry-zh">请输入字/词</div>
+          <div class="home-entry-en">Enter Characters / Words</div>
+          <div class="home-input-row">
+            <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
+            <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="level-select" class="card level-select-screen" style="display:none">
       <div class="level-grid">
         <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-label">入门 · Beginner</span><span class="level-count">Available ✓</span></button>
         <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-label">基础 · Elementary</span><span class="level-count">Available ✓</span></button>
@@ -603,14 +688,20 @@ body::after{
       <div class="practice-layout">
         <!-- 左栏：Step 1 -->
         <div class="card char-panel">
-          <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">
+          <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:6px">
             <div class="step-title" style="margin-bottom:0;white-space:nowrap"><span class="step-title-zh">① 选择拼音</span><span class="step-title-en">Choose Pinyin</span></div>
           </div>
           <div class="char-display">
             <span class="main-char" id="main-char">字</span>
             <div id="stroke-canvas"></div>
-            <button class="play-btn" id="play-btn" onclick="playStrokes()" title="Play stroke order">
+          </div>
+          <div class="stroke-controls">
+            <button class="play-circle-btn" id="play-btn" onclick="playStrokes()" title="播放 / Play" aria-label="播放 / Play">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="stroke-ctrl-btn" id="step-btn" onclick="nextStroke()" title="下一笔 / Next Stroke">
+              <svg viewBox="0 0 24 24"><path d="M7 6v12l8.5-6zM17 6h2v12h-2z"/></svg>
+              <span>下一笔 / <i class="ctrl-en">Next Stroke</i></span>
             </button>
           </div>
           <div class="pinyin-section">
@@ -622,23 +713,50 @@ body::after{
             Skip · 我已认识 →
           </button>
         </div>
-        <!-- 中栏：例词 -->
-        <div class="card word-panel" id="word-panel">
-          <div class="step-title"><span class="step-title-zh">例词</span><span class="step-title-en">Example Word</span></div>
-          <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
-          <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
-            <div style="font-size:2.2rem;margin-bottom:10px">🔒</div>
-            <p style="font-size:0.88rem;text-align:center">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Complete Step 1 first</span></p>
+        <!-- 中栏：上下两个独立方框 -->
+        <div class="word-panel" id="word-panel">
+          <!-- 上方框：书写练习 -->
+          <div class="card write-box">
+            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">③ 书写练习</span><span class="step-title-en">Writing Practice</span></div>
+            <!-- 锁定遮罩：拖拽成功前显示 -->
+            <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light);min-height:240px">
+              <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
+              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span></p>
+            </div>
+            <div class="write-stage" id="write-stage" style="display:none">
+              <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+                <line x1="0" y1="512" x2="1024" y2="512" class="grid-line"/>
+                <line x1="512" y1="0" x2="512" y2="1024" class="grid-line"/>
+                <line x1="0" y1="0" x2="1024" y2="1024" class="grid-line"/>
+                <line x1="1024" y1="0" x2="0" y2="1024" class="grid-line"/>
+                <rect x="0" y="0" width="1024" height="1024" class="grid-line"/>
+              </svg>
+              <div id="write-target"></div>
+              <div id="write-check" class="write-check">✓</div>
+            </div>
+            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写 / Redo</button>
+          </div>
+          <!-- 下方框：例词（选对拼音后出现） -->
+          <div class="card word-box">
+            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">④ 例词</span><span class="step-title-en">Example Word</span></div>
+            <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
+            <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
+              <div style="font-size:2.7rem;margin-bottom:12px">🔒</div>
+              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span></p>
+            </div>
+            <div id="next-btn-wrap" style="display:none;padding:10px 0 0;flex-shrink:0">
+              <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字 · Next →</button>
+            </div>
           </div>
         </div>
         <!-- 右栏：Step 2 -->
         <div class="card structure-panel" id="structure-panel">
+          <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
-            <div style="font-size:2.2rem;margin-bottom:10px">🔒</div>
-            <p style="font-size:0.88rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Complete Step 1 first</span></p>
+            <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
+            <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span></p>
           </div>
           <div id="drag-content" style="display:none;flex:1;flex-direction:column;height:100%;min-height:0">
-            <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
             <div class="drag-split-box">
               <div class="drag-left">
                 <div class="drag-canvas" id="drag-canvas"></div>
@@ -652,9 +770,6 @@ body::after{
             <div class="components-pool" style="flex:1;display:flex;flex-direction:column;min-height:0">
               
               <div class="comp-options" id="comp-options"></div>
-            </div>
-            <div id="next-btn-wrap" style="display:none;padding:8px 0 4px">
-              <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字 · Next →</button>
             </div>
             <div id="merge-result" style="display:none"></div>
           </div>
@@ -990,7 +1105,7 @@ const CHAR_DB = {
   '馆':{py:'guǎn',en:'building; hall',structure:'lr',components:['饣','官'],compNames:['食旁','官'],words:[{w:'图书馆',py:'túshūguǎn',en:'library',lv:2}]},
   '楼':{py:'lóu',en:'building',structure:'lr',components:['木','娄'],compNames:['木旁','娄'],words:[{w:'楼上',py:'lóushàng',en:'upstairs',lv:2}]},
   '室':{py:'shì',en:'room',structure:'tb',components:['宀','至'],compNames:['宝盖','至'],words:[{w:'教室',py:'jiàoshì',en:'classroom',lv:2}]},
-  '场':{py:'chǎng',en:'field; place',structure:'lr',components:['土','昜'],compNames:['土旁','昜'],words:[{w:'机场',py:'jīchǎng',en:'airport',lv:2}]},
+  '场':{py:'chǎng',en:'field; place',structure:'lr',components:['土','𠃓'],compNames:['土旁','𠃓'],words:[{w:'机场',py:'jīchǎng',en:'airport',lv:2}]},
   '站':{py:'zhàn',en:'station; stand',structure:'lr',components:['立','占'],compNames:['立旁','占'],words:[{w:'车站',py:'chēzhàn',en:'station',lv:2}]},
   '地':{py:'dì',en:'ground; place',structure:'lr',components:['土','也'],compNames:['土旁','也'],words:[{w:'地方',py:'dìfāng',en:'place',lv:2}]},
   '体':{py:'tǐ',en:'body',structure:'lr',components:['亻','本'],compNames:['人旁','本'],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
@@ -1129,6 +1244,20 @@ function updateStructHeight(){
   document.documentElement.style.setProperty('--struct-h', h+'px');
 }
 
+function toggleQR(){
+  const pop=document.getElementById("qr-popover");
+  const btn=document.getElementById("qr-btn");
+  if(!pop) return;
+  const open=pop.classList.toggle("open");
+  if(btn) btn.classList.toggle("open", open);
+}
+document.addEventListener("click",function(e){
+  const pop=document.getElementById("qr-popover");
+  const btn=document.getElementById("qr-btn");
+  if(pop&&pop.classList.contains("open")&&!pop.contains(e.target)&&btn&&!btn.contains(e.target)){
+    pop.classList.remove("open"); btn.classList.remove("open");
+  }
+});
 function toggleStructBar(){
   const body=document.getElementById('struct-body');
   const chevron=document.getElementById('struct-chevron');
@@ -1149,7 +1278,100 @@ function switchMode(mode){
   document.getElementById('learn-mode').style.display='block';
 }
 
+// ══ 首页导航：二选一入口 ══
+function showHome(){
+  state.teacherMode=false;
+  document.getElementById('home-screen').style.display='block';
+  document.getElementById('level-select').style.display='none';
+  document.getElementById('practice-screen').style.display='none';
+  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='none';
+}
+function showLevelSelect(){
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='block';
+  document.getElementById('practice-screen').style.display='none';
+  // 顶栏返回按钮：在等级选择页显示，点击回首页
+  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='block';
+}
+// 统一的顶栏返回：根据当前页面智能判断回到哪一层
+function navBack(){
+  // 在「等级选择」页 → 回首页
+  if(document.getElementById('level-select').style.display==='block'){ showHome(); return; }
+  // 在「练习」页：老师模式→首页，HSK模式→等级选择
+  if(state.teacherMode){ showHome(); return; }
+  showLevelSelect();
+}
+
+// ══ 老师输入会话（输入一串字/词，逐字翻页）══
+// 判断某字能否走"完整练习流程"：需在字库中且可拆部件（非独体字 whole/ov）
+function practiceable(char){
+  const d=CHAR_DB[char];
+  return !!(d && d.structure!=='whole' && d.structure!=='ov');
+}
+function startTeacherSession(){
+  const inp=document.getElementById('teacher-input');
+  const raw=inp?inp.value:'';
+  // 从输入中提取所有汉字，保持原顺序（"你好吗"→[你,好,吗]）
+  const chars=(raw.match(/[\u4e00-\u9fa5]/g))||[];
+  if(chars.length===0){showToast('请输入至少一个汉字 / Enter a character','error');return;}
+  state.teacherMode=true;
+  state.currentLevel=null;
+  state.sessionChars=chars;     // ★ 不打乱，按输入顺序逐字演示
+  state.sessionIndex=0;
+  state.failedQueue=[];
+  state.currentCharFailed=false;
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='none';
+  document.getElementById('practice-screen').style.display='block';
+  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='block';
+  loadTeacherChar(chars[0]);
+}
+// 路由：能练的走完整流程，不能练的（不在字库/独体字）只演示笔顺
+function loadTeacherChar(char){
+  if(practiceable(char)) loadCharacter(char);
+  else loadStrokeOnlyChar(char);
+}
+function teacherNext(){ state.sessionIndex++; nextCharacter(); }
+
+// 仅笔顺演示模式（HanziWriter 支持任意汉字）
+function loadStrokeOnlyChar(char){
+  state.currentChar=char;
+  state.pinyinDone=true;
+  state.droppedComponents={};
+  state.currentCharFailed=false;
+
+  document.getElementById('main-char').textContent=char;
+  renderStrokes(char);
+  unlockWriting();
+
+  // 左栏：若字库有拼音/释义则显示，否则留空
+  const data=CHAR_DB[char];
+  const pin=document.getElementById('pinyin-options');if(pin)pin.innerHTML='';
+  const info=document.getElementById('char-info');
+  if(data){
+    info.style.display='block';
+    info.innerHTML=`<div style="font-size:1.5rem;letter-spacing:0.04em">${data.py||''}</div>${data.en?`<div style="margin-top:4px;font-size:0.92rem">${data.en}</div>`:''}`;
+  }else{ info.style.display='none'; }
+  const sb=document.getElementById('skip-btn');if(sb)sb.style.display='none';
+
+  // 中栏：仅笔顺提示
+  const wh=document.getElementById('word-hint');wh.classList.remove('show');wh.style.display='none';wh.innerHTML='';
+  const wl=document.getElementById('word-locked');
+  if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">此字仅作笔顺演示<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Stroke order only</span></p>';}
+
+  // 右栏：提示 + 下一个字按钮
+  const lo=document.getElementById('locked-overlay');
+  lo.style.display='flex';
+  lo.innerHTML=`<div style="font-size:2.2rem;margin-bottom:10px">🎨</div>
+    <p style="font-size:0.95rem;margin-bottom:18px;line-height:1.6">此字不在可拆部件字库中<br><span style="font-family:Georgia;font-style:italic;font-size:0.8rem">Stroke order only — no component drill</span></p>
+    <button class="next-btn" onclick="teacherNext()">下一个字 · Next →</button>`;
+  document.getElementById('drag-content').style.display='none';
+  const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
+  const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+}
+
 function startLevel(level){
+  state.teacherMode=false;
   if(level>2){showToast('HSK'+level+' 字库扩展中，敬请期待！','error');return;}
   // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
   const levelChars = HSK_LEVEL_CHARS[level] || [];
@@ -1167,9 +1389,8 @@ function startLevel(level){
 }
 
 function backToLevelSelect(){
-  document.getElementById('level-select').style.display='block';
-  document.getElementById('practice-screen').style.display='none';
-  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='none';
+  if(state.teacherMode){ showHome(); return; }
+  showLevelSelect();
 }
 
 function loadCharacter(char){
@@ -1191,9 +1412,14 @@ function loadCharacter(char){
   state.droppedComponents={};
   state.currentCharFailed=false;
 
+  // 还原右栏/中栏的原始锁定内容（可能被"仅笔顺模式"覆盖过）
+  if(window._origLocked){document.getElementById('locked-overlay').innerHTML=window._origLocked;}
+  if(window._origWordLocked){document.getElementById('word-locked').innerHTML=window._origWordLocked;}
+
   // 隐藏 fallback 文本，渲染笔画 SVG
   document.getElementById('main-char').textContent=char;
   renderStrokes(char);
+  lockWriting();
   
   const wh=document.getElementById('word-hint');
   wh.classList.remove('show');
@@ -1236,22 +1462,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     playCorrectSound();
     const sb=document.getElementById('skip-btn');
     if(sb) sb.style.display='none';
-    if(data.words&&data.words.length>0){
-      const hint=document.getElementById('word-hint');
-      hint.innerHTML=data.words.map(w=>{
-    const lvBadge=w.lv?`<span style="display:inline-block;padding:4px 16px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:1.4rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.12em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
-    return `<div style="text-align:center">
-      <div style="margin-bottom:6px">${lvBadge}</div>
-      <div style="font-size:5.1rem;font-family:'KaiTi','STKaiti','楷体',serif;color:rgba(20,40,30,0.55);letter-spacing:0.08em;line-height:1.1">${w.w}</div>
-      <div style="font-size:2.4rem;color:rgba(20,40,30,0.55);margin-top:6px;letter-spacing:0.06em">${w.py}</div>
-      <div style="font-size:1.8rem;color:rgba(20,40,30,0.55);margin-top:4px;font-style:italic;font-family:Georgia,serif">${w.en}</div>
-    </div>`;
-  }).join('');
-      hint.style.display='flex';
-      hint.classList.add('show');
-      const wl=document.getElementById('word-locked');
-      if(wl) wl.style.display='none';
-    }
+    // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
     info.innerHTML=`<strong style="font-size:2.16rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.62rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
     info.style.display='block';info.style.fontSize='0.96rem';info.style.padding='16px 18px';info.style.textAlign='center';info.style.borderRadius='12px';
@@ -1497,6 +1708,48 @@ const SIMILAR_COMPS = {
   '灬':['火','执','点','黑'],
 };
 
+// ── 无字形的简体记号部件：用源字的指定笔画渲染成 SVG（如「场」右件 𠃓 显示不出来）──
+// key = 部件内部ID（仍用于拖拽匹配），值 = {源字, 笔画索引(0起)}
+const COMP_STROKE_RENDER = {
+  '𠃓': { src:'场', strokes:[3,4,5] },   // 简体「场/扬/汤/杨」共用右件 = 场的第 4~6 笔
+};
+// 从源字的指定笔画生成一个自动裁剪到部件包围盒的 SVG（返回 <svg> 元素，宽高由调用方设置）
+async function renderComponentStrokes(srcChar, strokeIdx, color){
+  if(typeof HanziWriter === 'undefined') return null;
+  let data;
+  try{ data = await HanziWriter.loadCharacterData(srcChar); }catch(e){ return null; }
+  if(!data || !data.strokes) return null;
+  const NS='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(NS,'svg');
+  svg.setAttribute('xmlns',NS);
+  const g=document.createElementNS(NS,'g');
+  g.setAttribute('transform','translate(0,900) scale(1,-1)'); // 与整字渲染一致的 Y 翻转
+  strokeIdx.forEach(idx=>{
+    const d=data.strokes[idx];
+    if(d==null) return;
+    const p=document.createElementNS(NS,'path');
+    p.setAttribute('d', d);
+    p.setAttribute('fill', color||'#ffffff');
+    g.appendChild(p);
+  });
+  svg.appendChild(g);
+  // 离屏挂载测量所选笔画的真实包围盒
+  svg.setAttribute('viewBox','0 0 1024 1024');
+  svg.style.cssText='position:absolute;left:-9999px;top:-9999px;width:120px;height:120px';
+  document.body.appendChild(svg);
+  let bb=null;
+  try{ bb=g.getBBox(); }catch(e){}
+  document.body.removeChild(svg);
+  if(bb && bb.width && bb.height){
+    // getBBox 返回的是翻转前坐标；翻转后 y' = 900 - y
+    const pad=Math.max(bb.width,bb.height)*0.14;
+    const fx=bb.x-pad, fy=(900-bb.y-bb.height)-pad, fw=bb.width+pad*2, fh=bb.height+pad*2;
+    svg.setAttribute('viewBox',`${fx} ${fy} ${fw} ${fh}`);
+  }
+  svg.removeAttribute('style');
+  return svg;
+}
+
 function renderCompPool(char,data){
   const pool=document.getElementById('comp-options');pool.innerHTML='';
   const correctComps=data.components; // 正确部件数组（可含重复）
@@ -1558,12 +1811,22 @@ function renderCompPool(char,data){
     const chip=document.createElement('div');
     chip.className='comp-chip';
     // 特殊部件用宋体确保渲染
-    const specialComps=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌']);
+    const specialComps=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌','𠃓']);
     if(specialComps.has(entry.comp)){
       chip.style.fontFamily="'SimSun','宋体','STSong',serif";
       chip.style.fontSize='2.6rem';
     }
-    chip.textContent=entry.comp;
+    const _srChip=COMP_STROKE_RENDER[entry.comp];
+    if(_srChip){
+      // 无字形记号部件：用笔画 SVG 代替文字
+      chip.textContent='';
+      renderComponentStrokes(_srChip.src,_srChip.strokes,'#ffffff').then(svg=>{
+        if(svg){ svg.style.cssText='width:2.9rem;height:2.9rem;display:block'; chip.appendChild(svg); }
+        else { chip.textContent=entry.comp; }
+      });
+    } else {
+      chip.textContent=entry.comp;
+    }
     chip.draggable=true;
     chip.dataset.comp=entry.comp;
     chip.dataset.correctIndex=entry.correctIndex;
@@ -1625,7 +1888,7 @@ function handleDrop(zoneEl,zoneIdx,data){
   state.droppedComponents[zoneIdx]=comp;
   const colIdx=compIndex>=0?compIndex:(Object.keys(state.droppedComponents).length-1);
   const col=COMP_COLORS[colIdx%COMP_COLORS.length];
-  const specialComps2=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌']);
+  const specialComps2=new Set(['冖','彐','壴','冂','疒','亠','勹','㇕','ノ','彳','艮','彐','灬','讠','钅','饣','辶','忄','扌','𠃓']);
   const isEnclosureZone=ENCLOSURE_STRUCTS.has(data.structure);
   // 所有包围结构的外框都半透明（嵌套布局），避免遮挡内框
   // 包围结构外框 — 字号略大但不再半透明，让两个部件都清晰可见
@@ -1635,7 +1898,18 @@ function handleDrop(zoneEl,zoneIdx,data){
   const compFontFamily="'KaiTi','STKaiti','楷体','SimSun','宋体','STSong',serif";
   // 字符用绝对定位居中，不影响 zone 尺寸（颜色用 ZONE_COLORS 而不是 COMP_COLORS）
   const zoneCol = ZONE_COLORS[zoneIdx % ZONE_COLORS.length];
-  zoneEl.innerHTML=`<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${compFontSize};color:${zoneCol.text};font-family:${compFontFamily};opacity:${compOpacity};pointer-events:none;line-height:1">${comp}</span>`;
+  const _srZone=COMP_STROKE_RENDER[comp];
+  if(_srZone){
+    zoneEl.innerHTML='';
+    const _wrap=document.createElement('div');
+    _wrap.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none';
+    zoneEl.appendChild(_wrap);
+    renderComponentStrokes(_srZone.src,_srZone.strokes,zoneCol.text).then(svg=>{
+      if(svg){ svg.style.cssText='width:68%;height:68%;display:block'; _wrap.appendChild(svg); }
+    });
+  } else {
+    zoneEl.innerHTML=`<span style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:${compFontSize};color:${zoneCol.text};font-family:${compFontFamily};opacity:${compOpacity};pointer-events:none;line-height:1">${comp}</span>`;
+  }
   zoneEl.style.position='absolute'; // 保持绝对定位
   zoneEl.style.borderColor=ZONE_COLORS[zoneIdx % ZONE_COLORS.length].border;
   zoneEl.style.background=zoneCol.bg; // 填入后用对应 zone 的墨绿色
@@ -1850,8 +2124,10 @@ function mergeCharacter(){
   side.style.opacity='1';side.style.pointerEvents='auto';
   const nbw=document.getElementById('next-btn-wrap');
   if(nbw) nbw.style.display='block';
-  // 🎉 撒花庆祝（覆盖全屏，三波）
-  celebrate();
+  // ✅ 拖拽成功：轻快提示音（撒花改到写对汉字后）
+  playCorrectSound();
+  // 🔓 解锁 ③ 书写练习（④ 例词改到写对汉字后才解锁）
+  unlockWriting();
   side.style.animation='none';
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
@@ -1862,6 +2138,11 @@ function mergeCharacter(){
 const RAINBOW_COLORS = ['#e63946','#f4a261','#e9c46a','#2a9d8f','#264653','#7b2cbf','#9d4edd'];
 let _hanziWriter = null;
 let _isPlaying = false;
+// ── 逐笔演示状态 ──
+let _stepChar = null;   // 当前正在逐笔演示的字
+let _stepIndex = 0;     // 已写出的笔画数
+let _stepData = null;   // 缓存的笔顺数据
+let _writeWriter = null; // 书写练习的 HanziWriter 实例
 
 async function renderStrokes(char){
   const canvas = document.getElementById('stroke-canvas');
@@ -1871,6 +2152,7 @@ async function renderStrokes(char){
   canvas.innerHTML = '';
   if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
   _isPlaying = false;
+  _stepChar = null; _stepIndex = 0; _stepData = null;
   document.getElementById('play-btn').classList.remove('playing');
 
   try{
@@ -2040,7 +2322,7 @@ async function playStrokes(){
       padding: 8,
       strokeColor: '#1f2c25',
       showOutline: true,
-      outlineColor: '#8a8a8a',
+      outlineColor: '#e6e6e6',
       strokeAnimationSpeed: 1,
       delayBetweenStrokes: 200,
       onLoadCharDataError: (err)=>console.warn('Load error',err),
@@ -2061,6 +2343,245 @@ async function playStrokes(){
   }
 }
 
+// ══ ③ 书写练习的锁定 / 解锁（拖拽成功后才解锁）══
+function lockWriting(){
+  const wl=document.getElementById('write-locked');
+  const ws=document.getElementById('write-stage');
+  const rb=document.getElementById('write-reset-btn');
+  if(wl) wl.style.display='flex';
+  if(ws) ws.style.display='none';
+  if(rb) rb.style.display='none';
+  // 取消可能残留的旧测验实例并隐藏打勾
+  if(_writeWriter){ try{ _writeWriter.cancelQuiz && _writeWriter.cancelQuiz(); }catch(e){} _writeWriter=null; }
+  const c=document.getElementById('write-check'); if(c) c.classList.remove('show');
+}
+function unlockWriting(){
+  const wl=document.getElementById('write-locked');
+  const ws=document.getElementById('write-stage');
+  const rb=document.getElementById('write-reset-btn');
+  if(wl) wl.style.display='none';
+  if(ws) ws.style.display='block';
+  if(rb) rb.style.display='inline-block';
+  startWritingQuiz();
+}
+
+// 显示下方例词（拖拽合并成功后调用）
+function showExampleWord(char){
+  const data=CHAR_DB[char];
+  const hint=document.getElementById('word-hint');
+  const wl=document.getElementById('word-locked');
+  if(!hint) return;
+  if(!data||!data.words||data.words.length===0) return; // 无例词则保持原状
+  hint.innerHTML=data.words.map(w=>{
+    const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:1.05rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
+    return `<div style="text-align:center">
+      <div style="margin-bottom:12px">${lvBadge}</div>
+      <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:16px 26px">
+        <span style="font-size:2.4rem;font-family:'KaiTi','STKaiti','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
+        <span style="font-size:1.5rem;color:#ffffff;letter-spacing:0.05em">${w.py}</span>
+        <span style="font-size:1.4rem;color:#ffffff">—</span>
+        <span style="font-size:1.2rem;color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
+      </div>
+    </div>`;
+  }).join('');
+  hint.style.display='flex';
+  hint.classList.add('show');
+  if(wl) wl.style.display='none';
+}
+
+// ══ 书写练习：HanziWriter 描红测验（逐笔书写，对错反馈）══
+const _WRITE_SENTINEL = '#19c3b2';   // 哨兵色：用于定位角色笔画后改为彩虹色
+function startWritingQuiz(){
+  const target = document.getElementById('write-target');
+  const char = state.currentChar;
+  if(!target || !char) return;
+  if(typeof HanziWriter === 'undefined') return;
+
+  // 清理旧实例
+  if(_writeWriter){ try{ _writeWriter.cancelQuiz && _writeWriter.cancelQuiz(); }catch(e){} _writeWriter = null; }
+  target.innerHTML = '';
+  const chk = document.getElementById('write-check'); if(chk) chk.classList.remove('show');
+
+  try{
+    _writeWriter = HanziWriter.create('write-target', char, {
+      width: 240,
+      height: 240,
+      padding: 6,
+      showCharacter: false,        // 隐藏整字，靠学生写
+      showOutline: true,           // 显示浅色字模引导（与笔画完全对齐）
+      showHintAfterMisses: 2,      // 连续写错 2 次后高亮提示该笔
+      highlightColor: '#f4a261',
+      drawingColor: '#666',        // 学生手写轨迹色（中性灰，不抢彩虹）
+      drawingWidth: 14,
+      strokeColor: '#222222',      // 写对后笔画填充为黑色
+      outlineColor: '#e0e0e0',
+      strokeAnimationSpeed: 1.2,
+    });
+    _writeWriter.quiz({
+      // 全部写完 → 角落打勾 + 🎉 撒花庆祝
+      onComplete: ()=>{
+        const c = document.getElementById('write-check'); if(c) c.classList.add('show');
+        showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
+        celebrate(); // 🎉 写对汉字后才撒花
+      },
+    });
+  }catch(err){
+    console.warn('Writing quiz unavailable for', char, err);
+  }
+}
+
+// ══ 逐笔演示：点一次"写出"下一笔（彩虹色 + 编号 + 书写动画）══
+async function nextStroke(){
+  const canvas = document.getElementById('stroke-canvas');
+  if(!canvas) return;
+  const char = canvas.dataset.char || _stepChar;
+  if(!char) return;
+  if(_isPlaying) return;                       // 与"整体播放"互斥
+  if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
+
+  const built = (_stepChar===char) && document.getElementById('step-layer') && _stepData && _stepData.strokes;
+  const finished = built && _stepIndex >= _stepData.strokes.length;
+  if(!built || finished){
+    const ok = await buildStepSVG(char);       // 重新搭建空白逐笔画布（_stepIndex 归零）
+    if(!ok) return;
+  }
+  if(!_stepData || !_stepData.strokes) return;
+  if(_stepIndex >= _stepData.strokes.length) return;
+  revealStroke(_stepIndex);
+  _stepIndex++;
+}
+
+// 搭建逐笔画布：米字格 + 浅灰全字引导 + 各笔(mask 初始隐藏) + 各编号(初始隐藏)
+async function buildStepSVG(char){
+  const canvas = document.getElementById('stroke-canvas');
+  let data = _stepData;
+  if(_stepChar !== char || !data){
+    try{ data = await HanziWriter.loadCharacterData(char); }
+    catch(e){ return false; }
+  }
+  if(!data || !data.strokes){ return false; }
+  _stepData = data; _stepChar = char; _stepIndex = 0;
+
+  const svgNS = 'http://www.w3.org/2000/svg';
+  canvas.innerHTML = '';
+  canvas.style.display = 'flex';
+  document.getElementById('main-char').style.display = 'none';
+
+  const svg = document.createElementNS(svgNS,'svg');
+  svg.setAttribute('viewBox','0 0 1024 1024');
+  svg.setAttribute('id','step-layer');
+
+  // 米字格
+  const gridG = document.createElementNS(svgNS,'g');
+  [[0,512,1024,512],[512,0,512,1024],[0,0,1024,1024],[1024,0,0,1024]].forEach(([x1,y1,x2,y2])=>{
+    const ln=document.createElementNS(svgNS,'line');
+    ln.setAttribute('x1',x1);ln.setAttribute('y1',y1);ln.setAttribute('x2',x2);ln.setAttribute('y2',y2);
+    ln.setAttribute('class','grid-line');gridG.appendChild(ln);
+  });
+  const box=document.createElementNS(svgNS,'rect');
+  box.setAttribute('x',0);box.setAttribute('y',0);box.setAttribute('width',1024);box.setAttribute('height',1024);
+  box.setAttribute('class','grid-line');gridG.appendChild(box);
+  svg.appendChild(gridG);
+
+  // 浅灰全字引导层（翻转 Y）
+  const guideG=document.createElementNS(svgNS,'g');
+  guideG.setAttribute('transform','translate(0,900) scale(1,-1)');
+  data.strokes.forEach(d=>{
+    const p=document.createElementNS(svgNS,'path');
+    p.setAttribute('d',d);p.setAttribute('fill','#e6e6e6');guideG.appendChild(p);
+  });
+  svg.appendChild(guideG);
+
+  // defs：每笔一个 mask（白色中线，dashoffset 控制书写进度）
+  const defs=document.createElementNS(svgNS,'defs');
+  svg.appendChild(defs);
+
+  // 彩色笔画层（翻转 Y），每笔被对应 mask 遮罩
+  const strokesG=document.createElementNS(svgNS,'g');
+  strokesG.setAttribute('transform','translate(0,900) scale(1,-1)');
+  data.strokes.forEach((d,i)=>{
+    const mask=document.createElementNS(svgNS,'mask');
+    mask.setAttribute('id','smask-'+i);
+    mask.setAttribute('maskUnits','userSpaceOnUse');
+    mask.setAttribute('x','-512');mask.setAttribute('y','-512');
+    mask.setAttribute('width','2048');mask.setAttribute('height','2048');
+    const mp=document.createElementNS(svgNS,'path');
+    const median=(data.medians&&data.medians[i])||[];
+    const dd=median.length ? ('M'+median.map(pt=>pt[0]+' '+pt[1]).join(' L')) : d;
+    mp.setAttribute('d',dd);
+    mp.setAttribute('stroke','#fff');
+    mp.setAttribute('stroke-width','230');
+    mp.setAttribute('fill','none');
+    mp.setAttribute('stroke-linecap','round');
+    mp.setAttribute('stroke-linejoin','round');
+    mp.setAttribute('id','smaskpath-'+i);
+    mask.appendChild(mp);
+    defs.appendChild(mask);
+
+    const p=document.createElementNS(svgNS,'path');
+    p.setAttribute('d',d);
+    p.setAttribute('fill',RAINBOW_COLORS[i%RAINBOW_COLORS.length]);
+    p.setAttribute('class','stroke-path');
+    p.setAttribute('mask','url(#smask-'+i+')');
+    strokesG.appendChild(p);
+  });
+  svg.appendChild(strokesG);
+
+  // 编号层（翻转 Y），各编号初始隐藏
+  const numG=document.createElementNS(svgNS,'g');
+  numG.setAttribute('transform','translate(0,900) scale(1,-1)');
+  if(data.medians){
+    data.medians.forEach((m,i)=>{
+      if(!m||!m.length) return;
+      const [cx,cy]=m[Math.floor(m.length/2)];
+      const color=RAINBOW_COLORS[i%RAINBOW_COLORS.length];
+      const g=document.createElementNS(svgNS,'g');
+      g.setAttribute('id','snum-'+i);
+      g.style.opacity='0'; g.style.transition='opacity .25s';
+      const c=document.createElementNS(svgNS,'circle');
+      c.setAttribute('cx',cx);c.setAttribute('cy',cy);c.setAttribute('r',30);
+      c.setAttribute('fill',color);c.setAttribute('class','stroke-num-circle');g.appendChild(c);
+      const t=document.createElementNS(svgNS,'text');
+      t.setAttribute('x',cx);t.setAttribute('y',cy);t.setAttribute('font-size','40');
+      t.setAttribute('class','stroke-num-text');
+      t.setAttribute('transform',`scale(1,-1) translate(0,${-cy*2})`);
+      t.textContent=(i+1).toString();g.appendChild(t);
+      numG.appendChild(g);
+    });
+  }
+  svg.appendChild(numG);
+  canvas.appendChild(svg);
+
+  // 初始化每笔为"未写出"
+  data.strokes.forEach((d,i)=>{
+    const mp=document.getElementById('smaskpath-'+i);
+    if(!mp) return;
+    let L=1000; try{ L=mp.getTotalLength(); }catch(e){}
+    mp.dataset.len=L;
+    mp.style.strokeDasharray=L;
+    mp.style.strokeDashoffset=L;   // 完全隐藏
+  });
+  return true;
+}
+
+// 写出第 i 笔（沿中线书写动画 + 显示编号）
+function revealStroke(i){
+  const mp=document.getElementById('smaskpath-'+i);
+  if(!mp) return;
+  const L=parseFloat(mp.dataset.len)||1000;
+  const dur=Math.max(280, Math.min(900, L*0.7));
+  try{
+    const anim=mp.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+      {duration:dur, easing:'ease-in-out', fill:'forwards'});
+    anim.onfinish=()=>{ mp.style.strokeDashoffset=0; };
+  }catch(e){
+    mp.style.transition='stroke-dashoffset '+dur+'ms ease-in-out';
+    requestAnimationFrame(()=>{ mp.style.strokeDashoffset=0; });
+  }
+  const num=document.getElementById('snum-'+i);
+  if(num){ setTimeout(()=>{ num.style.opacity='1'; }, dur*0.5); }
+}
+
 function skipCharacter(){
   // 跳过当前字：先递增 index，再加载下一字
   state.sessionIndex++;
@@ -2068,6 +2589,16 @@ function skipCharacter(){
 }
 
 function nextCharacter(){
+  // ★ 老师输入模式：按输入顺序逐字翻页，到末尾即结束
+  if(state.teacherMode){
+    if(state.sessionIndex>=state.sessionChars.length){
+      showToast('🎉 全部完成！Session complete!','success');
+      setTimeout(showHome,1400);
+      return;
+    }
+    loadTeacherChar(state.sessionChars[state.sessionIndex]);
+    return;
+  }
   // 如果本字失败过，把它插入到 5 个字之后的位置（间隔重复）
   if(state.currentCharFailed && state.currentChar){
     const failedChar = state.currentChar;
@@ -2171,7 +2702,7 @@ function renderQuerySVG(char,data,struct){
     if(comp){
       const cx=(z.x+z.w/2)/100*size;
       const cy=(z.y+z.h/2)/100*size+fontSize*.36;
-      const specials=new Set(['冖','彐','壴','冂','疒','亠','勹']);
+      const specials=new Set(['冖','彐','壴','冂','疒','亠','勹','𠃓']);
       const ff=specials.has(comp)?"SimSun, 宋体, serif":"KaiTi, 楷体, STKaiti, serif";
       texts+=`<text x="${cx}" y="${cy}" text-anchor="middle" font-size="${fontSize}" fill="${col.text}" font-family="${ff}" opacity="0.9">${comp}</text>`;
     }
@@ -2187,7 +2718,11 @@ function showToast(msg,type=''){
   window._toastTimer=setTimeout(()=>t.className='toast',2400);
 }
 
+// 捕获右/中栏锁定区原始HTML，供"仅笔顺模式"切回时还原
+window._origLocked = document.getElementById('locked-overlay').innerHTML;
+window._origWordLocked = document.getElementById('word-locked').innerHTML;
 switchMode('learn');
+showHome();
 </script>
 
 <!-- 反馈弹窗（嵌入 Microsoft Forms） -->

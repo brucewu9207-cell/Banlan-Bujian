@@ -579,7 +579,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:1rem !important;padding:9px 18px !important;margin-top:8px !important}
   .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
-  #char-info{font-size:0.85rem !important;padding:10px 12px !important}
+  #char-info{display:none !important}   /* ★ 分步向导第①页不显示该灰框（信息与④例词重复，且会顶出底部被遮挡）*/
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -1697,7 +1697,7 @@ function fitPracticeUI(){
         const free=cp.clientHeight - cp.scrollHeight;             // 面板底部剩余空间
         const cur=sc.clientWidth;
         const maxByWidth=(cp.clientWidth-46)/cur;                 // 宽度上限（留出左右内边距）
-        let boost=Math.min(1+Math.max(free,0)/cur, maxByWidth, 1.8);
+        let boost=Math.min(1+Math.max(free,0)/cur, maxByWidth, 2.0);
         boost=Math.max(1, Math.floor(boost*100)/100);
         root.style.setProperty('--char-boost', String(boost));
         // 防溢出回退：放大后若反而溢出，按 0.05 步退

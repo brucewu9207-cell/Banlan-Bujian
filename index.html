@@ -527,6 +527,12 @@ body::after{
   .comp-chip{min-height:64px}
 }
 
+/* ★ 防 iOS 双击缩放：连点「下一笔/播放」等按钮时，整页被 double-tap zoom 放大的问题 */
+button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn,.wdot,
+.next-btn,.next-btn-inline,.retry-btn-inline,.level-btn,.home-entry,.teacher-go,.merge-btn{
+  touch-action:manipulation;       /* 允许滚动/双指捏合，禁用双击缩放 */
+}
+
 /* ════════════════════════════════════════════════
    ★ 移动端「分步翻页向导」（仅手机/平板；桌面三栏完全不受影响）
    ════════════════════════════════════════════════ */
@@ -3226,9 +3232,12 @@ async function playStrokes(){
       overlay.appendChild(numG);
     }
 
+    // ★ 跟随当前 --ui-scale 创建（修复：固定 240 在缩放后被 CSS 裁切 → 笔画乱飞）
+    const _hwScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
+    const _hwPx=Math.max(120, Math.round(240*_hwScale));
     _hanziWriter = HanziWriter.create('hw-target', char, {
-      width: 240,
-      height: 240,
+      width: _hwPx,
+      height: _hwPx,
       padding: 8,
       charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       strokeColor: '#1f2c25',
@@ -3238,6 +3247,9 @@ async function playStrokes(){
       delayBetweenStrokes: 200,
       onLoadCharDataError: (err)=>console.warn('Load error',err),
     });
+    // ★ 补 viewBox：之后即使 --ui-scale 再变化，内容也等比缩放而不是被裁切
+    const _hwSvg=document.querySelector('#hw-target svg');
+    if(_hwSvg && !_hwSvg.getAttribute('viewBox')) _hwSvg.setAttribute('viewBox',`0 0 ${_hwPx} ${_hwPx}`);
     await new Promise(resolve => _hanziWriter.animateCharacter({
       onComplete: resolve
     }));
@@ -3320,9 +3332,12 @@ function startWritingQuiz(){
   const chk = document.getElementById('write-check'); if(chk) chk.classList.remove('show');
 
   try{
+    // ★ 跟随当前 --ui-scale 创建（与显示尺寸一致，触摸落笔坐标才准确）
+    const _wScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
+    const _wPx=Math.max(120, Math.round(240*_wScale));
     _writeWriter = HanziWriter.create('write-target', char, {
-      width: 240,
-      height: 240,
+      width: _wPx,
+      height: _wPx,
       padding: 6,
       charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       showCharacter: false,        // 隐藏整字，靠学生写
@@ -3335,6 +3350,8 @@ function startWritingQuiz(){
       outlineColor: '#e0e0e0',
       strokeAnimationSpeed: 1.2,
     });
+    const _wSvg=document.querySelector('#write-target svg');
+    if(_wSvg && !_wSvg.getAttribute('viewBox')) _wSvg.setAttribute('viewBox',`0 0 ${_wPx} ${_wPx}`);
     _writeWriter.quiz({
       // 全部写完 → 角落打勾 + 🎉 撒花庆祝
       onComplete: ()=>{

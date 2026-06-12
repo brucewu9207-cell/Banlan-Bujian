@@ -86,6 +86,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-panel{flex:3.885;padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;overflow-y:auto}
 .structure-panel{flex:5.9;padding:calc(18px*var(--ui-scale)) 14px calc(8px*var(--ui-scale));display:flex;flex-direction:column;overflow-y:auto;order:2}
 .word-panel{flex:3.885;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding:0;order:3}
+/* ★ 跨平台隐藏滚动条 — Win/Chrome/Edge 不再常驻占位条，观感对齐 macOS（仅隐藏，仍可滚动/触摸） */
+.char-panel,.structure-panel,.word-panel{scrollbar-width:none;-ms-overflow-style:none}
+.char-panel::-webkit-scrollbar,.structure-panel::-webkit-scrollbar,.word-panel::-webkit-scrollbar{width:0;height:0;display:none}
 /* 中栏上下两个独立方框 */
 .write-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .word-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;flex:1;min-height:0}
@@ -124,16 +127,16 @@ body::before{content:'';position:fixed;inset:0;background:
 .stroke-ctrl-btn.playing{background:var(--bamboo)}
 .stroke-ctrl-btn.playing svg{fill:#fff}
 /* 播放圆钮：纯圆、白三角，划过变猪肝红 */
-.play-circle-btn{width:50px;height:50px;border-radius:50%;border:none;background:rgba(20,40,30,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,0.18);padding:0}
-.play-circle-btn svg{width:22px;height:22px;fill:#fff;margin-left:3px}
+.play-circle-btn{width:calc(50px*var(--ui-scale));height:calc(50px*var(--ui-scale));border-radius:50%;border:none;background:rgba(20,40,30,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,0.18);padding:0}
+.play-circle-btn svg{width:calc(22px*var(--ui-scale));height:calc(22px*var(--ui-scale));fill:#fff;margin-left:3px}
 .play-circle-btn:hover{background:#8b2c2c;transform:scale(1.08)}
 .play-circle-btn.playing{background:var(--bamboo)}
 .char-display .play-btn:hover{transform:scale(1.1);background:#fff}
 .char-display .play-btn svg{width:16px;height:16px;fill:#3a6b4e;margin-left:2px}
 .char-display .play-btn.playing svg{fill:#c84b2f}
 .char-display .char-step-label{display:none}
-.pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
 .pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.3rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
@@ -237,7 +240,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool{margin-bottom:8px;flex-shrink:0}
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
-.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
+.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -460,6 +463,38 @@ body::after{
 }
 .struct-action-btn:hover{
   background:rgba(20,40,30,0.75);
+}
+
+/* ════════════════════════════════════════════════
+   ★ 手机 / iPad 竖屏适配（放在最后，覆盖前面的 !important 高度规则）
+   ════════════════════════════════════════════════ */
+@media(max-width:768px){
+  /* 三栏改竖排 + 解除"固定一屏"高度，让整页自然滚动 */
+  .practice-layout{
+    flex-direction:column;
+    height:auto !important;
+    gap:18px;
+    align-items:stretch;
+  }
+  .char-panel,.structure-panel,.word-panel{
+    overflow:visible;          /* 不再各自内部滚动，交给整页滚 */
+    flex:1 1 auto;
+    width:100%;
+  }
+  /* 拖拽方框居中、限宽，避免在平板上铺太大；同时是个大号触摸目标 */
+  .drag-canvas{max-width:420px;margin:0 auto;width:100%}
+  .drag-split-box{flex:0 0 auto}
+  /* 部件卡片：保证触摸目标足够大、间距更舒展 */
+  .comp-options{gap:12px}
+  .comp-chip{min-height:68px}
+  /* 顶部操作按钮在窄屏不至于挤压换行难看 */
+  .struct-action-btn{padding:8px 14px;font-size:1rem}
+}
+
+/* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
+@media(hover:none) and (pointer:coarse){
+  .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
+  .comp-chip{min-height:64px}
 }
 </style>
 </head>
@@ -1541,6 +1576,11 @@ function fitPracticeUI(){
   if(!screen || screen.style.display==='none') return;
   const layout=screen.querySelector('.practice-layout');
   if(!layout) return;
+  // ★ 移动端(手机/竖屏平板)：不做"挤进一屏"缩放，改为整页自然滚动，避免内容被缩得过小
+  if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    document.documentElement.style.setProperty('--ui-scale','1');
+    return;
+  }
   const panels=[...layout.querySelectorAll('.char-panel,.structure-panel,.word-panel')];
   if(!panels.length) return;
   const root=document.documentElement;
@@ -1548,7 +1588,7 @@ function fitPracticeUI(){
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
   const overflowing=()=>panels.some(p=>p.scrollHeight - p.clientHeight > 2);
   let guard=0;
-  while(overflowing() && scale>0.6 && guard<40){            // 读 scrollHeight 触发重排，逐步缩小
+  while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）
     scale=Math.round((scale-0.02)*1000)/1000;
     root.style.setProperty('--ui-scale', String(scale));
     guard++;
@@ -1588,6 +1628,10 @@ function toggleStructBar(){
 }
 
 window.addEventListener('load', updateStructHeight);
+// 字体加载完成后再适配一次：Windows 字体度量与 Mac 不同，晚到的字体可能撑高内容
+if(document.fonts && document.fonts.ready){
+  document.fonts.ready.then(()=>{ updateStructHeight(); setTimeout(fitPracticeUI,150); });
+}
 
 function switchMode(mode){
   state.mode='learn';
@@ -1842,6 +1886,7 @@ const ENCLOSURE_STRUCTS=new Set(['full','lur','lu','ld','ur','tlb','lrd']);
 function renderDragZones(char,data){
   const canvas=document.getElementById('drag-canvas');
   canvas.innerHTML='';
+  window._dragData=data;   // ★ 供指针拖拽落点时回调 handleDrop 使用
   const isWhole=data.structure==='whole'||data.components.length===1;
   const isEnclosure=ENCLOSURE_STRUCTS.has(data.structure);
   const zones=isWhole?[{x:10,y:10,w:80,h:80}]:getZonePositions(data.structure,data.components.length);
@@ -2334,7 +2379,7 @@ function renderCompPool(char,data){
     } else {
       chip.textContent=entry.comp;
     }
-    chip.draggable=true;
+    chip.draggable=false;   // ★ 禁用原生 HTML5 拖拽，改用下方「指针拖拽」(鼠标/触屏/触控笔统一)
     chip.dataset.comp=entry.comp;
     chip.dataset.correctIndex=entry.correctIndex;
     chip.id='chip-'+i;
@@ -2345,19 +2390,103 @@ function renderCompPool(char,data){
       : COMP_COLORS[(entry.correctIndex+3+i)%COMP_COLORS.length];
     chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#ffffff;background:#c4c4c4;border-width:1.5px`;
 
-    chip.addEventListener('dragstart',e=>{
-      e.dataTransfer.setData('text/plain',entry.comp);
-      window._draggingComp=entry.comp;
-      window._draggingChipId='chip-'+i;
-      window._draggingCompIndex=entry.correctIndex;
-      chip.classList.add('dragging');
+    // ★ 指针拖拽：一个事件统一鼠标 / 触屏 / 触控笔
+    chip.addEventListener('pointerdown',e=>{
+      beginCompDrag(e, chip, entry.comp, 'chip-'+i, entry.correctIndex);
     });
-    chip.addEventListener('dragend',()=>chip.classList.remove('dragging'));
     pool.appendChild(chip);
   });
 }
 
 // ★ 严格验证：拖入区域的部件必须是该区域对应的正确部件
+// ══════════════════════════════════════════════════════════
+// ★ 指针拖拽控制器：统一鼠标 / 触屏(手机·iPad) / 触控笔
+//   不改 handleDrop 的校验逻辑——只是用指针事件复刻「拖起→移动→落下」
+// ══════════════════════════════════════════════════════════
+let _ptrDrag=null;  // 当前拖拽态 {chip, ghost, pointerId, lastZone}
+
+function beginCompDrag(e, chip, comp, chipId, compIndex){
+  if(chip.classList.contains('used')) return;             // 已用部件不可再拖
+  if(_ptrDrag) return;                                    // 已在拖一个 → 忽略多指
+  if(e.pointerType==='mouse' && e.button!==0) return;     // 只认鼠标左键
+  e.preventDefault();
+
+  // 设置与原 HTML5 流程一致的全局态，handleDrop 原样复用
+  window._draggingComp=comp;
+  window._draggingChipId=chipId;
+  window._draggingCompIndex=compIndex;
+  chip.classList.add('dragging');
+
+  // 创建「跟手幽灵」——克隆卡片外观，固定定位跟随指针
+  const rect=chip.getBoundingClientRect();
+  const ghost=chip.cloneNode(true);
+  ghost.classList.remove('dragging');
+  ghost.classList.add('drag-ghost');
+  ghost.style.cssText+=`;position:fixed;left:0;top:0;width:${rect.width}px;height:${rect.height}px;margin:0;pointer-events:none;z-index:99999;opacity:0.95;box-shadow:0 8px 22px rgba(0,0,0,0.28);transition:none`;
+  document.body.appendChild(ghost);
+
+  _ptrDrag={chip, ghost, pointerId:e.pointerId, lastZone:null};
+  _moveGhost(e.clientX, e.clientY);
+
+  document.addEventListener('pointermove', _onCompPointerMove, {passive:false});
+  document.addEventListener('pointerup', _onCompPointerUp);
+  document.addEventListener('pointercancel', _onCompPointerCancel);
+}
+
+function _moveGhost(x,y){
+  if(!_ptrDrag) return;
+  // 幽灵中心对准指针
+  _ptrDrag.ghost.style.transform=`translate(${x}px,${y}px) translate(-50%,-50%) scale(1.06)`;
+}
+
+function _zoneAt(x,y){
+  const el=document.elementFromPoint(x,y);   // 幽灵 pointer-events:none，不会挡住命中
+  return el ? el.closest('.drop-zone') : null;
+}
+
+function _onCompPointerMove(e){
+  if(!_ptrDrag || e.pointerId!==_ptrDrag.pointerId) return;
+  e.preventDefault();
+  _moveGhost(e.clientX, e.clientY);
+  const zone=_zoneAt(e.clientX, e.clientY);
+  if(zone!==_ptrDrag.lastZone){
+    if(_ptrDrag.lastZone) _ptrDrag.lastZone.classList.remove('drag-over');
+    if(zone && !zone.classList.contains('filled')) zone.classList.add('drag-over');
+    _ptrDrag.lastZone=zone;
+  }
+}
+
+function _endPtrDrag(){
+  if(!_ptrDrag) return null;
+  const d=_ptrDrag;
+  document.removeEventListener('pointermove', _onCompPointerMove);
+  document.removeEventListener('pointerup', _onCompPointerUp);
+  document.removeEventListener('pointercancel', _onCompPointerCancel);
+  if(d.lastZone) d.lastZone.classList.remove('drag-over');
+  if(d.ghost) d.ghost.remove();
+  if(d.chip) d.chip.classList.remove('dragging');
+  _ptrDrag=null;
+  return d;
+}
+
+function _onCompPointerUp(e){
+  if(!_ptrDrag || e.pointerId!==_ptrDrag.pointerId) return;
+  const zone=_zoneAt(e.clientX, e.clientY);
+  _endPtrDrag();
+  // 落在某放置区上 → 走原有校验逻辑（位置/部件对错全沿用）
+  if(zone){
+    const idx=parseInt(zone.dataset.zoneIndex,10);
+    if(!isNaN(idx) && window._dragData){
+      handleDrop(zone, idx, window._dragData);
+    }
+  }
+}
+
+function _onCompPointerCancel(e){
+  if(!_ptrDrag || e.pointerId!==_ptrDrag.pointerId) return;
+  _endPtrDrag();   // 被系统打断 → 视为放弃，不落子
+}
+
 function handleDrop(zoneEl,zoneIdx,data){
   const comp=window._draggingComp;
   const compIndex=window._draggingCompIndex; // 该部件在 correctComps 中的位置

@@ -573,6 +573,10 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }
+  /* ★ ② 部件：灰色卡片纵向拉伸到底部导航上方（仅手机竖屏；其余步骤维持 -36px 余量） */
+  .practice-layout.wizard[data-step="2"]{
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
+  }
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}

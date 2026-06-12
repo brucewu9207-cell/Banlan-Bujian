@@ -499,7 +499,7 @@ body::after{
   .drag-split-box{flex:0 0 auto}
   /* 部件卡片：保证触摸目标足够大、间距更舒展 */
   .comp-options{gap:12px}
-  .comp-chip{min-height:calc(68px*var(--ui-scale))}
+  .comp-chip{min-height:68px}
   /* 顶部操作按钮在窄屏不至于挤压换行难看 */
   .struct-action-btn{padding:8px 14px;font-size:1rem}
   /* ★ 顶部四按钮已被 JS 搬到 #header-actions-bar（浅色页面区）；标题栏只留标题 */
@@ -524,7 +524,7 @@ body::after{
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
 @media(hover:none) and (pointer:coarse){
   .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
-  .comp-chip{min-height:calc(64px*var(--ui-scale))}
+  .comp-chip{min-height:64px}
 }
 
 /* ★ 防 iOS 双击缩放：连点「下一笔/播放」等按钮时，整页被 double-tap zoom 放大的问题 */
@@ -569,20 +569,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* ★ 一屏适配：向导页高度 = 视口 − 顶栏 − 底部导航，配合 --ui-scale 自动缩放，免滑动 */
   .practice-layout.wizard{
     padding-bottom:0;
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
-  }
-  /* ★ ② 部件：灰色卡片纵向拉伸到底部导航上方（仅手机竖屏；其余步骤维持 -36px 余量） */
-  .practice-layout.wizard[data-step="2"]{
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
-  }
-  /* ★ ②部件 关键修复：drag 方框原本按「宽度」撑成正方形(≈半屏宽)，在矮视口下高度占满，
-     把下面「可用部件」区挤到放不下 → 第二排部件被裁(就是你截图里的现象)。
-     改为：按「卡片可用高度」给方框设上限(仍是 width 驱动的正方形，不会变形，只是更小)，
-     多出的纵向空间让给部件区，保证两排部件完整可见(不裁、不滚)。矮屏才收紧，高屏维持原样。 */
-  .practice-layout.wizard[data-step="2"] .drag-canvas{
-    max-width:calc((var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px)) * 0.33) !important;
   }
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
@@ -590,7 +579,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:1rem !important;padding:9px 18px !important;margin-top:8px !important}
   .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
-  #char-info{font-size:0.92rem !important;padding:calc(12px*var(--ui-scale)) calc(14px*var(--ui-scale)) !important;margin-top:calc(10px*var(--ui-scale)) !important}   /* ★ 显示拼音+英文释义框（计入一屏高度，随缩放压缩、不再遮挡）*/
+  #char-info{font-size:0.92rem !important;padding:12px 14px !important;margin-top:10px !important}   /* ★ 显示拼音+英文释义框（计入一屏高度，不再遮挡）*/
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -894,7 +883,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         </div>
         <!-- 右栏：Step 2 -->
         <div class="card structure-panel" id="structure-panel">
-          <h3 style="font-size:calc(1.2rem*var(--ui-scale));margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
+          <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
             <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span></p>
@@ -1694,7 +1683,7 @@ function fitPracticeUI(){
   root.style.setProperty('--char-boost','1');               // ★ 米字格独立放大系数也复位
   const overflowing=()=>panels.some(p=>p.offsetParent!==null && p.scrollHeight - p.clientHeight > 2);  // ★ 只测当前可见面板
   let guard=0;
-  while(overflowing() && scale>0.35 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.35：极矮视口也保证塞下、绝不滚动）
+  while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）
     scale=Math.round((scale-0.02)*1000)/1000;
     root.style.setProperty('--ui-scale', String(scale));
     guard++;
@@ -2114,7 +2103,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     if(sb) sb.style.display='none';
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
-    info.innerHTML=`<strong style="font-size:calc(2.16rem*var(--ui-scale));font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:calc(1.62rem*var(--ui-scale));font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
+    info.innerHTML=`<strong style="font-size:2.16rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.62rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
     info.style.display='block';info.style.fontSize='0.96rem';info.style.padding='16px 18px';info.style.textAlign='center';info.style.borderRadius='12px';
     requestAnimationFrame(fitPracticeUI);   // ★ 信息框出现后立刻重算一屏：完整可见、米字格让出空间
     setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页

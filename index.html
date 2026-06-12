@@ -106,8 +106,8 @@ body::before{content:'';position:fixed;inset:0;background:
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'KaiTi','STKaiti','楷体',serif}
-.char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));background:#ffffff;border-radius:6px}
-.char-display #stroke-canvas svg{width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));display:block}
+.char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));background:#ffffff;border-radius:6px}
+.char-display #stroke-canvas svg{width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));display:block}
 .char-display #stroke-canvas svg .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
 .char-display #stroke-canvas svg .stroke-path{stroke-linecap:round;stroke-linejoin:round}
 .char-display #stroke-canvas svg .stroke-num-circle{stroke:#fff;stroke-width:1.5}
@@ -1680,6 +1680,7 @@ function fitPracticeUI(){
   const root=document.documentElement;
   let scale=1;
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
+  root.style.setProperty('--char-boost','1');               // ★ 米字格独立放大系数也复位
   const overflowing=()=>panels.some(p=>p.offsetParent!==null && p.scrollHeight - p.clientHeight > 2);  // ★ 只测当前可见面板
   let guard=0;
   while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）
@@ -1687,6 +1688,28 @@ function fitPracticeUI(){
     root.style.setProperty('--ui-scale', String(scale));
     guard++;
   }
+  // ══ ★ 手机端：用第①页的剩余空间「单独放大米字格」（其他元素一律不动）══
+  try{
+    if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+      const cp=screen.querySelector('.char-panel');
+      const sc=document.getElementById('stroke-canvas');
+      if(cp && sc && cp.offsetParent!==null && sc.clientWidth>0){
+        const free=cp.clientHeight - cp.scrollHeight;             // 面板底部剩余空间
+        const cur=sc.clientWidth;
+        const maxByWidth=(cp.clientWidth-46)/cur;                 // 宽度上限（留出左右内边距）
+        let boost=Math.min(1+Math.max(free,0)/cur, maxByWidth, 1.8);
+        boost=Math.max(1, Math.floor(boost*100)/100);
+        root.style.setProperty('--char-boost', String(boost));
+        // 防溢出回退：放大后若反而溢出，按 0.05 步退
+        let g2=0;
+        while(cp.scrollHeight - cp.clientHeight > 2 && boost>1 && g2<24){
+          boost=Math.max(1, Math.round((boost-0.05)*100)/100);
+          root.style.setProperty('--char-boost', String(boost));
+          g2++;
+        }
+      }
+    }
+  }catch(e){ root.style.setProperty('--char-boost','1'); }
 }
 // ══ 视口高度冻结：iOS 滚动时地址栏收放会抖动 innerHeight，导致内容反复缩放 ══
 //   策略：只在「明确时机」（载入/进练习/换字/横竖屏）拍一次快照冻结；
@@ -3173,9 +3196,9 @@ async function playStrokes(){
 
   // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
   canvas.innerHTML = `
-    <div style="position:relative;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale))">
+    <div style="position:relative;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1))">
       <div id="hw-target" style="position:absolute;inset:0"></div>
-      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));pointer-events:none"></svg>
+      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));pointer-events:none"></svg>
     </div>`;
 
   try{
@@ -3232,9 +3255,9 @@ async function playStrokes(){
       overlay.appendChild(numG);
     }
 
-    // ★ 跟随当前 --ui-scale 创建（修复：固定 240 在缩放后被 CSS 裁切 → 笔画乱飞）
-    const _hwScale=parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui-scale'))||1;
-    const _hwPx=Math.max(120, Math.round(240*_hwScale));
+    // ★ 直接量米字格的真实显示宽度（含 --ui-scale 与 --char-boost），保证不裁切
+    const _scEl=document.getElementById('stroke-canvas');
+    const _hwPx=Math.max(120, Math.round((_scEl&&_scEl.clientWidth)||240));
     _hanziWriter = HanziWriter.create('hw-target', char, {
       width: _hwPx,
       height: _hwPx,

@@ -579,7 +579,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:1rem !important;padding:9px 18px !important;margin-top:8px !important}
   .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
-  #char-info{display:none !important}   /* ★ 分步向导第①页不显示该灰框（信息与④例词重复，且会顶出底部被遮挡）*/
+  #char-info{font-size:0.92rem !important;padding:12px 14px !important;margin-top:10px !important}   /* ★ 显示拼音+英文释义框（计入一屏高度，不再遮挡）*/
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -2105,8 +2105,8 @@ function checkPinyin(btn,chosen,correct,data,char){
     const info=document.getElementById('char-info');
     info.innerHTML=`<strong style="font-size:2.16rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.62rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
     info.style.display='block';info.style.fontSize='0.96rem';info.style.padding='16px 18px';info.style.textAlign='center';info.style.borderRadius='12px';
-    
-    setTimeout(()=>unlockDragSection(char,data),600);
+    requestAnimationFrame(fitPracticeUI);   // ★ 信息框出现后立刻重算一屏：完整可见、米字格让出空间
+    setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
     btn.classList.add('wrong');

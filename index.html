@@ -296,7 +296,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .query-hint{text-align:center;font-size:0.78rem;color:var(--ink-light);margin-bottom:8px;font-family:Georgia,serif}
 
 @media(max-width:768px){
-  .main-content{padding:16px}
+  .main-content{padding:16px;min-height:0}   /* ★ 解除 100vh 下限：它使页面总高永远超一屏，滚动条常驻 */
   .practice-layout{flex-direction:column}
   .query-result-grid{grid-template-columns:1fr}
   /* ★ 首页两卡：居中 + 压缩尺寸，整个首页一屏装下不滑动 */
@@ -563,8 +563,7 @@ body::after{
   /* ★ 一屏适配：向导页高度 = 视口 − 顶栏 − 底部导航，配合 --ui-scale 自动缩放，免滑动 */
   .practice-layout.wizard{
     padding-bottom:0;
-    height:calc(100vh - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
-    height:calc(100dvh - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
     overflow:hidden;
   }
   .practice-layout.wizard > .char-panel,
@@ -1652,7 +1651,9 @@ const HSK1_CHARS=Object.keys(CHAR_DB);  // 兼容老代码
 function updateStructHeight(){
   const bar=document.getElementById('struct-bar');
   const h=bar?bar.offsetHeight:0;
-  document.documentElement.style.setProperty('--struct-h', h+'px');
+  const ab=document.getElementById('header-actions-bar');           // ★ 手机端搬出来的按钮条也要计入头部高度
+  const total=h+(ab&&ab.offsetParent!==null?ab.offsetHeight:0);
+  document.documentElement.style.setProperty('--struct-h', total+'px');
   fitPracticeUI();
 }
 
@@ -1679,10 +1680,35 @@ function fitPracticeUI(){
     guard++;
   }
 }
-// 窗口尺寸/缩放变化时重新适配（防抖）
+// ══ 视口高度冻结：iOS 滚动时地址栏收放会抖动 innerHeight，导致内容反复缩放 ══
+//   策略：以「见过的最小高度」为基准冻结成固定像素；只有宽度变化(横竖屏)才重置
+function setFitVH(force){
+  const h=window.innerHeight;
+  if(force || !window._fitVH || h<window._fitVH-1){
+    window._fitVH=h;
+    document.documentElement.style.setProperty('--fit-vh', h+'px');
+    return true;
+  }
+  return false;
+}
+setFitVH(true);
+// 窗口尺寸变化：宽度变了(横竖屏/真缩放)才全量重算；纯高度抖动(地址栏)最多只收紧一次基准
+window._lastVW=window.innerWidth;
 window.addEventListener('resize', ()=>{
   clearTimeout(window._fitTimer);
-  window._fitTimer=setTimeout(()=>{ updateStructHeight(); }, 120);
+  window._fitTimer=setTimeout(()=>{
+    const w=window.innerWidth;
+    if(w!==window._lastVW){
+      window._lastVW=w;
+      setFitVH(true);                                  // 宽度变化 → 重置基准并全量重算
+      if(typeof relocateHeaderButtons==='function') relocateHeaderButtons();
+      updateStructHeight();
+      if(typeof wizSync==='function') wizSync();
+    } else if(setFitVH(false)){
+      updateStructHeight();                            // 基准收紧一次（只会变小），不会来回跳
+    }
+    // 高度抖动且未收紧 → 什么都不做，内容纹丝不动
+  }, 120);
 });
 
 function toggleQR(){
@@ -1759,7 +1785,7 @@ function relocateHeaderButtons(){
   if(typeof updateStructHeight==='function') updateStructHeight();   // 标题栏高度变了，重测
 }
 window.addEventListener('load', relocateHeaderButtons);
-window.addEventListener('resize', ()=>{ clearTimeout(window._relocTimer); window._relocTimer=setTimeout(relocateHeaderButtons,150); });
+// （resize 时的搬运已并入统一的「宽度门控」处理器，避免地址栏抖动触发重排）
 
 // ══════════════════════════════════════════════════════════
 // ★ 移动端「分步翻页向导」控制器（仅手机/平板生效；桌面三栏不动）
@@ -1825,7 +1851,7 @@ function wizNext(){ if(_wiz.step<_wiz.max){ _wiz.step++; wizSync(); _wizTop(); }
 // 自动前进（由各流转点调用）：解锁到第 n 步；手机端同时翻到该页
 function wizAdvance(n){ _wiz.max=Math.max(_wiz.max,n); if(wizMobile()){ _wiz.step=n; } wizSync(); if(wizMobile()) _wizTop(); }
 
-window.addEventListener('resize', wizSync);
+// （wizSync 的 resize 触发已并入统一的「宽度门控」处理器）
 window.addEventListener('load', ()=>{ wizBuildNav(); wizSync(); });
 // 字体加载完成后再适配一次：Windows 字体度量与 Mac 不同，晚到的字体可能撑高内容
 if(document.fonts && document.fonts.ready){

@@ -489,12 +489,67 @@ body::after{
   .comp-chip{min-height:68px}
   /* 顶部操作按钮在窄屏不至于挤压换行难看 */
   .struct-action-btn{padding:8px 14px;font-size:1rem}
+  /* ★ 顶栏改竖排：标题在上，两组悬浮按钮落到标题下方（解除绝对定位，不再压住产品名） */
+  .struct-bar-header{flex-direction:column;gap:10px;padding:10px 14px}
+  .struct-bar-header > div:not(.struct-bar-title){
+    position:static !important;     /* 覆盖内联的 position:absolute */
+    transform:none !important;      /* 覆盖内联的 translateY(-50%) */
+    right:auto !important;left:auto !important;top:auto !important;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
 }
 
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
 @media(hover:none) and (pointer:coarse){
   .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
   .comp-chip{min-height:64px}
+}
+
+/* ════════════════════════════════════════════════
+   ★ 移动端「分步翻页向导」（仅手机/平板；桌面三栏完全不受影响）
+   ════════════════════════════════════════════════ */
+#wizard-nav{display:none}   /* 桌面：始终隐藏 */
+#wizard-nav .wiz-btn{
+  flex:0 0 auto;padding:9px 12px;border-radius:10px;
+  border:1px solid rgba(255,255,255,0.25);
+  background:rgba(255,255,255,0.12);color:#fff;
+  font-family:inherit;font-size:0.92rem;letter-spacing:0.04em;cursor:pointer;
+  white-space:nowrap;transition:opacity .2s;
+}
+#wizard-nav .wiz-btn:disabled{opacity:0.3;cursor:default}
+#wizard-nav .wizard-dots{display:flex;gap:4px;flex:1 1 auto;justify-content:center}
+#wizard-nav .wdot{
+  display:flex;flex-direction:column;align-items:center;gap:1px;
+  min-width:44px;padding:4px 4px;border:none;background:transparent;
+  border-radius:9px;cursor:pointer;font-family:inherit;color:rgba(255,255,255,0.85);
+}
+#wizard-nav .wdot b{font-size:1.1rem;line-height:1;font-weight:400}
+#wizard-nav .wdot i{font-size:0.6rem;font-style:normal;letter-spacing:0.05em}
+#wizard-nav .wdot.active{background:rgba(255,255,255,0.18);color:#fff}
+#wizard-nav .wdot.active b{color:#f4d35e}
+#wizard-nav .wdot.locked{opacity:0.36;cursor:default}
+
+@media(max-width:768px){
+  #wizard-nav{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    position:fixed;left:0;right:0;bottom:0;z-index:1200;
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));
+    background:rgba(20,40,30,0.94);backdrop-filter:blur(8px);
+    border-top:1px solid rgba(255,255,255,0.16);
+  }
+  /* 向导模式：一次只显示「一步」 */
+  .practice-layout.wizard{padding-bottom:94px}
+  .practice-layout.wizard > .char-panel,
+  .practice-layout.wizard > .structure-panel,
+  .practice-layout.wizard > .word-panel{display:none}
+  .practice-layout.wizard[data-step="1"] > .char-panel{display:flex}
+  .practice-layout.wizard[data-step="2"] > .structure-panel{display:flex}
+  .practice-layout.wizard[data-step="3"] > .word-panel,
+  .practice-layout.wizard[data-step="4"] > .word-panel{display:flex}
+  .practice-layout.wizard[data-step="3"] .word-box{display:none}   /* ③ 书写：只显示书写框 */
+  .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
+  .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
 </style>
 </head>
@@ -1628,6 +1683,84 @@ function toggleStructBar(){
 }
 
 window.addEventListener('load', updateStructHeight);
+// ★ 手机端默认收起「13 种结构」栏（桌面保持展开）
+function applyMobileStructDefault(){
+  if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    const body=document.getElementById('struct-body');
+    const chevron=document.getElementById('struct-chevron');
+    const btn=document.getElementById('toggle-struct-btn');
+    if(body && body.classList.contains('open')){
+      body.classList.remove('open');
+      if(chevron) chevron.classList.remove('open');
+      if(btn) btn.textContent='展开 / Expand';
+    }
+  }
+  updateStructHeight();
+}
+window.addEventListener('load', applyMobileStructDefault);
+
+// ══════════════════════════════════════════════════════════
+// ★ 移动端「分步翻页向导」控制器（仅手机/平板生效；桌面三栏不动）
+//   步骤：① 拼音 → ② 部件 → ③ 书写 → ④ 例词
+//   自动前进：拼音对/拼合完成/写完字 时各自前进一步；可「上一步」回翻
+// ══════════════════════════════════════════════════════════
+const _wiz={step:1, max:1};
+function wizMobile(){ return !!(window.matchMedia && window.matchMedia('(max-width:768px)').matches); }
+function _wizTop(){ if(wizMobile()){ try{ window.scrollTo({top:0,behavior:'smooth'}); }catch(e){ window.scrollTo(0,0); } } }
+
+function wizBuildNav(){
+  if(document.getElementById('wizard-nav')) return;
+  const ps=document.getElementById('practice-screen'); if(!ps) return;
+  const marks=['①','②','③','④'], zh=['拼音','部件','书写','例词'];
+  const dots=[1,2,3,4].map(n=>
+    `<button class="wdot" data-s="${n}" onclick="wizGoto(${n})"><b>${marks[n-1]}</b><i>${zh[n-1]}</i></button>`
+  ).join('');
+  const nav=document.createElement('div');
+  nav.id='wizard-nav';
+  nav.innerHTML=`<button id="wiz-prev" class="wiz-btn" onclick="wizPrev()">‹ 上一步</button>`
+    +`<div class="wizard-dots">${dots}</div>`
+    +`<button id="wiz-next" class="wiz-btn">下一步 ›</button>`;
+  ps.appendChild(nav);
+}
+
+function wizSync(){
+  wizBuildNav();
+  const layout=document.querySelector('#practice-screen .practice-layout');
+  if(layout){
+    if(wizMobile()){ layout.classList.add('wizard'); layout.setAttribute('data-step', String(_wiz.step)); }
+    else { layout.classList.remove('wizard'); layout.removeAttribute('data-step'); }
+  }
+  const prev=document.getElementById('wiz-prev');
+  const next=document.getElementById('wiz-next');
+  if(prev) prev.disabled=(_wiz.step<=1);
+  if(next){
+    if(_wiz.step>=4){            // 最后一页：按钮变「下一个字」
+      next.textContent='下一个字 →';
+      next.disabled=false;
+      next.onclick=()=>nextCharacter();
+    } else {
+      next.textContent='下一步 ›';
+      next.disabled=(_wiz.step>=_wiz.max);   // 只能前进到已解锁的步
+      next.onclick=()=>wizNext();
+    }
+  }
+  document.querySelectorAll('#wizard-nav .wdot').forEach(d=>{
+    const s=parseInt(d.dataset.s,10);
+    d.classList.toggle('active', s===_wiz.step);
+    d.classList.toggle('locked', s>_wiz.max);
+    d.disabled=(s>_wiz.max);
+  });
+}
+
+function wizReset(){ _wiz.step=1; _wiz.max=1; wizSync(); _wizTop(); }
+function wizGoto(n){ n=+n; if(n<1||n>_wiz.max) return; _wiz.step=n; wizSync(); _wizTop(); }
+function wizPrev(){ if(_wiz.step>1){ _wiz.step--; wizSync(); _wizTop(); } }
+function wizNext(){ if(_wiz.step<_wiz.max){ _wiz.step++; wizSync(); _wizTop(); } }
+// 自动前进（由各流转点调用）：解锁到第 n 步；手机端同时翻到该页
+function wizAdvance(n){ _wiz.max=Math.max(_wiz.max,n); if(wizMobile()){ _wiz.step=n; } wizSync(); if(wizMobile()) _wizTop(); }
+
+window.addEventListener('resize', wizSync);
+window.addEventListener('load', ()=>{ wizBuildNav(); wizSync(); });
 // 字体加载完成后再适配一次：Windows 字体度量与 Mac 不同，晚到的字体可能撑高内容
 if(document.fonts && document.fonts.ready){
   document.fonts.ready.then(()=>{ updateStructHeight(); setTimeout(fitPracticeUI,150); });
@@ -1822,6 +1955,7 @@ function loadCharacter(char){
   // 内容更新后重新适配一屏（笔画 SVG 异步渲染，故延时再测一次）
   requestAnimationFrame(fitPracticeUI);
   setTimeout(fitPracticeUI, 200);
+  wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
 }
 
 function renderPinyinOptions(char,data){
@@ -1877,6 +2011,7 @@ function unlockDragSection(char,data){
   if(_rs){ void _rs.offsetWidth; _rs.style.transition=''; } // 恢复过渡，供本字合并成功时正常淡入
   renderDragZones(char,data);
   renderCompPool(char,data);
+  wizAdvance(2);   // ★ 拼音完成 → 移动端自动翻到 ② 拖拽部件
 }
 
 // ★ 包围结构类型集合
@@ -2776,6 +2911,7 @@ function mergeCharacter(){
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
   state.sessionIndex++;
+  setTimeout(()=>wizAdvance(3), 650);   // ★ 拼合完成 → 移动端自动翻到 ③ 书写练习
 }
 
 // ══ 笔画渲染（彩虹色静态 + 动画播放） ══
@@ -3114,6 +3250,7 @@ function startWritingQuiz(){
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
+        setTimeout(()=>wizAdvance(4), 700);   // ★ 写完字 → 移动端自动翻到 ④ 例词
       },
     });
   }catch(err){

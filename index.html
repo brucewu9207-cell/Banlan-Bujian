@@ -564,6 +564,7 @@ body::after{
   .practice-layout.wizard{
     padding-bottom:0;
     height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
+    min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }
   .practice-layout.wizard > .char-panel,
@@ -1649,6 +1650,7 @@ const HSK1_CHARS=Object.keys(CHAR_DB);  // 兼容老代码
 
 
 function updateStructHeight(){
+  if(typeof setFitVH==='function') setFitVH();                      // ★ 定点刷新视口快照（不会在滚动中触发）
   const bar=document.getElementById('struct-bar');
   const h=bar?bar.offsetHeight:0;
   const ab=document.getElementById('header-actions-bar');           // ★ 手机端搬出来的按钮条也要计入头部高度
@@ -1681,18 +1683,17 @@ function fitPracticeUI(){
   }
 }
 // ══ 视口高度冻结：iOS 滚动时地址栏收放会抖动 innerHeight，导致内容反复缩放 ══
-//   策略：以「见过的最小高度」为基准冻结成固定像素；只有宽度变化(横竖屏)才重置
-function setFitVH(force){
-  const h=window.innerHeight;
-  if(force || !window._fitVH || h<window._fitVH-1){
-    window._fitVH=h;
-    document.documentElement.style.setProperty('--fit-vh', h+'px');
-    return true;
-  }
-  return false;
+//   策略：只在「明确时机」（载入/进练习/换字/横竖屏）拍一次快照冻结；
+//   滚动期间不重算。瞬时异常值（如 Telegram 打开动画期的极小高度）一律不采信。
+function setFitVH(){
+  const h=Math.max(window.innerHeight||0, document.documentElement.clientHeight||0);
+  if(h<300) return false;                                  // ★ 下限保护：瞬时小值不采信，防"整页消失"
+  window._fitVH=h;
+  document.documentElement.style.setProperty('--fit-vh', h+'px');
+  return true;
 }
-setFitVH(true);
-// 窗口尺寸变化：宽度变了(横竖屏/真缩放)才全量重算；纯高度抖动(地址栏)最多只收紧一次基准
+setFitVH();
+// 窗口尺寸变化：宽度变了(横竖屏/真缩放)才全量重算；纯高度抖动(地址栏)一律忽略
 window._lastVW=window.innerWidth;
 window.addEventListener('resize', ()=>{
   clearTimeout(window._fitTimer);
@@ -1700,14 +1701,12 @@ window.addEventListener('resize', ()=>{
     const w=window.innerWidth;
     if(w!==window._lastVW){
       window._lastVW=w;
-      setFitVH(true);                                  // 宽度变化 → 重置基准并全量重算
+      setFitVH();                                          // 宽度变化 → 重新快照并全量重算
       if(typeof relocateHeaderButtons==='function') relocateHeaderButtons();
       updateStructHeight();
       if(typeof wizSync==='function') wizSync();
-    } else if(setFitVH(false)){
-      updateStructHeight();                            // 基准收紧一次（只会变小），不会来回跳
     }
-    // 高度抖动且未收紧 → 什么都不做，内容纹丝不动
+    // 纯高度变化（地址栏收放）→ 什么都不做，内容纹丝不动
   }, 120);
 });
 
@@ -1844,7 +1843,7 @@ function wizSync(){
   requestAnimationFrame(fitPracticeUI);
 }
 
-function wizReset(){ _wiz.step=1; _wiz.max=1; wizSync(); _wizTop(); }
+function wizReset(){ setFitVH(); _wiz.step=1; _wiz.max=1; wizSync(); _wizTop(); }
 function wizGoto(n){ n=+n; if(n<1||n>_wiz.max) return; _wiz.step=n; wizSync(); _wizTop(); }
 function wizPrev(){ if(_wiz.step>1){ _wiz.step--; wizSync(); _wizTop(); } }
 function wizNext(){ if(_wiz.step<_wiz.max){ _wiz.step++; wizSync(); _wizTop(); } }

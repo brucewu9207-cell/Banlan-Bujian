@@ -16,6 +16,7 @@
   --porcelain:#4a5e8a; --vermillion:#c84b2f;
   --jade:#3a7a5a; --gold:#c8960a;
   --radius:12px;
+  --ui-scale:1;   /* 自适应缩放：内容溢出时由 JS 调小，塞进一屏（Mac 保持 1） */
   --shadow:0 4px 20px rgba(44,36,22,0.12);
   --shadow-lg:0 8px 40px rgba(44,36,22,0.18);
 }
@@ -82,17 +83,17 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* ★ 左右等高的关键 */
 .practice-layout{display:flex;gap:22px;align-items:stretch;height:calc(100vh - 100px)}
-.char-panel{flex:3.885;padding:18px 22px;display:flex;flex-direction:column;overflow-y:auto}
-.structure-panel{flex:5.9;padding:18px 14px 8px;display:flex;flex-direction:column;overflow-y:auto;order:2}
+.char-panel{flex:3.885;padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;overflow-y:auto}
+.structure-panel{flex:5.9;padding:calc(18px*var(--ui-scale)) 14px calc(8px*var(--ui-scale));display:flex;flex-direction:column;overflow-y:auto;order:2}
 .word-panel{flex:3.885;display:flex;flex-direction:column;gap:14px;overflow-y:auto;padding:0;order:3}
 /* 中栏上下两个独立方框 */
-.write-box{padding:18px 22px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
-.word-box{padding:18px 22px;display:flex;flex-direction:column;flex:1;min-height:0}
+.write-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.word-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;flex:1;min-height:0}
 /* 书写练习字台：白底 + 米字格 + HanziWriter + 打勾层 */
-.write-stage{position:relative;width:240px;height:240px;background:#ffffff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.12)}
-.write-grid{position:absolute;inset:0;width:240px;height:240px;pointer-events:none;z-index:1}
+.write-stage{position:relative;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));background:#ffffff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.12)}
+.write-grid{position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));pointer-events:none;z-index:1}
 .write-grid .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
-#write-target{position:absolute;inset:0;width:240px;height:240px;z-index:2;background:transparent;touch-action:none}
+#write-target{position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));z-index:2;background:transparent;touch-action:none}
 .write-check{position:absolute;top:6px;right:6px;display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#2a9d8f;font-size:1.3rem;color:#fff;font-weight:700;pointer-events:none;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
 .write-check.show{display:flex;animation:fadeIn .3s}
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
@@ -102,8 +103,8 @@ body::before{content:'';position:fixed;inset:0;background:
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'KaiTi','STKaiti','楷体',serif}
-.char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:240px;height:240px;background:#ffffff;border-radius:6px}
-.char-display #stroke-canvas svg{width:240px;height:240px;display:block}
+.char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));background:#ffffff;border-radius:6px}
+.char-display #stroke-canvas svg{width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));display:block}
 .char-display #stroke-canvas svg .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
 .char-display #stroke-canvas svg .stroke-path{stroke-linecap:round;stroke-linejoin:round}
 .char-display #stroke-canvas svg .stroke-num-circle{stroke:#fff;stroke-width:1.5}
@@ -113,7 +114,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .step-btn:hover{transform:scale(1.1);background:#fff}
 .char-display .step-btn svg{width:15px;height:15px;fill:#3a6b4e}
 /* 汉字下方的笔顺控制按钮（播放 / 下一笔） */
-.stroke-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.stroke-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:calc(12px*var(--ui-scale));flex-wrap:wrap}
+/* HSK 级别方框（与例词里的 HSK 方框样式一致），位于控制区左侧 */
+.hsk-level-badge{display:inline-block;padding:4px 13px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:0.95rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;line-height:1.2;white-space:nowrap}
 .stroke-ctrl-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.95rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .stroke-ctrl-btn:hover{background:#8b2c2c;transform:translateY(-2px)}
 .stroke-ctrl-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
@@ -131,7 +134,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.pinyin-btn{padding:10px 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:2.3rem;color:#ffffff;transition:all .2s;letter-spacing:0.06em}
+.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.3rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -198,11 +201,10 @@ body::before{content:'';position:fixed;inset:0;background:
   align-items:center;
   justify-content:center;
   gap:8px;
-  transition:opacity .4s ease;
   padding:10px;
 }
 .drag-right .result-char{
-  font-size:7.8rem;
+  font-size:calc(7.8rem*var(--ui-scale));
   line-height:1;
   display:block;
   font-family:'KaiTi','STKaiti','楷体',serif;
@@ -235,7 +237,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool{margin-bottom:8px;flex-shrink:0}
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
-.comp-chip{padding:14px 0;border-radius:12px;font-size:3.6rem;cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
+.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -322,7 +324,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .struct-bar-chevron{width:18px;height:18px;color:#ffffff;transition:transform .3s;flex-shrink:0;position:absolute;right:28px;top:50%;transform:translateY(-50%)}
 .qr-chevron{transition:transform .3s}
 #qr-btn.open .qr-chevron{transform:rotate(180deg)}
-.qr-popover{position:absolute;left:28px;top:100%;margin-top:10px;z-index:1000;background:var(--paper,#f5edd8);border:1px solid rgba(255,255,255,0.55);border-radius:14px;padding:16px 16px 12px;box-shadow:0 14px 40px rgba(20,40,30,0.35);text-align:center;transform-origin:top left;opacity:0;visibility:hidden;transform:scaleY(0.85) translateY(-6px);transition:opacity .22s ease,transform .22s ease}
+.qr-popover{position:absolute;left:0;top:100%;margin-top:10px;z-index:1000;background:var(--paper,#f5edd8);border:1px solid rgba(255,255,255,0.55);border-radius:14px;padding:16px 16px 12px;box-shadow:0 14px 40px rgba(20,40,30,0.35);text-align:center;transform-origin:top left;opacity:0;visibility:hidden;transform:scaleY(0.85) translateY(-6px);transition:opacity .22s ease,transform .22s ease}
 .qr-popover.open{opacity:1;visibility:visible;transform:none}
 .qr-title{font-family:Georgia,serif;font-size:0.82rem;font-weight:700;color:#8b2c2c;letter-spacing:0.08em;margin-bottom:10px}
 .qr-img{display:block;width:182px;height:182px;border-radius:8px;margin:0 auto}
@@ -371,9 +373,9 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 
 .step-title{
-  font-size:1.2rem;
+  font-size:calc(1.2rem*var(--ui-scale));
   letter-spacing:0.06em;
-  margin-bottom:12px;
+  margin-bottom:calc(12px*var(--ui-scale));
   padding:0 2px;
   text-align:center;
 }
@@ -503,7 +505,7 @@ body::after{
       <div style="display:flex;align-items:center;justify-content:center;gap:14px">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
         <span class="struct-bar-zh">斑斓部件</span>
-        <span style="color:#ffffff;font-size:1.05rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
+        <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
       </div>
       <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:9px">
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: Mozhou</span>
@@ -515,8 +517,7 @@ body::after{
       反馈 / Feedback
     </button>
     <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">折叠 / Collapse</button></div>
-    <div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdQAAAHUCAIAAAAMRU47AAALOklEQVR4nO3dO7YbxxVAUdFLA3Hi1MNhwglwSJqAEg3HqRPNBA7oxaVAemoChXuqu/eO+fqDBo7qQazLT4/H4ycAZv2jvgCAOxJfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgR+njzZP//9r8nTbeX3//z3b//Mkdfnzsc5YvI9tuqaj1h1X6ue11VNPlMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgMDrb4YjJvdWrTO6F323ewqp7v+o8gavOZPA5fZ2VL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQ2G62wxF33sO+6nquOitg1cyKVedaZbe5BEec8f0zycoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDVe0232C3+Q+r7mvVNZ9xRgT7sPIFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQJmO5zM5HyDVbMLJuct7DYnYbd5FOzDyhcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCJxytsOqmQO72W3ewuRxzmhyHsUZ5z/c+b1xhJUvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxDYbrbDbvvTz2hyVoDjzBxnN2e85t1Y+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgdHZDkf2ufOxyT31k/MNJk3OWzjjDITdntdVWfkCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHR2Q6rmG/w+rlWvYar7mvVa3jnZ3HEbp+dI854zUdY+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4Age1mO0zu8V9lt+tZZbdZCrvNf9htJsMZZ3pMnmu3z6CVL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQGJ3tsNv+9FV2m2+wym7zMY6YfBaTdvtc7PY673Y9R1j5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCBT4/HY+xkq/aen3HP+G5zLa56zUfsNhtkld1mFxxxxvfzKla+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHRf72Ye9pt59WS67nqNjnGiC/P262qk77fuwrznO1mO0zOCpi0297z3fa5X9Vuz/SIM87rOCPf+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+MIb3XkTAR8TX4CA+PLnLNlW8Uryp0ZnOxwxOf9h8lOx2zwKRTiX3eY2XHUexeTnwsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgH9Akzf6/PVLfQmv+u2XX+tL4JrEl/Uu0Nzvvt+LCrOWrx1Y7Erl/aOr3hcVK1+WuXyevt2gJTBLjM52mJxvsGqv9yqTe+GTuQ2XL+8fre3v5DyTO9ttnomvHVjgVuX96X73yzuIL0BAfHnVPZeB97xrFhJfXnLnBt353nmd+AIExBcgIL48z+/dXgGeZpMF0574S7JPNG7mLPA08WXO03sTvv3gwTjOnAVe5GsHhry+K+zIEWbOAq+z8mXCH4v2yncIv/3y6wc/PnMWWOKU8V21z33yOEes2pv/+nHetwv+uah9/vrlhxakM2f5IS8+lN3eh2ZNvM7XDrzd96K9spz827m6M2eBVcQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIFTznaY3Od+xKrr2W1GBAu9+HAnn+nk3IbJz+lurHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgMDobIfJ2QVXnbcwec0s9MEbYPI9tmpuwxnfY7vdl5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxD49Hg8xk42Od/gqufayuevXw7+yd9++fVHf+SJI8yc5a9+hDe56ufLypdRz6XqR39q5izwitGpZtzW569fvqftlcZ9vCCdOQssYeXLkNeLduQIM2eB11n5Mudb155Yk/5QEGfOAi8SX6bNNE5J2ZyvHXie/0PlFeBp4gsQEF+AgPjykjv/3n3ne+d14sur7tmge941C4kvQOCUsx0mTe4HP/L67LY//btb/dWuJ5a9HzzcyfkhR6y6nt3u64jJz5eVL2vc59fw+9wpb2WTBct8q9KFl8Cyy0JWvix21UJd9b6oWPmy3utzdfehubyJ+PJGygV/xdcOAAHxBQiIL0BAfAEC4gsQEF94u9020bKD7f6q2eR+8N3OtdWe+m2HSJzRxy/m5EyPyf8MTH52zsjKFyAgvvw5vynDW4kvQEB8AQLiCxAQX3gX35vzAfGFt1BePia+sJ7y8rfEFxZTXo4QX1hJeTlIfGEZ5eW4T4/HY+xku81kmNwzfsaP5VX31E+afO67zSpZZWyeycHjrGLlCxAQX3jGGX+VYSvbjZSEv3LV0Yvck5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCGw322G3eQL2wr/ujM90t2s+wiaUj+32TK18AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DAKf8Bzcl95WfcC7/qmifnP0zOo5i8ryN2mzlwxG6v4RlZ+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgVPOdlhlcm7DGeckHLHbcY7YbW7D5PPabd7CVe/rCCtfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDw6fF41NfA/51xj/9uswuuavJ5rbLbc9/teqx8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DA6GyHVfvTz2hyJsNucxJ2m0uw6jWcPM4qV72vI3b7XFj5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCB7WY77Lb/+ojd7ssshevZ7ZkesdtshyMmXx8rX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcg8HN9Ac+Y3DO+2174I9ezak7CEbvNbZg8zqRV13zG+zpit/s6wsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDna2aXbDKbnMSdrueI1Y9r8nZF0esmjWx2zyTVax8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA2Q4XtGq//G5zJCavZ3JWwKrjTM5kWDVv4YjdrmcVK1+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXIHDK2Q677dFeZbd5ApPXc8QZr2c3u81buDMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgsN1sh8m9+Vc1uad+t3kLR5xxvsFuMyvO+B7bbdaElS9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEPj0eDzqawC4HStfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDwPzodl4cVtqrFAAAAAElFTkSuQmCC" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div>
-    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="display:none;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">← 返回 / Back</button><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button></div>
+    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="display:none;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdQAAAHUCAIAAAAMRU47AAALOklEQVR4nO3dO7YbxxVAUdFLA3Hi1MNhwglwSJqAEg3HqRPNBA7oxaVAemoChXuqu/eO+fqDBo7qQazLT4/H4ycAZv2jvgCAOxJfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgR+njzZP//9r8nTbeX3//z3b//Mkdfnzsc5YvI9tuqaj1h1X6ue11VNPlMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgMDrb4YjJvdWrTO6F323ewqp7v+o8gavOZPA5fZ2VL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQ2G62wxF33sO+6nquOitg1cyKVedaZbe5BEec8f0zycoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDVe0232C3+Q+r7mvVNZ9xRgT7sPIFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQJmO5zM5HyDVbMLJuct7DYnYbd5FOzDyhcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCJxytsOqmQO72W3ewuRxzmhyHsUZ5z/c+b1xhJUvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxDYbrbDbvvTz2hyVoDjzBxnN2e85t1Y+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgdHZDkf2ufOxyT31k/MNJk3OWzjjDITdntdVWfkCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHR2Q6rmG/w+rlWvYar7mvVa3jnZ3HEbp+dI854zUdY+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4Age1mO0zu8V9lt+tZZbdZCrvNf9htJsMZZ3pMnmu3z6CVL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQGJ3tsNv+9FV2m2+wym7zMY6YfBaTdvtc7PY673Y9R1j5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCBT4/HY+xkq/aen3HP+G5zLa56zUfsNhtkld1mFxxxxvfzKla+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHRf72Ye9pt59WS67nqNjnGiC/P262qk77fuwrznO1mO0zOCpi0297z3fa5X9Vuz/SIM87rOCPf+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+MIb3XkTAR8TX4CA+PLnLNlW8Uryp0ZnOxwxOf9h8lOx2zwKRTiX3eY2XHUexeTnwsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgH9Akzf6/PVLfQmv+u2XX+tL4JrEl/Uu0Nzvvt+LCrOWrx1Y7Erl/aOr3hcVK1+WuXyevt2gJTBLjM52mJxvsGqv9yqTe+GTuQ2XL+8fre3v5DyTO9ttnomvHVjgVuX96X73yzuIL0BAfHnVPZeB97xrFhJfXnLnBt353nmd+AIExBcgIL48z+/dXgGeZpMF0574S7JPNG7mLPA08WXO03sTvv3gwTjOnAVe5GsHhry+K+zIEWbOAq+z8mXCH4v2yncIv/3y6wc/PnMWWOKU8V21z33yOEes2pv/+nHetwv+uah9/vrlhxakM2f5IS8+lN3eh2ZNvM7XDrzd96K9spz827m6M2eBVcQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIFTznaY3Od+xKrr2W1GBAu9+HAnn+nk3IbJz+lurHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgMDobIfJ2QVXnbcwec0s9MEbYPI9tmpuwxnfY7vdl5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxD49Hg8xk42Od/gqufayuevXw7+yd9++fVHf+SJI8yc5a9+hDe56ufLypdRz6XqR39q5izwitGpZtzW569fvqftlcZ9vCCdOQssYeXLkNeLduQIM2eB11n5Mudb155Yk/5QEGfOAi8SX6bNNE5J2ZyvHXie/0PlFeBp4gsQEF+AgPjykjv/3n3ne+d14sur7tmge941C4kvQOCUsx0mTe4HP/L67LY//btb/dWuJ5a9HzzcyfkhR6y6nt3u64jJz5eVL2vc59fw+9wpb2WTBct8q9KFl8Cyy0JWvix21UJd9b6oWPmy3utzdfehubyJ+PJGygV/xdcOAAHxBQiIL0BAfAEC4gsQEF94u9020bKD7f6q2eR+8N3OtdWe+m2HSJzRxy/m5EyPyf8MTH52zsjKFyAgvvw5vynDW4kvQEB8AQLiCxAQX3gX35vzAfGFt1BePia+sJ7y8rfEFxZTXo4QX1hJeTlIfGEZ5eW4T4/HY+xku81kmNwzfsaP5VX31E+afO67zSpZZWyeycHjrGLlCxAQX3jGGX+VYSvbjZSEv3LV0Yvck5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCGw322G3eQL2wr/ujM90t2s+wiaUj+32TK18AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DAKf8Bzcl95WfcC7/qmifnP0zOo5i8ryN2mzlwxG6v4RlZ+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgVPOdlhlcm7DGeckHLHbcY7YbW7D5PPabd7CVe/rCCtfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDw6fF41NfA/51xj/9uswuuavJ5rbLbc9/teqx8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DA6GyHVfvTz2hyJsNucxJ2m0uw6jWcPM4qV72vI3b7XFj5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCB7WY77Lb/+ojd7ssshevZ7ZkesdtshyMmXx8rX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcg8HN9Ac+Y3DO+2174I9ezak7CEbvNbZg8zqRV13zG+zpit/s6wsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDna2aXbDKbnMSdrueI1Y9r8nZF0esmjWx2zyTVax8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA2Q4XtGq//G5zJCavZ3JWwKrjTM5kWDVv4YjdrmcVK1+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXIHDK2Q677dFeZbd5ApPXc8QZr2c3u81buDMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgsN1sh8m9+Vc1uad+t3kLR5xxvsFuMyvO+B7bbdaElS9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEPj0eDzqawC4HStfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDwPzodl4cVtqrFAAAAAElFTkSuQmCC" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
   <div class="struct-bar-body open" id="struct-body">
@@ -658,8 +659,8 @@ body::after{
         <!-- 入口 B：请输入字/词 -->
         <div class="home-entry home-entry-input">
           <div class="home-entry-icon">✏️</div>
-          <div class="home-entry-zh">请输入字/词</div>
-          <div class="home-entry-en">Enter Characters / Words</div>
+          <div class="home-entry-zh">请输入内容</div>
+          <div class="home-entry-en">Enter Content</div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
             <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
@@ -672,7 +673,7 @@ body::after{
       <div class="level-grid">
         <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-label">入门 · Beginner</span><span class="level-count">Available ✓</span></button>
         <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-label">基础 · Elementary</span><span class="level-count">Available ✓</span></button>
-        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span><span class="level-label">初级 · Pre-intermediate</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span><span class="level-label">初级 · Pre-intermediate</span><span class="level-count">Available ✓</span></button>
         <button class="level-btn" onclick="startLevel(4)"><span class="level-num">HSK 4</span><span class="level-label">中级 · Intermediate</span><span class="level-count">Coming soon</span></button>
         <button class="level-btn" onclick="startLevel(5)"><span class="level-num">HSK 5</span><span class="level-label">中高级 · Upper-inter</span><span class="level-count">Coming soon</span></button>
         <button class="level-btn" onclick="startLevel(6)"><span class="level-num">HSK 6</span><span class="level-label">高级 · Advanced</span><span class="level-count">Coming soon</span></button>
@@ -696,6 +697,7 @@ body::after{
             <div id="stroke-canvas"></div>
           </div>
           <div class="stroke-controls">
+            <span class="hsk-level-badge" id="hsk-level-badge" style="display:none"></span>
             <button class="play-circle-btn" id="play-btn" onclick="playStrokes()" title="播放 / Play" aria-label="播放 / Play">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
@@ -838,334 +840,618 @@ const CHAR_DB = {
   '书':{py:'shū',en:'book',structure:'ov',components:['书'],words:[{w:'读书',py:'dú shū',en:'read / study'}]},
   '为':{py:'wèi',en:'for / because of',structure:'ov',components:['为'],words:[{w:'因为',py:'yīn wèi',en:'because'},{w:'为了',py:'wèi le',en:'in order to'}]},
   // ── 左右结构 ──
-  '你':{py:'nǐ',en:'you',structure:'lr',components:['亻','尔'],compNames:['人旁','尔'],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
-  '好':{py:'hǎo',en:'good',structure:'lr',components:['女','子'],compNames:['女','子'],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
-  '妈':{py:'mā',en:'mother',structure:'lr',components:['女','马'],compNames:['女旁','马'],words:[{w:'妈妈',py:'māma',en:'mother; mom',lv:1}]},
-  '姐':{py:'jiě',en:'elder sister',structure:'lr',components:['女','且'],compNames:['女旁','且'],words:[{w:'姐姐',py:'jiějie',en:'elder sister',lv:1}]},
-  '妹':{py:'mèi',en:'younger sister',structure:'lr',components:['女','未'],compNames:['女旁','未'],words:[{w:'妹妹',py:'mèimei',en:'younger sister',lv:1}]},
-  '他':{py:'tā',en:'he / him',structure:'lr',components:['亻','也'],compNames:['人旁','也'],words:[{w:'他们',py:'tāmen',en:'they (male)',lv:1}]},
-  '她':{py:'tā',en:'she / her',structure:'lr',components:['女','也'],compNames:['女旁','也'],words:[{w:'她们',py:'tāmen',en:'they (female)',lv:1}]},
-  '们':{py:'men',en:'plural marker',structure:'lr',components:['亻','门'],compNames:['人旁','门'],words:[{w:'我们',py:'wǒmen',en:'we; us',lv:1}]},
-  '时':{py:'shí',en:'time',structure:'lr',components:['日','寸'],compNames:['日','寸'],words:[{w:'时候',py:'shíhou',en:'time; moment',lv:1}]},
-  '明':{py:'míng',en:'bright / clear',structure:'lr',components:['日','月'],compNames:['日','月'],words:[{w:'明天',py:'míngtiān',en:'tomorrow',lv:1}]},
-  '吃':{py:'chī',en:'to eat',structure:'lr',components:['口','乞'],compNames:['口旁','乞'],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
-  '吗':{py:'ma',en:'question particle',structure:'lr',components:['口','马'],compNames:['口旁','马'],words:[{w:'是吗',py:'shì ma',en:'is that so?',lv:1}]},
-  '吧':{py:'ba',en:'suggestion particle',structure:'lr',components:['口','巴'],compNames:['口旁','巴'],words:[{w:'好吧',py:'hǎo ba',en:'alright then',lv:1}]},
-  '喝':{py:'hē',en:'to drink',structure:'lr',components:['口','曷'],compNames:['口旁','曷'],words:[{w:'喝水',py:'hē shuǐ',en:'drink water',lv:1}]},
-  '说':{py:'shuō',en:'to speak',structure:'lr',components:['讠','兑'],compNames:['言旁','兑'],words:[{w:'说话',py:'shuō huà',en:'speak; talk',lv:1}]},
-  '读':{py:'dú',en:'to read',structure:'lr',components:['讠','卖'],compNames:['言旁','卖'],words:[{w:'读书',py:'dú shū',en:'read; study',lv:1}]},
-  '请':{py:'qǐng',en:'please / invite',structure:'lr',components:['讠','青'],compNames:['言旁','青'],words:[{w:'请问',py:'qǐngwèn',en:'excuse me; may I ask',lv:1}]},
-  '谢':{py:'xiè',en:'to thank',structure:'lr',components:['讠','射'],compNames:['言旁','射'],words:[{w:'谢谢',py:'xièxie',en:'thank you',lv:1}]},
-  '认':{py:'rèn',en:'to recognize',structure:'lr',components:['讠','人'],compNames:['言旁','忍'],words:[{w:'认识',py:'rènshi',en:'know sb.; recognize',lv:1}]},
-  '语':{py:'yǔ',en:'language',structure:'lr',components:['讠','吾'],compNames:['言旁','吾'],words:[{w:'语言',py:'yǔyán',en:'language',lv:2}]},
-  '话':{py:'huà',en:'speech / word',structure:'lr',components:['讠','舌'],compNames:['言旁','舌'],words:[{w:'电话',py:'diànhuà',en:'telephone',lv:1}]},
-  '汉':{py:'hàn',en:'Chinese / Han',structure:'lr',components:['氵','又'],compNames:['水旁','又'],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
-  '没':{py:'méi',en:'not / without',structure:'lr',components:['氵','殳'],compNames:['水旁','殳'],words:[{w:'没有',py:'méiyǒu',en:'don\'t have; there is no',lv:1}]},
-  '打':{py:'dǎ',en:'to hit / play',structure:'lr',components:['扌','丁'],compNames:['手旁','丁'],words:[{w:'打电话',py:'dǎ diànhuà',en:'make a phone call',lv:1}]},
-  '找':{py:'zhǎo',en:'to look for',structure:'lr',components:['扌','戈'],compNames:['手旁','戈'],words:[{w:'找到',py:'zhǎodào',en:'find; found',lv:2}]},
-  '玩':{py:'wán',en:'to play',structure:'lr',components:['王','元'],compNames:['王旁','元'],words:[{w:'玩儿',py:'wánr',en:'play; have fun',lv:1}]},
-  '在':{py:'zài',en:'at / in / on',structure:'lr',components:['才','土'],compNames:['才','土'],words:[{w:'现在',py:'xiànzài',en:'now',lv:1}]},
-  '忙':{py:'máng',en:'busy',structure:'lr',components:['忄','亡'],compNames:['心旁','亡'],words:[{w:'帮忙',py:'bāng máng',en:'help; do a favor',lv:1}]},
+  '你':{py:'nǐ',en:'you',structure:'lr',components:['亻','尔'],compNames:['人旁','尔'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
+  '好':{py:'hǎo',en:'good',structure:'lr',components:['女','子'],compNames:['女','子'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'你好',py:'nǐ hǎo',en:'hello',lv:1}]},
+  '妈':{py:'mā',en:'mother',structure:'lr',components:['女','马'],compNames:['女旁','马'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'妈妈',py:'māma',en:'mother; mom',lv:1}]},
+  '姐':{py:'jiě',en:'elder sister',structure:'lr',components:['女','且'],compNames:['女旁','且'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'姐姐',py:'jiějie',en:'elder sister',lv:1}]},
+  '妹':{py:'mèi',en:'younger sister',structure:'lr',components:['女','未'],compNames:['女旁','未'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'妹妹',py:'mèimei',en:'younger sister',lv:1}]},
+  '他':{py:'tā',en:'he / him',structure:'lr',components:['亻','也'],compNames:['人旁','也'],splitRanges:[[0,1],[2,3,4]],words:[{w:'他们',py:'tāmen',en:'they (male)',lv:1}]},
+  '她':{py:'tā',en:'she / her',structure:'lr',components:['女','也'],compNames:['女旁','也'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'她们',py:'tāmen',en:'they (female)',lv:1}]},
+  '们':{py:'men',en:'plural marker',structure:'lr',components:['亻','门'],compNames:['人旁','门'],splitRanges:[[0,1],[2,3,4]],words:[{w:'我们',py:'wǒmen',en:'we; us',lv:1}]},
+  '时':{py:'shí',en:'time',structure:'lr',components:['日','寸'],compNames:['日','寸'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'时候',py:'shíhou',en:'time; moment',lv:1}]},
+  '明':{py:'míng',en:'bright / clear',structure:'lr',components:['日','月'],compNames:['日','月'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'明天',py:'míngtiān',en:'tomorrow',lv:1}]},
+  '吃':{py:'chī',en:'to eat',structure:'lr',components:['口','乞'],compNames:['口旁','乞'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
+  '吗':{py:'ma',en:'question particle',structure:'lr',components:['口','马'],compNames:['口旁','马'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'是吗',py:'shì ma',en:'is that so?',lv:1}]},
+  '吧':{py:'ba',en:'suggestion particle',structure:'lr',components:['口','巴'],compNames:['口旁','巴'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'好吧',py:'hǎo ba',en:'alright then',lv:1}]},
+  '喝':{py:'hē',en:'to drink',structure:'lr',components:['口','曷'],compNames:['口旁','曷'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11]],words:[{w:'喝水',py:'hē shuǐ',en:'drink water',lv:1}]},
+  '说':{py:'shuō',en:'to speak',structure:'lr',components:['讠','兑'],compNames:['言旁','兑'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'说话',py:'shuō huà',en:'speak; talk',lv:1}]},
+  '读':{py:'dú',en:'to read',structure:'lr',components:['讠','卖'],compNames:['言旁','卖'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'读书',py:'dú shū',en:'read; study',lv:1}]},
+  '请':{py:'qǐng',en:'please / invite',structure:'lr',components:['讠','青'],compNames:['言旁','青'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'请问',py:'qǐngwèn',en:'excuse me; may I ask',lv:1}]},
+  '谢':{py:'xiè',en:'to thank',structure:'lr',components:['讠','射'],compNames:['言旁','射'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9,10,11]],words:[{w:'谢谢',py:'xièxie',en:'thank you',lv:1}]},
+  '认':{py:'rèn',en:'to recognize',structure:'lr',components:['讠','人'],compNames:['言旁','忍'],splitRanges:[[0,1],[2,3]],words:[{w:'认识',py:'rènshi',en:'know sb.; recognize',lv:1}]},
+  '语':{py:'yǔ',en:'language',structure:'lr',components:['讠','吾'],compNames:['言旁','吾'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'语言',py:'yǔyán',en:'language',lv:2}]},
+  '话':{py:'huà',en:'speech / word',structure:'lr',components:['讠','舌'],compNames:['言旁','舌'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'电话',py:'diànhuà',en:'telephone',lv:1}]},
+  '汉':{py:'hàn',en:'Chinese / Han',structure:'lr',components:['氵','又'],compNames:['水旁','又'],splitRanges:[[0,1,2],[3,4]],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
+  '没':{py:'méi',en:'not / without',structure:'lr',components:['氵','殳'],compNames:['水旁','殳'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'没有',py:'méiyǒu',en:'don\'t have; there is no',lv:1}]},
+  '打':{py:'dǎ',en:'to hit / play',structure:'lr',components:['扌','丁'],compNames:['手旁','丁'],splitRanges:[[0,1,2],[3,4]],words:[{w:'打电话',py:'dǎ diànhuà',en:'make a phone call',lv:1}]},
+  '找':{py:'zhǎo',en:'to look for',structure:'lr',components:['扌','戈'],compNames:['手旁','戈'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'找到',py:'zhǎodào',en:'find; found',lv:2}]},
+  '玩':{py:'wán',en:'to play',structure:'lr',components:['王','元'],compNames:['王旁','元'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'玩儿',py:'wánr',en:'play; have fun',lv:1}]},
+  '在':{py:'zài',en:'at / in / on',structure:'lr',components:['才','土'],compNames:['才','土'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'现在',py:'xiànzài',en:'now',lv:1}]},
+  '忙':{py:'máng',en:'busy',structure:'lr',components:['忄','亡'],compNames:['心旁','亡'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'帮忙',py:'bāng máng',en:'help; do a favor',lv:1}]},
   '我':{py:'wǒ',en:'I / me',structure:'whole',components:['我'],compNames:['我'],words:[{w:'我们',py:'wǒ men',en:'we/us'}]},
-  '很':{py:'hěn',en:'very',structure:'lr',components:['彳','艮'],compNames:['双人旁','艮'],words:[{w:'很好',py:'hěn hǎo',en:'very good',lv:1}]},
-  '对':{py:'duì',en:'correct / towards',structure:'lr',components:['又','寸'],compNames:['又','寸'],words:[{w:'对不起',py:'duìbuqǐ',en:'sorry; excuse me',lv:1}]},
-  '什':{py:'shén',en:'what (in 什么)',structure:'lr',components:['亻','十'],compNames:['人旁','十'],words:[{w:'什么',py:'shénme',en:'what',lv:1}]},
+  '很':{py:'hěn',en:'very',structure:'lr',components:['彳','艮'],compNames:['双人旁','艮'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'很好',py:'hěn hǎo',en:'very good',lv:1}]},
+  '对':{py:'duì',en:'correct / towards',structure:'lr',components:['又','寸'],compNames:['又','寸'],splitRanges:[[0,1],[2,3,4]],words:[{w:'对不起',py:'duìbuqǐ',en:'sorry; excuse me',lv:1}]},
+  '什':{py:'shén',en:'what (in 什么)',structure:'lr',components:['亻','十'],compNames:['人旁','十'],splitRanges:[[0,1],[2,3]],words:[{w:'什么',py:'shénme',en:'what',lv:1}]},
   '那':{py:'nà',en:'that',structure:'whole',components:['那'],compNames:['那'],words:[{w:'那么',py:'nàme',en:'then; in that way',lv:1}]},
-  '哪':{py:'nǎ',en:'which',structure:'lr',components:['口','那'],compNames:['口旁','那'],words:[{w:'哪里',py:'nǎlǐ',en:'where',lv:1}]},
-  '钱':{py:'qián',en:'money',structure:'lr',components:['钅','戋'],compNames:['金旁','戋'],words:[{w:'钱包',py:'qiánbāo',en:'wallet',lv:2}]},
-  '钟':{py:'zhōng',en:'clock / bell',structure:'lr',components:['钅','中'],compNames:['金旁','中'],words:[{w:'钟表',py:'zhōngbiǎo',en:'clock; watch',lv:2}]},
-  '饭':{py:'fàn',en:'meal / rice',structure:'lr',components:['饣','反'],compNames:['食旁','反'],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
-  '冷':{py:'lěng',en:'cold',structure:'lr',components:['冫','令'],compNames:['冰旁','令'],words:[{w:'冷静',py:'lěngjìng',en:'calm; cool-headed',lv:3}]},
-  '睡':{py:'shuì',en:'to sleep',structure:'lr',components:['目','垂'],compNames:['目旁','垂'],words:[{w:'睡觉',py:'shuìjiào',en:'sleep',lv:1}]},
-  '知':{py:'zhī',en:'to know',structure:'lr',components:['矢','口'],compNames:['矢','口'],words:[{w:'知道',py:'zhīdào',en:'know',lv:1}]},
-  '住':{py:'zhù',en:'to live',structure:'lr',components:['亻','主'],compNames:['人旁','主'],words:[{w:'住在',py:'zhù zài',en:'live at',lv:1}]},
-  '作':{py:'zuò',en:'to do / make',structure:'lr',components:['亻','乍'],compNames:['人旁','乍'],words:[{w:'工作',py:'gōngzuò',en:'work; job',lv:1}]},
-  '做':{py:'zuò',en:'to do (colloquial)',structure:'lr',components:['亻','故'],compNames:['人旁','故'],words:[{w:'做饭',py:'zuò fàn',en:'cook',lv:1}]},
-  '朋':{py:'péng',en:'friend',structure:'lr',components:['月','月'],compNames:['月(左)','月(右)'],words:[{w:'朋友',py:'péngyou',en:'friend',lv:1}]},
+  '哪':{py:'nǎ',en:'which',structure:'lr',components:['口','那'],compNames:['口旁','那'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'哪里',py:'nǎlǐ',en:'where',lv:1}]},
+  '钱':{py:'qián',en:'money',structure:'lr',components:['钅','戋'],compNames:['金旁','戋'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'钱包',py:'qiánbāo',en:'wallet',lv:2}]},
+  '钟':{py:'zhōng',en:'clock / bell',structure:'lr',components:['钅','中'],compNames:['金旁','中'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'钟表',py:'zhōngbiǎo',en:'clock; watch',lv:2}]},
+  '饭':{py:'fàn',en:'meal / rice',structure:'lr',components:['饣','反'],compNames:['食旁','反'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'吃饭',py:'chī fàn',en:'have a meal',lv:1}]},
+  '冷':{py:'lěng',en:'cold',structure:'lr',components:['冫','令'],compNames:['冰旁','令'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'冷静',py:'lěngjìng',en:'calm; cool-headed',lv:3}]},
+  '睡':{py:'shuì',en:'to sleep',structure:'lr',components:['目','垂'],compNames:['目旁','垂'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12]],words:[{w:'睡觉',py:'shuìjiào',en:'sleep',lv:1}]},
+  '知':{py:'zhī',en:'to know',structure:'lr',components:['矢','口'],compNames:['矢','口'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'知道',py:'zhīdào',en:'know',lv:1}]},
+  '住':{py:'zhù',en:'to live',structure:'lr',components:['亻','主'],compNames:['人旁','主'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'住在',py:'zhù zài',en:'live at',lv:1}]},
+  '作':{py:'zuò',en:'to do / make',structure:'lr',components:['亻','乍'],compNames:['人旁','乍'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'工作',py:'gōngzuò',en:'work; job',lv:1}]},
+  '做':{py:'zuò',en:'to do (colloquial)',structure:'lr',components:['亻','故'],compNames:['人旁','故'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9,10]],words:[{w:'做饭',py:'zuò fàn',en:'cook',lv:1}]},
+  '朋':{py:'péng',en:'friend',structure:'lr',components:['月','月'],compNames:['月(左)','月(右)'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'朋友',py:'péngyou',en:'friend',lv:1}]},
   '以':{py:'yǐ',en:'by means of',structure:'whole',components:['以'],compNames:['以'],words:[{w:'可以',py:'kě yǐ',en:'can/may'}]},
-  '校':{py:'xiào',en:'school',structure:'lr',components:['木','交'],compNames:['木旁','交'],words:[{w:'学校',py:'xuéxiào',en:'school',lv:1}]},
-  '课':{py:'kè',en:'class / lesson',structure:'lr',components:['讠','果'],compNames:['言旁','果'],words:[{w:'上课',py:'shàng kè',en:'go to class',lv:1}]},
+  '校':{py:'xiào',en:'school',structure:'lr',components:['木','交'],compNames:['木旁','交'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'学校',py:'xuéxiào',en:'school',lv:1}]},
+  '课':{py:'kè',en:'class / lesson',structure:'lr',components:['讠','果'],compNames:['言旁','果'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'上课',py:'shàng kè',en:'go to class',lv:1}]},
   // ── 上下结构 ──
-  '爸':{py:'bà',en:'father',structure:'tb',components:['父','巴'],compNames:['父','巴'],words:[{w:'爸爸',py:'bàba',en:'father; dad',lv:1}]},
-  '家':{py:'jiā',en:'home / family',structure:'tb',components:['宀','豕'],compNames:['宝盖','豕'],words:[{w:'家庭',py:'jiātíng',en:'family',lv:2}]},
-  '客':{py:'kè',en:'guest',structure:'tb',components:['宀','各'],compNames:['宝盖','各'],words:[{w:'客人',py:'kèrén',en:'guest',lv:2}]},
-  '字':{py:'zì',en:'character',structure:'tb',components:['宀','子'],compNames:['宝盖','子'],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
-  '学':{py:'xué',en:'to study',structure:'tmb',components:['⺌','冖','子'],compNames:['小字头','秃宝盖','子'],words:[{w:'学习',py:'xuéxí',en:'study; learn',lv:1}]},
-  '早':{py:'zǎo',en:'early / morning',structure:'tb',components:['日','十'],compNames:['日','十'],words:[{w:'早上',py:'zǎoshang',en:'morning',lv:1}]},
-  '星':{py:'xīng',en:'star',structure:'tb',components:['日','生'],compNames:['日','生'],words:[{w:'星期',py:'xīngqī',en:'week',lv:1}]},
-  '是':{py:'shì',en:'to be',structure:'tb',components:['日','疋'],compNames:['日','疋'],words:[{w:'是的',py:'shì de',en:'yes; that\'s right',lv:1}]},
-  '名':{py:'míng',en:'name / famous',structure:'tb',components:['夕','口'],compNames:['夕','口'],words:[{w:'名字',py:'míngzi',en:'name',lv:1}]},
-  '多':{py:'duō',en:'many / much',structure:'tb',components:['夕','夕'],compNames:['夕(上)','夕(下)'],words:[{w:'多少',py:'duōshao',en:'how many; how much',lv:1}]},
+  '爸':{py:'bà',en:'father',structure:'tb',components:['父','巴'],compNames:['父','巴'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'爸爸',py:'bàba',en:'father; dad',lv:1}]},
+  '家':{py:'jiā',en:'home / family',structure:'tb',components:['宀','豕'],compNames:['宝盖','豕'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'家庭',py:'jiātíng',en:'family',lv:2}]},
+  '客':{py:'kè',en:'guest',structure:'tb',components:['宀','各'],compNames:['宝盖','各'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'客人',py:'kèrén',en:'guest',lv:2}]},
+  '字':{py:'zì',en:'character',structure:'tb',components:['宀','子'],compNames:['宝盖','子'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'汉字',py:'Hànzì',en:'Chinese character',lv:1}]},
+  '学':{py:'xué',en:'to study',structure:'tmb',components:['⺌','冖','子'],compNames:['小字头','秃宝盖','子'],splitRanges:[[0,1,2],[3,4],[5,6,7]],words:[{w:'学习',py:'xuéxí',en:'study; learn',lv:1}]},
+  '早':{py:'zǎo',en:'early / morning',structure:'tb',components:['日','十'],compNames:['日','十'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'早上',py:'zǎoshang',en:'morning',lv:1}]},
+  '星':{py:'xīng',en:'star',structure:'tb',components:['日','生'],compNames:['日','生'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'星期',py:'xīngqī',en:'week',lv:1}]},
+  '是':{py:'shì',en:'to be',structure:'tb',components:['日','疋'],compNames:['日','疋'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'是的',py:'shì de',en:'yes; that\'s right',lv:1}]},
+  '名':{py:'míng',en:'name / famous',structure:'tb',components:['夕','口'],compNames:['夕','口'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'名字',py:'míngzi',en:'name',lv:1}]},
+  '多':{py:'duō',en:'many / much',structure:'tb',components:['夕','夕'],compNames:['夕(上)','夕(下)'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'多少',py:'duōshao',en:'how many; how much',lv:1}]},
   '高':{py:'gāo',en:'tall / high',structure:'whole',components:['高'],compNames:['高'],words:[{w:'高兴',py:'gāoxìng',en:'happy; glad',lv:1}]},
-  '想':{py:'xiǎng',en:'to think / want',structure:'tb',components:['相','心'],compNames:['相','心'],words:[{w:'想法',py:'xiǎngfǎ',en:'idea; thought',lv:2}]},
-  '思':{py:'sī',en:'to think',structure:'tb',components:['田','心'],compNames:['田','心'],words:[{w:'意思',py:'yìsi',en:'meaning',lv:1}]},
-  '男':{py:'nán',en:'male',structure:'tb',components:['田','力'],compNames:['田','力'],words:[{w:'男人',py:'nánrén',en:'man',lv:1}]},
-  '看':{py:'kàn',en:'to look / watch',structure:'tb',components:['手','目'],compNames:['手','目'],words:[{w:'看书',py:'kàn shū',en:'read a book',lv:1}]},
-  '花':{py:'huā',en:'flower',structure:'tb',components:['艹','化'],compNames:['草头','化'],words:[{w:'花儿',py:'huār',en:'flower',lv:1}]},
-  '茶':{py:'chá',en:'tea',structure:'tb',components:['艹','余'],compNames:['草头','余'],words:[{w:'茶叶',py:'cháyè',en:'tea leaves',lv:2}]},
-  '菜':{py:'cài',en:'vegetable / dish',structure:'tb',components:['艹','采'],compNames:['草头','采'],words:[{w:'蔬菜',py:'shūcài',en:'vegetable',lv:2}]},
-  '分':{py:'fēn',en:'minute / divide',structure:'tb',components:['八','刀'],compNames:['八','刀'],words:[{w:'分钟',py:'fēnzhōng',en:'minute',lv:1}]},
-  '热':{py:'rè',en:'hot',structure:'tb',components:['执','灬'],compNames:['执','灬'],words:[{w:'热情',py:'rèqíng',en:'enthusiastic; warm',lv:2}]},
-  '点':{py:'diǎn',en:"o'clock / dot",structure:'tb',components:['占','灬'],compNames:['占','灬'],words:[{w:'一点儿',py:'yīdiǎnr',en:'a little; a bit',lv:1}]},
+  '想':{py:'xiǎng',en:'to think / want',structure:'tb',components:['相','心'],compNames:['相','心'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'想法',py:'xiǎngfǎ',en:'idea; thought',lv:2}]},
+  '思':{py:'sī',en:'to think',structure:'tb',components:['田','心'],compNames:['田','心'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'意思',py:'yìsi',en:'meaning',lv:1}]},
+  '男':{py:'nán',en:'male',structure:'tb',components:['田','力'],compNames:['田','力'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'男人',py:'nánrén',en:'man',lv:1}]},
+  '看':{py:'kàn',en:'to look / watch',structure:'tb',components:['手','目'],compNames:['手','目'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'看书',py:'kàn shū',en:'read a book',lv:1}]},
+  '花':{py:'huā',en:'flower',structure:'tb',components:['艹','化'],compNames:['草头','化'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'花儿',py:'huār',en:'flower',lv:1}]},
+  '茶':{py:'chá',en:'tea',structure:'tb',components:['茶_p0','茶_p1'],compNames:['草字头','茶字底'],strokeDemoDistractors:['茶_d0','茶_d1','茶_d2','茶_d3'],words:[{w:'茶叶',py:'cháyè',en:'tea leaves',lv:2}]},
+  '菜':{py:'cài',en:'vegetable / dish',structure:'tb',components:['艹','采'],compNames:['草头','采'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'蔬菜',py:'shūcài',en:'vegetable',lv:2}]},
+  '分':{py:'fēn',en:'minute / divide',structure:'tb',components:['八','刀'],compNames:['八','刀'],splitRanges:[[0,1],[2,3]],words:[{w:'分钟',py:'fēnzhōng',en:'minute',lv:1}]},
+  '热':{py:'rè',en:'hot',structure:'tb',components:['执','灬'],compNames:['执','灬'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'热情',py:'rèqíng',en:'enthusiastic; warm',lv:2}]},
+  '点':{py:'diǎn',en:"o'clock / dot",structure:'tb',components:['占','灬'],compNames:['占','灬'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'一点儿',py:'yīdiǎnr',en:'a little; a bit',lv:1}]},
   '年':{py:'nián',en:'year',structure:'whole',components:['年'],compNames:['年'],compNames:['年'],words:[{w:'今年',py:'jīnnián',en:'this year',lv:1}]},
-  '百':{py:'bǎi',en:'hundred',structure:'tb',components:['一','白'],compNames:['一','白'],words:[{w:'百分之',py:'bǎi fēn zhī',en:'percent',lv:2}]},
-  '会':{py:'huì',en:'can / meeting',structure:'tb',components:['人','云'],compNames:['人','云'],words:[{w:'开会',py:'kāi huì',en:'hold a meeting',lv:1}]},
-  '雪':{py:'xuě',en:'snow',structure:'tb',components:['雨','彐'],compNames:['雨字头','彐(下部)'],compNames:['雨字头','彐(下部)'],words:[{w:'下雪',py:'xià xuě',en:'it snows',lv:1}]},
-  '喜':{py:'xǐ',en:'happy / like',structure:'tb',components:['壴','口'],compNames:['壴(上部)','口'],words:[{w:'喜欢',py:'xǐhuan',en:'like; be fond of',lv:1}]},
-  '班':{py:'bān',en:'class / shift',structure:'lcr',components:['王','刀','王'],compNames:['王','刀','王'],words:[{w:'上班',py:'shàng bān',en:'go to work',lv:1}]},
+  '百':{py:'bǎi',en:'hundred',structure:'tb',components:['一','白'],compNames:['一','白'],splitRanges:[[0],[1,2,3,4,5]],words:[{w:'百分之',py:'bǎi fēn zhī',en:'percent',lv:2}]},
+  '会':{py:'huì',en:'can / meeting',structure:'tb',components:['人','云'],compNames:['人','云'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'开会',py:'kāi huì',en:'hold a meeting',lv:1}]},
+  '雪':{py:'xuě',en:'snow',structure:'tb',components:['雨','彐'],compNames:['雨字头','彐(下部)'],compNames:['雨字头','彐(下部)'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10]],words:[{w:'下雪',py:'xià xuě',en:'it snows',lv:1}]},
+  '喜':{py:'xǐ',en:'happy / like',structure:'tb',components:['壴','口'],compNames:['壴(上部)','口'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11]],words:[{w:'喜欢',py:'xǐhuan',en:'like; be fond of',lv:1}]},
+  '班':{py:'bān',en:'class / shift',structure:'lcr',components:['王','刀','王'],compNames:['王','刀','王'],splitRanges:[[0,1,2,3],[4,5],[6,7,8,9]],words:[{w:'上班',py:'shàng bān',en:'go to work',lv:1}]},
   // ── 全包围 ──
-  '国':{py:'guó',en:'country',structure:'full',components:['囗','玉'],compNames:['国框','玉'],words:[{w:'中国',py:'Zhōngguó',en:'China',lv:1}]},
-  '回':{py:'huí',en:'to return',structure:'full',components:['囗','口'],compNames:['大口','小口'],words:[{w:'回来',py:'huí lái',en:'come back',lv:1}]},
-  '因':{py:'yīn',en:'cause / because',structure:'full',components:['囗','大'],compNames:['国框','大'],words:[{w:'因为',py:'yīnwèi',en:'because',lv:1}]},
+  '国':{py:'guó',en:'country',structure:'full',components:['囗','玉'],compNames:['国框','玉'],splitRanges:[[0,1,7],[2,3,4,5,6]],words:[{w:'中国',py:'Zhōngguó',en:'China',lv:1}]},
+  '回':{py:'huí',en:'to return',structure:'full',components:['囗','口'],compNames:['大口','小口'],splitRanges:[[0,1,5],[2,3,4]],words:[{w:'回来',py:'huí lái',en:'come back',lv:1}]},
+  '因':{py:'yīn',en:'cause / because',structure:'full',components:['囗','大'],compNames:['国框','大'],splitRanges:[[0,1,5],[2,3,4]],words:[{w:'因为',py:'yīnwèi',en:'because',lv:1}]},
   // ── 左上右包围 ──
   '同':{py:'tóng',en:'same / together',structure:'whole',components:['同'],compNames:['同'],words:[{w:'同学',py:'tóngxué',en:'classmate',lv:1}]},
-  '间':{py:'jiān',en:'between / room',structure:'lur',components:['门','日'],compNames:['门框','日'],words:[{w:'时间',py:'shíjiān',en:'time',lv:1}]},
-  '问':{py:'wèn',en:'to ask',structure:'lur',components:['门','口'],compNames:['门框','口'],words:[{w:'问题',py:'wèntí',en:'question; problem',lv:1}]},
+  '间':{py:'jiān',en:'between / room',structure:'lur',components:['门','日'],compNames:['门框','日'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'时间',py:'shíjiān',en:'time',lv:1}]},
+  '问':{py:'wèn',en:'to ask',structure:'lur',components:['门','口'],compNames:['门框','口'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'问题',py:'wèntí',en:'question; problem',lv:1}]},
   // ── 右上包围 ──
-  '可':{py:'kě',en:'can / may',structure:'ur',components:['丁','口'],compNames:['丁','口'],words:[{w:'可以',py:'kěyǐ',en:'can; may',lv:1}]},
+  '可':{py:'kě',en:'can / may',structure:'ur',components:['丁','口'],compNames:['丁','口'],splitRanges:[[0,4],[1,2,3]],words:[{w:'可以',py:'kěyǐ',en:'can; may',lv:1}]},
   '司':{py:'sī',en:'manage / company',structure:'whole',components:['司'],compNames:['司'],words:[{w:'公司',py:'gōng sī',en:'company'}]},
   // ── 左上包围 ──
-  '病':{py:'bìng',en:'illness',structure:'lu',components:['疒','丙'],compNames:['疒旁','丙'],words:[{w:'生病',py:'shēng bìng',en:'get sick',lv:1}]},
-  '房':{py:'fáng',en:'room / house',structure:'lu',components:['户','方'],compNames:['户框','方'],words:[{w:'房间',py:'fángjiān',en:'room',lv:1}]},
+  '病':{py:'bìng',en:'illness',structure:'lu',components:['疒','丙'],compNames:['疒旁','丙'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'生病',py:'shēng bìng',en:'get sick',lv:1}]},
+  '房':{py:'fáng',en:'room / house',structure:'lu',components:['户','方'],compNames:['户框','方'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'房间',py:'fángjiān',en:'room',lv:1}]},
   // ── 左下包围 ──
-  '这':{py:'zhè',en:'this',structure:'ld',components:['辶','文'],compNames:['走之旁','文'],words:[{w:'这里',py:'zhèlǐ',en:'here',lv:1}]},
-  '进':{py:'jìn',en:'to enter',structure:'ld',components:['辶','井'],compNames:['走之旁','井'],words:[{w:'进来',py:'jìn lái',en:'come in',lv:1}]},
-  '还':{py:'hái',en:'still / also',structure:'ld',components:['辶','不'],compNames:['走之旁','不'],words:[{w:'还是',py:'háishi',en:'still; or',lv:1}]},
+  '这':{py:'zhè',en:'this',structure:'ld',components:['辶','文'],compNames:['走之旁','文'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'这里',py:'zhèlǐ',en:'here',lv:1}]},
+  '进':{py:'jìn',en:'to enter',structure:'ld',components:['辶','井'],compNames:['走之旁','井'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'进来',py:'jìn lái',en:'come in',lv:1}]},
+  '还':{py:'hái',en:'still / also',structure:'ld',components:['辶','不'],compNames:['走之旁','不'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'还是',py:'háishi',en:'still; or',lv:1}]},
   '几':{py:'jǐ',en:'how many; several',structure:'whole',components:['几'],compNames:['几'],words:[{w:'几个',py:'jǐ ge',en:'how many'}]},
   '个':{py:'gè',en:'(general measure word)',structure:'whole',components:['个'],compNames:['个'],words:[{w:'一个',py:'yī ge',en:'one (item)'}]},
-  '块':{py:'kuài',en:'piece',structure:'lr',components:['土','夬'],compNames:['土旁','夬'],words:[{w:'一块',py:'yī kuài',en:'one piece/yuan',lv:1}]},
-  '岁':{py:'suì',en:'years (of age)',structure:'tb',components:['山','夕'],compNames:['山','夕'],words:[{w:'几岁',py:'jǐ suì',en:'how old',lv:1}]},
-  '零':{py:'líng',en:'zero',structure:'tb',components:['雨','令'],compNames:['雨字头','令'],words:[{w:'零下',py:'líng xià',en:'below zero',lv:1}]},
+  '块':{py:'kuài',en:'piece',structure:'lr',components:['土','夬'],compNames:['土旁','夬'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'一块',py:'yī kuài',en:'one piece/yuan',lv:1}]},
+  '岁':{py:'suì',en:'years (of age)',structure:'tb',components:['山','夕'],compNames:['山','夕'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'几岁',py:'jǐ suì',en:'how old',lv:1}]},
+  '零':{py:'líng',en:'zero',structure:'tb',components:['雨','令'],compNames:['雨字头','令'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11,12]],words:[{w:'零下',py:'líng xià',en:'below zero',lv:1}]},
   '东':{py:'dōng',en:'east',structure:'whole',components:['东'],compNames:['东'],words:[{w:'东西',py:'dōng xi',en:'thing'}]},
   '西':{py:'xī',en:'west',structure:'whole',components:['西'],compNames:['西'],words:[{w:'东西',py:'dōng xi',en:'thing'}]},
   '里':{py:'lǐ',en:'inside',structure:'whole',components:['里'],compNames:['里'],words:[{w:'哪里',py:'nǎ lǐ',en:'where'}]},
-  '外':{py:'wài',en:'outside',structure:'lr',components:['夕','卜'],compNames:['夕','卜'],words:[{w:'外面',py:'wài miàn',en:'outside',lv:1}]},
-  '前':{py:'qián',en:'front; before',structure:'tb',components:['丷','刖'],compNames:['丷','刖'],words:[{w:'前面',py:'qián miàn',en:'front',lv:1}]},
-  '后':{py:'hòu',en:'back; after',structure:'lu',components:['厂','口'],compNames:['厂旁','口'],words:[{w:'后面',py:'hòu miàn',en:'behind',lv:1}]},
-  '边':{py:'biān',en:'side; edge',structure:'ld',components:['辶','力'],compNames:['走之旁','力'],words:[{w:'旁边',py:'páng biān',en:'beside',lv:1}]},
+  '外':{py:'wài',en:'outside',structure:'lr',components:['夕','卜'],compNames:['夕','卜'],splitRanges:[[0,1,2],[3,4]],words:[{w:'外面',py:'wài miàn',en:'outside',lv:1}]},
+  '前':{py:'qián',en:'front; before',structure:'tb',components:['前_p0','前_p1'],compNames:['前字头','下部(月+刂)'],strokeDemoDistractors:['前_d0','前_d1','前_d2','前_d3'],words:[{w:'前面',py:'qián miàn',en:'front',lv:1}]},
+  '后':{py:'hòu',en:'back; after',structure:'lu',components:['后_p0','后_p1'],compNames:['后字头','口'],strokeDemoDistractors:['后_d0','后_d1','后_d2','后_d3'],words:[{w:'后面',py:'hòu miàn',en:'behind',lv:1}]},
+  '边':{py:'biān',en:'side; edge',structure:'ld',components:['辶','力'],compNames:['走之旁','力'],splitRanges:[[2,3,4],[0,1]],words:[{w:'旁边',py:'páng biān',en:'beside',lv:1}]},
   '面':{py:'miàn',en:'face; side; noodle',structure:'whole',components:['面'],compNames:['面'],words:[{w:'前面',py:'qián miàn',en:'front'}]},
   '今':{py:'jīn',en:'today; now',structure:'whole',components:['今'],compNames:['今'],words:[{w:'今天',py:'jīn tiān',en:'today'}]},
-  '晚':{py:'wǎn',en:'late; evening',structure:'lr',components:['日','免'],compNames:['日旁','免'],words:[{w:'晚上',py:'wǎn shang',en:'evening',lv:1}]},
-  '昨':{py:'zuó',en:'yesterday',structure:'lr',components:['日','乍'],compNames:['日旁','乍'],words:[{w:'昨天',py:'zuó tiān',en:'yesterday',lv:1}]},
-  '期':{py:'qī',en:'period; week',structure:'lr',components:['其','月'],compNames:['其','月'],words:[{w:'星期',py:'xīng qī',en:'week',lv:1}]},
-  '候':{py:'hòu',en:'time; wait',structure:'lr',components:['亻','侯'],compNames:['人旁','侯'],words:[{w:'时候',py:'shí hou',en:'time',lv:1}]},
-  '现':{py:'xiàn',en:'present; now',structure:'lr',components:['王','见'],compNames:['王旁','见'],words:[{w:'现在',py:'xiàn zài',en:'now',lv:1}]},
-  '它':{py:'tā',en:'it',structure:'tb',components:['宀','匕'],compNames:['宝盖','匕'],words:[{w:'它们',py:'tā men',en:'they (non-human)',lv:1}]},
-  '您':{py:'nín',en:'you (respectful)',structure:'tb',components:['你','心'],compNames:['你','心'],words:[{w:'您好',py:'nín hǎo',en:'hello (polite)',lv:1}]},
-  '呢':{py:'ne',en:'(question particle)',structure:'lr',components:['口','尼'],compNames:['口旁','尼'],words:[{w:'你呢',py:'nǐ ne',en:'and you?',lv:1}]},
-  '些':{py:'xiē',en:'some; few',structure:'tb',components:['此','二'],compNames:['此','二'],words:[{w:'一些',py:'yī xiē',en:'some',lv:1}]},
-  '只':{py:'zhī',en:'only; (measure)',structure:'tb',components:['口','八'],compNames:['口','八'],words:[{w:'一只',py:'yī zhī',en:'one (animal)',lv:1}]},
-  '买':{py:'mǎi',en:'to buy',structure:'tb',components:['乛','头'],compNames:['乛','头'],words:[{w:'买东西',py:'mǎi dōng xi',en:'go shopping',lv:1}]},
-  '卖':{py:'mài',en:'to sell',structure:'tb',components:['十','买'],compNames:['十','买'],words:[{w:'卖东西',py:'mài dōng xi',en:'sell things',lv:2}]},
-  '叫':{py:'jiào',en:'to call; be called',structure:'lr',components:['口','丩'],compNames:['口旁','丩'],words:[{w:'叫做',py:'jiào zuò',en:'be called',lv:1}]},
-  '听':{py:'tīng',en:'to listen',structure:'lr',components:['口','斤'],compNames:['口旁','斤'],words:[{w:'听说',py:'tīng shuō',en:'hear that',lv:1}]},
-  '唱':{py:'chàng',en:'to sing',structure:'lr',components:['口','昌'],compNames:['口旁','昌'],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
-  '坐':{py:'zuò',en:'to sit',structure:'tb',components:['从','土'],compNames:['从','土'],words:[{w:'请坐',py:'qǐng zuò',en:'please sit',lv:1}]},
-  '穿':{py:'chuān',en:'to wear',structure:'tb',components:['穴','牙'],compNames:['穴字头','牙'],words:[{w:'穿衣服',py:'chuān yī fu',en:'wear clothes',lv:1}]},
+  '晚':{py:'wǎn',en:'late; evening',structure:'lr',components:['日','免'],compNames:['日旁','免'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'晚上',py:'wǎn shang',en:'evening',lv:1}]},
+  '昨':{py:'zuó',en:'yesterday',structure:'lr',components:['日','乍'],compNames:['日旁','乍'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'昨天',py:'zuó tiān',en:'yesterday',lv:1}]},
+  '期':{py:'qī',en:'period; week',structure:'lr',components:['其','月'],compNames:['其','月'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11]],words:[{w:'星期',py:'xīng qī',en:'week',lv:1}]},
+  '候':{py:'hòu',en:'time; wait',structure:'lr',components:['候_亻','候_右'],compNames:['人旁','右半·含丨'],strokeDemoDistractors:['候_侯','候_矢','候_失','候_厂'],words:[{w:'时候',py:'shí hou',en:'time',lv:1}]},
+  '现':{py:'xiàn',en:'present; now',structure:'lr',components:['王','见'],compNames:['王旁','见'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'现在',py:'xiàn zài',en:'now',lv:1}]},
+  '它':{py:'tā',en:'it',structure:'tb',components:['宀','匕'],compNames:['宝盖','匕'],splitRanges:[[0,1,2],[3,4]],words:[{w:'它们',py:'tā men',en:'they (non-human)',lv:1}]},
+  '您':{py:'nín',en:'you (respectful)',structure:'tb',components:['你','心'],compNames:['你','心'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10]],words:[{w:'您好',py:'nín hǎo',en:'hello (polite)',lv:1}]},
+  '呢':{py:'ne',en:'(question particle)',structure:'lr',components:['口','尼'],compNames:['口旁','尼'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'你呢',py:'nǐ ne',en:'and you?',lv:1}]},
+  '些':{py:'xiē',en:'some; few',structure:'tb',components:['此','二'],compNames:['此','二'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'一些',py:'yī xiē',en:'some',lv:1}]},
+  '只':{py:'zhī',en:'only; (measure)',structure:'tb',components:['口','八'],compNames:['口','八'],splitRanges:[[0,1,2],[3,4]],words:[{w:'一只',py:'yī zhī',en:'one (animal)',lv:1}]},
+  '买':{py:'mǎi',en:'to buy',structure:'tb',components:['乛','头'],compNames:['乛','头'],splitRanges:[[0],[1,2,3,4,5]],words:[{w:'买东西',py:'mǎi dōng xi',en:'go shopping',lv:1}]},
+  '卖':{py:'mài',en:'to sell',structure:'tb',components:['十','买'],compNames:['十','买'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'卖东西',py:'mài dōng xi',en:'sell things',lv:2}]},
+  '叫':{py:'jiào',en:'to call; be called',structure:'lr',components:['口','丩'],compNames:['口旁','丩'],splitRanges:[[0,1,2],[3,4]],words:[{w:'叫做',py:'jiào zuò',en:'be called',lv:1}]},
+  '听':{py:'tīng',en:'to listen',structure:'lr',components:['口','斤'],compNames:['口旁','斤'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'听说',py:'tīng shuō',en:'hear that',lv:1}]},
+  '唱':{py:'chàng',en:'to sing',structure:'lr',components:['口','昌'],compNames:['口旁','昌'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
+  '坐':{py:'zuò',en:'to sit',structure:'tb',components:['从','土'],compNames:['从','土'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'请坐',py:'qǐng zuò',en:'please sit',lv:1}]},
+  '穿':{py:'chuān',en:'to wear',structure:'tb',components:['穴','牙'],compNames:['穴字头','牙'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'穿衣服',py:'chuān yī fu',en:'wear clothes',lv:1}]},
   '能':{py:'néng',en:'can; able to',structure:'whole',components:['能'],compNames:['能'],words:[{w:'能够',py:'néng gòu',en:'be able to',lv:1}]},
-  '要':{py:'yào',en:'want; need',structure:'tb',components:['西','女'],compNames:['西','女'],words:[{w:'要是',py:'yào shi',en:'if',lv:1}]},
+  '要':{py:'yào',en:'want; need',structure:'tb',components:['西','女'],compNames:['西','女'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'要是',py:'yào shi',en:'if',lv:1}]},
   '见':{py:'jiàn',en:'to see',structure:'whole',components:['见'],compNames:['见'],words:[{w:'见面',py:'jiàn miàn',en:'meet'}]},
-  '到':{py:'dào',en:'to arrive',structure:'lr',components:['至','刂'],compNames:['至','刂'],words:[{w:'到家',py:'dào jiā',en:'arrive home',lv:1}]},
+  '到':{py:'dào',en:'to arrive',structure:'lr',components:['至','刂'],compNames:['至','刂'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'到家',py:'dào jiā',en:'arrive home',lv:1}]},
   '飞':{py:'fēi',en:'to fly',structure:'whole',components:['飞'],compNames:['飞'],words:[{w:'飞机',py:'fēi jī',en:'airplane'}]},
-  '起':{py:'qǐ',en:'to rise; get up',structure:'ld',components:['走','己'],compNames:['走旁','己'],words:[{w:'起来',py:'qǐ lái',en:'get up',lv:1}]},
-  '写':{py:'xiě',en:'to write',structure:'tb',components:['冖','与'],compNames:['秃宝盖','与'],words:[{w:'写字',py:'xiě zì',en:'write',lv:1}]},
-  '识':{py:'shí',en:'to know; recognize',structure:'lr',components:['讠','只'],compNames:['言旁','只'],words:[{w:'认识',py:'rèn shi',en:'know',lv:1}]},
-  '视':{py:'shì',en:'to see; vision',structure:'lr',components:['礻','见'],compNames:['示旁','见'],words:[{w:'电视',py:'diàn shì',en:'TV',lv:1}]},
-  '觉':{py:'jué',en:'to feel; sense',structure:'tmb',components:['⺌','冖','见'],compNames:['小字头','秃宝盖','见'],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
-  '谁':{py:'shéi',en:'who',structure:'lr',components:['讠','隹'],compNames:['言旁','隹'],words:[{w:'是谁',py:'shì shéi',en:'who is it',lv:1}]},
-  '得':{py:'de',en:'(structural particle)',structure:'lr',components:['彳','㝵'],compNames:['双人旁','㝵'],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
-  '兴':{py:'xìng',en:'interest; mood',structure:'tmb',components:['⺌','一','八'],compNames:['小字头','一','八'],words:[{w:'高兴',py:'gāo xìng',en:'happy',lv:1}]},
-  '休':{py:'xiū',en:'rest',structure:'lr',components:['亻','木'],compNames:['人旁','木'],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
-  '息':{py:'xī',en:'breath; rest',structure:'tb',components:['自','心'],compNames:['自','心'],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
-  '爱':{py:'ài',en:'to love',structure:'tb',components:['爫','友'],compNames:['爪字头','友'],words:[{w:'爱好',py:'ài hào',en:'hobby',lv:1}]},
-  '欢':{py:'huān',en:'happy; joyful',structure:'lr',components:['又','欠'],compNames:['又','欠'],words:[{w:'喜欢',py:'xǐ huan',en:'like',lv:1}]},
+  '起':{py:'qǐ',en:'to rise; get up',structure:'ld',components:['走','己'],compNames:['走旁','己'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9]],words:[{w:'起来',py:'qǐ lái',en:'get up',lv:1}]},
+  '写':{py:'xiě',en:'to write',structure:'tb',components:['冖','与'],compNames:['秃宝盖','与'],splitRanges:[[0,1],[2,3,4]],words:[{w:'写字',py:'xiě zì',en:'write',lv:1}]},
+  '识':{py:'shí',en:'to know; recognize',structure:'lr',components:['讠','只'],compNames:['言旁','只'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'认识',py:'rèn shi',en:'know',lv:1}]},
+  '视':{py:'shì',en:'to see; vision',structure:'lr',components:['礻','见'],compNames:['示旁','见'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'电视',py:'diàn shì',en:'TV',lv:1}]},
+  '觉':{py:'jué',en:'to feel; sense',structure:'tmb',components:['⺌','冖','见'],compNames:['小字头','秃宝盖','见'],splitRanges:[[0,1,2],[3,4],[5,6,7,8]],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
+  '谁':{py:'shéi',en:'who',structure:'lr',components:['讠','隹'],compNames:['言旁','隹'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'是谁',py:'shì shéi',en:'who is it',lv:1}]},
+  '得':{py:'de',en:'(structural particle)',structure:'lr',components:['彳','㝵'],compNames:['双人旁','㝵'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'觉得',py:'jué de',en:'feel',lv:1}]},
+  '兴':{py:'xìng',en:'interest; mood',structure:'tmb',components:['⺌','一','八'],compNames:['小字头','一','八'],splitRanges:[[0,1,2],[3],[4,5]],words:[{w:'高兴',py:'gāo xìng',en:'happy',lv:1}]},
+  '休':{py:'xiū',en:'rest',structure:'lr',components:['亻','木'],compNames:['人旁','木'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
+  '息':{py:'xī',en:'breath; rest',structure:'tb',components:['自','心'],compNames:['自','心'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'休息',py:'xiū xi',en:'rest',lv:1}]},
+  '爱':{py:'ài',en:'to love',structure:'tb',components:['爱_p0','爱_p1'],compNames:['爪字头','友'],strokeDemoDistractors:['爱_d0','爱_d1','爱_d2','爱_d3'],words:[{w:'爱好',py:'ài hào',en:'hobby',lv:1}]},
+  '欢':{py:'huān',en:'happy; joyful',structure:'lr',components:['又','欠'],compNames:['又','欠'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'喜欢',py:'xǐ huan',en:'like',lv:1}]},
   '正':{py:'zhèng',en:'right; just',structure:'whole',components:['正'],compNames:['正'],words:[{w:'正在',py:'zhèng zài',en:'be doing',lv:1}]},
   '真':{py:'zhēn',en:'true; really',structure:'whole',components:['真'],compNames:['真'],words:[{w:'真的',py:'zhēn de',en:'really',lv:1}]},
   '再':{py:'zài',en:'again',structure:'whole',components:['再'],compNames:['再'],words:[{w:'再见',py:'zài jiàn',en:'goodbye'}]},
-  '怎':{py:'zěn',en:'how',structure:'tb',components:['乍','心'],compNames:['乍','心'],words:[{w:'怎么',py:'zěn me',en:'how',lv:1}]},
-  '床':{py:'chuáng',en:'bed',structure:'lu',components:['广','木'],compNames:['广字旁','木'],words:[{w:'起床',py:'qǐ chuáng',en:'get up',lv:1}]},
-  '桌':{py:'zhuō',en:'table',structure:'tmb',components:['卜','日','木'],compNames:['卜','日','木'],words:[{w:'桌子',py:'zhuō zi',en:'table',lv:1}]},
-  '椅':{py:'yǐ',en:'chair',structure:'lr',components:['木','奇'],compNames:['木旁','奇'],words:[{w:'椅子',py:'yǐ zi',en:'chair',lv:1}]},
-  '杯':{py:'bēi',en:'cup',structure:'lr',components:['木','不'],compNames:['木旁','不'],words:[{w:'杯子',py:'bēi zi',en:'cup',lv:1}]},
+  '怎':{py:'zěn',en:'how',structure:'tb',components:['乍','心'],compNames:['乍','心'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'怎么',py:'zěn me',en:'how',lv:1}]},
+  '床':{py:'chuáng',en:'bed',structure:'lu',components:['广','木'],compNames:['广字旁','木'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'起床',py:'qǐ chuáng',en:'get up',lv:1}]},
+  '桌':{py:'zhuō',en:'table',structure:'tmb',components:['卜','日','木'],compNames:['卜','日','木'],splitRanges:[[0,1],[2,3,4,5],[6,7,8,9]],words:[{w:'桌子',py:'zhuō zi',en:'table',lv:1}]},
+  '椅':{py:'yǐ',en:'chair',structure:'lr',components:['木','奇'],compNames:['木旁','奇'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11]],words:[{w:'椅子',py:'yǐ zi',en:'chair',lv:1}]},
+  '杯':{py:'bēi',en:'cup',structure:'lr',components:['木','不'],compNames:['木旁','不'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'杯子',py:'bēi zi',en:'cup',lv:1}]},
   '本':{py:'běn',en:'book; root',structure:'whole',components:['本'],compNames:['本'],words:[{w:'本子',py:'běn zi',en:'notebook',lv:1}]},
-  '机':{py:'jī',en:'machine',structure:'lr',components:['木','几'],compNames:['木旁','几'],words:[{w:'飞机',py:'fēi jī',en:'airplane',lv:1}]},
+  '机':{py:'jī',en:'machine',structure:'lr',components:['木','几'],compNames:['木旁','几'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'飞机',py:'fēi jī',en:'airplane',lv:1}]},
   '车':{py:'chē',en:'vehicle',structure:'whole',components:['车'],compNames:['车'],words:[{w:'汽车',py:'qì chē',en:'car'}]},
   '衣':{py:'yī',en:'clothing',structure:'whole',components:['衣'],compNames:['衣'],words:[{w:'衣服',py:'yī fu',en:'clothes'}]},
-  '服':{py:'fú',en:'clothes; service',structure:'lr',components:['月','㔾'],compNames:['月旁','㔾'],words:[{w:'衣服',py:'yī fu',en:'clothes',lv:1}]},
+  '服':{py:'fú',en:'clothes; service',structure:'lr',components:['服_p0','服_p1'],compNames:['肉月','右部(卩+又)'],strokeDemoDistractors:['服_d0','服_d1','服_d2','服_d3'],words:[{w:'衣服',py:'yī fu',en:'clothes',lv:1}]},
   '果':{py:'guǒ',en:'fruit; result',structure:'whole',components:['果'],compNames:['果'],words:[{w:'水果',py:'shuǐ guǒ',en:'fruit'}]},
-  '苹':{py:'píng',en:'apple (in 苹果)',structure:'tb',components:['艹','平'],compNames:['草头','平'],words:[{w:'苹果',py:'píng guǒ',en:'apple',lv:1}]},
-  '蛋':{py:'dàn',en:'egg',structure:'tb',components:['疋','虫'],compNames:['疋','虫'],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
-  '鸡':{py:'jī',en:'chicken',structure:'lr',components:['又','鸟'],compNames:['又','鸟'],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
-  '狗':{py:'gǒu',en:'dog',structure:'lr',components:['犭','句'],compNames:['犬旁','句'],words:[{w:'小狗',py:'xiǎo gǒu',en:'puppy',lv:1}]},
-  '猫':{py:'māo',en:'cat',structure:'lr',components:['犭','苗'],compNames:['犬旁','苗'],words:[{w:'小猫',py:'xiǎo māo',en:'kitten',lv:1}]},
-  '题':{py:'tí',en:'topic; question',structure:'lr',components:['是','页'],compNames:['是','页'],words:[{w:'问题',py:'wèn tí',en:'question',lv:1}]},
+  '苹':{py:'píng',en:'apple (in 苹果)',structure:'tb',components:['艹','平'],compNames:['草头','平'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'苹果',py:'píng guǒ',en:'apple',lv:1}]},
+  '蛋':{py:'dàn',en:'egg',structure:'tb',components:['疋','虫'],compNames:['疋','虫'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10]],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
+  '鸡':{py:'jī',en:'chicken',structure:'lr',components:['又','鸟'],compNames:['又','鸟'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'鸡蛋',py:'jī dàn',en:'egg',lv:1}]},
+  '狗':{py:'gǒu',en:'dog',structure:'lr',components:['犭','句'],compNames:['犬旁','句'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'小狗',py:'xiǎo gǒu',en:'puppy',lv:1}]},
+  '猫':{py:'māo',en:'cat',structure:'lr',components:['犭','苗'],compNames:['犬旁','苗'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'小猫',py:'xiǎo māo',en:'kitten',lv:1}]},
+  '题':{py:'tí',en:'topic; question',structure:'lr',components:['是','页'],compNames:['是','页'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12,13,14]],words:[{w:'问题',py:'wèn tí',en:'question',lv:1}]},
   '事':{py:'shì',en:'matter; affair',structure:'whole',components:['事'],compNames:['事'],words:[{w:'事情',py:'shì qing',en:'matter',lv:1}]},
-  '影':{py:'yǐng',en:'shadow; movie',structure:'lr',components:['景','彡'],compNames:['景','彡'],words:[{w:'电影',py:'diàn yǐng',en:'movie',lv:1}]},
-  '院':{py:'yuàn',en:'courtyard; institute',structure:'lr',components:['阝','完'],compNames:['阝旁','完'],words:[{w:'医院',py:'yī yuàn',en:'hospital',lv:1}]},
-  '医':{py:'yī',en:'medicine; doctor',structure:'tlb',components:['匚','矢'],compNames:['匚','矢'],words:[{w:'医生',py:'yī shēng',en:'doctor',lv:1}]},
-  '商':{py:'shāng',en:'commerce',structure:'tb',components:['亠','㕯'],compNames:['亠','㕯'],words:[{w:'商店',py:'shāng diàn',en:'shop',lv:1}]},
+  '影':{py:'yǐng',en:'shadow; movie',structure:'lr',components:['景','彡'],compNames:['景','彡'],splitRanges:[[0,1,2,3,4,5,6,7,8,9,10,11],[12,13,14]],words:[{w:'电影',py:'diàn yǐng',en:'movie',lv:1}]},
+  '院':{py:'yuàn',en:'courtyard; institute',structure:'lr',components:['阝','完'],compNames:['阝旁','完'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'医院',py:'yī yuàn',en:'hospital',lv:1}]},
+  '医':{py:'yī',en:'medicine; doctor',structure:'tlb',components:['匚','矢'],compNames:['匚','矢'],splitRanges:[[0,6],[1,2,3,4,5]],words:[{w:'医生',py:'yī shēng',en:'doctor',lv:1}]},
+  '商':{py:'shāng',en:'commerce',structure:'tb',components:['亠','㕯'],compNames:['亠','㕯'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9,10]],words:[{w:'商店',py:'shāng diàn',en:'shop',lv:1}]},
   '士':{py:'shì',en:'scholar; gentleman',structure:'whole',components:['士'],compNames:['士'],words:[{w:'女士',py:'nǚ shì',en:'lady',lv:1}]},
   '市':{py:'shì',en:'market; city',structure:'whole',components:['市'],compNames:['市'],words:[{w:'市场',py:'shì chǎng',en:'market'}]},
-  '友':{py:'yǒu',en:'friend',structure:'lu',components:['ナ','又'],compNames:['ナ','又'],words:[{w:'朋友',py:'péng yǒu',en:'friend',lv:1}]},
-  '哥':{py:'gē',en:'elder brother',structure:'tb',components:['可','可'],compNames:['可(上)','可(下)'],words:[{w:'哥哥',py:'gē ge',en:'elder brother',lv:1}]},
+  '友':{py:'yǒu',en:'friend',structure:'lu',components:['ナ','又'],compNames:['ナ','又'],splitRanges:[[0,1],[2,3]],words:[{w:'朋友',py:'péng yǒu',en:'friend',lv:1}]},
+  '哥':{py:'gē',en:'elder brother',structure:'tb',components:['可','可'],compNames:['可(上)','可(下)'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'哥哥',py:'gē ge',en:'elder brother',lv:1}]},
   '弟':{py:'dì',en:'younger brother',structure:'whole',components:['弟'],compNames:['弟'],words:[{w:'弟弟',py:'dì di',en:'younger brother'}]},
-  '奶':{py:'nǎi',en:'milk; grandma',structure:'lr',components:['女','乃'],compNames:['女旁','乃'],words:[{w:'牛奶',py:'niú nǎi',en:'milk',lv:1}]},
+  '奶':{py:'nǎi',en:'milk; grandma',structure:'lr',components:['女','乃'],compNames:['女旁','乃'],splitRanges:[[0,1,2],[3,4]],words:[{w:'牛奶',py:'niú nǎi',en:'milk',lv:1}]},
   '老':{py:'lǎo',en:'old',structure:'whole',components:['老'],compNames:['老'],words:[{w:'老师',py:'lǎo shī',en:'teacher',lv:1}]},
-  '师':{py:'shī',en:'teacher; master',structure:'lr',components:['丿','帀'],compNames:['丿','帀'],words:[{w:'老师',py:'lǎo shī',en:'teacher',lv:1}]},
-  '孩':{py:'hái',en:'child',structure:'lr',components:['子','亥'],compNames:['子旁','亥'],words:[{w:'孩子',py:'hái zi',en:'child',lv:1}]},
-  '脑':{py:'nǎo',en:'brain',structure:'lr',components:['月','㘝'],compNames:['月旁','㘝'],words:[{w:'电脑',py:'diàn nǎo',en:'computer',lv:1}]},
+  '师':{py:'shī',en:'teacher; master',structure:'lr',components:['师_p0','师_p1'],compNames:['师字旁','右部'],strokeDemoDistractors:['师_d0','师_d1','师_d2','师_d3'],words:[{w:'老师',py:'lǎo shī',en:'teacher',lv:1}]},
+  '孩':{py:'hái',en:'child',structure:'lr',components:['子','亥'],compNames:['子旁','亥'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'孩子',py:'hái zi',en:'child',lv:1}]},
+  '脑':{py:'nǎo',en:'brain',structure:'lr',components:['月','㘝'],compNames:['月旁','㘝'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'电脑',py:'diàn nǎo',en:'computer',lv:1}]},
   '白':{py:'bái',en:'white',structure:'whole',components:['白'],compNames:['白'],words:[{w:'白色',py:'bái sè',en:'white color',lv:1}]},
-  '号':{py:'hào',en:'number',structure:'tb',components:['口','丂'],compNames:['口','丂'],words:[{w:'号码',py:'hào mǎ',en:'number',lv:1}]},
+  '号':{py:'hào',en:'number',structure:'tb',components:['口','丂'],compNames:['口','丂'],splitRanges:[[0,1,2],[3,4]],words:[{w:'号码',py:'hào mǎ',en:'number',lv:1}]},
   '气':{py:'qì',en:'air; gas',structure:'whole',components:['气'],compNames:['气'],words:[{w:'天气',py:'tiān qì',en:'weather'}]},
-  '亮':{py:'liàng',en:'bright',structure:'tmb',components:['亠','口','几'],compNames:['亠','口','几'],words:[{w:'月亮',py:'yuè liang',en:'moon',lv:1}]},
-  '漂':{py:'piào',en:'pretty (in 漂亮)',structure:'lr',components:['氵','票'],compNames:['水旁','票'],words:[{w:'漂亮',py:'piào liang',en:'pretty',lv:1}]},
-  '贵':{py:'guì',en:'expensive',structure:'tb',components:['中','贝'],compNames:['中','贝'],words:[{w:'贵姓',py:'guì xìng',en:'(your) surname',lv:1}]},
-  '便':{py:'pián',en:'cheap (in 便宜)',structure:'lr',components:['亻','更'],compNames:['人旁','更'],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
-  '宜':{py:'yí',en:'suitable; (in 便宜)',structure:'tb',components:['宀','且'],compNames:['宝盖','且'],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
-  '新':{py:'xīn',en:'new',structure:'lr',components:['亲','斤'],compNames:['亲','斤'],words:[{w:'新年',py:'xīn nián',en:'New Year',lv:1}]},
-  '超':{py:'chāo',en:'exceed; super',structure:'ld',components:['走','召'],compNames:['走旁','召'],words:[{w:'超市',py:'chāo shì',en:'supermarket',lv:1}]},
+  '亮':{py:'liàng',en:'bright',structure:'tmb',components:['亮_p0','亮_p1','亮_p2'],compNames:['亠','口','几(含冖)'],strokeDemoDistractors:['亮_d0','亮_d1','亮_d2'],words:[{w:'月亮',py:'yuè liang',en:'moon',lv:1}]},
+  '漂':{py:'piào',en:'pretty (in 漂亮)',structure:'lr',components:['氵','票'],compNames:['水旁','票'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13]],words:[{w:'漂亮',py:'piào liang',en:'pretty',lv:1}]},
+  '贵':{py:'guì',en:'expensive',structure:'tb',components:['贵_p0','贵_p1'],compNames:['贵字头','贝'],strokeDemoDistractors:['贵_d0','贵_d1','贵_d2','贵_d3'],words:[{w:'贵姓',py:'guì xìng',en:'(your) surname',lv:1}]},
+  '便':{py:'pián',en:'cheap (in 便宜)',structure:'lr',components:['亻','更'],compNames:['人旁','更'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
+  '宜':{py:'yí',en:'suitable; (in 便宜)',structure:'tb',components:['宀','且'],compNames:['宝盖','且'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'便宜',py:'pián yi',en:'cheap',lv:1}]},
+  '新':{py:'xīn',en:'new',structure:'lr',components:['亲','斤'],compNames:['亲','斤'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'新年',py:'xīn nián',en:'New Year',lv:1}]},
+  '超':{py:'chāo',en:'exceed; super',structure:'ld',components:['走','召'],compNames:['走旁','召'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11]],words:[{w:'超市',py:'chāo shì',en:'supermarket',lv:1}]},
   '太':{py:'tài',en:'too; very',structure:'whole',components:['太'],compNames:['太'],words:[{w:'太好了',py:'tài hǎo le',en:'great!',lv:1}]},
   '少':{py:'shǎo',en:'few; little',structure:'whole',components:['少'],compNames:['少'],words:[{w:'多少',py:'duō shao',en:'how many',lv:1}]},
   '非':{py:'fēi',en:'not; non-',structure:'whole',components:['非'],compNames:['非'],words:[{w:'非常',py:'fēi cháng',en:'very',lv:1}]},
-  '常':{py:'cháng',en:'often; usual',structure:'tmb',components:['⺌','冖','巾'],compNames:['小字头','秃宝盖','巾'],words:[{w:'非常',py:'fēi cháng',en:'very',lv:1}]},
-  '和':{py:'hé',en:'and; with',structure:'lr',components:['禾','口'],compNames:['禾','口'],words:[{w:'我和你',py:'wǒ hé nǐ',en:'me and you',lv:1}]},
-  '都':{py:'dōu',en:'all',structure:'lr',components:['者','阝'],compNames:['者','阝旁'],words:[{w:'都是',py:'dōu shì',en:'all are',lv:1}]},
-  '给':{py:'gěi',en:'give; for',structure:'lr',components:['纟','合'],compNames:['纟旁','合'],words:[{w:'给你',py:'gěi nǐ',en:'give you',lv:1}]},
+  '常':{py:'cháng',en:'often; usual',structure:'tb',components:['常_p0','常_p1'],compNames:['尚','巾'],strokeDemoDistractors:['常_d0','常_d1','常_d2','常_d3'],words:[{w:'非常',py:'fēi cháng',en:'very',lv:1}]},
+  '和':{py:'hé',en:'and; with',structure:'lr',components:['禾','口'],compNames:['禾','口'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'我和你',py:'wǒ hé nǐ',en:'me and you',lv:1}]},
+  '都':{py:'dōu',en:'all',structure:'lr',components:['者','阝'],compNames:['者','阝旁'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9]],words:[{w:'都是',py:'dōu shì',en:'all are',lv:1}]},
+  '给':{py:'gěi',en:'give; for',structure:'lr',components:['纟','合'],compNames:['纟旁','合'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'给你',py:'gěi nǐ',en:'give you',lv:1}]},
   '系':{py:'xì',en:'system; tie',structure:'whole',components:['系'],compNames:['系'],words:[{w:'关系',py:'guān xì',en:'relationship'}]},
-  '第':{py:'dì',en:'(ordinal prefix)',structure:'tb',components:['竹','弟'],compNames:['竹字头','弟'],words:[{w:'第一',py:'dì yī',en:'first',lv:1}]},
+  '第':{py:'dì',en:'(ordinal prefix)',structure:'tb',components:['第_p0','第_p1'],compNames:['竹字头','弟(下)'],strokeDemoDistractors:['第_d0','第_d1','第_d2','第_d3'],words:[{w:'第一',py:'dì yī',en:'first',lv:1}]},
   '先':{py:'xiān',en:'first; earlier',structure:'whole',components:['先'],compNames:['先'],words:[{w:'先生',py:'xiān sheng',en:'mister',lv:1}]},
-  '公':{py:'gōng',en:'public; male',structure:'tb',components:['八','厶'],compNames:['八','厶'],words:[{w:'公司',py:'gōng sī',en:'company',lv:1}]},
-  '件':{py:'jiàn',en:'(measure for items)',structure:'lr',components:['亻','牛'],compNames:['人旁','牛'],words:[{w:'一件',py:'yī jiàn',en:'one (item)',lv:1}]},
-  '条':{py:'tiáo',en:'(measure for long things)',structure:'tb',components:['夂','木'],compNames:['夂','木'],words:[{w:'一条',py:'yī tiáo',en:'one (strip)',lv:1}]},
-  '样':{py:'yàng',en:'kind; manner',structure:'lr',components:['木','羊'],compNames:['木旁','羊'],words:[{w:'这样',py:'zhè yàng',en:'like this',lv:1}]},
-  '租':{py:'zū',en:'to rent',structure:'lr',components:['禾','且'],compNames:['禾旁','且'],words:[{w:'出租车',py:'chū zū chē',en:'taxi',lv:1}]},
-  '道':{py:'dào',en:'way; road',structure:'ld',components:['辶','首'],compNames:['走之旁','首'],words:[{w:'知道',py:'zhī dào',en:'know',lv:1}]},
-  '喂':{py:'wèi',en:'hello (phone)',structure:'lr',components:['口','畏'],compNames:['口旁','畏'],words:[{w:'喂',py:'wèi',en:'hello (phone)',lv:1}]},
-  '包':{py:'bāo',en:'bag; wrap',structure:'lu',components:['勹','巳'],compNames:['勹','巳'],words:[{w:'书包',py:'shū bāo',en:'schoolbag',lv:1}]},
-  '歌':{py:'gē',en:'song',structure:'lr',components:['哥','欠'],compNames:['哥','欠'],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
+  '公':{py:'gōng',en:'public; male',structure:'tb',components:['八','厶'],compNames:['八','厶'],splitRanges:[[0,1],[2,3]],words:[{w:'公司',py:'gōng sī',en:'company',lv:1}]},
+  '件':{py:'jiàn',en:'(measure for items)',structure:'lr',components:['亻','牛'],compNames:['人旁','牛'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'一件',py:'yī jiàn',en:'one (item)',lv:1}]},
+  '条':{py:'tiáo',en:'(measure for long things)',structure:'tb',components:['夂','木'],compNames:['夂','木'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'一条',py:'yī tiáo',en:'one (strip)',lv:1}]},
+  '样':{py:'yàng',en:'kind; manner',structure:'lr',components:['木','羊'],compNames:['木旁','羊'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'这样',py:'zhè yàng',en:'like this',lv:1}]},
+  '租':{py:'zū',en:'to rent',structure:'lr',components:['禾','且'],compNames:['禾旁','且'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'出租车',py:'chū zū chē',en:'taxi',lv:1}]},
+  '道':{py:'dào',en:'way; road',structure:'ld',components:['辶','首'],compNames:['走之旁','首'],splitRanges:[[9,10,11],[0,1,2,3,4,5,6,7,8]],words:[{w:'知道',py:'zhī dào',en:'know',lv:1}]},
+  '喂':{py:'wèi',en:'hello (phone)',structure:'lr',components:['口','畏'],compNames:['口旁','畏'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11]],words:[{w:'喂',py:'wèi',en:'hello (phone)',lv:1}]},
+  '包':{py:'bāo',en:'bag; wrap',structure:'lu',components:['勹','巳'],compNames:['勹','巳'],splitRanges:[[0,1],[2,3,4]],words:[{w:'书包',py:'shū bāo',en:'schoolbag',lv:1}]},
+  '歌':{py:'gē',en:'song',structure:'lr',components:['哥','欠'],compNames:['哥','欠'],splitRanges:[[0,1,2,3,4,5,6,7,8,9],[10,11,12,13]],words:[{w:'唱歌',py:'chàng gē',en:'sing',lv:1}]},
   '习':{py:'xí',en:'study; practice',structure:'whole',components:['习'],words:[{w:'学习',py:'xué xí',en:'study; learn'}]},
   '午':{py:'wǔ',en:'noon',structure:'whole',components:['午'],words:[{w:'中午',py:'zhōng wǔ',en:'noon',lv:1}]},
-  '有':{py:'yǒu',en:'have; there is',structure:'lu',components:['ナ','月'],compNames:['ナ','月'],words:[{w:'没有',py:'méi yǒu',en:"don't have",lv:1}]},
-  '的':{py:'de',en:'(possessive particle)',structure:'lr',components:['白','勺'],compNames:['白旁','勺'],words:[{w:'我的',py:'wǒ de',en:'my',lv:1}]},
+  '有':{py:'yǒu',en:'have; there is',structure:'lu',components:['ナ','月'],compNames:['ナ','月'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'没有',py:'méi yǒu',en:"don't have",lv:1}]},
+  '的':{py:'de',en:'(possessive particle)',structure:'lr',components:['白','勺'],compNames:['白旁','勺'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'我的',py:'wǒ de',en:'my',lv:1}]},
   '万':{py:'wàn',en:'ten thousand',structure:'whole',components:['万'],compNames:['万'],words:[{w:'一万',py:'yī wàn',en:'10,000',lv:2}]},
   '丈':{py:'zhàng',en:'unit of length',structure:'whole',components:['丈'],compNames:['丈'],words:[{w:'丈夫',py:'zhàngfu',en:'husband',lv:2}]},
-  '次':{py:'cì',en:'time / order',structure:'lr',components:['冫','欠'],compNames:['冰旁','欠'],words:[{w:'第一次',py:'dì yī cì',en:'first time',lv:2}]},
+  '次':{py:'cì',en:'time / order',structure:'lr',components:['冫','欠'],compNames:['冰旁','欠'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'第一次',py:'dì yī cì',en:'first time',lv:2}]},
   '已':{py:'yǐ',en:'already',structure:'whole',components:['已'],compNames:['已'],words:[{w:'已经',py:'yǐjīng',en:'already',lv:2}]},
-  '经':{py:'jīng',en:'pass through',structure:'lr',components:['纟','圣'],compNames:['绞丝旁','圣'],words:[{w:'已经',py:'yǐjīng',en:'already',lv:2}]},
-  '最':{py:'zuì',en:'most',structure:'tb',components:['日','取'],compNames:['日','取'],words:[{w:'最好',py:'zuì hǎo',en:'best',lv:2}]},
-  '左':{py:'zuǒ',en:'left',structure:'lu',components:['ナ','工'],compNames:['ナ','工'],words:[{w:'左边',py:'zuǒ biān',en:'left side',lv:2}]},
-  '右':{py:'yòu',en:'right',structure:'lu',components:['ナ','口'],compNames:['ナ','口'],words:[{w:'右边',py:'yòu biān',en:'right side',lv:2}]},
-  '旁':{py:'páng',en:'side',structure:'tb',components:['立','方'],compNames:['立','方'],words:[{w:'旁边',py:'pángbiān',en:'beside',lv:2}]},
-  '远':{py:'yuǎn',en:'far',structure:'ld',components:['辶','元'],compNames:['走之旁','元'],words:[{w:'远近',py:'yuǎnjìn',en:'distance',lv:2}]},
-  '近':{py:'jìn',en:'near',structure:'ld',components:['辶','斤'],compNames:['走之旁','斤'],words:[{w:'附近',py:'fùjìn',en:'nearby',lv:2}]},
-  '过':{py:'guò',en:'pass; cross',structure:'ld',components:['辶','寸'],compNames:['走之旁','寸'],words:[{w:'过去',py:'guòqù',en:'past',lv:2}]},
+  '经':{py:'jīng',en:'pass through',structure:'lr',components:['纟','圣'],compNames:['绞丝旁','圣'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'已经',py:'yǐjīng',en:'already',lv:2}]},
+  '最':{py:'zuì',en:'most',structure:'tb',components:['日','取'],compNames:['日','取'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11]],words:[{w:'最好',py:'zuì hǎo',en:'best',lv:2}]},
+  '左':{py:'zuǒ',en:'left',structure:'lu',components:['ナ','工'],compNames:['ナ','工'],splitRanges:[[0,1],[2,3,4]],words:[{w:'左边',py:'zuǒ biān',en:'left side',lv:2}]},
+  '右':{py:'yòu',en:'right',structure:'lu',components:['ナ','口'],compNames:['ナ','口'],splitRanges:[[0,1],[2,3,4]],words:[{w:'右边',py:'yòu biān',en:'right side',lv:2}]},
+  '旁':{py:'páng',en:'side',structure:'tb',components:['旁_p0','旁_p1'],compNames:['旁字头','方'],strokeDemoDistractors:['旁_d0','旁_d1','旁_d2','旁_d3'],words:[{w:'旁边',py:'pángbiān',en:'beside',lv:2}]},
+  '远':{py:'yuǎn',en:'far',structure:'ld',components:['辶','元'],compNames:['走之旁','元'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'远近',py:'yuǎnjìn',en:'distance',lv:2}]},
+  '近':{py:'jìn',en:'near',structure:'ld',components:['辶','斤'],compNames:['走之旁','斤'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'附近',py:'fùjìn',en:'nearby',lv:2}]},
+  '过':{py:'guò',en:'pass; cross',structure:'ld',components:['辶','寸'],compNames:['走之旁','寸'],splitRanges:[[3,4,5],[0,1,2]],words:[{w:'过去',py:'guòqù',en:'past',lv:2}]},
   '己':{py:'jǐ',en:'self',structure:'whole',components:['己'],compNames:['己'],words:[{w:'自己',py:'zìjǐ',en:'oneself',lv:2}]},
   '自':{py:'zì',en:'self / from',structure:'whole',components:['自'],compNames:['自'],words:[{w:'自己',py:'zìjǐ',en:'oneself',lv:2}]},
-  '从':{py:'cóng',en:'from',structure:'lr',components:['人','人'],compNames:['人(左)','人(右)'],words:[{w:'从来',py:'cónglái',en:'always; ever',lv:2}]},
+  '从':{py:'cóng',en:'from',structure:'lr',components:['人','人'],compNames:['人(左)','人(右)'],splitRanges:[[0,1],[2,3]],words:[{w:'从来',py:'cónglái',en:'always; ever',lv:2}]},
   '介':{py:'jiè',en:'introduce',structure:'whole',components:['介'],compNames:['介'],words:[{w:'介绍',py:'jièshào',en:'introduce',lv:2}]},
-  '绍':{py:'shào',en:'connect; introduce',structure:'lr',components:['纟','召'],compNames:['绞丝旁','召'],words:[{w:'介绍',py:'jièshào',en:'introduce',lv:2}]},
-  '动':{py:'dòng',en:'move',structure:'lr',components:['云','力'],compNames:['云','力'],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
-  '运':{py:'yùn',en:'transport; luck',structure:'ld',components:['辶','云'],compNames:['走之旁','云'],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
+  '绍':{py:'shào',en:'connect; introduce',structure:'lr',components:['纟','召'],compNames:['绞丝旁','召'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'介绍',py:'jièshào',en:'introduce',lv:2}]},
+  '动':{py:'dòng',en:'move',structure:'lr',components:['云','力'],compNames:['云','力'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
+  '运':{py:'yùn',en:'transport; luck',structure:'ld',components:['辶','云'],compNames:['走之旁','云'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'运动',py:'yùndòng',en:'sports',lv:2}]},
   '走':{py:'zǒu',en:'walk',structure:'whole',components:['走'],compNames:['走'],words:[{w:'走路',py:'zǒu lù',en:'walk',lv:2}]},
-  '跑':{py:'pǎo',en:'run',structure:'lr',components:['足','包'],compNames:['足旁','包'],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
-  '步':{py:'bù',en:'step',structure:'tb',components:['止','少'],compNames:['止','少'],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
-  '跳':{py:'tiào',en:'jump',structure:'lr',components:['足','兆'],compNames:['足旁','兆'],words:[{w:'跳舞',py:'tiàowǔ',en:'dance',lv:2}]},
+  '跑':{py:'pǎo',en:'run',structure:'lr',components:['足','包'],compNames:['足旁','包'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11]],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
+  '步':{py:'bù',en:'step',structure:'tb',components:['步_p0','步_p1'],compNames:['止','步字底'],strokeDemoDistractors:['步_d0','步_d1','步_d2','步_d3'],words:[{w:'跑步',py:'pǎobù',en:'run',lv:2}]},
+  '跳':{py:'tiào',en:'jump',structure:'lr',components:['足','兆'],compNames:['足旁','兆'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12]],words:[{w:'跳舞',py:'tiàowǔ',en:'dance',lv:2}]},
   '舞':{py:'wǔ',en:'dance',structure:'whole',components:['舞'],compNames:['舞'],words:[{w:'跳舞',py:'tiàowǔ',en:'dance',lv:2}]},
-  '踢':{py:'tī',en:'kick',structure:'lr',components:['足','易'],compNames:['足旁','易'],words:[{w:'踢球',py:'tī qiú',en:'play soccer',lv:2}]},
+  '踢':{py:'tī',en:'kick',structure:'lr',components:['足','易'],compNames:['足旁','易'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12,13,14]],words:[{w:'踢球',py:'tī qiú',en:'play soccer',lv:2}]},
   '足':{py:'zú',en:'foot',structure:'whole',components:['足'],compNames:['足'],words:[{w:'足球',py:'zúqiú',en:'soccer',lv:2}]},
-  '跟':{py:'gēn',en:'follow; with',structure:'lr',components:['足','艮'],compNames:['足旁','艮'],words:[{w:'跟着',py:'gēnzhe',en:'follow',lv:2}]},
-  '路':{py:'lù',en:'road',structure:'lr',components:['足','各'],compNames:['足旁','各'],words:[{w:'走路',py:'zǒu lù',en:'walk',lv:2}]},
-  '游':{py:'yóu',en:'swim; tour',structure:'lr',components:['氵','斿'],compNames:['水旁','斿'],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
-  '泳':{py:'yǒng',en:'swim',structure:'lr',components:['氵','永'],compNames:['水旁','永'],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
-  '洗':{py:'xǐ',en:'wash',structure:'lr',components:['氵','先'],compNames:['水旁','先'],words:[{w:'洗澡',py:'xǐzǎo',en:'shower',lv:2}]},
-  '送':{py:'sòng',en:'send; give',structure:'ld',components:['辶','关'],compNames:['走之旁','关'],words:[{w:'送礼',py:'sòng lǐ',en:'give gift',lv:2}]},
+  '跟':{py:'gēn',en:'follow; with',structure:'lr',components:['足','艮'],compNames:['足旁','艮'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12]],words:[{w:'跟着',py:'gēnzhe',en:'follow',lv:2}]},
+  '路':{py:'lù',en:'road',structure:'lr',components:['足','各'],compNames:['足旁','各'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12]],words:[{w:'走路',py:'zǒu lù',en:'walk',lv:2}]},
+  '游':{py:'yóu',en:'swim; tour',structure:'lr',components:['氵','斿'],compNames:['水旁','斿'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11]],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
+  '泳':{py:'yǒng',en:'swim',structure:'lr',components:['氵','永'],compNames:['水旁','永'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'游泳',py:'yóuyǒng',en:'swim',lv:2}]},
+  '洗':{py:'xǐ',en:'wash',structure:'lr',components:['氵','先'],compNames:['水旁','先'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'洗澡',py:'xǐzǎo',en:'shower',lv:2}]},
+  '送':{py:'sòng',en:'send; give',structure:'ld',components:['辶','关'],compNames:['走之旁','关'],splitRanges:[[6,7,8],[0,1,2,3,4,5]],words:[{w:'送礼',py:'sòng lǐ',en:'give gift',lv:2}]},
   '画':{py:'huà',en:'paint',structure:'whole',components:['画'],compNames:['画'],words:[{w:'画画',py:'huà huà',en:'paint',lv:2}]},
-  '笑':{py:'xiào',en:'laugh',structure:'tb',components:['竹','夭'],compNames:['竹字头','夭'],words:[{w:'笑话',py:'xiàohua',en:'joke',lv:2}]},
-  '让':{py:'ràng',en:'let; allow',structure:'lr',components:['讠','上'],compNames:['言旁','上'],words:[{w:'让步',py:'ràngbù',en:'concede',lv:2}]},
-  '告':{py:'gào',en:'tell',structure:'tb',components:['牛','口'],compNames:['牛','口'],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
-  '诉':{py:'sù',en:'tell',structure:'lr',components:['讠','斥'],compNames:['言旁','斥'],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
-  '记':{py:'jì',en:'record; remember',structure:'lr',components:['讠','己'],compNames:['言旁','己'],words:[{w:'记得',py:'jì de',en:'remember',lv:2}]},
-  '忘':{py:'wàng',en:'forget',structure:'tb',components:['亡','心'],compNames:['亡','心'],words:[{w:'忘记',py:'wàngjì',en:'forget',lv:2}]},
-  '懂':{py:'dǒng',en:'understand',structure:'lr',components:['忄','董'],compNames:['心旁','董'],words:[{w:'懂得',py:'dǒng de',en:'understand',lv:2}]},
-  '希':{py:'xī',en:'hope',structure:'tb',components:['乂','巾'],compNames:['乂','巾'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
-  '望':{py:'wàng',en:'look; hope',structure:'tb',components:['亡月','王'],compNames:['亡月','王'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
-  '帮':{py:'bāng',en:'help',structure:'tb',components:['邦','巾'],compNames:['邦','巾'],words:[{w:'帮忙',py:'bāngmáng',en:'help',lv:2}]},
-  '拿':{py:'ná',en:'take',structure:'tb',components:['合','手'],compNames:['合','手'],words:[{w:'拿走',py:'ná zǒu',en:'take away',lv:2}]},
-  '教':{py:'jiāo',en:'teach',structure:'lr',components:['孝','攵'],compNames:['孝','攵'],words:[{w:'教学',py:'jiāoxué',en:'teach',lv:2}]},
+  '笑':{py:'xiào',en:'laugh',structure:'tb',components:['竹','夭'],compNames:['竹字头','夭'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'笑话',py:'xiàohua',en:'joke',lv:2}]},
+  '让':{py:'ràng',en:'let; allow',structure:'lr',components:['讠','上'],compNames:['言旁','上'],splitRanges:[[0,1],[2,3,4]],words:[{w:'让步',py:'ràngbù',en:'concede',lv:2}]},
+  '告':{py:'gào',en:'tell',structure:'tb',components:['牛','口'],compNames:['牛','口'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
+  '诉':{py:'sù',en:'tell',structure:'lr',components:['讠','斥'],compNames:['言旁','斥'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'告诉',py:'gàosu',en:'tell',lv:2}]},
+  '记':{py:'jì',en:'record; remember',structure:'lr',components:['讠','己'],compNames:['言旁','己'],splitRanges:[[0,1],[2,3,4]],words:[{w:'记得',py:'jì de',en:'remember',lv:2}]},
+  '忘':{py:'wàng',en:'forget',structure:'tb',components:['亡','心'],compNames:['亡','心'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'忘记',py:'wàngjì',en:'forget',lv:2}]},
+  '懂':{py:'dǒng',en:'understand',structure:'lr',components:['忄','董'],compNames:['心旁','董'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14]],words:[{w:'懂得',py:'dǒng de',en:'understand',lv:2}]},
+  '希':{py:'xī',en:'hope',structure:'tb',components:['希_p0','希_p1'],compNames:['希字头','巾'],strokeDemoDistractors:['希_d0','希_d1','希_d2','希_d3'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
+  '望':{py:'wàng',en:'look; hope',structure:'tb',components:['望_p0','望_p1'],compNames:['亡+月(上)','王'],strokeDemoDistractors:['望_d0','望_d1','望_d2','望_d3'],words:[{w:'希望',py:'xīwàng',en:'hope',lv:2}]},
+  '帮':{py:'bāng',en:'help',structure:'tb',components:['邦','巾'],compNames:['邦','巾'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'帮忙',py:'bāngmáng',en:'help',lv:2}]},
+  '拿':{py:'ná',en:'take',structure:'tb',components:['合','手'],compNames:['合','手'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'拿走',py:'ná zǒu',en:'take away',lv:2}]},
+  '教':{py:'jiāo',en:'teach',structure:'lr',components:['孝','攵'],compNames:['孝','攵'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10]],words:[{w:'教学',py:'jiāoxué',en:'teach',lv:2}]},
   '考':{py:'kǎo',en:'test; exam',structure:'whole',components:['考'],compNames:['考'],words:[{w:'考试',py:'kǎoshì',en:'exam',lv:2}]},
-  '试':{py:'shì',en:'try; test',structure:'lr',components:['讠','式'],compNames:['言旁','式'],words:[{w:'考试',py:'kǎoshì',en:'exam',lv:2}]},
+  '试':{py:'shì',en:'try; test',structure:'lr',components:['讠','式'],compNames:['言旁','式'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'考试',py:'kǎoshì',en:'exam',lv:2}]},
   '比':{py:'bǐ',en:'compare',structure:'whole',components:['比'],compNames:['比'],words:[{w:'比较',py:'bǐjiào',en:'compare',lv:2}]},
-  '坏':{py:'huài',en:'bad; broken',structure:'lr',components:['土','不'],compNames:['土旁','不'],words:[{w:'坏人',py:'huài rén',en:'bad person',lv:2}]},
-  '错':{py:'cuò',en:'wrong',structure:'lr',components:['钅','昔'],compNames:['金旁','昔'],words:[{w:'错误',py:'cuòwù',en:'mistake',lv:2}]},
+  '坏':{py:'huài',en:'bad; broken',structure:'lr',components:['土','不'],compNames:['土旁','不'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'坏人',py:'huài rén',en:'bad person',lv:2}]},
+  '错':{py:'cuò',en:'wrong',structure:'lr',components:['钅','昔'],compNames:['金旁','昔'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12]],words:[{w:'错误',py:'cuòwù',en:'mistake',lv:2}]},
   '夫':{py:'fū',en:'man; husband',structure:'whole',components:['夫'],compNames:['夫'],words:[{w:'丈夫',py:'zhàngfu',en:'husband',lv:2}]},
-  '妻':{py:'qī',en:'wife',structure:'tb',components:['一肀','女'],compNames:['上部','女'],words:[{w:'妻子',py:'qīzi',en:'wife',lv:2}]},
-  '爷':{py:'yé',en:'grandfather',structure:'tb',components:['父','卩'],compNames:['父','卩'],words:[{w:'爷爷',py:'yéye',en:'grandpa',lv:2}]},
-  '姓':{py:'xìng',en:'surname',structure:'lr',components:['女','生'],compNames:['女旁','生'],words:[{w:'姓名',py:'xìngmíng',en:'name',lv:2}]},
-  '店':{py:'diàn',en:'shop',structure:'lu',components:['广','占'],compNames:['广字旁','占'],words:[{w:'商店',py:'shāngdiàn',en:'shop',lv:2}]},
-  '馆':{py:'guǎn',en:'building; hall',structure:'lr',components:['饣','官'],compNames:['食旁','官'],words:[{w:'图书馆',py:'túshūguǎn',en:'library',lv:2}]},
-  '楼':{py:'lóu',en:'building',structure:'lr',components:['木','娄'],compNames:['木旁','娄'],words:[{w:'楼上',py:'lóushàng',en:'upstairs',lv:2}]},
-  '室':{py:'shì',en:'room',structure:'tb',components:['宀','至'],compNames:['宝盖','至'],words:[{w:'教室',py:'jiàoshì',en:'classroom',lv:2}]},
-  '场':{py:'chǎng',en:'field; place',structure:'lr',components:['土','𠃓'],compNames:['土旁','𠃓'],words:[{w:'机场',py:'jīchǎng',en:'airport',lv:2}]},
-  '站':{py:'zhàn',en:'station; stand',structure:'lr',components:['立','占'],compNames:['立旁','占'],words:[{w:'车站',py:'chēzhàn',en:'station',lv:2}]},
-  '地':{py:'dì',en:'ground; place',structure:'lr',components:['土','也'],compNames:['土旁','也'],words:[{w:'地方',py:'dìfāng',en:'place',lv:2}]},
-  '体':{py:'tǐ',en:'body',structure:'lr',components:['亻','本'],compNames:['人旁','本'],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
+  '妻':{py:'qī',en:'wife',structure:'tb',components:['妻_p0','妻_p1'],compNames:['妻字头','女'],strokeDemoDistractors:['妻_d0','妻_d1','妻_d2','妻_d3'],words:[{w:'妻子',py:'qīzi',en:'wife',lv:2}]},
+  '爷':{py:'yé',en:'grandfather',structure:'tb',components:['父','卩'],compNames:['父','卩'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'爷爷',py:'yéye',en:'grandpa',lv:2}]},
+  '姓':{py:'xìng',en:'surname',structure:'lr',components:['女','生'],compNames:['女旁','生'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'姓名',py:'xìngmíng',en:'name',lv:2}]},
+  '店':{py:'diàn',en:'shop',structure:'lu',components:['广','占'],compNames:['广字旁','占'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'商店',py:'shāngdiàn',en:'shop',lv:2}]},
+  '馆':{py:'guǎn',en:'building; hall',structure:'lr',components:['饣','官'],compNames:['食旁','官'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'图书馆',py:'túshūguǎn',en:'library',lv:2}]},
+  '楼':{py:'lóu',en:'building',structure:'lr',components:['木','娄'],compNames:['木旁','娄'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11,12]],words:[{w:'楼上',py:'lóushàng',en:'upstairs',lv:2}]},
+  '室':{py:'shì',en:'room',structure:'tb',components:['宀','至'],compNames:['宝盖','至'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'教室',py:'jiàoshì',en:'classroom',lv:2}]},
+  '场':{py:'chǎng',en:'field; place',structure:'lr',components:['土','𠃓'],compNames:['土旁','𠃓'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'机场',py:'jīchǎng',en:'airport',lv:2}]},
+  '站':{py:'zhàn',en:'station; stand',structure:'lr',components:['立','占'],compNames:['立旁','占'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'车站',py:'chēzhàn',en:'station',lv:2}]},
+  '地':{py:'dì',en:'ground; place',structure:'lr',components:['土','也'],compNames:['土旁','也'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'地方',py:'dìfāng',en:'place',lv:2}]},
+  '体':{py:'tǐ',en:'body',structure:'lr',components:['亻','本'],compNames:['人旁','本'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
   '身':{py:'shēn',en:'body',structure:'whole',components:['身'],compNames:['身'],words:[{w:'身体',py:'shēntǐ',en:'body',lv:2}]},
-  '眼':{py:'yǎn',en:'eye',structure:'lr',components:['目','艮'],compNames:['目旁','艮'],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
-  '睛':{py:'jīng',en:'eyeball',structure:'lr',components:['目','青'],compNames:['目旁','青'],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
+  '眼':{py:'yǎn',en:'eye',structure:'lr',components:['目','艮'],compNames:['目旁','艮'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10]],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
+  '睛':{py:'jīng',en:'eyeball',structure:'lr',components:['目','青'],compNames:['目旁','青'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12]],words:[{w:'眼睛',py:'yǎnjing',en:'eye',lv:2}]},
   '头':{py:'tóu',en:'head',structure:'whole',components:['头'],compNames:['头'],words:[{w:'头发',py:'tóufa',en:'hair',lv:2}]},
-  '疼':{py:'téng',en:'pain',structure:'lu',components:['疒','冬'],compNames:['病字旁','冬'],words:[{w:'头疼',py:'tóuténg',en:'headache',lv:2}]},
-  '药':{py:'yào',en:'medicine',structure:'tb',components:['艹','约'],compNames:['草头','约'],words:[{w:'吃药',py:'chī yào',en:'take medicine',lv:2}]},
-  '票':{py:'piào',en:'ticket',structure:'tb',components:['覀','示'],compNames:['覀','示'],words:[{w:'车票',py:'chēpiào',en:'ticket',lv:2}]},
-  '酒':{py:'jiǔ',en:'wine',structure:'lr',components:['氵','酉'],compNames:['水旁','酉'],words:[{w:'喝酒',py:'hē jiǔ',en:'drink alcohol',lv:2}]},
-  '咖':{py:'kā',en:'coffee (in 咖啡)',structure:'lr',components:['口','加'],compNames:['口旁','加'],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
-  '啡':{py:'fēi',en:'coffee (in 咖啡)',structure:'lr',components:['口','非'],compNames:['口旁','非'],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
+  '疼':{py:'téng',en:'pain',structure:'lu',components:['疒','冬'],compNames:['病字旁','冬'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'头疼',py:'tóuténg',en:'headache',lv:2}]},
+  '药':{py:'yào',en:'medicine',structure:'tb',components:['艹','约'],compNames:['草头','约'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'吃药',py:'chī yào',en:'take medicine',lv:2}]},
+  '票':{py:'piào',en:'ticket',structure:'tb',components:['覀','示'],compNames:['覀','示'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'车票',py:'chēpiào',en:'ticket',lv:2}]},
+  '酒':{py:'jiǔ',en:'wine',structure:'lr',components:['氵','酉'],compNames:['水旁','酉'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'喝酒',py:'hē jiǔ',en:'drink alcohol',lv:2}]},
+  '咖':{py:'kā',en:'coffee (in 咖啡)',structure:'lr',components:['口','加'],compNames:['口旁','加'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
+  '啡':{py:'fēi',en:'coffee (in 咖啡)',structure:'lr',components:['口','非'],compNames:['口旁','非'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'咖啡',py:'kāfēi',en:'coffee',lv:2}]},
   '肉':{py:'ròu',en:'meat',structure:'whole',components:['肉'],compNames:['肉'],words:[{w:'牛肉',py:'niúròu',en:'beef',lv:2}]},
   '鱼':{py:'yú',en:'fish',structure:'whole',components:['鱼'],compNames:['鱼'],words:[{w:'鱼肉',py:'yú ròu',en:'fish',lv:2}]},
   '鸟':{py:'niǎo',en:'bird',structure:'whole',components:['鸟'],compNames:['鸟'],words:[{w:'小鸟',py:'xiǎo niǎo',en:'small bird',lv:2}]},
-  '篮':{py:'lán',en:'basket',structure:'tb',components:['竹','监'],compNames:['竹字头','监'],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
-  '球':{py:'qiú',en:'ball',structure:'lr',components:['王','求'],compNames:['王旁','求'],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
-  '笔':{py:'bǐ',en:'pen',structure:'tb',components:['竹','毛'],compNames:['竹字头','毛'],words:[{w:'铅笔',py:'qiānbǐ',en:'pencil',lv:2}]},
-  '裤':{py:'kù',en:'pants',structure:'lr',components:['衤','库'],compNames:['衣旁','库'],words:[{w:'裤子',py:'kùzi',en:'pants',lv:2}]},
-  '词':{py:'cí',en:'word',structure:'lr',components:['讠','司'],compNames:['言旁','司'],words:[{w:'词语',py:'cíyǔ',en:'word',lv:2}]},
+  '篮':{py:'lán',en:'basket',structure:'tb',components:['竹','监'],compNames:['竹字头','监'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13,14,15]],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
+  '球':{py:'qiú',en:'ball',structure:'lr',components:['王','求'],compNames:['王旁','求'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'篮球',py:'lánqiú',en:'basketball',lv:2}]},
+  '笔':{py:'bǐ',en:'pen',structure:'tb',components:['竹','毛'],compNames:['竹字头','毛'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'铅笔',py:'qiānbǐ',en:'pencil',lv:2}]},
+  '裤':{py:'kù',en:'pants',structure:'lr',components:['衤','库'],compNames:['衣旁','库'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11]],words:[{w:'裤子',py:'kùzi',en:'pants',lv:2}]},
+  '词':{py:'cí',en:'word',structure:'lr',components:['讠','司'],compNames:['言旁','司'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'词语',py:'cíyǔ',en:'word',lv:2}]},
   '网':{py:'wǎng',en:'net',structure:'whole',components:['网'],compNames:['网'],words:[{w:'网络',py:'wǎngluò',en:'internet',lv:2}]},
-  '铁':{py:'tiě',en:'iron',structure:'lr',components:['钅','失'],compNames:['金旁','失'],words:[{w:'地铁',py:'dìtiě',en:'subway',lv:2}]},
-  '位':{py:'wèi',en:'position; (measure)',structure:'lr',components:['亻','立'],compNames:['人旁','立'],words:[{w:'一位',py:'yī wèi',en:'one (person)',lv:2}]},
-  '别':{py:'bié',en:'other; do not',structure:'lr',components:['另','刂'],compNames:['另','刀旁'],words:[{w:'别的',py:'bié de',en:'other',lv:2}]},
-  '但':{py:'dàn',en:'but',structure:'lr',components:['亻','旦'],compNames:['人旁','旦'],words:[{w:'但是',py:'dànshì',en:'but',lv:2}]},
-  '准':{py:'zhǔn',en:'accurate; allow',structure:'lr',components:['冫','隹'],compNames:['冰旁','隹'],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
-  '备':{py:'bèi',en:'prepare',structure:'tb',components:['夂','田'],compNames:['夂','田'],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
-  '完':{py:'wán',en:'finish',structure:'tb',components:['宀','元'],compNames:['宝盖','元'],words:[{w:'完成',py:'wánchéng',en:'complete',lv:2}]},
-  '始':{py:'shǐ',en:'begin',structure:'lr',components:['女','台'],compNames:['女旁','台'],words:[{w:'开始',py:'kāishǐ',en:'begin',lv:2}]},
-  '就':{py:'jiù',en:'just; precisely',structure:'lr',components:['京','尤'],compNames:['京','尤'],words:[{w:'就是',py:'jiùshì',en:'just is',lv:2}]},
-  '快':{py:'kuài',en:'fast',structure:'lr',components:['忄','夬'],compNames:['心旁','夬'],words:[{w:'快乐',py:'kuàilè',en:'happy',lv:2}]},
-  '慢':{py:'màn',en:'slow',structure:'lr',components:['忄','曼'],compNames:['心旁','曼'],words:[{w:'慢慢',py:'mànmàn',en:'slowly',lv:2}]},
-  '累':{py:'lèi',en:'tired',structure:'tb',components:['田','糸'],compNames:['田','糸'],words:[{w:'很累',py:'hěn lèi',en:'very tired',lv:2}]},
-  '舒':{py:'shū',en:'comfortable',structure:'lr',components:['舍','予'],compNames:['舍','予'],words:[{w:'舒服',py:'shūfu',en:'comfortable',lv:2}]},
-  '情':{py:'qíng',en:'feeling',structure:'lr',components:['忄','青'],compNames:['心旁','青'],words:[{w:'心情',py:'xīnqíng',en:'mood',lv:2}]},
-  '意':{py:'yì',en:'meaning; intent',structure:'tb',components:['音','心'],compNames:['音','心'],words:[{w:'意思',py:'yìsi',en:'meaning',lv:2}]},
-  '晴':{py:'qíng',en:'clear; sunny',structure:'lr',components:['日','青'],compNames:['日旁','青'],words:[{w:'晴天',py:'qíngtiān',en:'sunny day',lv:2}]},
-  '阴':{py:'yīn',en:'cloudy; shade',structure:'lr',components:['阝','月'],compNames:['阝旁','月'],words:[{w:'阴天',py:'yīntiān',en:'cloudy',lv:2}]},
-  '虽':{py:'suī',en:'although',structure:'tb',components:['口','虫'],compNames:['口','虫'],words:[{w:'虽然',py:'suīrán',en:'although',lv:2}]},
-  '然':{py:'rán',en:'thus; -ly',structure:'tb',components:['犬肉','灬'],compNames:['上部','四点底'],words:[{w:'当然',py:'dāngrán',en:'of course',lv:2}]},
-  '色':{py:'sè',en:'color',structure:'tb',components:['⺈','巴'],compNames:['⺈','巴'],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
-  '颜':{py:'yán',en:'face; color',structure:'lr',components:['彦','页'],compNames:['彦','页'],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
-  '红':{py:'hóng',en:'red',structure:'lr',components:['纟','工'],compNames:['绞丝旁','工'],words:[{w:'红色',py:'hóngsè',en:'red color',lv:2}]},
-  '绿':{py:'lǜ',en:'green',structure:'lr',components:['纟','录'],compNames:['绞丝旁','录'],words:[{w:'绿色',py:'lǜsè',en:'green color',lv:2}]},
+  '铁':{py:'tiě',en:'iron',structure:'lr',components:['钅','失'],compNames:['金旁','失'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'地铁',py:'dìtiě',en:'subway',lv:2}]},
+  '位':{py:'wèi',en:'position; (measure)',structure:'lr',components:['亻','立'],compNames:['人旁','立'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'一位',py:'yī wèi',en:'one (person)',lv:2}]},
+  '别':{py:'bié',en:'other; do not',structure:'lr',components:['另','刂'],compNames:['另','刀旁'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'别的',py:'bié de',en:'other',lv:2}]},
+  '但':{py:'dàn',en:'but',structure:'lr',components:['亻','旦'],compNames:['人旁','旦'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'但是',py:'dànshì',en:'but',lv:2}]},
+  '准':{py:'zhǔn',en:'accurate; allow',structure:'lr',components:['冫','隹'],compNames:['冰旁','隹'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
+  '备':{py:'bèi',en:'prepare',structure:'tb',components:['夂','田'],compNames:['夂','田'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'准备',py:'zhǔnbèi',en:'prepare',lv:2}]},
+  '完':{py:'wán',en:'finish',structure:'tb',components:['宀','元'],compNames:['宝盖','元'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'完成',py:'wánchéng',en:'complete',lv:2}]},
+  '始':{py:'shǐ',en:'begin',structure:'lr',components:['女','台'],compNames:['女旁','台'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'开始',py:'kāishǐ',en:'begin',lv:2}]},
+  '就':{py:'jiù',en:'just; precisely',structure:'lr',components:['京','尤'],compNames:['京','尤'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11]],words:[{w:'就是',py:'jiùshì',en:'just is',lv:2}]},
+  '快':{py:'kuài',en:'fast',structure:'lr',components:['忄','夬'],compNames:['心旁','夬'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'快乐',py:'kuàilè',en:'happy',lv:2}]},
+  '慢':{py:'màn',en:'slow',structure:'lr',components:['忄','曼'],compNames:['心旁','曼'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13]],words:[{w:'慢慢',py:'mànmàn',en:'slowly',lv:2}]},
+  '累':{py:'lèi',en:'tired',structure:'tb',components:['田','糸'],compNames:['田','糸'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10]],words:[{w:'很累',py:'hěn lèi',en:'very tired',lv:2}]},
+  '舒':{py:'shū',en:'comfortable',structure:'lr',components:['舍','予'],compNames:['舍','予'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11]],words:[{w:'舒服',py:'shūfu',en:'comfortable',lv:2}]},
+  '情':{py:'qíng',en:'feeling',structure:'lr',components:['忄','青'],compNames:['心旁','青'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'心情',py:'xīnqíng',en:'mood',lv:2}]},
+  '意':{py:'yì',en:'meaning; intent',structure:'tb',components:['音','心'],compNames:['音','心'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'意思',py:'yìsi',en:'meaning',lv:2}]},
+  '晴':{py:'qíng',en:'clear; sunny',structure:'lr',components:['日','青'],compNames:['日旁','青'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11]],words:[{w:'晴天',py:'qíngtiān',en:'sunny day',lv:2}]},
+  '阴':{py:'yīn',en:'cloudy; shade',structure:'lr',components:['阝','月'],compNames:['阝旁','月'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'阴天',py:'yīntiān',en:'cloudy',lv:2}]},
+  '虽':{py:'suī',en:'although',structure:'tb',components:['口','虫'],compNames:['口','虫'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'虽然',py:'suīrán',en:'although',lv:2}]},
+  '然':{py:'rán',en:'thus; -ly',structure:'tb',components:['然_p0','然_p1'],compNames:['月+犬(上)','灬'],strokeDemoDistractors:['然_d0','然_d1','然_d2','然_d3'],words:[{w:'当然',py:'dāngrán',en:'of course',lv:2}]},
+  '色':{py:'sè',en:'color',structure:'tb',components:['⺈','巴'],compNames:['⺈','巴'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
+  '颜':{py:'yán',en:'face; color',structure:'lr',components:['彦','页'],compNames:['彦','页'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12,13,14]],words:[{w:'颜色',py:'yánsè',en:'color',lv:2}]},
+  '红':{py:'hóng',en:'red',structure:'lr',components:['纟','工'],compNames:['绞丝旁','工'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'红色',py:'hóngsè',en:'red color',lv:2}]},
+  '绿':{py:'lǜ',en:'green',structure:'lr',components:['纟','录'],compNames:['绞丝旁','录'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'绿色',py:'lǜsè',en:'green color',lv:2}]},
   '黑':{py:'hēi',en:'black',structure:'whole',components:['黑'],compNames:['黑'],words:[{w:'黑色',py:'hēisè',en:'black color',lv:2}]},
-  '周':{py:'zhōu',en:'week; circle',structure:'lur',components:['冂','吉'],compNames:['冂','吉'],words:[{w:'周末',py:'zhōumò',en:'weekend',lv:2}]},
-  '所':{py:'suǒ',en:'place; that which',structure:'lr',components:['户','斤'],compNames:['户','斤'],words:[{w:'所以',py:'suǒyǐ',en:'so',lv:2}]},
-  '往':{py:'wǎng',en:'toward; go to',structure:'lr',components:['彳','主'],compNames:['双人旁','主'],words:[{w:'前往',py:'qiánwǎng',en:'go to',lv:2}]},
+  '周':{py:'zhōu',en:'week; circle',structure:'lur',components:['冂','吉'],compNames:['冂','吉'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'周末',py:'zhōumò',en:'weekend',lv:2}]},
+  '所':{py:'suǒ',en:'place; that which',structure:'lr',components:['户','斤'],compNames:['户','斤'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'所以',py:'suǒyǐ',en:'so',lv:2}]},
+  '往':{py:'wǎng',en:'toward; go to',structure:'lr',components:['彳','主'],compNames:['双人旁','主'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'前往',py:'qiánwǎng',en:'go to',lv:2}]},
   '离':{py:'lí',en:'leave; away from',structure:'whole',components:['离'],compNames:['离'],words:[{w:'离开',py:'líkāi',en:'leave',lv:2}]},
-  '旅':{py:'lǚ',en:'travel',structure:'lr',components:['方','㫃'],compNames:['方','㫃'],words:[{w:'旅游',py:'lǚyóu',en:'travel',lv:2}]},
+  '旅':{py:'lǚ',en:'travel',structure:'lr',components:['方','㫃'],compNames:['方','㫃'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'旅游',py:'lǚyóu',en:'travel',lv:2}]},
   '交':{py:'jiāo',en:'cross; exchange',structure:'whole',components:['交'],compNames:['交'],words:[{w:'交通',py:'jiāotōng',en:'traffic',lv:2}]},
-  '等':{py:'děng',en:'wait; rank',structure:'tb',components:['竹','寺'],compNames:['竹字头','寺'],words:[{w:'等等',py:'děng děng',en:'wait',lv:2}]},
-  '留':{py:'liú',en:'stay; remain',structure:'tb',components:['卯','田'],compNames:['卯','田'],words:[{w:'留学',py:'liúxué',en:'study abroad',lv:2}]},
-  '啊':{py:'a',en:'(exclamation)',structure:'lr',components:['口','阿'],compNames:['口旁','阿'],words:[{w:'好啊',py:'hǎo a',en:'good!',lv:2}]},
+  '等':{py:'děng',en:'wait; rank',structure:'tb',components:['竹','寺'],compNames:['竹字头','寺'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11]],words:[{w:'等等',py:'děng děng',en:'wait',lv:2}]},
+  '留':{py:'liú',en:'stay; remain',structure:'tb',components:['卯','田'],compNames:['卯','田'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'留学',py:'liúxué',en:'study abroad',lv:2}]},
+  '啊':{py:'a',en:'(exclamation)',structure:'lr',components:['口','阿'],compNames:['口旁','阿'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'好啊',py:'hǎo a',en:'good!',lv:2}]},
   '乐':{py:'lè',en:'happy',structure:'whole',components:['乐'],compNames:['乐'],words:[{w:'快乐',py:'kuàilè',en:'happy',lv:2}]},
-  '每':{py:'měi',en:'every',structure:'tb',components:['𠂉','母'],compNames:['𠂉','母'],words:[{w:'每天',py:'měi tiān',en:'every day',lv:2}]},
+  '每':{py:'měi',en:'every',structure:'tb',components:['𠂉','母'],compNames:['𠂉','母'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'每天',py:'měi tiān',en:'every day',lv:2}]},
   '表':{py:'biǎo',en:'watch; form',structure:'whole',components:['表'],compNames:['表'],words:[{w:'手表',py:'shǒubiǎo',en:'watch',lv:2}]},
-  '着':{py:'zhe',en:'(particle)',structure:'tb',components:['⺶','目'],compNames:['⺶','目'],words:[{w:'看着',py:'kàn zhe',en:'looking',lv:2}]},
+  '着':{py:'zhe',en:'(particle)',structure:'tb',components:['⺶','目'],compNames:['⺶','目'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'看着',py:'kàn zhe',en:'looking',lv:2}]},
   '长':{py:'cháng',en:'long',structure:'whole',components:['长'],compNames:['长'],words:[{w:'很长',py:'hěn cháng',en:'very long',lv:2}]},
+  '阿':{py:'ā',en:'prefix (in names)',structure:'lr',components:['阝','可'],compNames:['耳刀旁','可'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'阿姨',py:'āyí',en:'aunt',lv:3}]},
+  '矮':{py:'ǎi',en:'short',structure:'lr',components:['矢','委'],compNames:['矢','委'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12]],words:[{w:'矮',py:'ǎi',en:'short (height)',lv:3}]},
+  '安':{py:'ān',en:'peaceful',structure:'tb',components:['宀','女'],compNames:['宝盖头','女'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'安静',py:'ānjìng',en:'quiet',lv:3},{w:'安全',py:'ānquán',en:'safe',lv:3}]},
+  '把':{py:'bǎ',en:'to hold; (measure word)',structure:'lr',components:['扌','巴'],compNames:['提手旁','巴'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'把',py:'bǎ',en:'(measure word)',lv:3}]},
+  '般':{py:'bān',en:'sort, kind',structure:'lr',components:['舟','殳'],compNames:['舟','殳'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'一般',py:'yìbān',en:'general',lv:3}]},
+  '搬':{py:'bān',en:'to move',structure:'lr',components:['扌','般'],compNames:['提手旁','般'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12]],words:[{w:'搬',py:'bān',en:'to move (heavy objects)',lv:3},{w:'搬家',py:'bānjiā',en:'to move house',lv:3}]},
+  '板':{py:'bǎn',en:'board',structure:'lr',components:['木','反'],compNames:['木','反'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'黑板',py:'hēibǎn',en:'blackboard',lv:3}]},
+  '办':{py:'bàn',en:'to set up',structure:'whole',components:['办'],words:[{w:'办',py:'bàn',en:'to do',lv:3},{w:'办法',py:'bànfǎ',en:'method',lv:3}]},
+  '饱':{py:'bǎo',en:'full (after eating)',structure:'lr',components:['饣','包'],compNames:['食字旁','包'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'饱',py:'bǎo',en:'full (from eating)',lv:3}]},
+  '报':{py:'bào',en:'to report',structure:'lr',components:['扌','报_1'],compNames:['提手旁','右部'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'报纸',py:'bàozhǐ',en:'newspaper',lv:3}]},
+  '北':{py:'běi',en:'north',structure:'lr',components:['北_0','北_1'],compNames:['左部','匕'],splitRanges:[[0,1,2],[3,4]],words:[{w:'北',py:'běi',en:'north',lv:3},{w:'北方',py:'běifāng',en:'North',lv:3}]},
+  '被':{py:'bèi',en:'quilt; (passive marker)',structure:'lr',components:['衤','皮'],compNames:['衣字旁','皮'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'被',py:'bèi',en:'(passive marker)',lv:3}]},
+  '必':{py:'bì',en:'surely, certainly',structure:'whole',components:['必'],words:[{w:'必须',py:'bìxū',en:'must',lv:3}]},
+  '变':{py:'biàn',en:'to change',structure:'tb',components:['亦','又'],compNames:['亦','又'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'变',py:'biàn',en:'to change',lv:3},{w:'变成',py:'biànchéng',en:'to turn into',lv:3}]},
+  '遍':{py:'biàn',en:'all over; (times)',structure:'ld',components:['辶','扁'],compNames:['走之','扁'],splitRanges:[[9,10,11],[0,1,2,3,4,5,6,7,8]],words:[{w:'遍',py:'biàn',en:'(measure word for times/rounds)',lv:3}]},
+  '宾':{py:'bīn',en:'guest',structure:'tb',components:['宀','兵'],compNames:['宝盖头','兵'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'宾馆',py:'bīnguǎn',en:'guesthouse',lv:3}]},
+  '冰':{py:'bīng',en:'ice',structure:'lr',components:['冫','水'],compNames:['冫','水'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'冰箱',py:'bīngxiāng',en:'refrigerator',lv:3},{w:'冰激凌',py:'bīngjīlíng',en:'ice cream',lv:3}]},
+  '才':{py:'cái',en:'ability, talent, gift',structure:'whole',components:['才'],words:[{w:'才1',py:'cái',en:'only',lv:3},{w:'刚才',py:'gāngcái',en:'just now',lv:3}]},
+  '参':{py:'cān',en:'to take part',structure:'tb',components:['参_0','彡'],compNames:['上部','彡'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'参加',py:'cānjiā',en:'to participate',lv:3}]},
+  '草':{py:'cǎo',en:'grass',structure:'tb',components:['艹','早'],compNames:['草字头','早'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'草',py:'cǎo',en:'grass',lv:3},{w:'草地',py:'cǎodì',en:'lawn',lv:3}]},
+  '层':{py:'céng',en:'layer; floor',structure:'lu',components:['尸','云'],compNames:['尸字头','云'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'层',py:'céng',en:'floor',lv:3}]},
+  '查':{py:'chá',en:'to check',structure:'tb',components:['木','旦'],compNames:['木','旦'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'查',py:'chá',en:'to check',lv:3},{w:'检查',py:'jiǎnchá',en:'to check',lv:3}]},
+  '差':{py:'chà',en:'difference; poor (quality)',structure:'lu',components:['羊','工'],compNames:['羊','工'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'差',py:'chà',en:'poor',lv:3},{w:'差不多',py:'chàbuduō',en:'almost',lv:3}]},
+  '尝':{py:'cháng',en:'to taste',structure:'tb',components:['尚','云'],compNames:['尚','云'],splitRanges:[[0,1,2,3,4,5,6,7],[8]],words:[{w:'尝',py:'cháng',en:'to taste',lv:3}]},
+  '衬':{py:'chèn',en:'lining',structure:'lr',components:['衤','寸'],compNames:['衣字旁','寸'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'衬衫',py:'chènshān',en:'shirt',lv:3}]},
+  '成':{py:'chéng',en:'to become; to succeed',structure:'lr',components:['丁','戈'],compNames:['丁','戈'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'变成',py:'biànchéng',en:'to turn into',lv:3},{w:'成绩',py:'chéngjì',en:'result',lv:3}]},
+  '城':{py:'chéng',en:'city',structure:'lr',components:['土','成'],compNames:['土','成'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'城市',py:'chéngshì',en:'city',lv:3}]},
+  '迟':{py:'chí',en:'late',structure:'ld',components:['辶','尺'],compNames:['走之','尺'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'迟到',py:'chídào',en:'to be late',lv:3}]},
+  '持':{py:'chí',en:'to hold',structure:'lr',components:['扌','寺'],compNames:['提手旁','寺'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'坚持',py:'jiānchí',en:'to persist',lv:3}]},
+  '初':{py:'chū',en:'beginning; first',structure:'lr',components:['衤','刀'],compNames:['衣字旁','刀'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'初中',py:'chūzhōng',en:'junior high school',lv:3}]},
+  '除':{py:'chú',en:'to remove; except',structure:'lr',components:['阝','余'],compNames:['耳刀旁','余'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'除了',py:'chúle',en:'except',lv:3}]},
+  '楚':{py:'chǔ',en:'clear',structure:'tb',components:['林','疋'],compNames:['林','疋'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11,12]],words:[{w:'清楚',py:'qīngchu',en:'clear',lv:3}]},
+  '处':{py:'chǔ',en:'place; to handle',structure:'ld',components:['夂','卜'],compNames:['夂','卜'],splitRanges:[[0,1,2],[3,4]],words:[{w:'到处',py:'dàochù',en:'everywhere',lv:3}]},
+  '船':{py:'chuán',en:'boat, ship',structure:'lr',components:['舟','船_1'],compNames:['舟','右部'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'船',py:'chuán',en:'boat',lv:3}]},
+  '春':{py:'chūn',en:'spring (season)',structure:'tb',components:['春_0','春_1'],compNames:['春字头','日'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'春天',py:'chūntiān',en:'spring',lv:3}]},
+  '聪':{py:'cōng',en:'clever',structure:'lr',components:['耳','总'],compNames:['耳','总'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13,14]],words:[{w:'聪明',py:'cōngmíng',en:'clever',lv:3}]},
+  '答':{py:'dá',en:'to answer',structure:'tb',components:['⺮','合'],compNames:['竹字头','合'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11]],words:[{w:'回答',py:'huídá',en:'to answer',lv:3}]},
+  '带':{py:'dài',en:'belt; to bring',structure:'tb',components:['卅','带_1'],compNames:['卅','下部'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'带',py:'dài',en:'to bring',lv:3}]},
+  '担':{py:'dān',en:'to carry; to worry',structure:'lr',components:['扌','旦'],compNames:['提手旁','旦'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'担心',py:'dānxīn',en:'to worry',lv:3}]},
+  '单':{py:'dān',en:'single',structure:'tb',components:['单_0','单_1'],compNames:['上部','下部'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'菜单',py:'càidān',en:'menu',lv:3},{w:'简单',py:'jiǎndān',en:'simple',lv:3}]},
+  '当':{py:'dāng',en:'to serve as; when',structure:'tb',components:['⺌','彐'],compNames:['小字头','彐'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'当然',py:'dāngrán',en:'of course',lv:3}]},
+  '灯':{py:'dēng',en:'lamp, light',structure:'lr',components:['火','丁'],compNames:['火','丁'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'灯',py:'dēng',en:'lamp',lv:3},{w:'红绿灯',py:'hóng-lǜdēng',en:'traffic light',lv:3}]},
+  '典':{py:'diǎn',en:'classic; dictionary',structure:'tb',components:['曲','八'],compNames:['曲','八'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'词典',py:'cídiǎn',en:'dictionary',lv:3},{w:'字典',py:'zìdiǎn',en:'dictionary',lv:3}]},
+  '调':{py:'diào',en:'to adjust; tune',structure:'lr',components:['讠','周'],compNames:['言字旁','周'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'空调',py:'kōngtiáo',en:'air conditioner',lv:3}]},
+  '定':{py:'dìng',en:'to decide; surely',structure:'tb',components:['宀','疋'],compNames:['宝盖头','疋'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'决定',py:'juédìng',en:'to decide',lv:3},{w:'一定',py:'yídìng',en:'definite',lv:3}]},
+  '丢':{py:'diū',en:'to lose',structure:'tb',components:['王','厶'],compNames:['王','厶'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'丢',py:'diū',en:'to lose',lv:3}]},
+  '冬':{py:'dōng',en:'winter',structure:'tb',components:['夂','⺀'],compNames:['折文','两点'],splitRanges:[[0,1,2],[3,4]],words:[{w:'冬天',py:'dōngtiān',en:'winter',lv:3}]},
+  '短':{py:'duǎn',en:'short',structure:'lr',components:['矢','豆'],compNames:['矢','豆'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11]],words:[{w:'短',py:'duǎn',en:'short (length)',lv:3},{w:'短裤',py:'duǎnkù',en:'shorts',lv:3}]},
+  '段':{py:'duàn',en:'section; paragraph',structure:'lr',components:['段_0','段_1'],compNames:['左','右'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'段',py:'duàn',en:'(measure word for segments/periods)',lv:3}]},
+  '锻':{py:'duàn',en:'to forge; to exercise',structure:'lr',components:['钅','段'],compNames:['金字旁','段'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12,13]],words:[{w:'锻炼',py:'duànliàn',en:'to exercise',lv:3}]},
+  '朵':{py:'duǒ',en:'(measure word for flowers)',structure:'tb',components:['几','木'],compNames:['几','木'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'耳朵',py:'ěrduo',en:'ear',lv:3}]},
+  '饿':{py:'è',en:'hungry',structure:'lr',components:['饣','我'],compNames:['食字旁','我'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'饿',py:'è',en:'hungry',lv:3}]},
+  '而':{py:'ér',en:'and, and then, and yet',structure:'whole',components:['而'],words:[{w:'而且',py:'érqiě',en:'but also',lv:3}]},
+  '耳':{py:'ěr',en:'ear',structure:'whole',components:['耳'],words:[{w:'耳朵',py:'ěrduo',en:'ear',lv:3},{w:'耳机',py:'ěrjī',en:'headphones',lv:3}]},
+  '发':{py:'fā',en:'to issue, to dispatch, to send out',structure:'whole',components:['发'],words:[{w:'发',py:'fā',en:'to send (out)',lv:3},{w:'出发',py:'chūfā',en:'to set out',lv:3}]},
+  '法':{py:'fǎ',en:'law; method',structure:'lr',components:['氵','去'],compNames:['三点水','去'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'办法',py:'bànfǎ',en:'method',lv:3},{w:'方法',py:'fāngfǎ',en:'method',lv:3}]},
+  '方':{py:'fāng',en:'square, rectangle',structure:'whole',components:['方'],words:[{w:'北方',py:'běifāng',en:'North',lv:3},{w:'地方',py:'dìfang',en:'place',lv:3}]},
+  '放':{py:'fàng',en:'to put; to release',structure:'lr',components:['方','攵'],compNames:['方','攵'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'放',py:'fàng',en:'to put',lv:3},{w:'放假',py:'fàngjià',en:'to have a holiday/vacation',lv:3}]},
+  '风':{py:'fēng',en:'wind',structure:'ur',components:['几','乂'],compNames:['几','乂'],splitRanges:[[0,1],[2,3]],words:[{w:'风',py:'fēng',en:'wind',lv:3}]},
+  '封':{py:'fēng',en:'to seal; (measure word for letters)',structure:'lr',components:['圭','寸'],compNames:['圭','寸'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'封',py:'fēng',en:'(measure word for letters)',lv:3}]},
+  '附':{py:'fù',en:'to attach; nearby',structure:'lr',components:['阝','付'],compNames:['耳刀旁','付'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'附近',py:'fùjìn',en:'nearby',lv:3}]},
+  '复':{py:'fù',en:'to repeat; again',structure:'tb',components:['亻','复_1'],compNames:['人旁','下'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'复习',py:'fùxí',en:'to review',lv:3}]},
+  '该':{py:'gāi',en:'should; the said',structure:'lr',components:['讠','亥'],compNames:['言字旁','亥'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'该1',py:'gāi',en:'should',lv:3},{w:'应该',py:'yīnggāi',en:'should',lv:3}]},
+  '概':{py:'gài',en:'general; approximately',structure:'lr',components:['木','既'],compNames:['木','既'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11,12]],words:[{w:'大概',py:'dàgài',en:'probably',lv:3}]},
+  '感':{py:'gǎn',en:'to feel; sense',structure:'tb',components:['咸','心'],compNames:['咸','心'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'感到',py:'gǎndào',en:'to feel',lv:3},{w:'感冒',py:'gǎnmào',en:'cold',lv:3}]},
+  '干':{py:'gàn',en:'arid, dry',structure:'whole',components:['干'],words:[{w:'干',py:'gàn',en:'to do',lv:3},{w:'干净',py:'gānjìng',en:'clean',lv:3}]},
+  '刚':{py:'gāng',en:'just now; firm',structure:'lr',components:['冈','刂'],compNames:['冈','立刀旁'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'刚',py:'gāng',en:'just',lv:3},{w:'刚才',py:'gāngcái',en:'just now',lv:3}]},
+  '糕':{py:'gāo',en:'cake',structure:'lr',components:['米','羔'],compNames:['米','羔'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13,14,15]],words:[{w:'蛋糕',py:'dàngāo',en:'cake',lv:3}]},
+  '根':{py:'gēn',en:'root; (measure word)',structure:'lr',components:['木','艮'],compNames:['木','艮'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'根据',py:'gēnjù',en:'according to',lv:3}]},
+  '更':{py:'gèng',en:'more, further',structure:'whole',components:['更'],words:[{w:'更',py:'gèng',en:'more',lv:3}]},
+  '共':{py:'gòng',en:'together; in total',structure:'tb',components:['共_0','共_1'],compNames:['上部','八'],splitRanges:[[0,1,2,3],[4,5]],words:[{w:'一共',py:'yígòng',en:'altogether',lv:3}]},
+  '故':{py:'gù',en:'reason; therefore',structure:'lr',components:['古','攵'],compNames:['古','攵'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'故事',py:'gùshi',en:'story',lv:3}]},
+  '顾':{py:'gù',en:'to look after',structure:'lr',components:['厄','页'],compNames:['厄','页'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'照顾',py:'zhàogù',en:'to take care of',lv:3}]},
+  '瓜':{py:'guā',en:'melon, gourd, squash, cucumber',structure:'whole',components:['瓜'],words:[{w:'西瓜',py:'xīguā',en:'watermelon',lv:3}]},
+  '刮':{py:'guā',en:'to blow (wind); to scrape',structure:'lr',components:['舌','刂'],compNames:['舌','立刀旁'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'刮',py:'guā',en:'to blow (wind)',lv:3}]},
+  '怪':{py:'guài',en:'strange; to blame',structure:'lr',components:['忄','圣'],compNames:['竖心旁','圣'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'奇怪',py:'qíguài',en:'strange',lv:3}]},
+  '惯':{py:'guàn',en:'habit; to be used to',structure:'lr',components:['忄','贯'],compNames:['竖心旁','贯'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'习惯',py:'xíguàn',en:'habit',lv:3}]},
+  '海':{py:'hǎi',en:'sea',structure:'lr',components:['氵','每'],compNames:['三点水','每'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'海',py:'hǎi',en:'sea',lv:3}]},
+  '害':{py:'hài',en:'to harm',structure:'tb',components:['宀','害_1'],compNames:['宝盖头','下部'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'害怕',py:'hàipà',en:'to be afraid',lv:3}]},
+  '合':{py:'hé',en:'to combine; to close',structure:'tb',components:['亼','口'],compNames:['亼','口'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'合适',py:'héshì',en:'suitable',lv:3}]},
+  '河':{py:'hé',en:'river',structure:'lr',components:['氵','可'],compNames:['三点水','可'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'河',py:'hé',en:'river',lv:3}]},
+  '乎':{py:'hū',en:'interrogative or exclamatory final par',structure:'whole',components:['乎'],words:[{w:'几乎',py:'jīhū',en:'almost',lv:3}]},
+  '护':{py:'hù',en:'to protect',structure:'lr',components:['扌','户'],compNames:['提手旁','户'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'护照',py:'hùzhào',en:'passport',lv:3}]},
+  '化':{py:'huà',en:'to change; -ize',structure:'lr',components:['亻','匕'],compNames:['人旁','匕'],splitRanges:[[0,1],[2,3]],words:[{w:'变化',py:'biànhuà',en:'change',lv:3},{w:'文化',py:'wénhuà',en:'culture',lv:3}]},
+  '环':{py:'huán',en:'ring; environment',structure:'lr',components:['王','不'],compNames:['王','不'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'环境',py:'huánjìng',en:'environment',lv:3}]},
+  '换':{py:'huàn',en:'to exchange',structure:'lr',components:['扌','奂'],compNames:['提手旁','奂'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'换',py:'huàn',en:'to change',lv:3}]},
+  '黄':{py:'huáng',en:'yellow',structure:'tb',components:['黄_0','黄_1'],compNames:['上部','下部'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'黄色',py:'huángsè',en:'yellow',lv:3}]},
+  '婚':{py:'hūn',en:'marriage; to marry',structure:'lr',components:['女','昏'],compNames:['女','昏'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'结婚',py:'jiéhūn',en:'to get married',lv:3}]},
+  '活':{py:'huó',en:'to live; alive',structure:'lr',components:['氵','舌'],compNames:['三点水','舌'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'生活',py:'shēnghuó',en:'life',lv:3}]},
+  '或':{py:'huò',en:'or',structure:'ur',components:['戈','或_1'],compNames:['戈','内部'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'或者',py:'huòzhě',en:'or',lv:3},{w:'或',py:'huò',en:'or',lv:3}]},
+  '激':{py:'jī',en:'to excite; intense',structure:'lr',components:['氵','敫'],compNames:['三点水','敫'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14,15]],words:[{w:'冰激凌',py:'bīngjīlíng',en:'ice cream',lv:3}]},
+  '级':{py:'jí',en:'level, grade',structure:'lr',components:['纟','及'],compNames:['绞丝旁','及'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'班级',py:'bānjí',en:'class (at school)',lv:3},{w:'年级',py:'niánjí',en:'grade (in school)',lv:3}]},
+  '极':{py:'jí',en:'extreme; extremely',structure:'lr',components:['木','及'],compNames:['木','及'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'极',py:'jí',en:'extremely',lv:3}]},
+  '急':{py:'jí',en:'urgent; anxious',structure:'tb',components:['刍','心'],compNames:['刍','心'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'急',py:'jí',en:'urgent',lv:3},{w:'着急',py:'zháojí',en:'worried',lv:3}]},
+  '季':{py:'jì',en:'season',structure:'tb',components:['禾','子'],compNames:['禾','子'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'季',py:'jì',en:'season',lv:3},{w:'季节',py:'jìjié',en:'season',lv:3}]},
+  '绩':{py:'jì',en:'achievement; grades',structure:'lr',components:['纟','责'],compNames:['绞丝旁','责'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'成绩',py:'chéngjì',en:'result',lv:3}]},
+  '加':{py:'jiā',en:'to add',structure:'lr',components:['力','口'],compNames:['力','口'],splitRanges:[[0,1],[2,3,4]],words:[{w:'加',py:'jiā',en:'to add',lv:3},{w:'参加',py:'cānjiā',en:'to participate',lv:3}]},
+  '假':{py:'jiǎ',en:'fake; vacation (jià)',structure:'lr',components:['亻','叚'],compNames:['人旁','叚'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9,10]],words:[{w:'放假',py:'fàngjià',en:'to have a holiday/vacation',lv:3},{w:'假期',py:'jiàqī',en:'holiday',lv:3}]},
+  '坚':{py:'jiān',en:'firm; solid',structure:'tb',components:['坚_0','坚_1'],compNames:['上部','土'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'坚持',py:'jiānchí',en:'to persist',lv:3}]},
+  '检':{py:'jiǎn',en:'to check, to inspect',structure:'lr',components:['木','佥'],compNames:['木','佥'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'检查',py:'jiǎnchá',en:'to check',lv:3},{w:'检票',py:'jiǎnpiào',en:'to check tickets',lv:3}]},
+  '简':{py:'jiǎn',en:'simple',structure:'tb',components:['⺮','间'],compNames:['竹字头','间'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12]],words:[{w:'简单',py:'jiǎndān',en:'simple',lv:3}]},
+  '健':{py:'jiàn',en:'healthy',structure:'lr',components:['亻','建'],compNames:['人旁','建'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'健康',py:'jiànkāng',en:'healthy',lv:3}]},
+  '讲':{py:'jiǎng',en:'to speak; to explain',structure:'lr',components:['讠','井'],compNames:['言字旁','井'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'讲',py:'jiǎng',en:'to speak',lv:3}]},
+  '蕉':{py:'jiāo',en:'banana',structure:'tb',components:['艹','焦'],compNames:['草字头','焦'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14]],words:[{w:'香蕉',py:'xiāngjiāo',en:'banana',lv:3}]},
+  '角':{py:'jiǎo',en:'corner; angle',structure:'tb',components:['⺈','用'],compNames:['角字头','用'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'角',py:'jiǎo',en:'(measure word for 0.1 yuan)',lv:3}]},
+  '饺':{py:'jiǎo',en:'dumpling',structure:'lr',components:['饣','交'],compNames:['食字旁','交'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'饺子',py:'jiǎozi',en:'dumpling',lv:3}]},
+  '脚':{py:'jiǎo',en:'foot',structure:'lr',components:['⺼','却'],compNames:['月字旁','却'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'脚',py:'jiǎo',en:'foot',lv:3}]},
+  '较':{py:'jiào',en:'to compare; relatively',structure:'lr',components:['车','交'],compNames:['车','交'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'比较',py:'bǐjiào',en:'to compare',lv:3}]},
+  '接':{py:'jiē',en:'to receive; to connect',structure:'lr',components:['扌','妾'],compNames:['提手旁','妾'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'接',py:'jiē',en:'to pick up',lv:3}]},
+  '街':{py:'jiē',en:'street',structure:'lcr',components:['街_0','街_1','街_2'],compNames:['双人旁','圭','右部'],splitRanges:[[0,1,2],[3,4,5,6,7,8],[9,10,11]],words:[{w:'街',py:'jiē',en:'street',lv:3}]},
+  '节':{py:'jié',en:'festival; section',structure:'tb',components:['节_0','节_1'],compNames:['草字头','卩'],splitRanges:[[0,1,2],[3,4]],words:[{w:'过节',py:'guòjié',en:'to celebrate a festival',lv:3},{w:'季节',py:'jìjié',en:'season',lv:3}]},
+  '结':{py:'jié',en:'to tie; knot',structure:'lr',components:['纟','吉'],compNames:['绞丝旁','吉'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'结婚',py:'jiéhūn',en:'to get married',lv:3},{w:'结束',py:'jiéshù',en:'to end',lv:3}]},
+  '解':{py:'jiě',en:'to untie; to explain',structure:'lr',components:['角','解_1'],compNames:['角','右部'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12]],words:[{w:'解决',py:'jiějué',en:'to solve',lv:3},{w:'了解',py:'liǎojiě',en:'to understand',lv:3}]},
+  '界':{py:'jiè',en:'boundary; world',structure:'tb',components:['田','介'],compNames:['田','介'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'世界',py:'shìjiè',en:'world',lv:3}]},
+  '借':{py:'jiè',en:'to borrow; to lend',structure:'lr',components:['亻','昔'],compNames:['人旁','昔'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'借',py:'jiè',en:'to borrow',lv:3}]},
+  '斤':{py:'jīn',en:'(measure word, ~500g)',structure:'lu',components:['厂','下'],compNames:['厂字头','下部'],splitRanges:[[0,1],[2,3]],words:[{w:'斤',py:'jīn',en:'jin (unit of weight, 0.5kg)',lv:3},{w:'公斤',py:'gōngjīn',en:'kilogram',lv:3}]},
+  '净':{py:'jìng',en:'clean',structure:'lr',components:['冫','争'],compNames:['冫','争'],splitRanges:[[0,1],[2,3,4,5,6,7]],words:[{w:'干净',py:'gānjìng',en:'clean',lv:3}]},
+  '静':{py:'jìng',en:'quiet, still',structure:'lr',components:['青','争'],compNames:['青','争'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11,12,13]],words:[{w:'安静',py:'ānjìng',en:'quiet',lv:3}]},
+  '境':{py:'jìng',en:'border; environment',structure:'lr',components:['土','竟'],compNames:['土','竟'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13]],words:[{w:'环境',py:'huánjìng',en:'environment',lv:3}]},
+  '久':{py:'jiǔ',en:'long ago',structure:'whole',components:['久'],words:[{w:'久',py:'jiǔ',en:'long (time)',lv:3},{w:'不久',py:'bùjiǔ',en:'not long (after)',lv:3}]},
+  '旧':{py:'jiù',en:'old (used)',structure:'lr',components:['旧_0','旧_1'],compNames:['竖','日'],splitRanges:[[0],[1,2,3,4]],words:[{w:'旧',py:'jiù',en:'old',lv:3}]},
+  '居':{py:'jū',en:'to live, to reside',structure:'lu',components:['户','古'],compNames:['户','古'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'邻居',py:'línjū',en:'neighbor',lv:3}]},
+  '句':{py:'jù',en:'sentence; (measure word)',structure:'ur',components:['勹','口'],compNames:['包字头','口'],splitRanges:[[0,1],[2,3,4]],words:[{w:'句',py:'jù',en:'(measure word for sentences)',lv:3},{w:'句子',py:'jùzi',en:'sentence',lv:3}]},
+  '据':{py:'jù',en:'according to; to occupy',structure:'lr',components:['扌','居'],compNames:['提手旁','居'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'根据',py:'gēnjù',en:'according to',lv:3}]},
+  '决':{py:'jué',en:'to decide',structure:'lr',components:['冫','夬'],compNames:['冫','夬'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'解决',py:'jiějué',en:'to solve',lv:3},{w:'决定',py:'juédìng',en:'to decide',lv:3}]},
+  '卡':{py:'kǎ',en:'card',structure:'tb',components:['上','卜'],compNames:['上部','卜'],splitRanges:[[0,1,2],[3,4]],words:[{w:'卡',py:'kǎ',en:'card',lv:3},{w:'信用卡',py:'xìnyòngkǎ',en:'credit card',lv:3}]},
+  '康':{py:'kāng',en:'health',structure:'lu',components:['广','隶'],compNames:['广字头','隶'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'健康',py:'jiànkāng',en:'healthy',lv:3}]},
+  '渴':{py:'kě',en:'thirsty',structure:'lr',components:['氵','曷'],compNames:['三点水','曷'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11]],words:[{w:'渴',py:'kě',en:'thirsty',lv:3}]},
+  '刻':{py:'kè',en:'to carve; quarter (of hour)',structure:'lr',components:['亥','刂'],compNames:['亥','立刀旁'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'刻',py:'kè',en:'quarter (of an hour)',lv:3}]},
+  '空':{py:'kōng',en:'empty; sky',structure:'tb',components:['穴','工'],compNames:['穴','工'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'空调',py:'kōngtiáo',en:'air conditioner',lv:3}]},
+  '哭':{py:'kū',en:'to cry',structure:'tb',components:['哭_0','犬'],compNames:['吅','犬'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'哭',py:'kū',en:'to cry',lv:3}]},
+  '筷':{py:'kuài',en:'chopsticks',structure:'tb',components:['⺮','快'],compNames:['竹字头','快'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12]],words:[{w:'筷子',py:'kuàizi',en:'chopsticks',lv:3}]},
+  '矿':{py:'kuàng',en:'mine; ore',structure:'lr',components:['石','广'],compNames:['石','广字头'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'矿泉水',py:'kuàngquánshuǐ',en:'mineral water',lv:3}]},
+  '蓝':{py:'lán',en:'blue',structure:'tb',components:['艹','监'],compNames:['草字头','监'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12]],words:[{w:'蓝',py:'lán',en:'blue',lv:3}]},
+  '礼':{py:'lǐ',en:'courtesy; gift',structure:'lr',components:['礼_0','礼_1'],compNames:['示字旁','乚'],splitRanges:[[0,1,2,3],[4]],words:[{w:'礼物',py:'lǐwù',en:'gift',lv:3}]},
+  '李':{py:'lǐ',en:'plum',structure:'tb',components:['木','子'],compNames:['木','子'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'行李',py:'xíngli',en:'luggage',lv:3}]},
+  '理':{py:'lǐ',en:'reason; to manage',structure:'lr',components:['王','里'],compNames:['王','里'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'经理',py:'jīnglǐ',en:'manager',lv:3}]},
+  '力':{py:'lì',en:'strength, power',structure:'whole',components:['力'],words:[{w:'努力',py:'nǔlì',en:'to make great efforts',lv:3}]},
+  '历':{py:'lì',en:'history; to experience',structure:'lu',components:['厂','力'],compNames:['厂字头','力'],splitRanges:[[0,1],[2,3]],words:[{w:'历史',py:'lìshǐ',en:'history',lv:3}]},
+  '脸':{py:'liǎn',en:'face',structure:'lr',components:['⺼','佥'],compNames:['月字旁','佥'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'脸',py:'liǎn',en:'face',lv:3}]},
+  '练':{py:'liàn',en:'to practice',structure:'lr',components:['纟','柬'],compNames:['绞丝旁','柬'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'练',py:'liàn',en:'to practice',lv:3},{w:'练习',py:'liànxí',en:'to practice',lv:3}]},
+  '炼':{py:'liàn',en:'to refine',structure:'lr',components:['火','柬'],compNames:['火','柬'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'锻炼',py:'duànliàn',en:'to exercise',lv:3}]},
+  '凉':{py:'liáng',en:'cool',structure:'lr',components:['冫','京'],compNames:['冫','京'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'凉快',py:'liángkuai',en:'cool (weather)',lv:3}]},
+  '辆':{py:'liàng',en:'measure word for vehicles',structure:'lr',components:['车','两'],compNames:['车','两'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'辆',py:'liàng',en:'(measure word for vehicles)',lv:3}]},
+  '聊':{py:'liáo',en:'to chat',structure:'lr',components:['耳','卯'],compNames:['耳','卯'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'聊',py:'liáo',en:'to chat',lv:3},{w:'聊天儿',py:'liáotiānr',en:'to chat',lv:3}]},
+  '料':{py:'liào',en:'material',structure:'lr',components:['米','斗'],compNames:['米','斗'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'饮料',py:'yǐnliào',en:'beverage',lv:3}]},
+  '邻':{py:'lín',en:'neighbor',structure:'lr',components:['令','阝'],compNames:['令','耳刀旁'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'邻居',py:'línjū',en:'neighbor',lv:3}]},
+  '凌':{py:'líng',en:'before dawn (in 凌晨)',structure:'lr',components:['冫','夌'],compNames:['冫','夌'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'冰激凌',py:'bīngjīlíng',en:'ice cream',lv:3}]},
+  '马':{py:'mǎ',en:'horse',structure:'whole',components:['马'],words:[{w:'马',py:'mǎ',en:'horse',lv:3},{w:'马路',py:'mǎlù',en:'road',lv:3}]},
+  '码':{py:'mǎ',en:'number, code',structure:'lr',components:['石','马'],compNames:['石','马'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'号码',py:'hàomǎ',en:'number',lv:3}]},
+  '满':{py:'mǎn',en:'full',structure:'lr',components:['氵','满_1'],compNames:['三点水','右部'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12]],words:[{w:'满意',py:'mǎnyì',en:'satisfied',lv:3}]},
+  '毛':{py:'máo',en:'hair, fur, feathers',structure:'whole',components:['毛'],words:[{w:'羽毛球',py:'yǔmáoqiú',en:'badminton',lv:3},{w:'毛',py:'máo',en:'(measure word for 0.1 yuan)',lv:3}]},
+  '冒':{py:'mào',en:'to emit; to risk',structure:'tb',components:['日','目'],compNames:['日','目'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'感冒',py:'gǎnmào',en:'cold',lv:3}]},
+  '末':{py:'mò',en:'end, final, last',structure:'whole',components:['末'],words:[{w:'周末',py:'zhōumò',en:'weekend',lv:3}]},
+  '目':{py:'mù',en:'eye',structure:'whole',components:['目'],words:[{w:'节目',py:'jiémù',en:'program',lv:3}]},
+  '南':{py:'nán',en:'south',structure:'tb',components:['十','南_1'],compNames:['十','下部'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'南',py:'nán',en:'south',lv:3},{w:'东南',py:'dōngnán',en:'southeast',lv:3}]},
+  '难':{py:'nán',en:'difficult',structure:'lr',components:['又','隹'],compNames:['又','隹'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9]],words:[{w:'难过',py:'nánguò',en:'sad',lv:3},{w:'难看',py:'nánkàn',en:'ugly',lv:3}]},
+  '努':{py:'nǔ',en:'to exert effort',structure:'tb',components:['奴','力'],compNames:['奴','力'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'努力',py:'nǔlì',en:'to make great efforts',lv:3}]},
+  '爬':{py:'pá',en:'to climb',structure:'ld',components:['爪','巴'],compNames:['爪','巴'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'爬',py:'pá',en:'to climb',lv:3}]},
+  '怕':{py:'pà',en:'to fear, to be afraid',structure:'lr',components:['忄','白'],compNames:['竖心旁','白'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'害怕',py:'hàipà',en:'to be afraid',lv:3},{w:'怕',py:'pà',en:'to fear',lv:3}]},
+  '拍':{py:'pāi',en:'to clap; to take (photo)',structure:'lr',components:['扌','白'],compNames:['提手旁','白'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'拍照',py:'pāizhào',en:'to take a picture',lv:3}]},
+  '盘':{py:'pán',en:'plate, dish',structure:'tb',components:['舟','皿'],compNames:['舟','皿'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'盘子',py:'pánzi',en:'plate',lv:3}]},
+  '胖':{py:'pàng',en:'fat (of a person)',structure:'lr',components:['⺼','半'],compNames:['月字旁','半'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'胖',py:'pàng',en:'fat',lv:3}]},
+  '啤':{py:'pí',en:'beer',structure:'lr',components:['口','卑'],compNames:['口','卑'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'啤酒',py:'píjiǔ',en:'beer',lv:3}]},
+  '片':{py:'piàn',en:'slice, splinter',structure:'whole',components:['片'],words:[{w:'照片',py:'zhàopiàn',en:'photo',lv:3}]},
+  '平':{py:'píng',en:'flat, level, even',structure:'whole',components:['平'],words:[{w:'平时',py:'píngshí',en:'normally',lv:3},{w:'水平',py:'shuǐpíng',en:'level',lv:3}]},
+  '瓶':{py:'píng',en:'bottle',structure:'lr',components:['并','瓦'],compNames:['并','瓦'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9]],words:[{w:'瓶子',py:'píngzi',en:'bottle',lv:3}]},
+  '其':{py:'qí',en:'its; that',structure:'tb',components:['甘','其_1'],compNames:['甘','下部'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'其实',py:'qíshí',en:'actually',lv:3},{w:'其他',py:'qítā',en:'other',lv:3}]},
+  '奇':{py:'qí',en:'strange',structure:'tb',components:['大','可'],compNames:['大','可'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'奇怪',py:'qíguài',en:'strange',lv:3}]},
+  '骑':{py:'qí',en:'to ride',structure:'lr',components:['马','奇'],compNames:['马','奇'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'骑',py:'qí',en:'to ride (a bike/horse)',lv:3}]},
+  '汽':{py:'qì',en:'steam; (汽车 car)',structure:'lr',components:['氵','气'],compNames:['三点水','气'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'汽车',py:'qìchē',en:'car',lv:3}]},
+  '铅':{py:'qiān',en:'lead (metal)',structure:'lr',components:['钅','铅_1'],compNames:['金字旁','右部'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9]],words:[{w:'铅笔',py:'qiānbǐ',en:'pencil',lv:3}]},
+  '且':{py:'qiě',en:'moreover, also (post-subject)',structure:'whole',components:['且'],words:[{w:'而且',py:'érqiě',en:'but also',lv:3}]},
+  '轻':{py:'qīng',en:'light (weight)',structure:'lr',components:['车','轻_1'],compNames:['车','右部'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'年轻',py:'niánqīng',en:'young',lv:3}]},
+  '清':{py:'qīng',en:'clear; clean',structure:'lr',components:['氵','青'],compNames:['三点水','青'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'清楚',py:'qīngchu',en:'clear',lv:3}]},
+  '秋':{py:'qiū',en:'autumn',structure:'lr',components:['禾','火'],compNames:['禾','火'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'秋天',py:'qiūtiān',en:'autumn',lv:3}]},
+  '求':{py:'qiú',en:'to seek',structure:'whole',components:['求'],words:[{w:'要求',py:'yāoqiú',en:'to require',lv:3}]},
+  '区':{py:'qū',en:'district, area',structure:'tlb',components:['匸','乂'],compNames:['匸','乂'],splitRanges:[[0,3],[1,2]],words:[{w:'小区',py:'xiǎoqū',en:'residential community',lv:3}]},
+  '趣':{py:'qù',en:'interest',structure:'ld',components:['走','取'],compNames:['走','取'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11,12,13,14]],words:[{w:'兴趣',py:'xìngqù',en:'interest',lv:3},{w:'感兴趣',py:'gǎn xìngqù',en:'to be interested in',lv:3}]},
+  '全':{py:'quán',en:'whole; all',structure:'tb',components:['入','玉'],compNames:['入','玉'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'安全',py:'ānquán',en:'safe',lv:3}]},
+  '泉':{py:'quán',en:'spring (of water)',structure:'tb',components:['白','水'],compNames:['白','水'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'矿泉水',py:'kuàngquánshuǐ',en:'mineral water',lv:3}]},
+  '裙':{py:'qún',en:'skirt',structure:'lr',components:['衤','君'],compNames:['衣字旁','君'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11]],words:[{w:'裙子',py:'qúnzi',en:'skirt',lv:3}]},
+  '容':{py:'róng',en:'to contain; appearance',structure:'tb',components:['宀','谷'],compNames:['宝盖头','谷'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'容易',py:'róngyì',en:'easy',lv:3}]},
+  '如':{py:'rú',en:'like, as',structure:'lr',components:['女','口'],compNames:['女','口'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'比如',py:'bǐrú',en:'for example',lv:3},{w:'如果',py:'rúguǒ',en:'if',lv:3}]},
+  '赛':{py:'sài',en:'to compete; match',structure:'tmb',components:['赛_0','赛_1','赛_2'],compNames:['宝盖头','中部','贝'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9],[10,11,12,13]],words:[{w:'比赛',py:'bǐsài',en:'competition',lv:3}]},
+  '伞':{py:'sǎn',en:'umbrella, parasol, parachute',structure:'whole',components:['伞'],words:[{w:'伞',py:'sǎn',en:'umbrella',lv:3}]},
+  '扫':{py:'sǎo',en:'to sweep',structure:'lr',components:['扌','彐'],compNames:['提手旁','彐'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'扫',py:'sǎo',en:'to sweep',lv:3},{w:'打扫',py:'dǎsǎo',en:'to clean',lv:3}]},
+  '沙':{py:'shā',en:'sand',structure:'lr',components:['氵','少'],compNames:['三点水','少'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'沙发',py:'shāfā',en:'sofa',lv:3}]},
+  '山':{py:'shān',en:'mountain, hill, peak',structure:'whole',components:['山'],words:[{w:'山',py:'shān',en:'mountain',lv:3}]},
+  '衫':{py:'shān',en:'shirt',structure:'lr',components:['衤','彡'],compNames:['衣字旁','彡'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'衬衫',py:'chènshān',en:'shirt',lv:3}]},
+  '烧':{py:'shāo',en:'to burn; to cook',structure:'lr',components:['火','尧'],compNames:['火','尧'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'发烧',py:'fāshāo',en:'to have a fever',lv:3}]},
+  '勺':{py:'sháo',en:'spoon, ladle',structure:'whole',components:['勺'],words:[{w:'勺子',py:'sháozi',en:'spoon',lv:3}]},
+  '声':{py:'shēng',en:'sound, noise',structure:'whole',components:['声'],words:[{w:'声',py:'shēng',en:'sound',lv:3},{w:'声音',py:'shēngyīn',en:'sound',lv:3}]},
+  '实':{py:'shí',en:'real; solid',structure:'tb',components:['宀','头'],compNames:['宝盖头','头'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'其实',py:'qíshí',en:'actually',lv:3}]},
+  '史':{py:'shǐ',en:'history, chronicle, annals',structure:'whole',components:['史'],words:[{w:'历史',py:'lìshǐ',en:'history',lv:3}]},
+  '世':{py:'shì',en:'generation, era, age',structure:'whole',components:['世'],words:[{w:'世界',py:'shìjiè',en:'world',lv:3}]},
+  '适':{py:'shì',en:'suitable',structure:'ld',components:['辶','舌'],compNames:['走之','舌'],splitRanges:[[6,7,8],[0,1,2,3,4,5]],words:[{w:'合适',py:'héshì',en:'suitable',lv:3}]},
+  '收':{py:'shōu',en:'to receive; to collect',structure:'lr',components:['丩','攵'],compNames:['丩','攵'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'收',py:'shōu',en:'to receive',lv:3},{w:'收到',py:'shōudào',en:'to receive',lv:3}]},
+  '受':{py:'shòu',en:'to receive; to bear',structure:'tmb',components:['爫','冖','又'],compNames:['爫','秃宝盖','又'],splitRanges:[[0,1,2,3],[4,5],[6,7]],words:[{w:'受',py:'shòu',en:'to receive',lv:3},{w:'受到',py:'shòudào',en:'to receive (an influence, etc.)',lv:3}]},
+  '瘦':{py:'shòu',en:'thin (of a person)',structure:'lu',components:['疒','叟'],compNames:['病字旁','叟'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12,13]],words:[{w:'瘦',py:'shòu',en:'thin',lv:3}]},
+  '叔':{py:'shū',en:'uncle',structure:'lr',components:['叔_0','又'],compNames:['左部','又'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'叔叔',py:'shūshu',en:'uncle',lv:3}]},
+  '束':{py:'shù',en:'to bind, to control, to restrain',structure:'whole',components:['束'],words:[{w:'结束',py:'jiéshù',en:'to end',lv:3}]},
+  '树':{py:'shù',en:'tree',structure:'lr',components:['木','对'],compNames:['木','对'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'树',py:'shù',en:'tree',lv:3}]},
+  '数':{py:'shù',en:'number; to count',structure:'lr',components:['娄','攵'],compNames:['娄','攵'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'数学',py:'shùxué',en:'mathematics',lv:3}]},
+  '刷':{py:'shuā',en:'to brush',structure:'lr',components:['刷_0','刂'],compNames:['左部','立刀旁'],splitRanges:[[0,1,2,3,4,5],[6,7]],words:[{w:'刷',py:'shuā',en:'to brush',lv:3},{w:'牙刷',py:'yáshuā',en:'toothbrush',lv:3}]},
+  '双':{py:'shuāng',en:'pair; (measure word)',structure:'lr',components:['又','又'],compNames:['又','又'],splitRanges:[[0,1],[2,3]],words:[{w:'双',py:'shuāng',en:'pair (measure word)',lv:3}]},
+  '算':{py:'suàn',en:'to calculate',structure:'tb',components:['⺮','具'],compNames:['竹字头','具'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13]],words:[{w:'打算',py:'dǎsuàn',en:'to plan',lv:3}]},
+  '糖':{py:'táng',en:'sugar, candy',structure:'lr',components:['米','唐'],compNames:['米','唐'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13,14,15]],words:[{w:'糖',py:'táng',en:'sugar',lv:3}]},
+  '特':{py:'tè',en:'special',structure:'lr',components:['牛','寺'],compNames:['牛','寺'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'特别',py:'tèbié',en:'special',lv:3}]},
+  '梯':{py:'tī',en:'stairs; ladder',structure:'lr',components:['木','弟'],compNames:['木','弟'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'电梯',py:'diàntī',en:'elevator',lv:3},{w:'楼梯',py:'lóutī',en:'stairs',lv:3}]},
+  '提':{py:'tí',en:'to lift; to mention',structure:'lr',components:['扌','是'],compNames:['提手旁','是'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11]],words:[{w:'提高',py:'tígāo',en:'to improve',lv:3}]},
+  '甜':{py:'tián',en:'sweet',structure:'lr',components:['舌','甘'],compNames:['舌','甘'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10]],words:[{w:'甜',py:'tián',en:'sweet',lv:3}]},
+  '挺':{py:'tǐng',en:'quite, rather',structure:'lr',components:['扌','廷'],compNames:['提手旁','廷'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'挺',py:'tǐng',en:'quite',lv:3}]},
+  '突':{py:'tū',en:'sudden',structure:'tb',components:['穴','犬'],compNames:['穴','犬'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'突然',py:'tūrán',en:'sudden',lv:3}]},
+  '图':{py:'tú',en:'picture; map',structure:'full',components:['囗','冬'],compNames:['围字框','冬'],splitRanges:[[0,1,7],[2,3,4,5,6]],words:[{w:'地图',py:'dìtú',en:'map',lv:3},{w:'图书馆',py:'túshūguǎn',en:'library',lv:3}]},
+  '腿':{py:'tuǐ',en:'leg',structure:'lr',components:['⺼','退'],compNames:['月字旁','退'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10,11,12]],words:[{w:'腿',py:'tuǐ',en:'leg',lv:3}]},
+  '碗':{py:'wǎn',en:'bowl',structure:'lr',components:['石','宛'],compNames:['石','宛'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10,11,12]],words:[{w:'碗',py:'wǎn',en:'bowl',lv:3}]},
+  '卫':{py:'wèi',en:'to guard, to protect, to defend',structure:'whole',components:['卫'],words:[{w:'卫生间',py:'wèishēngjiān',en:'restroom',lv:3}]},
+  '闻':{py:'wén',en:'to hear; news',structure:'ur',components:['门','耳'],compNames:['门字框','耳'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'新闻',py:'xīnwén',en:'news',lv:3}]},
+  '屋':{py:'wū',en:'room; house',structure:'lu',components:['尸','至'],compNames:['尸字头','至'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'屋子',py:'wūzi',en:'room',lv:3}]},
+  '务':{py:'wù',en:'affairs, business',structure:'tb',components:['夂','力'],compNames:['夂','力'],splitRanges:[[0,1,2],[3,4]],words:[{w:'服务',py:'fúwù',en:'to serve',lv:3}]},
+  '物':{py:'wù',en:'thing, object',structure:'lr',components:['牛','勿'],compNames:['牛','勿'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'动物',py:'dòngwù',en:'animal',lv:3},{w:'礼物',py:'lǐwù',en:'gift',lv:3}]},
+  '戏':{py:'xì',en:'drama; game',structure:'lr',components:['又','戈'],compNames:['又','戈'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'游戏',py:'yóuxì',en:'game',lv:3}]},
+  '夏':{py:'xià',en:'summer',structure:'tb',components:['夏_0','夏_1'],compNames:['上部','夂'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9]],words:[{w:'夏天',py:'xiàtiān',en:'summer',lv:3}]},
+  '鲜':{py:'xiān',en:'fresh',structure:'lr',components:['鱼','羊'],compNames:['鱼','羊'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11,12,13]],words:[{w:'新鲜',py:'xīnxiān',en:'fresh',lv:3}]},
+  '相':{py:'xiāng',en:'mutual; appearance (xiàng)',structure:'lr',components:['木','目'],compNames:['木','目'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'相信',py:'xiāngxìn',en:'to believe',lv:3},{w:'相机',py:'xiàngjī',en:'camera',lv:3}]},
+  '香':{py:'xiāng',en:'fragrant',structure:'tb',components:['禾','日'],compNames:['禾','日'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'香蕉',py:'xiāngjiāo',en:'banana',lv:3}]},
+  '箱':{py:'xiāng',en:'box, case',structure:'tb',components:['⺮','相'],compNames:['竹字头','相'],splitRanges:[[0,1,2,3,4,5],[6,7,8,9,10,11,12,13,14]],words:[{w:'冰箱',py:'bīngxiāng',en:'refrigerator',lv:3},{w:'箱子',py:'xiāngzi',en:'box',lv:3}]},
+  '响':{py:'xiǎng',en:'to sound; loud',structure:'lr',components:['口','向'],compNames:['口','向'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'影响',py:'yǐngxiǎng',en:'to influence',lv:3}]},
+  '向':{py:'xiàng',en:'towards',structure:'whole',components:['向'],words:[{w:'向',py:'xiàng',en:'towards',lv:3},{w:'方向',py:'fāngxiàng',en:'direction',lv:3}]},
+  '像':{py:'xiàng',en:'to resemble; image',structure:'lr',components:['亻','象'],compNames:['人旁','象'],splitRanges:[[0,1],[2,3,4,5,6,7,8,9,10,11,12]],words:[{w:'好像',py:'hǎoxiàng',en:'seem',lv:3},{w:'像',py:'xiàng',en:'to be like',lv:3}]},
+  '鞋':{py:'xié',en:'shoes',structure:'lr',components:['革','圭'],compNames:['革','圭'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12,13,14]],words:[{w:'鞋',py:'xié',en:'shoes',lv:3}]},
+  '心':{py:'xīn',en:'heart',structure:'whole',components:['心'],words:[{w:'担心',py:'dānxīn',en:'to worry',lv:3},{w:'放心',py:'fàngxīn',en:'to be at ease',lv:3}]},
+  '信':{py:'xìn',en:'letter; to believe',structure:'lr',components:['亻','言'],compNames:['人旁','言'],splitRanges:[[0,1],[2,3,4,5,6,7,8]],words:[{w:'信',py:'xìn',en:'letter',lv:3},{w:'相信',py:'xiāngxìn',en:'to believe',lv:3}]},
+  '行':{py:'xíng',en:'OK; to walk (xíng)',structure:'lr',components:['彳','亍'],compNames:['双人旁','亍'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'行',py:'xíng',en:'to be okay',lv:3},{w:'不行',py:'bùxíng',en:'won\'t do',lv:3}]},
+  '熊':{py:'xióng',en:'bear',structure:'tb',components:['能','灬'],compNames:['能','四点底'],splitRanges:[[0,1,2,3,4,5,6,7,8,9],[10,11,12,13]],words:[{w:'大熊猫',py:'dàxióngmāo',en:'giant panda',lv:3}]},
+  '须':{py:'xū',en:'must',structure:'lr',components:['彡','页'],compNames:['彡','页'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'必须',py:'bìxū',en:'must',lv:3}]},
+  '需':{py:'xū',en:'to need',structure:'tb',components:['雨','而'],compNames:['雨','而'],splitRanges:[[0,1,2,3,4,5,6,7],[8,9,10,11,12,13]],words:[{w:'需要',py:'xūyào',en:'to need',lv:3}]},
+  '选':{py:'xuǎn',en:'to choose',structure:'ld',components:['辶','先'],compNames:['走之','先'],splitRanges:[[6,7,8],[0,1,2,3,4,5]],words:[{w:'选',py:'xuǎn',en:'to choose',lv:3},{w:'选择',py:'xuǎnzé',en:'to choose',lv:3}]},
+  '牙':{py:'yá',en:'tooth, molar',structure:'whole',components:['牙'],words:[{w:'牙',py:'yá',en:'tooth',lv:3},{w:'牙刷',py:'yáshuā',en:'toothbrush',lv:3}]},
+  '言':{py:'yán',en:'speech; words',structure:'tb',components:['亠','言_1'],compNames:['亠','下部'],splitRanges:[[0,1],[2,3,4,5,6]],words:[{w:'语言',py:'yǔyán',en:'language',lv:3}]},
+  '演':{py:'yǎn',en:'to perform',structure:'lr',components:['氵','寅'],compNames:['三点水','寅'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13]],words:[{w:'表演',py:'biǎoyǎn',en:'to perform',lv:3}]},
+  '羊':{py:'yáng',en:'sheep, goat',structure:'whole',components:['羊'],words:[{w:'羊',py:'yáng',en:'sheep',lv:3}]},
+  '阳':{py:'yáng',en:'sun (太阳)',structure:'lr',components:['阝','日'],compNames:['耳刀旁','日'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'太阳',py:'tàiyáng',en:'sun',lv:3}]},
+  '养':{py:'yǎng',en:'to raise; to nurture',structure:'tb',components:['羊','儿'],compNames:['羊','儿'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'养',py:'yǎng',en:'to raise',lv:3}]},
+  '业':{py:'yè',en:'business, profession',structure:'whole',components:['业'],words:[{w:'作业',py:'zuòyè',en:'homework',lv:3}]},
+  '页':{py:'yè',en:'page, sheet, leaf',structure:'whole',components:['页'],words:[{w:'页',py:'yè',en:'page',lv:3}]},
+  '姨':{py:'yí',en:'aunt',structure:'lr',components:['女','夷'],compNames:['女','夷'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'阿姨',py:'āyí',en:'aunt',lv:3}]},
+  '议':{py:'yì',en:'to discuss',structure:'lr',components:['讠','义'],compNames:['言字旁','义'],splitRanges:[[0,1],[2,3,4]],words:[{w:'会议',py:'huìyì',en:'meeting',lv:3}]},
+  '易':{py:'yì',en:'easy',structure:'tb',components:['日','勿'],compNames:['日','勿'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'容易',py:'róngyì',en:'easy',lv:3}]},
+  '音':{py:'yīn',en:'sound; tone',structure:'tb',components:['立','日'],compNames:['立','日'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'声音',py:'shēngyīn',en:'sound',lv:3},{w:'音乐',py:'yīnyuè',en:'music',lv:3}]},
+  '银':{py:'yín',en:'silver',structure:'lr',components:['钅','艮'],compNames:['金字旁','艮'],splitRanges:[[0,1,2,3,4],[5,6,7,8,9,10]],words:[{w:'银行',py:'yínháng',en:'bank',lv:3},{w:'银行卡',py:'yínhángkǎ',en:'bank card',lv:3}]},
+  '饮':{py:'yǐn',en:'to drink',structure:'lr',components:['饣','欠'],compNames:['食字旁','欠'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'饮料',py:'yǐnliào',en:'beverage',lv:3}]},
+  '应':{py:'yìng',en:'should; to answer (yìng)',structure:'lu',components:['广','应_1'],compNames:['广字头','内部'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'应该',py:'yīnggāi',en:'should',lv:3}]},
+  '迎':{py:'yíng',en:'to welcome',structure:'ld',components:['辶','卬'],compNames:['走之','卬'],splitRanges:[[4,5,6],[0,1,2,3]],words:[{w:'欢迎',py:'huānyíng',en:'to welcome',lv:3}]},
+  '用':{py:'yòng',en:'to use, to employ, to apply',structure:'whole',components:['用'],words:[{w:'用',py:'yòng',en:'to use',lv:3},{w:'不用',py:'búyòng',en:'no need to',lv:3}]},
+  '邮':{py:'yóu',en:'mail, post',structure:'lr',components:['由','阝'],compNames:['由','耳刀旁'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'邮件',py:'yóujiàn',en:'mail',lv:3},{w:'邮箱',py:'yóuxiāng',en:'mailbox',lv:3}]},
+  '又':{py:'yòu',en:'and, also, again, in addition',structure:'whole',components:['又'],words:[{w:'又',py:'yòu',en:'again',lv:3}]},
+  '于':{py:'yú',en:'at, in, on',structure:'whole',components:['于'],words:[{w:'关于',py:'guānyú',en:'about',lv:3},{w:'终于',py:'zhōngyú',en:'finally',lv:3}]},
+  '羽':{py:'yǔ',en:'feather',structure:'lr',components:['习','习'],compNames:['习','习'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'羽毛球',py:'yǔmáoqiú',en:'badminton',lv:3}]},
+  '育':{py:'yù',en:'to nurture; education',structure:'tb',components:['育_0','⺼'],compNames:['上部','月字底'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'体育',py:'tǐyù',en:'physical education',lv:3},{w:'体育馆',py:'tǐyùguǎn',en:'gymnasium',lv:3}]},
+  '遇':{py:'yù',en:'to meet, to encounter',structure:'ld',components:['辶','禺'],compNames:['走之','禺'],splitRanges:[[9,10,11],[0,1,2,3,4,5,6,7,8]],words:[{w:'遇到',py:'yùdào',en:'to encounter',lv:3},{w:'遇见',py:'yùjiàn',en:'to meet',lv:3}]},
+  '园':{py:'yuán',en:'garden; park',structure:'full',components:['囗','元'],compNames:['围字框','元'],splitRanges:[[0,1,6],[2,3,4,5]],words:[{w:'园',py:'yuán',en:'garden',lv:3},{w:'公园',py:'gōngyuán',en:'park',lv:3}]},
+  '员':{py:'yuán',en:'member; staff',structure:'tb',components:['口','贝'],compNames:['口','贝'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'员',py:'yuán',en:'member',lv:3},{w:'运动员',py:'yùndòngyuán',en:'athlete',lv:3}]},
+  '愿':{py:'yuàn',en:'to wish; willing',structure:'lu',components:['原','心'],compNames:['原','心'],splitRanges:[[0,1,2,3,4,5,6,7,8,9],[10,11,12,13]],words:[{w:'愿意',py:'yuànyì',en:'to be willing',lv:3}]},
+  '越':{py:'yuè',en:'to exceed; the more...',structure:'ld',components:['走','戉'],compNames:['走','戉'],splitRanges:[[0,1,2,3,4,5,6],[7,8,9,10,11]],words:[{w:'越',py:'yuè',en:'the more...',lv:3}]},
+  '咱':{py:'zán',en:'we (inclusive)',structure:'lr',components:['口','自'],compNames:['口','自'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'咱们',py:'zánmen',en:'we',lv:3}]},
+  '脏':{py:'zāng',en:'dirty (zāng); organ (zàng)',structure:'lr',components:['⺼','庄'],compNames:['月字旁','庄'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9]],words:[{w:'脏',py:'zāng',en:'dirty',lv:3}]},
+  '澡':{py:'zǎo',en:'to bathe',structure:'lr',components:['氵','喿'],compNames:['三点水','喿'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14,15]],words:[{w:'洗澡',py:'xǐzǎo',en:'to take a bath/shower',lv:3}]},
+  '择':{py:'zé',en:'to choose',structure:'lr',components:['择_0','择_1'],compNames:['提手旁','右部'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'选择',py:'xuǎnzé',en:'to choose',lv:3}]},
+  '展':{py:'zhǎn',en:'to unfold; to exhibit',structure:'lu',components:['展_0','展_1'],compNames:['尸字头','内部'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9]],words:[{w:'发展',py:'fāzhǎn',en:'to develop',lv:3}]},
+  '张':{py:'zhāng',en:'to open; (measure word for flat things)',structure:'lr',components:['弓','长'],compNames:['弓','长'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'张',py:'zhāng',en:'to spread',lv:3}]},
+  '照':{py:'zhào',en:'to shine; to take (photo)',structure:'tb',components:['昭','灬'],compNames:['昭','四点底'],splitRanges:[[0,1,2,3,4,5,6,7,8],[9,10,11,12]],words:[{w:'照',py:'zhào',en:'to shine',lv:3},{w:'护照',py:'hùzhào',en:'passport',lv:3}]},
+  '者':{py:'zhě',en:'-er (one who)',structure:'lu',components:['耂','日'],compNames:['耂','日'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'或者',py:'huòzhě',en:'or',lv:3}]},
+  '直':{py:'zhí',en:'straight, vertical',structure:'whole',components:['直'],words:[{w:'一直',py:'yìzhí',en:'always',lv:3},{w:'直到',py:'zhídào',en:'until',lv:3}]},
+  '纸':{py:'zhǐ',en:'paper',structure:'lr',components:['纟','氏'],compNames:['绞丝旁','氏'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'纸',py:'zhǐ',en:'paper',lv:3},{w:'报纸',py:'bàozhǐ',en:'newspaper',lv:3}]},
+  '终':{py:'zhōng',en:'end; finally',structure:'lr',components:['纟','冬'],compNames:['绞丝旁','冬'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'终于',py:'zhōngyú',en:'finally',lv:3}]},
+  '种':{py:'zhǒng',en:'kind, type; to plant (zhòng)',structure:'lr',components:['禾','中'],compNames:['禾','中'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'种',py:'zhǒng',en:'kind',lv:3}]},
+  '重':{py:'chóng',en:'heavy, weighty',structure:'whole',components:['重'],words:[{w:'重要',py:'zhòngyào',en:'important',lv:3}]},
+  '主':{py:'zhǔ',en:'to own',structure:'whole',components:['主'],words:[{w:'主要',py:'zhǔyào',en:'main',lv:3}]},
+  '助':{py:'zhù',en:'to help',structure:'lr',components:['且','力'],compNames:['且','力'],splitRanges:[[0,1,2,3,4],[5,6]],words:[{w:'帮助',py:'bāngzhù',en:'to help',lv:3}]},
+  '注':{py:'zhù',en:'to pour; to pay attention',structure:'lr',components:['氵','主'],compNames:['三点水','主'],splitRanges:[[0,1,2],[3,4,5,6,7]],words:[{w:'关注',py:'guānzhù',en:'to follow',lv:3},{w:'注意',py:'zhùyì',en:'to pay attention to',lv:3}]},
+  '总':{py:'zǒng',en:'always; general',structure:'tb',components:['总_0','总_1'],compNames:['上部','心'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'总是',py:'zǒngshì',en:'always',lv:3},{w:'总',py:'zǒng',en:'always',lv:3}]},
+  '嘴':{py:'zuǐ',en:'mouth',structure:'lr',components:['口','觜'],compNames:['口','觜'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14,15]],words:[{w:'嘴',py:'zuǐ',en:'mouth',lv:3}]},
 };
 
 const STRUCTURES={
@@ -1234,6 +1520,7 @@ let state={mode:'learn',currentChar:null,pinyinDone:false,droppedComponents:{},s
 const HSK_LEVEL_CHARS = {
   1: ['一','七','三','上','下','不','东','两','个','中','么','九','也','习','书','买','了','事','二','五','些','亮','人','什','今','他','以','们','件','休','会','住','作','你','便','候','做','儿','元','先','八','公','六','关','兴','再','写','冷','几','出','分','到','前','包','医','十','千','午','半','卖','去','友','口','只','叫','可','号','司','吃','同','名','后','吗','吧','听','呢','和','哥','哪','唱','商','喂','喜','喝','四','回','国','在','坐','块','士','外','多','大','天','太','女','奶','她','好','妈','妹','姐','子','字','学','孩','它','宜','客','家','对','小','少','岁','工','市','师','常','年','床','开','弟','影','很','得','忙','怎','息','您','想','我','房','手','打','找','文','新','日','早','时','明','星','昨','是','晚','月','有','朋','服','期','本','机','条','来','杯','果','校','样','桌','椅','欢','歌','正','气','水','汉','没','漂','火','点','热','爱','爸','牛','狗','猫','玩','现','班','生','电','男','病','白','百','的','看','真','睡','知','租','穿','第','米','系','给','老','能','脑','苹','茶','菜','蛋','衣','西','要','见','视','觉','认','识','话','语','说','请','读','课','谁','谢','贵','起','超','车','边','还','这','道','那','都','里','钟','钱','问','间','院','雨','雪','零','非','面','题','飞','饭','高','鸡'],
   2: ['万','丈','为','乐','交','介','从','但','位','体','准','别','动','右','告','周','咖','啊','啡','因','地','场','坏','备','夫','头','妻','始','姓','完','室','就','左','己','已','希','帮','店','往','忘','快','思','情','意','慢','懂','所','拿','教','旁','旅','晴','最','望','楼','次','步','每','比','泳','洗','游','然','爷','球','画','留','疼','眼','着','睛','票','离','站','笑','笔','等','篮','累','红','绍','经','绿','网','考','肉','自','舒','舞','色','花','药','虽','表','裤','让','记','诉','词','试','走','足','跑','跟','路','跳','踢','身','过','运','近','进','远','送','酒','铁','错','长','门','阴','颜','馆','鱼','鸟','黑'],
+  3: ['阿','矮','安','把','般','搬','板','办','饱','报','北','被','必','变','遍','宾','冰','才','参','草','层','查','差','尝','衬','成','城','迟','持','初','除','楚','处','船','春','聪','答','带','担','单','当','灯','典','调','定','丢','冬','短','段','锻','朵','饿','而','耳','发','法','方','放','风','封','附','复','该','概','感','干','刚','糕','根','更','共','故','顾','瓜','刮','怪','惯','海','害','合','河','乎','护','化','环','换','黄','婚','活','或','激','级','极','急','季','绩','加','假','坚','检','简','健','讲','蕉','角','饺','脚','较','接','街','节','结','解','界','借','斤','净','静','境','久','旧','居','句','据','决','卡','康','渴','刻','空','哭','筷','矿','蓝','礼','李','理','力','历','脸','练','炼','凉','辆','聊','料','邻','凌','马','码','满','毛','冒','末','目','南','难','努','爬','怕','拍','盘','胖','啤','片','平','瓶','其','奇','骑','汽','铅','且','轻','清','秋','求','区','趣','全','泉','裙','容','如','赛','伞','扫','沙','山','衫','烧','勺','声','实','史','世','适','收','受','瘦','叔','束','树','数','刷','双','算','糖','特','梯','提','甜','挺','突','图','腿','碗','卫','闻','屋','务','物','戏','夏','鲜','相','香','箱','响','向','像','鞋','心','信','行','熊','须','需','选','牙','言','演','羊','阳','养','业','页','姨','议','易','音','银','饮','应','迎','用','邮','又','于','羽','育','遇','园','员','愿','越','咱','脏','澡','择','展','张','照','者','直','纸','终','种','重','主','助','注','总','嘴'],
 };
 const HSK1_CHARS=Object.keys(CHAR_DB);  // 兼容老代码
 
@@ -1242,7 +1529,36 @@ function updateStructHeight(){
   const bar=document.getElementById('struct-bar');
   const h=bar?bar.offsetHeight:0;
   document.documentElement.style.setProperty('--struct-h', h+'px');
+  fitPracticeUI();
 }
+
+// ══ 自适应一屏：实测面板是否纵向溢出，逐步调小 --ui-scale 直到塞进一屏 ══
+//   Mac 等高视口本就不溢出 → scale 保持 1，外观不变；
+//   Windows 缩放/矮视口 → 自动等比缩小米字格、部件卡、拼音钮等，免去单模块滚动条
+let _fitRAF=null;
+function fitPracticeUI(){
+  const screen=document.getElementById('practice-screen');
+  if(!screen || screen.style.display==='none') return;
+  const layout=screen.querySelector('.practice-layout');
+  if(!layout) return;
+  const panels=[...layout.querySelectorAll('.char-panel,.structure-panel,.word-panel')];
+  if(!panels.length) return;
+  const root=document.documentElement;
+  let scale=1;
+  root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
+  const overflowing=()=>panels.some(p=>p.scrollHeight - p.clientHeight > 2);
+  let guard=0;
+  while(overflowing() && scale>0.6 && guard<40){            // 读 scrollHeight 触发重排，逐步缩小
+    scale=Math.round((scale-0.02)*1000)/1000;
+    root.style.setProperty('--ui-scale', String(scale));
+    guard++;
+  }
+}
+// 窗口尺寸/缩放变化时重新适配（防抖）
+window.addEventListener('resize', ()=>{
+  clearTimeout(window._fitTimer);
+  window._fitTimer=setTimeout(()=>{ updateStructHeight(); }, 120);
+});
 
 function toggleQR(){
   const pop=document.getElementById("qr-popover");
@@ -1333,6 +1649,24 @@ function loadTeacherChar(char){
 }
 function teacherNext(){ state.sessionIndex++; nextCharacter(); }
 
+// ══ HSK 级别方框：判定某字属于第几级（扫描 HSK_LEVEL_CHARS，找不到则取例词最低级）══
+function charHskLevel(ch){
+  for(let L=1;L<=9;L++){
+    if((HSK_LEVEL_CHARS[L]||[]).includes(ch)) return L;
+  }
+  const d=CHAR_DB[ch];
+  if(d&&d.words&&d.words.length){
+    const lvs=d.words.map(w=>w.lv).filter(v=>v); if(lvs.length) return Math.min(...lvs);
+  }
+  return null;
+}
+function updateHskBadge(ch){
+  const b=document.getElementById('hsk-level-badge'); if(!b) return;
+  const L=charHskLevel(ch);
+  if(L){ b.textContent='HSK '+L; b.style.display='inline-block'; }
+  else { b.style.display='none'; }
+}
+
 // 仅笔顺演示模式（HanziWriter 支持任意汉字）
 function loadStrokeOnlyChar(char){
   state.currentChar=char;
@@ -1341,6 +1675,7 @@ function loadStrokeOnlyChar(char){
   state.currentCharFailed=false;
 
   document.getElementById('main-char').textContent=char;
+  updateHskBadge(char);
   renderStrokes(char);
   unlockWriting();
 
@@ -1368,11 +1703,13 @@ function loadStrokeOnlyChar(char){
   document.getElementById('drag-content').style.display='none';
   const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
   const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+  requestAnimationFrame(fitPracticeUI);
+  setTimeout(fitPracticeUI, 200);
 }
 
 function startLevel(level){
   state.teacherMode=false;
-  if(level>2){showToast('HSK'+level+' 字库扩展中，敬请期待！','error');return;}
+  // 是否解锁完全由数据决定：本级别没有可练字（如 HSK4+ 尚未导入）时，下方统一提示"扩展中"
   // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
   const levelChars = HSK_LEVEL_CHARS[level] || [];
   const practiceChars = levelChars.filter(c=>CHAR_DB[c]&&CHAR_DB[c].structure!=='whole'&&CHAR_DB[c].structure!=='ov');
@@ -1418,6 +1755,7 @@ function loadCharacter(char){
 
   // 隐藏 fallback 文本，渲染笔画 SVG
   document.getElementById('main-char').textContent=char;
+  updateHskBadge(char);
   renderStrokes(char);
   lockWriting();
   
@@ -1436,7 +1774,10 @@ function loadCharacter(char){
   const sb2=document.getElementById('skip-btn');
   if(sb2) sb2.style.display='block';
   const rs=document.getElementById('result-side');
-  if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+  if(rs){rs.style.animation='none';rs.style.opacity='0';rs.style.pointerEvents='none';} // ★清掉残留 mergeIn，防止重播闪动
+  // 内容更新后重新适配一屏（笔画 SVG 异步渲染，故延时再测一次）
+  requestAnimationFrame(fitPracticeUI);
+  setTimeout(fitPracticeUI, 200);
 }
 
 function renderPinyinOptions(char,data){
@@ -1482,8 +1823,14 @@ function checkPinyin(btn,chosen,correct,data,char){
 
 function unlockDragSection(char,data){
   state.pinyinDone=true;
+  // ★ 解锁前先把上一字的"合并成功"瞬间清掉(关闭过渡)，避免解锁拖拽时才看到它淡出
+  const _rs=document.getElementById('result-side');
+  const _rc=document.getElementById('result-char');
+  if(_rs){ _rs.style.animation='none'; _rs.style.transition='none'; _rs.style.opacity='0'; _rs.style.pointerEvents='none'; } // ★清掉残留 mergeIn 动画(根因)
+  if(_rc) _rc.textContent='';
   document.getElementById('locked-overlay').style.display='none';
   document.getElementById('drag-content').style.display='flex';
+  if(_rs){ void _rs.offsetWidth; _rs.style.transition=''; } // 恢复过渡，供本字合并成功时正常淡入
   renderDragZones(char,data);
   renderCompPool(char,data);
 }
@@ -1712,19 +2059,139 @@ const SIMILAR_COMPS = {
 // key = 部件内部ID（仍用于拖拽匹配），值 = {源字, 笔画索引(0起)}
 const COMP_STROKE_RENDER = {
   '𠃓': { src:'场', strokes:[3,4,5] },   // 简体「场/扬/汤/杨」共用右件 = 场的第 4~6 笔
+  // ── 「候」笔画图形拆分示范（自动拆分：左偏旁笔画数法 → 亻取前2笔，右半取其余）──
+  '候_亻': { src:'候', strokes:[0,1] },                 // 左：人字旁 = 笔顺前 2 笔
+  '候_右': { src:'候', strokes:[2,3,4,5,6,7,8,9] },     // 右：其余 8 笔（含 候≠侯 的命门短竖丨）
+  '候_侯': { src:'侯', strokes:'all' },                 // 干扰·形近陷阱：侯（缺那根丨）
+  '候_矢': { src:'矢', strokes:'all' },                 // 干扰：矢
+  '候_失': { src:'失', strokes:'all' },                 // 干扰：失
+  '候_厂': { src:'厂', strokes:'all' },                 // 干扰：厂
+  // ── 「爱」修正拆分（笔画图形，覆盖全部笔画）──
+  '爱_p0': { src:'爱', strokes:[0, 1, 2, 3] },
+  '爱_p1': { src:'爱', strokes:[4, 5, 6, 7, 8, 9] },
+  '爱_d0': { src:'受', strokes:'all' },
+  '爱_d1': { src:'反', strokes:'all' },
+  '爱_d2': { src:'爪', strokes:'all' },
+  '爱_d3': { src:'支', strokes:'all' },
+  // ── 「亮」修正拆分（笔画图形，覆盖全部笔画）──
+  '亮_p0': { src:'亮', strokes:[0, 1] },
+  '亮_p1': { src:'亮', strokes:[2, 3, 4] },
+  '亮_p2': { src:'亮', strokes:[5, 6, 7, 8] },
+  '亮_d0': { src:'亡', strokes:'all' },
+  '亮_d1': { src:'贝', strokes:'all' },
+  '亮_d2': { src:'八', strokes:'all' },
+  // ── 「旁」修正拆分（笔画图形，覆盖全部笔画）──
+  '旁_p0': { src:'旁', strokes:[0, 1, 2, 3, 4, 5] },
+  '旁_p1': { src:'旁', strokes:[6, 7, 8, 9] },
+  '旁_d0': { src:'立', strokes:'all' },
+  '旁_d1': { src:'万', strokes:'all' },
+  '旁_d2': { src:'力', strokes:'all' },
+  '旁_d3': { src:'文', strokes:'all' },
+  // ── 「常」修正拆分（笔画图形，覆盖全部笔画）──
+  '常_p0': { src:'常', strokes:[0, 1, 2, 3, 4, 5, 6, 7] },
+  '常_p1': { src:'常', strokes:[8, 9, 10] },
+  '常_d0': { src:'党', strokes:'all' },
+  '常_d1': { src:'向', strokes:'all' },
+  '常_d2': { src:'币', strokes:'all' },
+  '常_d3': { src:'师', strokes:'all' },
+  // ── 「步」修正拆分（笔画图形，覆盖全部笔画）──
+  '步_p0': { src:'步', strokes:[0, 1, 2, 3] },
+  '步_p1': { src:'步', strokes:[4, 5, 6] },
+  '步_d0': { src:'少', strokes:'all' },
+  '步_d1': { src:'此', strokes:'all' },
+  '步_d2': { src:'正', strokes:'all' },
+  '步_d3': { src:'齿', strokes:'all' },
+  // ── 「望」修正拆分（笔画图形，覆盖全部笔画）──
+  '望_p0': { src:'望', strokes:[0, 1, 2, 3, 4, 5, 6] },
+  '望_p1': { src:'望', strokes:[7, 8, 9, 10] },
+  '望_d0': { src:'主', strokes:'all' },
+  '望_d1': { src:'月', strokes:'all' },
+  '望_d2': { src:'工', strokes:'all' },
+  '望_d3': { src:'土', strokes:'all' },
+  // ── 「妻」修正拆分（笔画图形，覆盖全部笔画）──
+  '妻_p0': { src:'妻', strokes:[0, 1, 2, 3, 4] },
+  '妻_p1': { src:'妻', strokes:[5, 6, 7] },
+  '妻_d0': { src:'母', strokes:'all' },
+  '妻_d1': { src:'安', strokes:'all' },
+  '妻_d2': { src:'要', strokes:'all' },
+  '妻_d3': { src:'委', strokes:'all' },
+  // ── 「然」修正拆分（笔画图形，覆盖全部笔画）──
+  '然_p0': { src:'然', strokes:[0, 1, 2, 3, 4, 5, 6, 7] },
+  '然_p1': { src:'然', strokes:[8, 9, 10, 11] },
+  '然_d0': { src:'火', strokes:'all' },
+  '然_d1': { src:'犬', strokes:'all' },
+  '然_d2': { src:'大', strokes:'all' },
+  '然_d3': { src:'黑', strokes:'all' },
+  // ── 「前」修正拆分 ──
+  '前_p0': { src:'前', strokes:[0, 1, 2] },
+  '前_p1': { src:'前', strokes:[3, 4, 5, 6, 7, 8] },
+  '前_d0': { src:'月', strokes:'all' },
+  '前_d1': { src:'刀', strokes:'all' },
+  '前_d2': { src:'八', strokes:'all' },
+  '前_d3': { src:'青', strokes:'all' },
+  // ── 「后」修正拆分 ──
+  '后_p0': { src:'后', strokes:[0, 1, 2] },
+  '后_p1': { src:'后', strokes:[3, 4, 5] },
+  '后_d0': { src:'司', strokes:'all' },
+  '后_d1': { src:'石', strokes:'all' },
+  '后_d2': { src:'右', strokes:'all' },
+  '后_d3': { src:'反', strokes:'all' },
+  // ── 「师」修正拆分 ──
+  '师_p0': { src:'师', strokes:[0, 1] },
+  '师_p1': { src:'师', strokes:[2, 3, 4, 5] },
+  '师_d0': { src:'帅', strokes:'all' },
+  '师_d1': { src:'币', strokes:'all' },
+  '师_d2': { src:'市', strokes:'all' },
+  '师_d3': { src:'刀', strokes:'all' },
+  // ── 「贵」修正拆分 ──
+  '贵_p0': { src:'贵', strokes:[0, 1, 2, 3, 4] },
+  '贵_p1': { src:'贵', strokes:[5, 6, 7, 8] },
+  '贵_d0': { src:'中', strokes:'all' },
+  '贵_d1': { src:'虫', strokes:'all' },
+  '贵_d2': { src:'费', strokes:'all' },
+  '贵_d3': { src:'买', strokes:'all' },
+  // ── 「希」修正拆分 ──
+  '希_p0': { src:'希', strokes:[0, 1, 2, 3] },
+  '希_p1': { src:'希', strokes:[4, 5, 6] },
+  '希_d0': { src:'布', strokes:'all' },
+  '希_d1': { src:'市', strokes:'all' },
+  '希_d2': { src:'又', strokes:'all' },
+  '希_d3': { src:'杀', strokes:'all' },
+  // ── 「茶」修正拆分 ──
+  '茶_p0': { src:'茶', strokes:[0, 1, 2] },
+  '茶_p1': { src:'茶', strokes:[3, 4, 5, 6, 7, 8] },
+  '茶_d0': { src:'余', strokes:'all' },
+  '茶_d1': { src:'菜', strokes:'all' },
+  '茶_d2': { src:'木', strokes:'all' },
+  '茶_d3': { src:'未', strokes:'all' },
+  // ── 「第」修正拆分 ──
+  '第_p0': { src:'第', strokes:[0, 1, 2, 3, 4, 5] },
+  '第_p1': { src:'第', strokes:[6, 7, 8, 9, 10] },
+  '第_d0': { src:'弟', strokes:'all' },
+  '第_d1': { src:'竹', strokes:'all' },
+  '第_d2': { src:'弓', strokes:'all' },
+  '第_d3': { src:'节', strokes:'all' },
+  // ── 「服」修正拆分 ──
+  '服_p0': { src:'服', strokes:[0, 1, 2, 3] },
+  '服_p1': { src:'服', strokes:[4, 5, 6, 7] },
+  '服_d0': { src:'报', strokes:'all' },
+  '服_d1': { src:'又', strokes:'all' },
+  '服_d2': { src:'肝', strokes:'all' },
+  '服_d3': { src:'胆', strokes:'all' },
 };
 // 从源字的指定笔画生成一个自动裁剪到部件包围盒的 SVG（返回 <svg> 元素，宽高由调用方设置）
-async function renderComponentStrokes(srcChar, strokeIdx, color){
+async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
   if(typeof HanziWriter === 'undefined') return null;
   let data;
-  try{ data = await HanziWriter.loadCharacterData(srcChar); }catch(e){ return null; }
+  try{ data = await loadStrokeData(srcChar); }catch(e){ return null; }
   if(!data || !data.strokes) return null;
   const NS='http://www.w3.org/2000/svg';
   const svg=document.createElementNS(NS,'svg');
   svg.setAttribute('xmlns',NS);
   const g=document.createElementNS(NS,'g');
   g.setAttribute('transform','translate(0,900) scale(1,-1)'); // 与整字渲染一致的 Y 翻转
-  strokeIdx.forEach(idx=>{
+  const _idxList=(strokeIdx==='all'||strokeIdx==null)?data.strokes.map((_,i)=>i):strokeIdx;
+  _idxList.forEach(idx=>{
     const d=data.strokes[idx];
     if(d==null) return;
     const p=document.createElementNS(NS,'path');
@@ -1737,14 +2204,31 @@ async function renderComponentStrokes(srcChar, strokeIdx, color){
   svg.setAttribute('viewBox','0 0 1024 1024');
   svg.style.cssText='position:absolute;left:-9999px;top:-9999px;width:120px;height:120px';
   document.body.appendChild(svg);
-  let bb=null;
+  let bb=null, full=null;
   try{ bb=g.getBBox(); }catch(e){}
+  if(sharedScale){
+    // 额外测量整字包围盒，作为统一缩放基准（保证各部件笔画粗细一致）
+    const gF=document.createElementNS(NS,'g');
+    gF.setAttribute('transform','translate(0,900) scale(1,-1)');
+    data.strokes.forEach(d=>{ if(d==null) return; const pp=document.createElementNS(NS,'path'); pp.setAttribute('d',d); gF.appendChild(pp); });
+    svg.appendChild(gF);
+    try{ full=gF.getBBox(); }catch(e){}
+    svg.removeChild(gF);
+  }
   document.body.removeChild(svg);
   if(bb && bb.width && bb.height){
-    // getBBox 返回的是翻转前坐标；翻转后 y' = 900 - y
-    const pad=Math.max(bb.width,bb.height)*0.14;
-    const fx=bb.x-pad, fy=(900-bb.y-bb.height)-pad, fw=bb.width+pad*2, fh=bb.height+pad*2;
-    svg.setAttribute('viewBox',`${fx} ${fy} ${fw} ${fh}`);
+    if(sharedScale && full && full.width && full.height){
+      // 统一缩放：视窗边长 = 整字最大边*1.16，以部件中心定位 → 部件真实大小、粗细与整字一致
+      const S=Math.max(full.width, full.height)*1.16;
+      const pcx=bb.x+bb.width/2, pcy=bb.y+bb.height/2;
+      const fx=pcx-S/2, fy=(900-pcy)-S/2;
+      svg.setAttribute('viewBox',`${fx} ${fy} ${S} ${S}`);
+    } else {
+      // 独立适配（干扰项整字）：裁剪到自身包围盒
+      const pad=Math.max(bb.width,bb.height)*0.14;
+      const fx=bb.x-pad, fy=(900-bb.y-bb.height)-pad, fw=bb.width+pad*2, fh=bb.height+pad*2;
+      svg.setAttribute('viewBox',`${fx} ${fy} ${fw} ${fh}`);
+    }
   }
   svg.removeAttribute('style');
   return svg;
@@ -1760,24 +2244,33 @@ function renderCompPool(char,data){
   //          + SIMILAR_COMPS 表所有 value 里的字符（已人工审核的真部件）
   const COMPOUND_CHARS = new Set();
   const PARTS_WHITELIST = new Set();
+  const PARTS_ONLY = new Set();   // ★ 仅"部件"(出现在拆分里的真字)，比整字更像偏旁、更有迷惑性
   Object.entries(CHAR_DB).forEach(([ch,d])=>{
     if(d.structure==='whole'||d.structure==='ov'){
       PARTS_WHITELIST.add(ch);
     } else {
       COMPOUND_CHARS.add(ch);
     }
-    (d.components||[]).forEach(c=>PARTS_WHITELIST.add(c));
+    (d.components||[]).forEach(c=>{ if(!String(c).includes('_')){ PARTS_WHITELIST.add(c); PARTS_ONLY.add(c); } }); // ★排除部件token，防泄漏
   });
   // SIMILAR_COMPS 表里的所有干扰字符（人工审核过的真部件），加入白名单
   Object.values(SIMILAR_COMPS).forEach(arr=>arr.forEach(c=>PARTS_WHITELIST.add(c)));
   // 兜底：常用偏旁
-  ['亻','彳','氵','扌','钅','饣','讠','艹','宀','冖','冂','凵','勹','匚','疒','广','辶','阝','纟','犭','礻','衤','忄','灬','爫','⺌','⻊'].forEach(p=>PARTS_WHITELIST.add(p));
+  const BARE_RADICALS=new Set(['亻','彳','氵','扌','钅','饣','讠','艹','宀','冖','冂','凵','勹','匚','疒','广','辶','阝','纟','犭','礻','衤','忄','灬','爫','⺌','⻊']);
+  BARE_RADICALS.forEach(p=>PARTS_WHITELIST.add(p));
 
   // ★ 形近干扰项生成：优先从 SIMILAR_COMPS 取，必须通过白名单 + 黑名单双重过滤
   const distractorCount=Math.max(6-correctComps.length,0);
+  // ★ 笔画拆分示范：用指定的笔画图形干扰项 token，避免「正确项=图形/干扰项=字体」混排泄题
+  const _demoDistractors=data.strokeDemoDistractors||null;
+  // ★ 单笔画黑名单：丶丿一丨等单笔在 3.6rem 卡片里会糊成"巨大的点/线"，禁止作干扰项
+  //   （注意：只过滤干扰项；若某字的正确部件本就是单笔，仍会照常显示）
+  const LONE_STROKES=new Set(['丶','丿','一','丨','乙','乚','亅','㇏','㇀','乀','乁','乛','乄','㇒','㇑','㇐']);
   const passFilter=(s)=>
     !correctComps.includes(s)
+    &&!String(s).includes('_')     // ★不能是部件token(步_p0/候_亻…)
     &&!COMPOUND_CHARS.has(s)       // 不能是合体字
+    &&!LONE_STROKES.has(s)         // ★不能是单笔画(防糊成大点)
     &&PARTS_WHITELIST.has(s);       // 必须在白名单中
   const similarCandidates=[];
   correctComps.forEach(comp=>{
@@ -1785,12 +2278,18 @@ function renderCompPool(char,data){
     similarCandidates.push(...sims);
   });
   const shuffledSimilar=[...new Set(similarCandidates)].sort(()=>Math.random()-0.5);
-  let distractors=shuffledSimilar.slice(0,distractorCount);
+  let distractors=_demoDistractors?_demoDistractors.slice():shuffledSimilar.slice(0,distractorCount);
   // 不足时从白名单随机补充
-  if(distractors.length<distractorCount){
-    const pool=[...PARTS_WHITELIST].filter(c=>passFilter(c)&&!distractors.includes(c));
-    const extra=pool.sort(()=>Math.random()-0.5).slice(0,distractorCount-distractors.length);
-    distractors=[...distractors,...extra];
+  if(!_demoDistractors && distractors.length<distractorCount){
+    const need=()=>distractorCount-distractors.length;
+    // ① 优先用"真部件"补充(更像偏旁、有迷惑性，且能渲染成笔画图形)，排除光杆偏旁
+    const tier1=[...PARTS_ONLY].filter(c=>passFilter(c)&&!distractors.includes(c)&&!BARE_RADICALS.has(c)).sort(()=>Math.random()-0.5);
+    distractors=[...distractors,...tier1.slice(0,need())];
+    // ② 仍不足才用整字白名单兜底(含光杆偏旁)
+    if(need()>0){
+      const tier2=[...PARTS_WHITELIST].filter(c=>passFilter(c)&&!distractors.includes(c)).sort(()=>Math.random()-0.5);
+      distractors=[...distractors,...tier2.slice(0,need())];
+    }
   }
 
   // ★ 构建entries：正确部件各自带独立correctIndex，干扰项=-1
@@ -1816,11 +2315,19 @@ function renderCompPool(char,data){
       chip.style.fontFamily="'SimSun','宋体','STSong',serif";
       chip.style.fontSize='2.6rem';
     }
+    // 笔画图形优先级：splitRanges(整字切图) > COMP_STROKE_RENDER(记号token) > 字体
     const _srChip=COMP_STROKE_RENDER[entry.comp];
-    if(_srChip){
-      // 无字形记号部件：用笔画 SVG 代替文字
+    if(data.splitRanges){
       chip.textContent='';
-      renderComponentStrokes(_srChip.src,_srChip.strokes,'#ffffff').then(svg=>{
+      const _src = entry.isCorrect ? char : entry.comp;
+      const _stk = entry.isCorrect ? data.splitRanges[entry.correctIndex] : 'all';
+      renderComponentStrokes(_src,_stk,'#ffffff', entry.isCorrect).then(svg=>{
+        if(svg){ svg.style.cssText='width:2.9rem;height:2.9rem;display:block'; chip.appendChild(svg); }
+        else { chip.textContent=entry.comp; }
+      });
+    } else if(_srChip){
+      chip.textContent='';
+      renderComponentStrokes(_srChip.src,_srChip.strokes,'#ffffff', true).then(svg=>{
         if(svg){ svg.style.cssText='width:2.9rem;height:2.9rem;display:block'; chip.appendChild(svg); }
         else { chip.textContent=entry.comp; }
       });
@@ -1899,12 +2406,20 @@ function handleDrop(zoneEl,zoneIdx,data){
   // 字符用绝对定位居中，不影响 zone 尺寸（颜色用 ZONE_COLORS 而不是 COMP_COLORS）
   const zoneCol = ZONE_COLORS[zoneIdx % ZONE_COLORS.length];
   const _srZone=COMP_STROKE_RENDER[comp];
-  if(_srZone){
+  if(data.splitRanges){
     zoneEl.innerHTML='';
     const _wrap=document.createElement('div');
     _wrap.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none';
     zoneEl.appendChild(_wrap);
-    renderComponentStrokes(_srZone.src,_srZone.strokes,zoneCol.text).then(svg=>{
+    renderComponentStrokes(state.currentChar,data.splitRanges[zoneIdx],zoneCol.text, true).then(svg=>{
+      if(svg){ svg.style.cssText='width:68%;height:68%;display:block'; _wrap.appendChild(svg); }
+    });
+  } else if(_srZone){
+    zoneEl.innerHTML='';
+    const _wrap=document.createElement('div');
+    _wrap.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none';
+    zoneEl.appendChild(_wrap);
+    renderComponentStrokes(_srZone.src,_srZone.strokes,zoneCol.text, true).then(svg=>{
       if(svg){ svg.style.cssText='width:68%;height:68%;display:block'; _wrap.appendChild(svg); }
     });
   } else {
@@ -2143,11 +2658,44 @@ let _stepChar = null;   // 当前正在逐笔演示的字
 let _stepIndex = 0;     // 已写出的笔画数
 let _stepData = null;   // 缓存的笔顺数据
 let _writeWriter = null; // 书写练习的 HanziWriter 实例
+let _renderSeq = 0;       // ★ 笔画渲染序号令牌：防止快速翻字时两次异步渲染叠加（多字重影）
+
+// ══ 笔画数据加载：多 CDN 兜底 + 重试 + 缓存 ══
+//   解决单点 CDN（jsdelivr）间歇性失败导致的"红字兜底"：
+//   先用默认源（成功时与原行为完全一致），失败再轮询备用源并重试，全部缓存避免重复请求。
+const _strokeCache = {};
+const _STROKE_SOURCES = [
+  c => `https://unpkg.com/hanzi-writer-data@2.0/${encodeURIComponent(c)}.json`,
+  c => `https://raw.githubusercontent.com/chanind/hanzi-writer-data/master/data/${encodeURIComponent(c)}.json`,
+  c => `https://cdn.jsdelivr.net/gh/chanind/hanzi-writer-data@master/data/${encodeURIComponent(c)}.json`,
+];
+async function loadStrokeData(char){
+  if(_strokeCache[char]) return _strokeCache[char];
+  // ① 默认加载器（jsdelivr npm）——网络正常时与原逻辑一致
+  try{
+    const d = await HanziWriter.loadCharacterData(char);
+    if(d && d.strokes){ _strokeCache[char]=d; return d; }
+  }catch(e){ /* 落到备用源 */ }
+  // ② 备用 CDN 轮询，最多两轮
+  for(let round=0; round<2; round++){
+    for(const make of _STROKE_SOURCES){
+      try{
+        const res = await fetch(make(char), {mode:'cors'});
+        if(res && res.ok){
+          const d = await res.json();
+          if(d && d.strokes){ _strokeCache[char]=d; return d; }
+        }
+      }catch(e){ /* 试下一个源 */ }
+    }
+  }
+  return null; // 全部失败 → 调用方按原逻辑走红字兜底
+}
 
 async function renderStrokes(char){
   const canvas = document.getElementById('stroke-canvas');
   const mainChar = document.getElementById('main-char');
   if(!canvas) return;
+  const myseq = ++_renderSeq;   // ★ 本次渲染令牌
 
   canvas.innerHTML = '';
   if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
@@ -2156,7 +2704,8 @@ async function renderStrokes(char){
   document.getElementById('play-btn').classList.remove('playing');
 
   try{
-    const data = await HanziWriter.loadCharacterData(char);
+    const data = await loadStrokeData(char);
+    if(myseq !== _renderSeq) return;   // ★ 期间已发起更新的渲染 → 丢弃本次过期结果（防多字叠加）
     if(!data || !data.strokes){
       mainChar.style.display = 'block';
       canvas.style.display = 'none';
@@ -2237,9 +2786,12 @@ async function renderStrokes(char){
       svg.appendChild(numG);
     }
 
+    if(myseq !== _renderSeq) return;   // ★ append 前再确认本次仍是最新渲染
+    canvas.innerHTML = '';             // ★ 双保险：清掉任何残留再画
     canvas.appendChild(svg);
     canvas.dataset.char = char;
   }catch(err){
+    if(myseq !== _renderSeq) return;   // 过期渲染的失败不要覆盖新字
     console.warn('Stroke data unavailable for', char, err);
     mainChar.style.display = 'block';
     canvas.style.display = 'none';
@@ -2251,6 +2803,7 @@ async function playStrokes(){
   const canvas = document.getElementById('stroke-canvas');
   const char = canvas.dataset.char;
   if(!char) return;
+  const myseq = _renderSeq;   // ★ 记录当前渲染令牌，换字后丢弃过期动画
 
   const btn = document.getElementById('play-btn');
   btn.classList.add('playing');
@@ -2258,14 +2811,15 @@ async function playStrokes(){
 
   // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
   canvas.innerHTML = `
-    <div style="position:relative;width:240px;height:240px">
+    <div style="position:relative;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale))">
       <div id="hw-target" style="position:absolute;inset:0"></div>
-      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:240px;height:240px;pointer-events:none"></svg>
+      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));pointer-events:none"></svg>
     </div>`;
 
   try{
     // 拉取数据用于绘制数字
-    const data = await HanziWriter.loadCharacterData(char);
+    const data = await loadStrokeData(char);
+    if(myseq !== _renderSeq){ _isPlaying=false; btn.classList.remove('playing'); return; } // ★ 已换字 → 中止
     const overlay = document.getElementById('num-overlay');
     const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -2320,6 +2874,7 @@ async function playStrokes(){
       width: 240,
       height: 240,
       padding: 8,
+      charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       strokeColor: '#1f2c25',
       showOutline: true,
       outlineColor: '#e6e6e6',
@@ -2372,21 +2927,27 @@ function showExampleWord(char){
   const wl=document.getElementById('word-locked');
   if(!hint) return;
   if(!data||!data.words||data.words.length===0) return; // 无例词则保持原状
-  hint.innerHTML=data.words.map(w=>{
-    const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:1.05rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
+  // ★ 过滤掉"与字头相同的单字项"（如 收 的 words 里含'收'本身），只留真正的多字例词；
+  //   万一过滤后变空（该字本就没有多字例词），回退显示原内容，避免例词区开天窗
+  let words=data.words.filter(w=>w.w!==char);
+  if(words.length===0) words=data.words;
+  words=words.slice(0,1);   // ★ 例词只保留一个
+  hint.innerHTML=words.map(w=>{
+    const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
     return `<div style="text-align:center">
-      <div style="margin-bottom:12px">${lvBadge}</div>
-      <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:16px 26px">
-        <span style="font-size:2.4rem;font-family:'KaiTi','STKaiti','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
-        <span style="font-size:1.5rem;color:#ffffff;letter-spacing:0.05em">${w.py}</span>
-        <span style="font-size:1.4rem;color:#ffffff">—</span>
-        <span style="font-size:1.2rem;color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
+      <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
+      <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) 26px">
+        <span style="font-size:calc(2.4rem*var(--ui-scale));font-family:'KaiTi','STKaiti','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
+        <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em">${w.py}</span>
+        <span style="font-size:calc(1.4rem*var(--ui-scale));color:#ffffff">—</span>
+        <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
       </div>
     </div>`;
   }).join('');
   hint.style.display='flex';
   hint.classList.add('show');
   if(wl) wl.style.display='none';
+  requestAnimationFrame(fitPracticeUI);
 }
 
 // ══ 书写练习：HanziWriter 描红测验（逐笔书写，对错反馈）══
@@ -2407,6 +2968,7 @@ function startWritingQuiz(){
       width: 240,
       height: 240,
       padding: 6,
+      charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       showCharacter: false,        // 隐藏整字，靠学生写
       showOutline: true,           // 显示浅色字模引导（与笔画完全对齐）
       showHintAfterMisses: 2,      // 连续写错 2 次后高亮提示该笔
@@ -2456,7 +3018,7 @@ async function buildStepSVG(char){
   const canvas = document.getElementById('stroke-canvas');
   let data = _stepData;
   if(_stepChar !== char || !data){
-    try{ data = await HanziWriter.loadCharacterData(char); }
+    try{ data = await loadStrokeData(char); }
     catch(e){ return false; }
   }
   if(!data || !data.strokes){ return false; }
@@ -2673,7 +3235,11 @@ function queryCharacter(){
     const item=document.createElement('div');
     item.className='query-comp-item';
     item.style.cssText=`border-color:${col.border};background:${col.bg}`;
-    item.innerHTML=`<span class="comp-char" style="color:${col.text}">${comp}</span><span class="comp-name" style="color:${col.text}">${name}</span>`;
+    const _srQ = data.splitRanges ? {src:char, strokes:data.splitRanges[i]} : COMP_STROKE_RENDER[comp];
+    item.innerHTML=`<span class="comp-char" style="color:${col.text}"></span><span class="comp-name" style="color:${col.text}">${name}</span>`;
+    const _cc=item.querySelector('.comp-char');
+    if(_srQ){ renderComponentStrokes(_srQ.src,_srQ.strokes,col.text, true).then(svg=>{ if(svg){svg.style.cssText='width:1.7rem;height:1.7rem;display:block';_cc.appendChild(svg);} else {_cc.textContent=comp;} }); }
+    else { _cc.textContent=comp; }
     compList.appendChild(item);
   });
   renderQuerySVG(char,data,struct);

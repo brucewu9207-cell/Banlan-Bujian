@@ -577,6 +577,13 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="2"]{
     height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
   }
+  /* ★ ②部件 关键修复：drag 方框原本按「宽度」撑成正方形(≈半屏宽)，在矮视口下高度占满，
+     把下面「可用部件」区挤到放不下 → 第二排部件被裁(就是你截图里的现象)。
+     改为：按「卡片可用高度」给方框设上限(仍是 width 驱动的正方形，不会变形，只是更小)，
+     多出的纵向空间让给部件区，保证两排部件完整可见(不裁、不滚)。矮屏才收紧，高屏维持原样。 */
+  .practice-layout.wizard[data-step="2"] .drag-canvas{
+    max-width:calc((var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px)) * 0.33) !important;
+  }
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}

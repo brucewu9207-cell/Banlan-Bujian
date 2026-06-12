@@ -299,8 +299,20 @@ body::before{content:'';position:fixed;inset:0;background:
   .main-content{padding:16px}
   .practice-layout{flex-direction:column}
   .query-result-grid{grid-template-columns:1fr}
-  .home-grid{grid-template-columns:1fr;justify-items:center}
-  .home-grid .home-entry{width:100%;max-width:480px;margin:0 auto}
+  /* ★ 首页两卡：居中 + 压缩尺寸，整个首页一屏装下不滑动 */
+  .home-screen{padding:10px 12px}
+  .home-grid{grid-template-columns:1fr;justify-items:center;gap:14px;width:100%}
+  .home-grid .home-entry{
+    width:100%;max-width:440px;margin:0 auto;
+    min-height:0;                 /* 解除 268px 死高度（一屏装不下的元凶） */
+    padding:20px 18px;
+  }
+  .home-entry-icon{font-size:2rem;margin-bottom:8px}
+  .home-entry-zh{font-size:1.35rem}
+  .home-entry-en{font-size:0.85rem;margin-bottom:10px}
+  .home-input-row{margin:4px 0 8px;max-width:280px}
+  .teacher-input{padding:9px 12px;font-size:1.05rem}
+  .teacher-go{padding:9px 12px;font-size:0.9rem}
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
 }

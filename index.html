@@ -489,15 +489,19 @@ body::after{
   .comp-chip{min-height:68px}
   /* 顶部操作按钮在窄屏不至于挤压换行难看 */
   .struct-action-btn{padding:8px 14px;font-size:1rem}
-  /* ★ 顶栏改竖排：标题在上，两组悬浮按钮落到标题下方（解除绝对定位，不再压住产品名） */
-  .struct-bar-header{flex-direction:column;gap:10px;padding:10px 14px}
+  /* ★ 顶栏：标题独占一行；「返回/二维码/反馈/展开」四个按钮缩小后并成一行，另起一条空间放 */
+  .struct-bar-header{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:6px 8px;padding:8px 10px 9px}
+  .struct-bar-title{flex:0 0 100%}
   .struct-bar-header > div:not(.struct-bar-title){
     position:static !important;     /* 覆盖内联的 position:absolute */
     transform:none !important;      /* 覆盖内联的 translateY(-50%) */
     right:auto !important;left:auto !important;top:auto !important;
-    justify-content:center;
-    flex-wrap:wrap;
+    display:flex;justify-content:center;align-items:center;
+    gap:6px !important;flex:0 0 auto;flex-wrap:nowrap;
   }
+  /* 按钮整体缩小一号 */
+  .struct-action-btn{padding:5px 9px !important;font-size:0.74rem !important;border-radius:7px}
+  .struct-action-btn svg{width:12px;height:12px}
 }
 
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
@@ -539,7 +543,20 @@ body::after{
     border-top:1px solid rgba(255,255,255,0.16);
   }
   /* 向导模式：一次只显示「一步」 */
-  .practice-layout.wizard{padding-bottom:94px}
+  /* ★ 一屏适配：向导页高度 = 视口 − 顶栏 − 底部导航，配合 --ui-scale 自动缩放，免滑动 */
+  .practice-layout.wizard{
+    padding-bottom:0;
+    height:calc(100vh - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
+    height:calc(100dvh - var(--struct-h,0px) - var(--wiz-h,70px) - 36px) !important;
+    overflow:hidden;
+  }
+  .practice-layout.wizard > .char-panel,
+  .practice-layout.wizard > .structure-panel,
+  .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}
+  /* 死高度元素缩一号，帮助一屏收敛 */
+  #skip-btn{font-size:1rem !important;padding:9px 18px !important;margin-top:8px !important}
+  .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
+  #char-info{font-size:0.85rem !important;padding:10px 12px !important}
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -1631,17 +1648,13 @@ function fitPracticeUI(){
   if(!screen || screen.style.display==='none') return;
   const layout=screen.querySelector('.practice-layout');
   if(!layout) return;
-  // ★ 移动端(手机/竖屏平板)：不做"挤进一屏"缩放，改为整页自然滚动，避免内容被缩得过小
-  if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
-    document.documentElement.style.setProperty('--ui-scale','1');
-    return;
-  }
+  // ★ 手机端也做"挤进一屏"缩放（向导模式一次只显示一步，只测当前可见的那页）
   const panels=[...layout.querySelectorAll('.char-panel,.structure-panel,.word-panel')];
   if(!panels.length) return;
   const root=document.documentElement;
   let scale=1;
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
-  const overflowing=()=>panels.some(p=>p.scrollHeight - p.clientHeight > 2);
+  const overflowing=()=>panels.some(p=>p.offsetParent!==null && p.scrollHeight - p.clientHeight > 2);  // ★ 只测当前可见面板
   let guard=0;
   while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）
     scale=Math.round((scale-0.02)*1000)/1000;
@@ -1750,6 +1763,10 @@ function wizSync(){
     d.classList.toggle('locked', s>_wiz.max);
     d.disabled=(s>_wiz.max);
   });
+  // ★ 一屏适配：把底部导航高度写入 --wiz-h，并在换页后重新缩放当前页内容
+  const nav=document.getElementById('wizard-nav');
+  if(nav) document.documentElement.style.setProperty('--wiz-h',(nav.offsetHeight||70)+'px');
+  requestAnimationFrame(fitPracticeUI);
 }
 
 function wizReset(){ _wiz.step=1; _wiz.max=1; wizSync(); _wizTop(); }

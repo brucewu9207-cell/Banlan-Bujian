@@ -930,6 +930,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 </div>
 
 <div class="toast" id="toast"></div>
+<!-- ★ 临时版本标记：用于确认部署/缓存是否生效，确认后可删 -->
+<div id="ver-badge" style="position:fixed;top:2px;right:6px;z-index:99999;font-family:Georgia,serif;font-size:11px;font-weight:700;color:rgba(139,44,44,0.85);background:rgba(255,255,255,0.6);padding:1px 5px;border-radius:6px;pointer-events:none;letter-spacing:0.06em">v25</div>
 
 <script>
 // ============================================================
@@ -3124,9 +3126,12 @@ async function loadStrokeData(char){
       }catch(e){ /* 试下一个源 */ }
     }
   }
-  // ② 最后兜底：HanziWriter 默认加载器（jsdelivr，无超时）
+  // ② 最后兜底：HanziWriter 默认加载器（jsdelivr）——也加 5 秒超时，绝不死等
   try{
-    const d = await HanziWriter.loadCharacterData(char);
+    const d = await Promise.race([
+      HanziWriter.loadCharacterData(char),
+      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), 5000))
+    ]);
     if(d && d.strokes){ _strokeCache[char]=d; return d; }
   }catch(e){}
   return null; // 全部失败 → 调用方按原逻辑走红字兜底

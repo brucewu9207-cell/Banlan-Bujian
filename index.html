@@ -578,7 +578,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard{
     padding-bottom:0;
     margin-top:-10px;              /* ★ ② 上提贴近顶部按钮条（返回/二维码/反馈/展开），收掉那道空隙 */
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 18px) !important;  /* ★ ③ 底部留缝露出下边框（8→18px）；配合米字格预留缓冲，Skip 不被裁切 */
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 22px) !important;  /* ★ ③ 底边缝(8→22px)，露出灰框下边框；Skip 由命中分支钳制+缩小拼音框保证不裁切 */
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }
@@ -587,7 +587,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.55rem*var(--ui-scale)) !important;padding:calc(4px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框 + 降低高度，给下方 Skip 让出空间 */
+  .pinyin-btn{font-size:calc(1.3rem*var(--ui-scale)) !important;padding:calc(2px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框 + 降低高度，给下方 Skip 让出空间 */
+  .pinyin-options{gap:calc(5px*var(--ui-scale)) !important;margin-bottom:calc(5px*var(--ui-scale)) !important}   /* ★ 收紧两行拼音间距与下方留白，进一步给 Skip 腾位置 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
   .hsk-level-badge{padding:3px 8px !important;font-size:0.72rem !important}
@@ -1711,6 +1712,20 @@ function fitPracticeUI(){
     root.style.setProperty('--ui-scale', c.s);
     root.style.setProperty('--char-boost', c.cb);
     root.style.setProperty('--write-boost', c.wb);
+    // ★ 安全钳制：缓存放大值可能是在内容未完全渲染时算得偏大；若当前实际溢出，就在绘制前同步回退到不溢出，
+    //   绝不让米字格挤掉底部 Skip。命中且本就不溢出时，下面循环 0 次执行 → 不产生任何跳动。
+    if(_step===1){
+      try{
+        const cp=screen.querySelector('.char-panel');
+        let b=parseFloat(c.cb)||1, g=0;
+        while(cp && cp.scrollHeight - cp.clientHeight > 2 && b>1 && g<40){
+          b=Math.max(1, Math.round((b-0.04)*100)/100);
+          root.style.setProperty('--char-boost', String(b));
+          g++;
+        }
+        if(g>0) c.cb=String(b);   // 顺手修正缓存，下次直接命中正确值
+      }catch(e){}
+    }
     return;   // 直接套用，无复位、无逐步逼近 → 无闪动
   }
   let scale=1;
@@ -1732,7 +1747,7 @@ function fitPracticeUI(){
       const cp=screen.querySelector('.char-panel');
       const sc=document.getElementById('stroke-canvas');
       if(cp && sc && cp.offsetParent!==null && sc.clientWidth>0){
-        const free=cp.clientHeight - cp.scrollHeight - 24;       // 面板底部剩余空间（★预留24px：米字格放大后仍给底部 Skip 按钮留余量，绝不挤出框外被裁）
+        const free=cp.clientHeight - cp.scrollHeight - 6;        // 面板底部剩余空间（留6px安全边；真正防裁切由命中分支的钳制兜底）
         const cur=sc.clientWidth;
         const maxByWidth=(cp.clientWidth-46)/cur;                 // 宽度上限（留出左右内边距）
         let boost=Math.min(1+Math.max(free,0)/cur, maxByWidth, 2.0);

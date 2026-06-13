@@ -139,8 +139,6 @@ body::before{content:'';position:fixed;inset:0;background:
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
 .pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大到原来的 1.1 倍（2.3→2.53rem） */
-/* ★ v37：选对拼音后锁定拼音框尺寸——禁止自适应缩放(--ui-scale)回弹把整组拼音框放大；高特异性 + !important 覆盖向导态规则 */
-.practice-layout .pinyin-options.py-locked .pinyin-btn{font-size:var(--py-lock-fs) !important;padding:var(--py-lock-pad) !important;transition:none !important}
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -400,6 +398,9 @@ body::before{content:'';position:fixed;inset:0;background:
   text-align:center;
 }
 .step-title-zh{font-family:Georgia,'STSong','宋体',serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase}
+/* ★ v38 ③：step② 标题左侧"当前要拖的字"提示——楷体小字，提示学生此刻在拼哪个字 */
+.drag-hint-char{position:absolute;left:0;top:50%;transform:translateY(-50%);font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:1.7rem;line-height:1;color:var(--ink-dark);background:rgba(20,40,30,0.08);border:1.5px solid rgba(20,40,30,0.25);border-radius:8px;padding:2px 10px;letter-spacing:0;text-transform:none;font-weight:400}
+.drag-hint-char:empty{display:none}
 .step-title-en{font-family:Georgia,serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase;margin-left:8px}
 
 .drag-right .retry-btn-inline{
@@ -904,7 +905,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         </div>
         <!-- 右栏：Step 2 -->
         <div class="card structure-panel" id="structure-panel">
-          <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center"><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
+          <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center;position:relative"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en">Drag Components</span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
             <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span></p>
@@ -1691,8 +1692,11 @@ function updateStructHeight(){
 //   Mac 等高视口本就不溢出 → scale 保持 1，外观不变；
 //   Windows 缩放/矮视口 → 自动等比缩小米字格、部件卡、拼音钮等，免去单模块滚动条
 let _fitRAF=null;
+let _fitFrozen=false;   // ★ v38 ①：选对拼音后置 true，锁定当前步缩放，禁止 fit 重算（拼音框/释义框不再回弹）
 const _fitCache={};   // ★ 适配结果缓存：键=视口宽 + fit-vh + 顶栏高 + 步骤。布局没变(只是换了字)时直接套用，免去"复位→重算"造成的方框闪缩
 function fitPracticeUI(){
+  // ★ v38 ①：锁定期间（选对拼音 → 翻到 step2 前，只显示 step①）直接跳过，缩放系数保持不变 → 框体原地不动
+  if(_fitFrozen && (typeof _wiz!=='undefined') && _wiz && _wiz.step===1) return;
   const screen=document.getElementById('practice-screen');
   if(!screen || screen.style.display==='none') return;
   const layout=screen.querySelector('.practice-layout');
@@ -1938,8 +1942,8 @@ function wizSync(){
   const next=document.getElementById('wiz-next');
   if(prev) prev.disabled=(_wiz.step<=1);
   if(next){
-    if(_wiz.step>=4){            // 最后一页：按钮变「下一个字」
-      next.textContent='下一个字 →';
+    if(_wiz.step>=4){            // 最后一页：按钮文案改为「下一步」（仍切到下一个字）
+      next.textContent='下一步 →';
       next.disabled=false;
       next.onclick=()=>nextCharacter();
     } else {
@@ -2067,7 +2071,8 @@ function loadStrokeOnlyChar(char){
 
   // 左栏：若字库有拼音/释义则显示，否则留空
   const data=CHAR_DB[char];
-  const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';pin.classList.remove('py-locked');pin.style.removeProperty('--py-lock-fs');pin.style.removeProperty('--py-lock-pad');}   /* ★ v37：换字时解除尺寸锁定，恢复自适应缩放 */
+  const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
+  _fitFrozen=false;   /* ★ v38 ①：换字时解锁缩放，新字的 step① 正常自适应 */
   const info=document.getElementById('char-info');
   if(data){
     info.style.display='block';
@@ -2190,17 +2195,9 @@ function checkPinyin(btn,chosen,correct,data,char){
     // 在拼音按钮文字后追加 ☑️ 勾标
     btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
     playCorrectSound();
-    // ★ v37 ①b：冻结整组拼音框当前尺寸 → 之后 --ui-scale 回弹也不会把它们放大（翻页前不再"忽然变大一下"）
-    const _pyBox=document.getElementById('pinyin-options');
-    if(_pyBox){
-      const _ref=_pyBox.querySelector('.pinyin-btn');
-      if(_ref){
-        const _cs=getComputedStyle(_ref);
-        _pyBox.style.setProperty('--py-lock-fs', _cs.fontSize);   // 锁死当前像素字号
-        _pyBox.style.setProperty('--py-lock-pad', _cs.padding);   // 锁死当前内边距
-        _pyBox.classList.add('py-locked');
-      }
-    }
+    // ★ v38 ①：选对的瞬间锁死整步自适应缩放 → 之后不再重算 --ui-scale，
+    //          拼音框不会变大、释义框不会缩小，全部原地不动（翻页时由 unlockDragSection 解锁）。
+    _fitFrozen = true;
     const sb=document.getElementById('skip-btn');
     if(sb) sb.style.display='none';
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
@@ -2228,6 +2225,7 @@ function checkPinyin(btn,chosen,correct,data,char){
 
 function unlockDragSection(char,data){
   state.pinyinDone=true;
+  _fitFrozen=false;   // ★ v38 ①：离开 step① → 解锁缩放，step② 正常自适应
   // ★ 解锁前先把上一字的"合并成功"瞬间清掉(关闭过渡)，避免解锁拖拽时才看到它淡出
   const _rs=document.getElementById('result-side');
   const _rc=document.getElementById('result-char');
@@ -2645,6 +2643,7 @@ async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
 
 function renderCompPool(char,data){
   const pool=document.getElementById('comp-options');pool.innerHTML='';
+  const _hint=document.getElementById('drag-hint-char'); if(_hint) _hint.textContent=char||'';   // ★ v38 ③：step② 标题左侧显示当前要拼的字
   const correctComps=data.components; // 正确部件数组（可含重复）
 
   // ★ 双层过滤：
@@ -3508,6 +3507,7 @@ function startWritingQuiz(){
       highlightColor: '#f4a261',
       drawingColor: '#666',        // 学生手写轨迹色（中性灰，不抢彩虹）
       drawingWidth: 14,
+      leniency: 1.5,               // ★ v38 ④：判定容差 1.0→1.5，触屏短笔画（如"收"第一笔）更易识别为正确
       strokeColor: '#222222',      // 写对后笔画填充为黑色
       outlineColor: '#e0e0e0',
       strokeAnimationSpeed: 1.2,

@@ -1344,7 +1344,7 @@ const CHAR_DB = {
   '层':{py:'céng',en:'layer; floor',structure:'lu',components:['尸','云'],compNames:['尸字头','云'],splitRanges:[[0,1,2],[3,4,5,6]],words:[{w:'层',py:'céng',en:'floor',lv:3}]},
   '查':{py:'chá',en:'to check',structure:'tb',components:['木','旦'],compNames:['木','旦'],splitRanges:[[0,1,2,3],[4,5,6,7,8]],words:[{w:'查',py:'chá',en:'to check',lv:3},{w:'检查',py:'jiǎnchá',en:'to check',lv:3}]},
   '差':{py:'chà',en:'difference; poor (quality)',structure:'lu',components:['羊','工'],compNames:['羊','工'],splitRanges:[[0,1,2,3,4,5],[6,7,8]],words:[{w:'差',py:'chà',en:'poor',lv:3},{w:'差不多',py:'chàbuduō',en:'almost',lv:3}]},
-  '尝':{py:'cháng',en:'to taste',structure:'tb',components:['尚','云'],compNames:['尚','云'],splitRanges:[[0,1,2,3,4,5,6,7],[8]],words:[{w:'尝',py:'cháng',en:'to taste',lv:3}]},
+  '尝':{py:'cháng',en:'to taste',structure:'tb',components:['尚','云'],compNames:['尚','云'],splitRanges:[[0,1,2,3,4],[5,6,7,8]],words:[{w:'尝',py:'cháng',en:'to taste',lv:3}]},   // ★ v52③：拆为「上面部分(5笔) + 云(4笔)」;splitRanges 模式下正确部件用笔画图形渲染(不依赖字体)
   '衬':{py:'chèn',en:'lining',structure:'lr',components:['衤','寸'],compNames:['衣字旁','寸'],splitRanges:[[0,1,2,3,4],[5,6,7]],words:[{w:'衬衫',py:'chènshān',en:'shirt',lv:3}]},
   '成':{py:'chéng',en:'to become; to succeed',structure:'lr',components:['丁','戈'],compNames:['丁','戈'],splitRanges:[[0,1],[2,3,4,5]],words:[{w:'变成',py:'biànchéng',en:'to turn into',lv:3},{w:'成绩',py:'chéngjì',en:'result',lv:3}]},
   '城':{py:'chéng',en:'city',structure:'lr',components:['土','成'],compNames:['土','成'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'城市',py:'chéngshì',en:'city',lv:3}]},
@@ -1971,6 +1971,8 @@ function wizPrev(){ if(_wiz.step>1){ _wiz.step--; wizSync(); _wizTop(); } }
 function wizNext(){ if(_wiz.step<_wiz.max){ _wiz.step++; wizSync(); _wizTop(); } }
 // 自动前进（由各流转点调用）：解锁到第 n 步；手机端同时翻到该页
 function wizAdvance(n){ _wiz.max=Math.max(_wiz.max,n); if(wizMobile()){ _wiz.step=n; } wizSync(); if(wizMobile()) _wizTop(); }
+// ★ v52④：只解锁不翻页——选对拼音/拼合成功/写完字 都只解锁,不自动翻页;用户点「下一步」才前进
+function wizUnlock(n){ _wiz.max=Math.max(_wiz.max,n); wizSync(); }
 
 // （wizSync 的 resize 触发已并入统一的「宽度门控」处理器）
 window.addEventListener('load', ()=>{ wizBuildNav(); wizSync(); });
@@ -2238,7 +2240,7 @@ function unlockDragSection(char,data){
   //          兜底：万一容器为空（异常路径），才补渲染一次，确保绝不空白。
   const _pool=document.getElementById('comp-options');
   if(!_pool || _pool.childElementCount===0){ renderDragZones(char,data); renderCompPool(char,data); }
-  wizAdvance(2);   // ★ 拼音完成 → 移动端自动翻到 ② 拖拽部件
+  wizUnlock(2);   // ★ v52④：只解锁②,不自动翻页;用户点「下一步」才翻
 }
 
 // ★ 包围结构类型集合
@@ -3139,7 +3141,7 @@ function mergeCharacter(){
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
   state.sessionIndex++;
-  setTimeout(()=>wizAdvance(3), 650);   // ★ 拼合完成 → 移动端自动翻到 ③ 书写练习
+  wizUnlock(3);   // ★ v52④：只解锁③,不自动翻页;用户点「下一步」才翻
 }
 
 // ══ 笔画渲染（彩虹色静态 + 动画播放） ══
@@ -3620,7 +3622,7 @@ function startWritingQuiz(){
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
-        setTimeout(()=>wizAdvance(4), 700);   // ★ 写完字 → 移动端自动翻到 ④ 例词
+        wizUnlock(4);   // ★ v52④：只解锁④,不自动翻页;用户点「下一步」才翻
       },
     });
   }catch(err){
@@ -3634,17 +3636,16 @@ async function nextStroke(){
   if(!canvas) return;
   const char = canvas.dataset.char || _stepChar;
   if(!char) return;
-  // ★ v47：暂停态下也允许点「下一笔」——先把播放彻底中止并复位按钮,然后从第1笔开始(buildStepSVG 会归零 _stepIndex)
-  if(_playState === 'paused'){
+  // ★ v52②：播放中(playing)或暂停中(paused)点「下一笔」——都立刻中止播放、复位按钮,从第1笔开始
+  if(_playState === 'playing' || _playState === 'paused'){
     try{ _hanziWriter && _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){}
+    try{ _hanziWriter && _hanziWriter.pauseAnimation && _hanziWriter.pauseAnimation(); }catch(e){}  // 防止动画继续触发回调
     _hanziWriter = null;
     _isPlaying = false;
     _playState = 'idle';
     setPlayIcon('play');
     document.getElementById('play-btn').classList.remove('playing');
     _stepChar = null;   // 强制 buildStepSVG 重搭,从第1笔开始
-  } else if(_isPlaying){
-    return;                                    // 正在播放中 → 不响应(原行为)
   }
   if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
 

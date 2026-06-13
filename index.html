@@ -3622,7 +3622,14 @@ async function buildStepSVG(char){
   box.setAttribute('class','grid-line');gridG.appendChild(box);
   svg.appendChild(gridG);
 
-  // ★ v44：去掉「浅灰全字引导层」——「下一笔」只逐笔显示彩色笔画（干净，和「播放」一致；未写的笔由 mask 隐藏，不显示）
+  // ★ v45：恢复「浅灰全字引导层」——给逐笔点击提供整字轮廓参照（之前 v44 误删，零散笔画无法识形）
+  const guideG=document.createElementNS(svgNS,'g');
+  guideG.setAttribute('transform','translate(0,900) scale(1,-1)');
+  data.strokes.forEach(d=>{
+    const p=document.createElementNS(svgNS,'path');
+    p.setAttribute('d',d);p.setAttribute('fill','#e6e6e6');guideG.appendChild(p);
+  });
+  svg.appendChild(guideG);
 
   // defs：每笔一个 mask（白色中线，dashoffset 控制书写进度）
   const defs=document.createElementNS(svgNS,'defs');

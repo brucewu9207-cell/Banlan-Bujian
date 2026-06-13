@@ -3495,7 +3495,7 @@ async function playStrokes(){
     _hanziWriter = HanziWriter.create('hw-target', char, {
       width: _hwPx,
       height: _hwPx,
-      padding: 8,
+      padding: 0,   // ★ v50：从 8 改 0——彩色笔画撑满,与下面浅灰底字完全重合;之前 8px 留白让黑色笔画整体缩在浅灰字中央
       charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       strokeColor: '#1f2c25',
       showOutline: false,                                              // ★ v49：关掉,用上面手动叠加的同款灰字代替(避免双重叠加,且不受 HW padding 缩小)

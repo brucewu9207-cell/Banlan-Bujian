@@ -588,7 +588,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .char-panel{padding-bottom:calc(6px*var(--ui-scale)) !important}   /* ★ ② 收窄面板底部留白，让 Skip / 释义框更贴近灰框下边 */
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.14rem*var(--ui-scale)) !important;padding:calc(2px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ 拼音框放大到约 1.2 倍 */
+  .pinyin-btn{font-size:calc(1.37rem*var(--ui-scale)) !important;padding:0 10px !important;height:calc(2.5rem*var(--ui-scale)) !important;line-height:1.15 !important;display:flex !important;align-items:center !important;justify-content:center !important}   /* ★ 放大到约1.2倍；固定高度+居中：选对加✓/换样式也不再放大 */
   .pinyin-options{gap:calc(4px*var(--ui-scale)) !important;margin-bottom:calc(4px*var(--ui-scale)) !important}   /* ★ 两行拼音间距与下方留白再收紧 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
@@ -2186,7 +2186,7 @@ function checkPinyin(btn,chosen,correct,data,char){
   if(chosen===correct){
     btn.classList.add('correct');
     // 在拼音按钮文字后追加 ☑️ 勾标
-    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
+    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1em">✓</span>';
     playCorrectSound();
     const sb=document.getElementById('skip-btn');
     if(sb) sb.style.display='none';
@@ -2196,7 +2196,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
-    setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页
+    setTimeout(()=>unlockDragSection(char,data),600);   // ★ 选对后短暂停留即翻页（原 1800ms 过久，部件等太久）
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
     btn.classList.add('wrong');

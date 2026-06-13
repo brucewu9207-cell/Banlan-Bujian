@@ -535,8 +535,14 @@ body::after{
   .play-circle-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
   .pinyin-btn:hover:not(:disabled){background:#c4c4c4;border-color:rgba(255,255,255,0.4)}
   .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
-  /* ★ v55：返回按钮与演示按钮完全一致(bamboo + 白描边),覆盖通用 hover */
-  #nav-back-btn,#nav-back-btn:hover{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
+  /* ★ v57：iOS Safari 上父级 .struct-bar 的 backdrop-filter:blur 会把返回按钮的 bamboo 实色与背景混色变暗(实测 135,106,62 vs 期望 181,118,58)。
+     用 isolation:isolate + transform:translateZ(0) 强制独立合成层,跳出 backdrop-filter 影响。 */
+  #nav-back-btn,#nav-back-btn:hover{
+    background:var(--bamboo) !important;
+    border:1px solid rgba(255,255,255,0.3) !important;
+    isolation:isolate;
+    transform:translateZ(0);
+  }
 }
 
 /* ★ 防 iOS 双击缩放：连点「下一笔/播放」等按钮时，整页被 double-tap zoom 放大的问题 */

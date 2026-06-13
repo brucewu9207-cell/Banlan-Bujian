@@ -577,7 +577,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* ★ 一屏适配：向导页高度 = 视口 − 顶栏 − 底部导航，配合 --ui-scale 自动缩放，免滑动 */
   .practice-layout.wizard{
     padding-bottom:0;
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
+    margin-top:-10px;              /* ★ ② 上提贴近顶部按钮条（返回/二维码/反馈/展开），收掉那道空隙 */
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 22px) !important;  /* ★ ③ 底部多留缝（8→22px），让灰框下边框露出在 ①②③④ 导航条上方 */
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }

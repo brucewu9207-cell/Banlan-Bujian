@@ -3410,12 +3410,12 @@ async function playStrokes(){
   _playState = 'playing';         // ★ v47：进入播放态
   setPlayIcon('pause');           // ★ v47：显示 Ⅱ（点一下=暂停）
 
-  // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
-  // ★ v48：容器用 100% 撑满 canvas,与「下一笔」/静态米字格的实际显示大小一致——
-  //   之前用 calc(240px*--ui-scale*--char-boost) 重新算 px,但 stroke-canvas 本身的
-  //   clientWidth 来自父级 flex 撑大,与"240px×倍数"对不齐,导致播放时米字格视觉先缩小。
+  // 准备：清空 canvas，搭建容器
+  // 层级(从下到上): guide-overlay(米字格+浅灰底字) → hw-target(彩色笔画动画) → num-overlay(编号)
+  // ★ v49：浅灰底字下沉到 hw-target **下面**——保证彩色笔画在它之上;编号始终在最上
   canvas.innerHTML = `
     <div style="position:relative;width:100%;height:100%">
+      <svg id="guide-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg>
       <div id="hw-target" style="position:absolute;inset:0"></div>
       <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg>
     </div>`;
@@ -3424,10 +3424,11 @@ async function playStrokes(){
     // 拉取数据用于绘制数字
     const data = await loadStrokeData(char);
     if(myseq !== _renderSeq){ _isPlaying=false; _playState='idle'; setPlayIcon('play'); btn.classList.remove('playing'); return; } // ★ 已换字 → 中止
-    const overlay = document.getElementById('num-overlay');
+    const guideOverlay = document.getElementById('guide-overlay');   // ★ v49：底层(米字格+灰字)
+    const overlay = document.getElementById('num-overlay');          // 顶层(编号)
     const svgNS = 'http://www.w3.org/2000/svg';
 
-    // 米字格（与静态一致）
+    // 米字格（放底层 guide-overlay,与静态一致）
     const gridG = document.createElementNS(svgNS,'g');
     const lines = [[0,512,1024,512],[512,0,512,1024],[0,0,1024,1024],[1024,0,0,1024]];
     lines.forEach(([x1,y1,x2,y2])=>{
@@ -3442,9 +3443,23 @@ async function playStrokes(){
     box.setAttribute('width',1024);box.setAttribute('height',1024);
     box.setAttribute('class','grid-line');
     gridG.appendChild(box);
-    overlay.appendChild(gridG);
+    guideOverlay.appendChild(gridG);
 
-    // 数字一开始就全部显示
+    // ★ v49：浅灰底字引导层——和「下一笔」buildStepSVG 里 guideG 完全同款(同viewBox 1024,同Y翻转,同色#e6e6e6)。
+    //   放在 guide-overlay(hw-target **下面**),所以彩色笔画动画在它之上正常显示;
+    //   HanziWriter 自带的 outline 关掉(下面 showOutline:false),避免双重叠加。
+    if(data && data.strokes && data.strokes.length){
+      const guideG = document.createElementNS(svgNS,'g');
+      guideG.setAttribute('transform','translate(0,900) scale(1,-1)');
+      data.strokes.forEach(d=>{
+        const p = document.createElementNS(svgNS,'path');
+        p.setAttribute('d',d); p.setAttribute('fill','#e6e6e6');
+        guideG.appendChild(p);
+      });
+      guideOverlay.appendChild(guideG);
+    }
+
+    // 数字一开始就全部显示(放顶层 num-overlay)
     const numG = document.createElementNS(svgNS,'g');
     numG.setAttribute('transform','translate(0,900) scale(1,-1)');
     if(data && data.medians && data.medians.length){
@@ -3483,8 +3498,7 @@ async function playStrokes(){
       padding: 8,
       charDataLoader: (c)=>loadStrokeData(c),   // 多 CDN 兜底加载
       strokeColor: '#1f2c25',
-      showOutline: true,
-      outlineColor: '#e6e6e6',
+      showOutline: false,                                              // ★ v49：关掉,用上面手动叠加的同款灰字代替(避免双重叠加,且不受 HW padding 缩小)
       strokeAnimationSpeed: 1,
       delayBetweenStrokes: 200,
       onLoadCharDataError: (err)=>console.warn('Load error',err),

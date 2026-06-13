@@ -3692,13 +3692,16 @@ async function buildStepSVG(char){
   canvas.appendChild(svg);
 
   // 初始化每笔为"未写出"
+  // ★ v46：dasharray 用 L+200 而非 L,配合 dashoffset=L+200 → pattern 周期=2(L+200),起点在间隙正中,彻底遮死所有渗漏。
+  //   之前用 dasharray=L 时,复合路径(横折等)在子段接点上会渗漏出一小段(因为 dash 在每段端点重置)。
+  //   revealStroke 动画把 dashoffset 从 L+200 → 0,正常显示完整笔画。
   data.strokes.forEach((d,i)=>{
     const mp=document.getElementById('smaskpath-'+i);
     if(!mp) return;
     let L=1000; try{ L=mp.getTotalLength(); }catch(e){}
     mp.dataset.len=L;
-    mp.style.strokeDasharray=L;
-    mp.style.strokeDashoffset=L;   // 完全隐藏
+    mp.style.strokeDasharray=(L+200);   // ★ 实线段长度 = L+200,确保覆盖整笔
+    mp.style.strokeDashoffset=(L+200);   // ★ 整体向后移 L+200,起始时实线段完全位于路径外 → 全隐藏
   });
   return true;
 }
@@ -3710,7 +3713,7 @@ function revealStroke(i){
   const L=parseFloat(mp.dataset.len)||1000;
   const dur=Math.max(280, Math.min(900, L*0.7));
   try{
-    const anim=mp.animate([{strokeDashoffset:L},{strokeDashoffset:0}],
+    const anim=mp.animate([{strokeDashoffset:(L+200)},{strokeDashoffset:0}],   // ★ v46：起点配合初始化的 L+200,避免第一帧跳变
       {duration:dur, easing:'ease-in-out', fill:'forwards'});
     anim.onfinish=()=>{ mp.style.strokeDashoffset=0; };
   }catch(e){

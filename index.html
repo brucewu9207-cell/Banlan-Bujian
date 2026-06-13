@@ -582,9 +582,15 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.55rem*var(--ui-scale)) !important;padding:calc(7px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框，给下方 Skip 让出空间 */
-  .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
-  #char-info{font-size:0.92rem !important;padding:12px 14px !important;margin-top:10px !important}   /* ★ 显示拼音+英文释义框（计入一屏高度，不再遮挡）*/
+  .pinyin-btn{font-size:calc(1.55rem*var(--ui-scale)) !important;padding:calc(4px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框 + 降低高度，给下方 Skip 让出空间 */
+  /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
+  .stroke-controls{flex-wrap:nowrap !important;gap:6px}
+  .hsk-level-badge{padding:3px 8px !important;font-size:0.72rem !important}
+  .play-circle-btn{width:calc(38px*var(--ui-scale)) !important;height:calc(38px*var(--ui-scale)) !important}
+  .play-circle-btn svg{width:calc(17px*var(--ui-scale)) !important;height:calc(17px*var(--ui-scale)) !important}
+  .stroke-ctrl-btn{padding:5px 9px !important;font-size:0.7rem !important;flex-shrink:1;min-width:0}
+  .stroke-ctrl-btn .ctrl-en{font-size:0.62rem}
+  #char-info{font-size:0.85rem !important;padding:8px 12px !important;margin-top:8px !important}   /* ★ 释义框做小（拼音+单个英文释义）*/
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -2111,9 +2117,16 @@ function checkPinyin(btn,chosen,correct,data,char){
     if(sb) sb.style.display='none';
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
-    info.innerHTML=`<strong style="font-size:2.16rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.62rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${data.en}</span>`;
-    info.style.display='block';info.style.fontSize='0.96rem';info.style.padding='16px 18px';info.style.textAlign='center';info.style.borderRadius='12px';
-    requestAnimationFrame(fitPracticeUI);   // ★ 信息框出现后立刻重算一屏：完整可见、米字格让出空间
+    const enShort=(data.en||'').split(/[;,；，]/)[0].trim();   // ★ 英文只保留第一个释义
+    info.innerHTML=`<strong style="font-size:1.5rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.0rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${enShort}</span>`;
+    info.style.display='block';info.style.fontSize='0.9rem';info.style.padding='9px 14px';info.style.textAlign='center';info.style.borderRadius='10px';
+    // ★ 选对后不整屏重缩(否则拼音/控制按钮会跟着变小)；只逐步缩小米字格(--char-boost)腾出空间，直到小释义框完整放下
+    requestAnimationFrame(()=>{
+      const root=document.documentElement; const cp=document.querySelector('.char-panel');
+      if(cp){ let boost=1, g=0; root.style.setProperty('--char-boost','1');
+        while(cp.scrollHeight - cp.clientHeight > 2 && boost>0.4 && g<30){ boost=Math.round((boost-0.04)*100)/100; root.style.setProperty('--char-boost', String(boost)); g++; }
+      }
+    });
     setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试

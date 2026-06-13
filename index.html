@@ -2643,7 +2643,7 @@ async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
 
 function renderCompPool(char,data){
   const pool=document.getElementById('comp-options');pool.innerHTML='';
-  const _hint=document.getElementById('drag-hint-char'); if(_hint) _hint.textContent=char||'';   // ★ v38 ③：step② 标题左侧显示当前要拼的字
+  const _hint=document.getElementById('drag-hint-char'); if(_hint){ if(char){ renderGlyphInto(_hint, char); } else { _hint.dataset.glyph=''; _hint.textContent=''; } }   // ★ v41：step② 标题左侧小字也画成米字格那种笔画字形（原 textContent 字体）
   const correctComps=data.components; // 正确部件数组（可含重复）
 
   // ★ 双层过滤：

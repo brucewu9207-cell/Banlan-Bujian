@@ -93,10 +93,11 @@ body::before{content:'';position:fixed;inset:0;background:
 .write-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
 .word-box{padding:calc(18px*var(--ui-scale)) 22px;display:flex;flex-direction:column;flex:1;min-height:0}
 /* 书写练习字台：白底 + 米字格 + HanziWriter + 打勾层 */
-.write-stage{position:relative;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));background:#ffffff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.12)}
-.write-grid{position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));pointer-events:none;z-index:1}
+.write-stage{position:relative;width:calc(240px*var(--ui-scale)*var(--write-boost,1));height:calc(240px*var(--ui-scale)*var(--write-boost,1));background:#ffffff;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.12)}
+.write-grid{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .write-grid .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
-#write-target{position:absolute;inset:0;width:calc(240px*var(--ui-scale));height:calc(240px*var(--ui-scale));z-index:2;background:transparent;touch-action:none}
+#write-target{position:absolute;inset:0;width:100%;height:100%;z-index:2;background:transparent;touch-action:none}
+#write-target svg{width:100%;height:100%}
 .write-check{position:absolute;top:6px;right:6px;display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#2a9d8f;font-size:1.3rem;color:#fff;font-weight:700;pointer-events:none;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
 .write-check.show{display:flex;animation:fadeIn .3s}
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
@@ -105,7 +106,7 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'KaiTi','STKaiti','楷体',serif}
+.char-display .main-char{font-size:6.5rem;line-height:1;color:var(--vermillion);text-shadow:2px 2px 0 rgba(0,0,0,0.15);display:none;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
 .char-display #stroke-canvas{display:flex;align-items:center;justify-content:center;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));background:#ffffff;border-radius:6px}
 .char-display #stroke-canvas svg{width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));display:block}
 .char-display #stroke-canvas svg .grid-line{stroke:#6a6a6a;stroke-width:4.2;stroke-dasharray:8,4;fill:none}
@@ -211,7 +212,7 @@ body::before{content:'';position:fixed;inset:0;background:
   line-height:1;
   display:block;
   max-height:100%;
-  font-family:'KaiTi','STKaiti','楷体',serif;
+  font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;
   color:rgba(20,40,30,0.55);
   animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1);
 }
@@ -241,7 +242,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool{margin-bottom:8px;flex-shrink:0}
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
-.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'KaiTi','STKaiti','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
+.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -258,7 +259,7 @@ body::before{content:'';position:fixed;inset:0;background:
   100%{opacity:0;transform:scale(0.9)}
 }
 @keyframes mergeIn{from{transform:scale(.5) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-.merge-result .result-char{font-size:5.5rem;line-height:1;display:block;margin-bottom:8px;font-family:'KaiTi','STKaiti','楷体',serif}
+.merge-result .result-char{font-size:5.5rem;line-height:1;display:block;margin-bottom:8px;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
 .merge-result .result-label{font-size:0.82rem;color:var(--jade);font-family:Georgia,serif;font-style:italic}
 
 /* 查询模式 */
@@ -275,7 +276,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .query-result.show{display:block}
 .query-result-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:22px;align-items:start}
 .query-char-display{padding:28px;text-align:center}
-.query-char-big{font-size:6.5rem;line-height:1;color:var(--ink-dark);text-shadow:4px 4px 0 rgba(44,36,22,0.06);display:block;margin-bottom:10px;font-family:'KaiTi','STKaiti','楷体',serif}
+.query-char-big{font-size:6.5rem;line-height:1;color:var(--ink-dark);text-shadow:4px 4px 0 rgba(44,36,22,0.06);display:block;margin-bottom:10px;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
 .query-char-pinyin{font-size:1.05rem;color:var(--bamboo);display:block;margin-bottom:4px;letter-spacing:0.05em}
 .query-char-meaning{font-size:0.8rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic}
 .query-detail-panel{padding:22px}
@@ -286,7 +287,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .query-components h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:12px;letter-spacing:0.06em;font-family:Georgia,serif}
 .query-comp-list{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px}
 .query-comp-item{display:flex;flex-direction:column;align-items:center;padding:10px 14px;border-radius:10px;border:2px solid;background:var(--paper);min-width:68px}
-.query-comp-item .comp-char{font-size:1.7rem;line-height:1;margin-bottom:4px;font-family:'KaiTi','STKaiti','楷体',serif}
+.query-comp-item .comp-char{font-size:1.7rem;line-height:1;margin-bottom:4px;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
 .query-comp-item .comp-name{font-size:0.62rem;color:var(--ink-light);text-align:center;font-family:Georgia,serif}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink-dark);color:var(--paper);padding:11px 22px;border-radius:24px;font-size:0.88rem;z-index:1000;transition:transform .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0)}
@@ -593,7 +594,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .play-circle-btn svg{width:calc(17px*var(--ui-scale)) !important;height:calc(17px*var(--ui-scale)) !important}
   .stroke-ctrl-btn{padding:5px 9px !important;font-size:0.7rem !important;flex-shrink:1;min-width:0}
   .stroke-ctrl-btn .ctrl-en{font-size:0.62rem}
-  #char-info{font-size:0.85rem !important;padding:8px 12px !important;margin-top:8px !important}   /* ★ 释义框做小（拼音+单个英文释义）*/
+  #char-info{padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important;line-height:1.2 !important}   /* ★ 与 Skip 按钮同样大小（单行） */
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -602,7 +603,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="3"] > .word-panel,
   .practice-layout.wizard[data-step="4"] > .word-panel{display:flex}
   .practice-layout.wizard[data-step="3"] .word-box{display:none}   /* ③ 书写：只显示书写框 */
-  .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:center}   /* ★ 第③步灰卡片也填满，高度与①②④一致 */
+  .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:flex-start}   /* ★ 第③步：标题置顶，书写格在下方充分放大 */
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
@@ -1696,6 +1697,7 @@ function fitPracticeUI(){
   let scale=1;
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
   root.style.setProperty('--char-boost','1');               // ★ 米字格独立放大系数也复位
+  root.style.setProperty('--write-boost','1');              // ★ 书写格放大系数复位
   const overflowing=()=>panels.some(p=>p.offsetParent!==null && p.scrollHeight - p.clientHeight > 2);  // ★ 只测当前可见面板
   let guard=0;
   while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）
@@ -1725,6 +1727,33 @@ function fitPracticeUI(){
       }
     }
   }catch(e){ root.style.setProperty('--char-boost','1'); }
+  // ══ ★ 手机端：第③页用剩余空间「放大书写田字格」（标题/重写键不动）══
+  try{
+    if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+      const wb=screen.querySelector('.write-box');
+      const ws=document.getElementById('write-stage');
+      if(wb && ws && ws.offsetParent!==null && ws.clientWidth>0){
+        const title=wb.querySelector('.step-title');
+        const redo=document.getElementById('write-reset-btn');
+        const titleH=title?title.offsetHeight:0;
+        const redoH=(redo && redo.offsetParent!==null)?redo.offsetHeight:0;
+        const availH=Math.max(0, wb.clientHeight - titleH - redoH - 44);   // 扣标题/重写键/留白
+        const availW=Math.max(0, wb.clientWidth - 30);
+        const target=Math.min(availH, availW);
+        const cur=ws.clientWidth;
+        let boost=Math.max(1, Math.floor((target/cur)*100)/100);
+        boost=Math.min(boost, 2.6);
+        root.style.setProperty('--write-boost', String(boost));
+        // 防溢出回退
+        let g3=0;
+        while(wb.scrollHeight - wb.clientHeight > 2 && boost>1 && g3<30){
+          boost=Math.max(1, Math.round((boost-0.04)*100)/100);
+          root.style.setProperty('--write-boost', String(boost));
+          g3++;
+        }
+      }
+    }
+  }catch(e){ root.style.setProperty('--write-boost','1'); }
 }
 // ══ 视口高度冻结：iOS 滚动时地址栏收放会抖动 innerHeight，导致内容反复缩放 ══
 //   策略：只在「明确时机」（载入/进练习/换字/横竖屏）拍一次快照冻结；
@@ -2122,15 +2151,9 @@ function checkPinyin(btn,chosen,correct,data,char){
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
     const enShort=(data.en||'').split(/[;,；，]/)[0].trim();   // ★ 英文只保留第一个释义
-    info.innerHTML=`<strong style="font-size:1.5rem;font-family:'KaiTi','STKaiti','楷体',serif">${char}</strong> <span style="font-size:1.0rem;font-family:'KaiTi','STKaiti','楷体',serif">${data.py} — ${enShort}</span>`;
-    info.style.display='block';info.style.fontSize='0.9rem';info.style.padding='9px 14px';info.style.textAlign='center';info.style.borderRadius='10px';
-    // ★ 选对后不整屏重缩(否则拼音/控制按钮会跟着变小)；只逐步缩小米字格(--char-boost)腾出空间，直到小释义框完整放下
-    requestAnimationFrame(()=>{
-      const root=document.documentElement; const cp=document.querySelector('.char-panel');
-      if(cp){ let boost=1, g=0; root.style.setProperty('--char-boost','1');
-        while(cp.scrollHeight - cp.clientHeight > 2 && boost>0.4 && g<30){ boost=Math.round((boost-0.04)*100)/100; root.style.setProperty('--char-boost', String(boost)); g++; }
-      }
-    });
+    info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
+    info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
+    // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
     setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
@@ -2811,7 +2834,7 @@ function handleDrop(zoneEl,zoneIdx,data){
   const isOuterEnclosure=isEnclosureZone&&zoneIdx===0;
   const compFontSize=isOuterEnclosure?'5.5rem':'4.5rem';
   const compOpacity='1'; // 全部完全不透明
-  const compFontFamily="'KaiTi','STKaiti','楷体','SimSun','宋体','STSong',serif";
+  const compFontFamily="'Kaiti SC','STKaiti','KaiTi','楷体','SimSun','宋体','STSong',serif";
   // 字符用绝对定位居中，不影响 zone 尺寸（颜色用 ZONE_COLORS 而不是 COMP_COLORS）
   const zoneCol = ZONE_COLORS[zoneIdx % ZONE_COLORS.length];
   const _srZone=COMP_STROKE_RENDER[comp];
@@ -3353,7 +3376,7 @@ function showExampleWord(char){
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
       <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) 26px">
-        <span style="font-size:calc(2.4rem*var(--ui-scale));font-family:'KaiTi','STKaiti','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
+        <span style="font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
         <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em">${w.py}</span>
         <span style="font-size:calc(1.4rem*var(--ui-scale));color:#ffffff">—</span>
         <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
@@ -3691,7 +3714,7 @@ function renderQuerySVG(char,data,struct){
       const cx=(z.x+z.w/2)/100*size;
       const cy=(z.y+z.h/2)/100*size+fontSize*.36;
       const specials=new Set(['冖','彐','壴','冂','疒','亠','勹','𠃓']);
-      const ff=specials.has(comp)?"SimSun, 宋体, serif":"KaiTi, 楷体, STKaiti, serif";
+      const ff=specials.has(comp)?"SimSun, 宋体, serif":"'Kaiti SC', KaiTi, 楷体, STKaiti, serif";
       texts+=`<text x="${cx}" y="${cy}" text-anchor="middle" font-size="${fontSize}" fill="${col.text}" font-family="${ff}" opacity="0.9">${comp}</text>`;
     }
   });

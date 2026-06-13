@@ -578,7 +578,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard{
     padding-bottom:0;
     margin-top:-10px;              /* ★ ② 上提贴近顶部按钮条（返回/二维码/反馈/展开），收掉那道空隙 */
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 22px) !important;  /* ★ ③ 底部多留缝（8→22px），让灰框下边框露出在 ①②③④ 导航条上方 */
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 18px) !important;  /* ★ ③ 底部留缝露出下边框（8→18px）；配合米字格预留缓冲，Skip 不被裁切 */
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }
@@ -1732,7 +1732,7 @@ function fitPracticeUI(){
       const cp=screen.querySelector('.char-panel');
       const sc=document.getElementById('stroke-canvas');
       if(cp && sc && cp.offsetParent!==null && sc.clientWidth>0){
-        const free=cp.clientHeight - cp.scrollHeight;             // 面板底部剩余空间
+        const free=cp.clientHeight - cp.scrollHeight - 24;       // 面板底部剩余空间（★预留24px：米字格放大后仍给底部 Skip 按钮留余量，绝不挤出框外被裁）
         const cur=sc.clientWidth;
         const maxByWidth=(cp.clientWidth-46)/cur;                 // 宽度上限（留出左右内边距）
         let boost=Math.min(1+Math.max(free,0)/cur, maxByWidth, 2.0);

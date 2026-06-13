@@ -217,8 +217,8 @@ body::before{content:'';position:fixed;inset:0;background:
   animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1);
 }
 .drag-right .result-label{
-  font-size:1.56rem;color:var(--jade);
-  font-family:Georgia,serif;font-style:italic;
+  font-size:3.5rem;color:#ffffff;font-weight:700;line-height:1;
+  text-shadow:0 2px 6px rgba(0,0,0,0.3);   /* ★ v43①：与拖拽方框 showZoneFeedback 的对勾同款（白色加粗+阴影）*/
   text-align:center;
 }
 .drag-right .next-btn-inline{
@@ -918,7 +918,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
               <div class="drag-divider"></div>
               <div class="drag-right" id="result-side" style="opacity:0;pointer-events:none">
                 <span class="result-char" id="result-char"></span>
-                <span class="result-label">✅</span>
+                <span class="result-label">✓</span>
               </div>
             </div>
             <div class="components-pool" style="flex:1;display:flex;flex-direction:column;min-height:0">
@@ -3172,10 +3172,13 @@ function _fetchWithTimeout(url, ms){
 }
 // ★ hsk.json 大字典：整包只 fetch 一次（Promise 缓存防并发重复请求）；失败则返回空表→自动走下面的 CDN 兜底
 let _hskBundlePromise = null;
+let _hskBundleData = null;        // ★ v43②：整包就绪后填充 → 之后内存秒查（离线、瞬时）
+const _strokeInflight = {};       // ★ v43②：同字并发请求合并(de-dup)，避免多个部件同时重复拉同一个字
 function _loadHskBundle(){
   if(_hskBundlePromise) return _hskBundlePromise;
   _hskBundlePromise = fetch('hsk.json')
     .then(r => r.ok ? r.json() : {})
+    .then(j => { _hskBundleData = j; return j; })   // ★ 标记整包就绪
     .catch(() => ({}));
   return _hskBundlePromise;
 }
@@ -3183,40 +3186,38 @@ function _loadHskBundle(){
 try{ _loadHskBundle(); }catch(e){}
 async function loadStrokeData(char){
   if(_strokeCache[char]) return _strokeCache[char];
-  // ★ 优先：本地 hsk.json 大字典（同源，整包只下载一次→缓存→之后全在内存里查，离线/瞬时）
-  // ★ v42③：优先用 hsk.json 整包；但整包(7.9MB)若还没下完，**不死等**——最多等 800ms 就先放行，
-  //   去下面的 CDN 取「这一个字」（快）。整包仍在后台继续下载，下次查到即命中（瞬时、离线）。
-  try{
-    const bundle = await Promise.race([
-      _loadHskBundle(),
-      new Promise(res => setTimeout(()=>res(null), 800))
-    ]);
-    if(bundle && bundle[char] && bundle[char].strokes){
-      _strokeCache[char] = bundle[char];
-      return bundle[char];
-    }
-  }catch(e){ /* 字典加载失败 → 往下走 CDN 兜底 */ }
-  // ① 多源轮询（国内优先 + 单源 4.5 秒超时，慢/被墙的源即放弃换下一个，不再死等）
-  for(let round=0; round<2; round++){
-    for(const make of _STROKE_SOURCES){
-      try{
-        const res = await _fetchWithTimeout(make(char), 4500);
-        if(res && res.ok){
-          const d = await res.json();
-          if(d && d.strokes){ _strokeCache[char]=d; return d; }
-        }
-      }catch(e){ /* 试下一个源 */ }
-    }
+  // ★ 整包已就绪 → 内存秒查（离线、瞬时）
+  if(_hskBundleData && _hskBundleData[char] && _hskBundleData[char].strokes){
+    return _strokeCache[char] = _hskBundleData[char];
   }
-  // ② 最后兜底：HanziWriter 默认加载器（jsdelivr）——也加 5 秒超时，绝不死等
-  try{
-    const d = await Promise.race([
-      HanziWriter.loadCharacterData(char),
-      new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), 5000))
-    ]);
-    if(d && d.strokes){ _strokeCache[char]=d; return d; }
-  }catch(e){}
-  return null; // 全部失败 → 调用方按原逻辑走红字兜底
+  // ★ v43②：整包(7.9MB)还没下完时**不再干等**——直接去 CDN 取「这一个字」（快），
+  //   整包仍在后台续传，下载完后即走上面的内存秒查。同字并发请求合并为一个，避免多个部件重复拉同一字。
+  if(_strokeInflight[char]) return _strokeInflight[char];
+  const job = (async()=>{
+    // ① 多源轮询（国内优先 + 单源 4.5 秒超时，慢/被墙的源即放弃换下一个）
+    for(let round=0; round<2; round++){
+      for(const make of _STROKE_SOURCES){
+        try{
+          const res = await _fetchWithTimeout(make(char), 4500);
+          if(res && res.ok){ const d = await res.json(); if(d && d.strokes){ return _strokeCache[char]=d; } }
+        }catch(e){ /* 试下一个源 */ }
+      }
+    }
+    // ② 兜底：HanziWriter 默认加载器（jsdelivr）——加 5 秒超时，绝不死等
+    try{
+      const d = await Promise.race([
+        HanziWriter.loadCharacterData(char),
+        new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')), 5000))
+      ]);
+      if(d && d.strokes){ return _strokeCache[char]=d; }
+    }catch(e){}
+    // ③ 若此刻整包恰好下完，再兜一次
+    if(_hskBundleData && _hskBundleData[char] && _hskBundleData[char].strokes){ return _strokeCache[char]=_hskBundleData[char]; }
+    return null; // 全部失败 → 调用方按原逻辑走兜底
+  })();
+  _strokeInflight[char] = job;
+  try{ return await job; }
+  finally{ delete _strokeInflight[char]; }
 }
 
 // ★ v40：把单个汉字画成「米字格那种」笔画字形（与 renderStrokes 同款画法：笔画数据→SVG路径，

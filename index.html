@@ -525,6 +525,10 @@ body::after{
 @media(hover:none) and (pointer:coarse){
   .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
   .comp-chip{min-height:64px}
+  /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔」按钮点完变红卡住）→ 中和 hover 背景 */
+  .stroke-ctrl-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
+  .pinyin-btn:hover:not(:disabled){background:#c4c4c4;border-color:rgba(255,255,255,0.4)}
+  .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
 }
 
 /* ★ 防 iOS 双击缩放：连点「下一笔/播放」等按钮时，整页被 double-tap zoom 放大的问题 */
@@ -577,7 +581,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}
   /* 死高度元素缩一号，帮助一屏收敛 */
-  #skip-btn{font-size:1rem !important;padding:9px 18px !important;margin-top:8px !important}
+  #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
+  .pinyin-btn{font-size:calc(1.55rem*var(--ui-scale)) !important;padding:calc(7px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框，给下方 Skip 让出空间 */
   .stroke-ctrl-btn{padding:7px 12px;font-size:0.85rem}
   #char-info{font-size:0.92rem !important;padding:12px 14px !important;margin-top:10px !important}   /* ★ 显示拼音+英文释义框（计入一屏高度，不再遮挡）*/
   .practice-layout.wizard > .char-panel,

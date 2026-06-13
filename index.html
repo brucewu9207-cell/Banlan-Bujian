@@ -930,8 +930,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 </div>
 
 <div class="toast" id="toast"></div>
-<!-- ★ 临时版本标记：用于确认部署/缓存是否生效，确认后可删 -->
-<div id="ver-badge" style="position:fixed;top:2px;right:6px;z-index:99999;font-family:Georgia,serif;font-size:11px;font-weight:700;color:rgba(139,44,44,0.85);background:rgba(255,255,255,0.6);padding:1px 5px;border-radius:6px;pointer-events:none;letter-spacing:0.06em">v25</div>
+
 
 <script>
 // ============================================================
@@ -1687,6 +1686,7 @@ function updateStructHeight(){
 //   Mac 等高视口本就不溢出 → scale 保持 1，外观不变；
 //   Windows 缩放/矮视口 → 自动等比缩小米字格、部件卡、拼音钮等，免去单模块滚动条
 let _fitRAF=null;
+const _fitCache={};   // ★ 适配结果缓存：键=视口宽 + fit-vh + 顶栏高 + 步骤。布局没变(只是换了字)时直接套用，免去"复位→重算"造成的方框闪缩
 function fitPracticeUI(){
   const screen=document.getElementById('practice-screen');
   if(!screen || screen.style.display==='none') return;
@@ -1696,6 +1696,19 @@ function fitPracticeUI(){
   const panels=[...layout.querySelectorAll('.char-panel,.structure-panel,.word-panel')];
   if(!panels.length) return;
   const root=document.documentElement;
+  // ★ 防闪缩：第①/③步的方框尺寸只取决于视口/步骤/顶栏，与"具体哪个字"无关。
+  //    这些没变时直接套用上次算好的缩放，不再复位成1再逐步涨回——消除 skip / 下一个字 时的缩放闪动。
+  const _step=(typeof _wiz!=='undefined' && _wiz)?_wiz.step:0;
+  const _gcs=getComputedStyle(root);
+  const _sig=window.innerWidth+'|'+_gcs.getPropertyValue('--fit-vh')+'|'+_gcs.getPropertyValue('--struct-h')+'|'+_step;
+  const _safe=(_step===1||_step===3);   // 仅这两步布局与字无关，可安全复用缓存
+  if(_safe && _fitCache[_sig]){
+    const c=_fitCache[_sig];
+    root.style.setProperty('--ui-scale', c.s);
+    root.style.setProperty('--char-boost', c.cb);
+    root.style.setProperty('--write-boost', c.wb);
+    return;   // 直接套用，无复位、无逐步逼近 → 无闪动
+  }
   let scale=1;
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
   root.style.setProperty('--char-boost','1');               // ★ 米字格独立放大系数也复位
@@ -1756,6 +1769,10 @@ function fitPracticeUI(){
       }
     }
   }catch(e){ root.style.setProperty('--write-boost','1'); }
+  // ★ 存入缓存：同一视口/步骤下次换字直接复用，免去"复位→重算"的闪动
+  if(_safe){
+    _fitCache[_sig]={ s:String(scale), cb:(root.style.getPropertyValue('--char-boost')||'1'), wb:(root.style.getPropertyValue('--write-boost')||'1') };
+  }
 }
 // ══ 视口高度冻结：iOS 滚动时地址栏收放会抖动 innerHeight，导致内容反复缩放 ══
 //   策略：只在「明确时机」（载入/进练习/换字/横竖屏）拍一次快照冻结；

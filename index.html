@@ -850,8 +850,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
           </div>
           <div class="stroke-controls">
             <span class="hsk-level-badge" id="hsk-level-badge" style="display:none"></span>
-            <button class="play-circle-btn" id="play-btn" onclick="playStrokes()" title="播放 / Play" aria-label="播放 / Play">
-              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <button class="play-circle-btn" id="play-btn" onclick="togglePlay()" title="播放 / Play" aria-label="播放 / Play">
+              <svg id="play-btn-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
             </button>
             <button class="stroke-ctrl-btn" id="step-btn" onclick="nextStroke()" title="下一笔 / Next Stroke">
               <svg viewBox="0 0 24 24"><path d="M7 6v12l8.5-6zM17 6h2v12h-2z"/></svg>
@@ -3264,6 +3264,9 @@ async function renderStrokes(char){
   _isPlaying = false;
   _stepChar = null; _stepIndex = 0; _stepData = null;
   document.getElementById('play-btn').classList.remove('playing');
+  // ★ v47：换字时把播放按钮复位到 ▶（避免卡在 Ⅱ）
+  if(typeof _playState !== 'undefined') _playState = 'idle';
+  if(typeof setPlayIcon === 'function') setPlayIcon('play');
 
   try{
     const data = await loadStrokeData(char);
@@ -3360,6 +3363,37 @@ async function renderStrokes(char){
   }
 }
 
+// ★ v47：播放按钮的三态切换
+//   idle    → 点击 → playStrokes() 开始播放;按钮显示 Ⅱ
+//   playing → 点击 → pauseAnimation 暂停;按钮显示 ▶
+//   paused  → 点击 → resumeAnimation 续播;按钮显示 Ⅱ
+//   动画完成 → 自动回到 idle,按钮显示 ▶
+let _playState = 'idle';   // 'idle' | 'playing' | 'paused'
+const _PLAY_ICON  = '<path d="M8 5v14l11-7z"/>';                     // ▶ 三角
+const _PAUSE_ICON = '<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';        // Ⅱ 两条
+function setPlayIcon(kind){
+  const icon = document.getElementById('play-btn-icon');
+  if(icon) icon.innerHTML = (kind==='pause') ? _PAUSE_ICON : _PLAY_ICON;
+  const btn = document.getElementById('play-btn');
+  if(btn){
+    btn.setAttribute('title',   kind==='pause' ? '暂停 / Pause' : '播放 / Play');
+    btn.setAttribute('aria-label', kind==='pause' ? '暂停 / Pause' : '播放 / Play');
+  }
+}
+function togglePlay(){
+  if(_playState==='idle'){
+    playStrokes();                       // 从头开始;playStrokes 内部会切到 playing 并显示 Ⅱ
+  } else if(_playState==='playing'){
+    try{ _hanziWriter && _hanziWriter.pauseAnimation(); }catch(e){}
+    _playState='paused';
+    setPlayIcon('play');                 // 暂停态显示 ▶（提示可以续播）
+  } else if(_playState==='paused'){
+    try{ _hanziWriter && _hanziWriter.resumeAnimation(); }catch(e){}
+    _playState='playing';
+    setPlayIcon('pause');                // 续播 → 显示 Ⅱ
+  }
+}
+
 async function playStrokes(){
   if(_isPlaying) return;
   const canvas = document.getElementById('stroke-canvas');
@@ -3370,6 +3404,8 @@ async function playStrokes(){
   const btn = document.getElementById('play-btn');
   btn.classList.add('playing');
   _isPlaying = true;
+  _playState = 'playing';         // ★ v47：进入播放态
+  setPlayIcon('pause');           // ★ v47：显示 Ⅱ（点一下=暂停）
 
   // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
   canvas.innerHTML = `
@@ -3381,7 +3417,7 @@ async function playStrokes(){
   try{
     // 拉取数据用于绘制数字
     const data = await loadStrokeData(char);
-    if(myseq !== _renderSeq){ _isPlaying=false; btn.classList.remove('playing'); return; } // ★ 已换字 → 中止
+    if(myseq !== _renderSeq){ _isPlaying=false; _playState='idle'; setPlayIcon('play'); btn.classList.remove('playing'); return; } // ★ 已换字 → 中止
     const overlay = document.getElementById('num-overlay');
     const svgNS = 'http://www.w3.org/2000/svg';
 
@@ -3456,12 +3492,16 @@ async function playStrokes(){
     setTimeout(()=>{
       btn.classList.remove('playing');
       _isPlaying = false;
+      _playState = 'idle';        // ★ v47：动画完成 → 回到 idle
+      setPlayIcon('play');        // ★ v47：复位为 ▶
       renderStrokes(char);
     }, 600);
   }catch(err){
     console.warn('Animation failed', err);
     btn.classList.remove('playing');
     _isPlaying = false;
+    _playState = 'idle';          // ★ v47：异常也复位
+    setPlayIcon('play');
     renderStrokes(char);
   }
 }
@@ -3575,7 +3615,18 @@ async function nextStroke(){
   if(!canvas) return;
   const char = canvas.dataset.char || _stepChar;
   if(!char) return;
-  if(_isPlaying) return;                       // 与"整体播放"互斥
+  // ★ v47：暂停态下也允许点「下一笔」——先把播放彻底中止并复位按钮,然后从第1笔开始(buildStepSVG 会归零 _stepIndex)
+  if(_playState === 'paused'){
+    try{ _hanziWriter && _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){}
+    _hanziWriter = null;
+    _isPlaying = false;
+    _playState = 'idle';
+    setPlayIcon('play');
+    document.getElementById('play-btn').classList.remove('playing');
+    _stepChar = null;   // 强制 buildStepSVG 重搭,从第1笔开始
+  } else if(_isPlaying){
+    return;                                    // 正在播放中 → 不响应(原行为)
+  }
   if(_hanziWriter){ try{ _hanziWriter.cancelQuiz && _hanziWriter.cancelQuiz(); }catch(e){} _hanziWriter = null; }
 
   const built = (_stepChar===char) && document.getElementById('step-layer') && _stepData && _stepData.strokes;

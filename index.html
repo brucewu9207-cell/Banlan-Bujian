@@ -639,6 +639,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
     flex-wrap:nowrap !important;
     gap:calc(16px*var(--ui-scale)) !important;
   }
+
+  /* ★ v61：拼合成功后 step② 右侧弹出的「汉字」放大到 2 倍（SVG 用 1em，跟随 font-size） */
+  .drag-right .result-char{font-size:calc(10rem*var(--ui-scale)) !important}
 }
 </style>
 </head>

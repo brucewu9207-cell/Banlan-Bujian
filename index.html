@@ -506,7 +506,7 @@ body::after{
   .struct-bar-header{padding:8px 10px 9px}
   #header-actions-bar{
     display:flex;justify-content:center;align-items:center;
-    gap:5px;flex-wrap:nowrap;       /* ★ 4个按钮强制挤在一行，不换行 */
+    gap:4px;flex-wrap:nowrap;       /* ★ 4个按钮强制挤在一行，不换行 */
     padding:8px 8px 2px;          /* 落在浅墨绿页面区，背景透明 */
   }
   #header-actions-bar > div{
@@ -514,11 +514,11 @@ body::after{
     transform:none !important;      /* 覆盖内联的 translateY(-50%) */
     right:auto !important;left:auto !important;top:auto !important;
     display:flex;justify-content:center;align-items:center;
-    gap:5px !important;flex:0 1 auto;min-width:0;flex-wrap:nowrap;
+    gap:4px !important;flex:0 0 auto;flex-wrap:nowrap;
   }
   /* 按钮整体缩小一号 */
-  .struct-action-btn{padding:4px 7px !important;font-size:0.6rem !important;border-radius:6px;white-space:nowrap}
-  .struct-action-btn svg{width:10px;height:10px}
+  .struct-action-btn{padding:3px 5px !important;font-size:0.5rem !important;border-radius:5px;white-space:nowrap}
+  .struct-action-btn svg{width:9px;height:9px}
 }
 
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
@@ -2073,8 +2073,10 @@ function loadCharacter(char){
   const rs=document.getElementById('result-side');
   if(rs){rs.style.animation='none';rs.style.opacity='0';rs.style.pointerEvents='none';} // ★清掉残留 mergeIn，防止重播闪动
   // 内容更新后重新适配一屏（笔画 SVG 异步渲染，故延时再测一次）
-  requestAnimationFrame(fitPracticeUI);
-  setTimeout(fitPracticeUI, 200);
+  // ★ 改用 updateStructHeight：它会先重新测量顶栏真实高度(--struct-h)再适配，
+  //   修复「首页13结构展开时测得的陈旧 --struct-h(过大) 导致卡片高度算成负数、塌缩成320px」的根因。
+  requestAnimationFrame(updateStructHeight);
+  setTimeout(updateStructHeight, 200);
   wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
 }
 

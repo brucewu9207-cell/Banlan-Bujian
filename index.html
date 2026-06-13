@@ -621,6 +621,25 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
+
+/* ════════════════════════════════════════════════
+   ★ v58 电脑端专属（≥769px）——手机端(≤768px)完全不受影响
+   ① 放大 step① 释义框；③ 例词改为单行横排：中文 拼音 英文
+   ════════════════════════════════════════════════ */
+@media(min-width:769px){
+  /* ① 释义框整体放大约 1.5 倍（内层字号用 !important 盖过 JS 写死的内联值） */
+  #char-info{padding:20px 26px !important;border-radius:12px !important;margin-top:18px !important;line-height:1.5 !important}
+  #char-info strong{font-size:3rem !important}     /* v60：在 v59 (2rem) 基础上再 ×1.5 */
+  #char-info span{font-size:1.95rem !important}    /* v60：在 v59 (1.3rem) 基础上再 ×1.5 */
+
+  /* ③ 例词内框：竖排三行 → 单行横排（中文 拼音 英文底部对齐） */
+  .ex-word-inner{
+    flex-direction:row !important;
+    align-items:center !important;
+    flex-wrap:nowrap !important;
+    gap:calc(16px*var(--ui-scale)) !important;
+  }
+}
 </style>
 </head>
 <body>
@@ -1418,7 +1437,7 @@ const CHAR_DB = {
   '黄':{py:'huáng',en:'yellow',structure:'tb',components:['黄_0','黄_1'],compNames:['上部','下部'],splitRanges:[[0,1,2,3],[4,5,6,7,8,9,10]],words:[{w:'黄色',py:'huángsè',en:'yellow',lv:3}]},
   '婚':{py:'hūn',en:'marriage; to marry',structure:'lr',components:['女','昏'],compNames:['女','昏'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10]],words:[{w:'结婚',py:'jiéhūn',en:'to get married',lv:3}]},
   '活':{py:'huó',en:'to live; alive',structure:'lr',components:['氵','舌'],compNames:['三点水','舌'],splitRanges:[[0,1,2],[3,4,5,6,7,8]],words:[{w:'生活',py:'shēnghuó',en:'life',lv:3}]},
-  '或':{py:'huò',en:'or',structure:'ur',components:['戈','或_1'],compNames:['戈','内部'],splitRanges:[[0,1,2,3],[4,5,6,7]],words:[{w:'或者',py:'huòzhě',en:'or',lv:3},{w:'或',py:'huò',en:'or',lv:3}]},
+  '或':{py:'huò',en:'or',structure:'ur',components:['戈','口'],compNames:['戈','口'],splitRanges:[[0,5,6,7],[1,2,3,4]],words:[{w:'或者',py:'huòzhě',en:'or',lv:3},{w:'或',py:'huò',en:'or',lv:3}]},
   '激':{py:'jī',en:'to excite; intense',structure:'lr',components:['氵','敫'],compNames:['三点水','敫'],splitRanges:[[0,1,2],[3,4,5,6,7,8,9,10,11,12,13,14,15]],words:[{w:'冰激凌',py:'bīngjīlíng',en:'ice cream',lv:3}]},
   '级':{py:'jí',en:'level, grade',structure:'lr',components:['纟','及'],compNames:['绞丝旁','及'],splitRanges:[[0,1,2],[3,4,5]],words:[{w:'班级',py:'bānjí',en:'class (at school)',lv:3},{w:'年级',py:'niánjí',en:'grade (in school)',lv:3}]},
   '极':{py:'jí',en:'extreme; extremely',structure:'lr',components:['木','及'],compNames:['木','及'],splitRanges:[[0,1,2,3],[4,5,6]],words:[{w:'极',py:'jí',en:'extremely',lv:3}]},
@@ -2374,7 +2393,7 @@ const SIMILAR_COMPS = {
   '钅':['讠','金','戋','饣','针'],
   '饣':['食','钅','讠','飠'],
   // 草木系
-  '艹':['草','茅','苗','++','廾'],
+  '艹':['草','茅','苗','廿','廾'],
   // 心系
   '心':['忄','必','志','忘'],
   '忄':['心','必','情','忘'],
@@ -3574,7 +3593,7 @@ function showExampleWord(char){
     const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
-      <div style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
+      <div class="ex-word-inner" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
         <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
         <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em;line-height:1.1">${w.py}</span>
         <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif;line-height:1.1">${w.en}</span>

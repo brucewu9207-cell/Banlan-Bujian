@@ -184,7 +184,7 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 .drag-canvas{
   width:100%;
-  height:100%;
+  height:auto;
   position:relative;
   background:transparent;
   border:none;
@@ -207,9 +207,10 @@ body::before{content:'';position:fixed;inset:0;background:
   padding:10px;
 }
 .drag-right .result-char{
-  font-size:calc(7.8rem*var(--ui-scale));
+  font-size:calc(5rem*var(--ui-scale));
   line-height:1;
   display:block;
+  max-height:100%;
   font-family:'KaiTi','STKaiti','楷体',serif;
   color:rgba(20,40,30,0.55);
   animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1);
@@ -525,8 +526,9 @@ body::after{
 @media(hover:none) and (pointer:coarse){
   .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
   .comp-chip{min-height:64px}
-  /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔」按钮点完变红卡住）→ 中和 hover 背景 */
+  /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔/播放」按钮点完变红卡住）→ 中和 hover 背景 */
   .stroke-ctrl-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
+  .play-circle-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
   .pinyin-btn:hover:not(:disabled){background:#c4c4c4;border-color:rgba(255,255,255,0.4)}
   .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
 }
@@ -535,6 +537,7 @@ body::after{
 button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn,.wdot,
 .next-btn,.next-btn-inline,.retry-btn-inline,.level-btn,.home-entry,.teacher-go,.merge-btn{
   touch-action:manipulation;       /* 允许滚动/双指捏合，禁用双击缩放 */
+  -webkit-tap-highlight-color:transparent;   /* ★ 关闭 iOS 点击时的灰/红高亮闪烁 */
 }
 
 /* ════════════════════════════════════════════════
@@ -599,6 +602,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="3"] > .word-panel,
   .practice-layout.wizard[data-step="4"] > .word-panel{display:flex}
   .practice-layout.wizard[data-step="3"] .word-box{display:none}   /* ③ 书写：只显示书写框 */
+  .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:center}   /* ★ 第③步灰卡片也填满，高度与①②④一致 */
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }

@@ -1806,7 +1806,8 @@ function relocateHeaderButtons(){
   }
   const mobile=window.matchMedia && window.matchMedia('(max-width:768px)').matches;
   if(mobile){
-    groups.forEach(g=>{ if(g.parentElement!==bar) bar.appendChild(g); });
+    // ★ 手机端按钮顺序：返回 | 二维码 | 反馈 | 展开 —— 把两组按 DOM 倒序追加
+    [...groups].reverse().forEach(g=>{ if(g.parentElement!==bar) bar.appendChild(g); });
   } else {
     groups.forEach(g=>{ if(g.parentElement!==header) header.appendChild(g); });
   }

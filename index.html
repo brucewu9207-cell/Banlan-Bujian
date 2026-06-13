@@ -3564,11 +3564,10 @@ function showExampleWord(char){
     const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
-      <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) 26px">
+      <div style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
         <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
-        <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em">${w.py}</span>
-        <span style="font-size:calc(1.4rem*var(--ui-scale));color:#ffffff">—</span>
-        <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
+        <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em;line-height:1.1">${w.py}</span>
+        <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif;line-height:1.1">${w.en}</span>
       </div>
     </div>`;
   }).join('');

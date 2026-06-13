@@ -642,6 +642,10 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
   /* ★ v61：拼合成功后 step② 右侧弹出的「汉字」放大到 2 倍（SVG 用 1em，跟随 font-size） */
   .drag-right .result-char{font-size:calc(10rem*var(--ui-scale)) !important}
+
+  /* ★ v63：「下一个字 · Next」按钮配色对齐「返回 / Back」按钮（var(--bamboo) 橙褐 + 同款 hover） */
+  .next-btn{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
+  .next-btn:hover{background:var(--bamboo-light) !important}
 }
 </style>
 </head>

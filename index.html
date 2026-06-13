@@ -138,7 +138,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
-.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.3rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}
+.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大到原来的 1.1 倍（2.3→2.53rem） */
+/* ★ v37：选对拼音后锁定拼音框尺寸——禁止自适应缩放(--ui-scale)回弹把整组拼音框放大；高特异性 + !important 覆盖向导态规则 */
+.practice-layout .pinyin-options.py-locked .pinyin-btn{font-size:var(--py-lock-fs) !important;padding:var(--py-lock-pad) !important;transition:none !important}
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -588,7 +590,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .char-panel{padding-bottom:calc(6px*var(--ui-scale)) !important}   /* ★ ② 收窄面板底部留白，让 Skip / 释义框更贴近灰框下边 */
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.37rem*var(--ui-scale)) !important;padding:0 10px !important;height:calc(2.5rem*var(--ui-scale)) !important;line-height:1.15 !important;display:flex !important;align-items:center !important;justify-content:center !important}   /* ★ 放大到约1.2倍；固定高度+居中：选对加✓/换样式也不再放大 */
+  .pinyin-btn{font-size:calc(1.25rem*var(--ui-scale)) !important;padding:calc(2px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ v37：在原 1.14rem 基础上再放大到 1.1 倍（→1.25rem） */
   .pinyin-options{gap:calc(4px*var(--ui-scale)) !important;margin-bottom:calc(4px*var(--ui-scale)) !important}   /* ★ 两行拼音间距与下方留白再收紧 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
@@ -2065,7 +2067,7 @@ function loadStrokeOnlyChar(char){
 
   // 左栏：若字库有拼音/释义则显示，否则留空
   const data=CHAR_DB[char];
-  const pin=document.getElementById('pinyin-options');if(pin)pin.innerHTML='';
+  const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';pin.classList.remove('py-locked');pin.style.removeProperty('--py-lock-fs');pin.style.removeProperty('--py-lock-pad');}   /* ★ v37：换字时解除尺寸锁定，恢复自适应缩放 */
   const info=document.getElementById('char-info');
   if(data){
     info.style.display='block';
@@ -2186,8 +2188,19 @@ function checkPinyin(btn,chosen,correct,data,char){
   if(chosen===correct){
     btn.classList.add('correct');
     // 在拼音按钮文字后追加 ☑️ 勾标
-    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1em">✓</span>';
+    btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
     playCorrectSound();
+    // ★ v37 ①b：冻结整组拼音框当前尺寸 → 之后 --ui-scale 回弹也不会把它们放大（翻页前不再"忽然变大一下"）
+    const _pyBox=document.getElementById('pinyin-options');
+    if(_pyBox){
+      const _ref=_pyBox.querySelector('.pinyin-btn');
+      if(_ref){
+        const _cs=getComputedStyle(_ref);
+        _pyBox.style.setProperty('--py-lock-fs', _cs.fontSize);   // 锁死当前像素字号
+        _pyBox.style.setProperty('--py-lock-pad', _cs.padding);   // 锁死当前内边距
+        _pyBox.classList.add('py-locked');
+      }
+    }
     const sb=document.getElementById('skip-btn');
     if(sb) sb.style.display='none';
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
@@ -2196,7 +2209,11 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
-    setTimeout(()=>unlockDragSection(char,data),600);   // ★ 选对后短暂停留即翻页（原 1800ms 过久，部件等太久）
+    // ★ v37 ②：选对的"瞬间"就在后台把 step2 的拖拽区 + 部件卡渲染好（此刻 drag-content 仍被 locked-overlay 盖住/隐藏，
+    //          但 DOM 与笔画 SVG 已就绪）。等下面 1.8s 停留结束 unlockDragSection 揭开时，部件已经画好直接显示，不再现场加载。
+    renderDragZones(char,data);
+    renderCompPool(char,data);
+    setTimeout(()=>unlockDragSection(char,data),1800);   // ★ 多停留，便于看清拼音+释义后再翻页
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
     btn.classList.add('wrong');
@@ -2219,8 +2236,10 @@ function unlockDragSection(char,data){
   document.getElementById('locked-overlay').style.display='none';
   document.getElementById('drag-content').style.display='flex';
   if(_rs){ void _rs.offsetWidth; _rs.style.transition=''; } // 恢复过渡，供本字合并成功时正常淡入
-  renderDragZones(char,data);
-  renderCompPool(char,data);
+  // ★ v37 ②：部件与拖拽区已在选对拼音的瞬间（checkPinyin）预渲染完毕，这里直接揭开即可，无需现场加载。
+  //          兜底：万一容器为空（异常路径），才补渲染一次，确保绝不空白。
+  const _pool=document.getElementById('comp-options');
+  if(!_pool || _pool.childElementCount===0){ renderDragZones(char,data); renderCompPool(char,data); }
   wizAdvance(2);   // ★ 拼音完成 → 移动端自动翻到 ② 拖拽部件
 }
 
@@ -3161,6 +3180,8 @@ function _loadHskBundle(){
     .catch(() => ({}));
   return _hskBundlePromise;
 }
+// ★ v37 ②A：开屏即预载 hsk.json 整包（7.9MB），不等到 step2 才下载 → 部件随取随有
+try{ _loadHskBundle(); }catch(e){}
 async function loadStrokeData(char){
   if(_strokeCache[char]) return _strokeCache[char];
   // ★ 优先：本地 hsk.json 大字典（同源，整包只下载一次→缓存→之后全在内存里查，离线/瞬时）

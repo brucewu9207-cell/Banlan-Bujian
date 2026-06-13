@@ -2126,6 +2126,9 @@ function loadStrokeOnlyChar(char){
   document.getElementById('drag-content').style.display='none';
   const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
   const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+  // ★ v62：清空 step② 标题左侧 hint（仅笔顺模式 step② 是 lock 的，hint 显示前字残留无意义）
+  const _hint=document.getElementById('drag-hint-char');
+  if(_hint){ _hint.dataset.glyph=''; _hint.textContent=''; }
   requestAnimationFrame(fitPracticeUI);
   setTimeout(fitPracticeUI, 200);
 }
@@ -2198,6 +2201,9 @@ function loadCharacter(char){
   if(sb2) sb2.style.display='block';
   const rs=document.getElementById('result-side');
   if(rs){rs.style.animation='none';rs.style.opacity='0';rs.style.pointerEvents='none';} // ★清掉残留 mergeIn，防止重播闪动
+  // ★ v62：同步 step② 标题左侧的小字 hint 到当前字（修复切字后残留上一字的 bug）
+  const _hint=document.getElementById('drag-hint-char');
+  if(_hint){ renderGlyphInto(_hint, char); }
   // 内容更新后重新适配一屏（笔画 SVG 异步渲染，故延时再测一次）
   // ★ 改用 updateStructHeight：它会先重新测量顶栏真实高度(--struct-h)再适配，
   //   修复「首页13结构展开时测得的陈旧 --struct-h(过大) 导致卡片高度算成负数、塌缩成320px」的根因。

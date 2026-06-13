@@ -578,7 +578,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard{
     padding-bottom:0;
     margin-top:-10px;              /* ★ ② 上提贴近顶部按钮条（返回/二维码/反馈/展开），收掉那道空隙 */
-    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 22px) !important;  /* ★ ③ 底边缝(8→22px)，露出灰框下边框；Skip 由命中分支钳制+缩小拼音框保证不裁切 */
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 12px) !important;  /* ★ ③ 底边缝收到12px：灰框下边框更贴近 ①②③④ 导航条 */
     min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
   }
@@ -587,8 +587,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .word-panel{overflow:hidden;height:100%;min-height:0}
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.3rem*var(--ui-scale)) !important;padding:calc(2px*var(--ui-scale)) 12px !important}   /* ★ 缩小拼音框 + 降低高度，给下方 Skip 让出空间 */
-  .pinyin-options{gap:calc(5px*var(--ui-scale)) !important;margin-bottom:calc(5px*var(--ui-scale)) !important}   /* ★ 收紧两行拼音间距与下方留白，进一步给 Skip 腾位置 */
+  .pinyin-btn{font-size:calc(0.95rem*var(--ui-scale)) !important;padding:calc(1px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ 拼音框再缩到约 2/3（含行高，确保高度真的降下来） */
+  .pinyin-options{gap:calc(4px*var(--ui-scale)) !important;margin-bottom:calc(4px*var(--ui-scale)) !important}   /* ★ 两行拼音间距与下方留白再收紧 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
   .hsk-level-badge{padding:3px 8px !important;font-size:0.72rem !important}

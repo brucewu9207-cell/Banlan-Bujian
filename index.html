@@ -6,8 +6,6 @@
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-<!-- ★ v39：在线楷体「霞鹜文楷·屏幕版」（cdnjs 分包，按需只下载用到的字，文件几乎不变大；font-display:swap 先显示回退字再无缝换上） -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.css">
 <style>
 :root {
   --bg-main:#b8cec4; --bg-wash:#c8d9d0;
@@ -614,15 +612,6 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:flex-start}   /* ★ 第③步：标题置顶，书写格在下方充分放大 */
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
-}
-/* ★ v39：仅手机端——例词汉字 & 合并成功跳出的汉字 用在线楷体「LXGW WenKai Screen」。
-   用 !important 以覆盖例词处的内联 font-family；电脑端不在此媒体查询内，保持原系统楷体不变。 */
-@media(max-width:768px){
-  .ex-word-zh,
-  .drag-right .result-char,
-  .merge-result .result-char{
-    font-family:'LXGW WenKai Screen','Kaiti SC','STKaiti','KaiTi','楷体',serif !important;
-  }
 }
 </style>
 </head>
@@ -3137,7 +3126,7 @@ function celebrate(){
 
 function mergeCharacter(){
   const char=state.currentChar;
-  document.getElementById('result-char').textContent=char;
+  renderGlyphInto(document.getElementById('result-char'), char);   // ★ v40：用米字格那种笔画字形（原 textContent 字体）
   const side=document.getElementById('result-side');
   side.style.opacity='1';side.style.pointerEvents='auto';
   const nbw=document.getElementById('next-btn-wrap');
@@ -3223,6 +3212,39 @@ async function loadStrokeData(char){
     if(d && d.strokes){ _strokeCache[char]=d; return d; }
   }catch(e){}
   return null; // 全部失败 → 调用方按原逻辑走红字兜底
+}
+
+// ★ v40：把单个汉字画成「米字格那种」笔画字形（与 renderStrokes 同款画法：笔画数据→SVG路径，
+//   Y轴翻转）。单色填充用 currentColor（自动跟随宿主元素的 color），无格线、无编号。
+//   svg 尺寸 1em → 直接继承宿主元素的 font-size。无笔画数据时回退为文字（保留原字体）。
+async function renderGlyphInto(el, char){
+  if(!el) return;
+  el.dataset.glyph = char;          // 标记当前应显示的字（防异步过期覆盖）
+  try{
+    const data = await loadStrokeData(char);
+    if(el.dataset.glyph !== char) return;   // 期间已换字 → 丢弃过期结果
+    if(!data || !data.strokes || !data.strokes.length){
+      el.textContent = char;        // 无数据 → 回退文字（宿主自带楷体字体栈）
+      return;
+    }
+    const NS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(NS,'svg');
+    svg.setAttribute('viewBox','0 0 1024 1024');
+    svg.style.width = '1em'; svg.style.height = '1em'; svg.style.display = 'block';
+    const g = document.createElementNS(NS,'g');
+    g.setAttribute('transform','translate(0,900) scale(1,-1)');   // 与米字格同款 Y 轴翻转
+    data.strokes.forEach(d=>{
+      const p = document.createElementNS(NS,'path');
+      p.setAttribute('d', d);
+      p.setAttribute('fill','currentColor');                      // 跟随宿主 color
+      g.appendChild(p);
+    });
+    svg.appendChild(g);
+    el.textContent = '';
+    el.appendChild(svg);
+  }catch(e){
+    if(el.dataset.glyph === char) el.textContent = char;          // 出错也保底显示文字
+  }
 }
 
 async function renderStrokes(char){
@@ -3477,7 +3499,7 @@ function showExampleWord(char){
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
       <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) 26px">
-        <span class="ex-word-zh" style="font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
+        <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
         <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em">${w.py}</span>
         <span style="font-size:calc(1.4rem*var(--ui-scale));color:#ffffff">—</span>
         <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>
@@ -3487,6 +3509,8 @@ function showExampleWord(char){
   hint.style.display='flex';
   hint.classList.add('show');
   if(wl) wl.style.display='none';
+  // ★ v40：把例词里每个汉字都画成「米字格那种」笔画字形（无数据则保留文字回退）
+  hint.querySelectorAll('.ex-word-zh[data-glyph]').forEach(sp=>renderGlyphInto(sp, sp.dataset.glyph));
   requestAnimationFrame(fitPracticeUI);
 }
 

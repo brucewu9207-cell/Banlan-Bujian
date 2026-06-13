@@ -1712,8 +1712,10 @@ function fitPracticeUI(){
   }
   let scale=1;
   root.style.setProperty('--ui-scale','1');                 // 先复位到原始尺寸再测量
-  root.style.setProperty('--char-boost','1');               // ★ 米字格独立放大系数也复位
-  root.style.setProperty('--write-boost','1');              // ★ 书写格放大系数复位
+  // ★ 只在「当前这一步会用到该放大系数」时才复位；离开第①/③步后保留上次的值，
+  //    避免「下一个字」跳回第①步时，方框先以系数=1 渲染一帧再涨回（=你看到的拼音框缩放过程）。
+  if(_step===1) root.style.setProperty('--char-boost','1');   // 第①步要重测米字格，才复位
+  if(_step===3) root.style.setProperty('--write-boost','1');  // 第③步要重测书写格，才复位
   const overflowing=()=>panels.some(p=>p.offsetParent!==null && p.scrollHeight - p.clientHeight > 2);  // ★ 只测当前可见面板
   let guard=0;
   while(overflowing() && scale>0.45 && guard<40){           // 读 scrollHeight 触发重排，逐步缩小（地板 0.45，解除人为封顶）

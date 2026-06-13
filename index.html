@@ -6,6 +6,8 @@
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+<!-- ★ v39：在线楷体「霞鹜文楷·屏幕版」（cdnjs 分包，按需只下载用到的字，文件几乎不变大；font-display:swap 先显示回退字再无缝换上） -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lxgw-wenkai-screen-webfont/1.7.0/lxgwwenkaiscreen.css">
 <style>
 :root {
   --bg-main:#b8cec4; --bg-wash:#c8d9d0;
@@ -613,11 +615,14 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
-/* ★ v39 ②：手机端整体字体改为「楷体」——正文默认、标题中文、拼音按钮、例词拼音等中文统一楷体。
-   英文/拼音字母处用 Georgia 的元素保留各自字体不变（楷体不含或不适合拉丁字形时回退 serif）。 */
+/* ★ v39：仅手机端——例词汉字 & 合并成功跳出的汉字 用在线楷体「LXGW WenKai Screen」。
+   用 !important 以覆盖例词处的内联 font-family；电脑端不在此媒体查询内，保持原系统楷体不变。 */
 @media(max-width:768px){
-  body{font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
-  .step-title-zh{font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif}
+  .ex-word-zh,
+  .drag-right .result-char,
+  .merge-result .result-char{
+    font-family:'LXGW WenKai Screen','Kaiti SC','STKaiti','KaiTi','楷体',serif !important;
+  }
 }
 </style>
 </head>
@@ -1701,8 +1706,8 @@ let _fitRAF=null;
 let _fitFrozen=false;   // ★ v38 ①：选对拼音后置 true，锁定当前步缩放，禁止 fit 重算（拼音框/释义框不再回弹）
 const _fitCache={};   // ★ 适配结果缓存：键=视口宽 + fit-vh + 顶栏高 + 步骤。布局没变(只是换了字)时直接套用，免去"复位→重算"造成的方框闪缩
 function fitPracticeUI(){
-  // ★ v39 ①：仅手机端、且处于 step① 锁定期间才跳过重算（电脑端永不锁定，走原逻辑）
-  if(_fitFrozen && (typeof wizMobile==='function' && wizMobile()) && (typeof _wiz!=='undefined') && _wiz && _wiz.step===1) return;
+  // ★ v38 ①：锁定期间（选对拼音 → 翻到 step2 前，只显示 step①）直接跳过，缩放系数保持不变 → 框体原地不动
+  if(_fitFrozen && (typeof _wiz!=='undefined') && _wiz && _wiz.step===1) return;
   const screen=document.getElementById('practice-screen');
   if(!screen || screen.style.display==='none') return;
   const layout=screen.querySelector('.practice-layout');
@@ -2201,9 +2206,9 @@ function checkPinyin(btn,chosen,correct,data,char){
     // 在拼音按钮文字后追加 ☑️ 勾标
     btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
     playCorrectSound();
-    // ★ v39 ①：缩放锁定只在「手机端」生效（电脑端恢复原始行为，释义框不再被锁定影响）。
-    //          手机端选对瞬间锁死缩放 → 拼音框不放大、释义框不缩小；电脑端完全走原逻辑。
-    if(wizMobile()) _fitFrozen = true;
+    // ★ v38 ①：选对的瞬间锁死整步自适应缩放 → 之后不再重算 --ui-scale，
+    //          拼音框不会变大、释义框不会缩小，全部原地不动（翻页时由 unlockDragSection 解锁）。
+    _fitFrozen = true;
     const sb=document.getElementById('skip-btn');
     if(sb) sb.style.display='none';
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
@@ -3472,7 +3477,7 @@ function showExampleWord(char){
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
       <div style="display:inline-flex;align-items:baseline;justify-content:center;gap:14px;flex-wrap:wrap;background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) 26px">
-        <span style="font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
+        <span class="ex-word-zh" style="font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${w.w}</span>
         <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em">${w.py}</span>
         <span style="font-size:calc(1.4rem*var(--ui-scale));color:#ffffff">—</span>
         <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif">${w.en}</span>

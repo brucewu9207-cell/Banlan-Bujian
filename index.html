@@ -3381,16 +3381,19 @@ function setPlayIcon(kind){
   }
 }
 function togglePlay(){
+  const btn = document.getElementById('play-btn');
   if(_playState==='idle'){
     playStrokes();                       // 从头开始;playStrokes 内部会切到 playing 并显示 Ⅱ
   } else if(_playState==='playing'){
     try{ _hanziWriter && _hanziWriter.pauseAnimation(); }catch(e){}
     _playState='paused';
     setPlayIcon('play');                 // 暂停态显示 ▶（提示可以续播）
+    if(btn) btn.classList.remove('playing');   // ★ v48：暂停态用深墨绿(与 idle 同色),不再保留黄色
   } else if(_playState==='paused'){
     try{ _hanziWriter && _hanziWriter.resumeAnimation(); }catch(e){}
     _playState='playing';
     setPlayIcon('pause');                // 续播 → 显示 Ⅱ
+    if(btn) btn.classList.add('playing');      // ★ v48：续播 → 黄色
   }
 }
 
@@ -3408,10 +3411,13 @@ async function playStrokes(){
   setPlayIcon('pause');           // ★ v47：显示 Ⅱ（点一下=暂停）
 
   // 准备：清空 canvas，搭建容器（hw-target 用于动画，overlay 用于数字）
+  // ★ v48：容器用 100% 撑满 canvas,与「下一笔」/静态米字格的实际显示大小一致——
+  //   之前用 calc(240px*--ui-scale*--char-boost) 重新算 px,但 stroke-canvas 本身的
+  //   clientWidth 来自父级 flex 撑大,与"240px×倍数"对不齐,导致播放时米字格视觉先缩小。
   canvas.innerHTML = `
-    <div style="position:relative;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1))">
+    <div style="position:relative;width:100%;height:100%">
       <div id="hw-target" style="position:absolute;inset:0"></div>
-      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:calc(240px*var(--ui-scale)*var(--char-boost,1));height:calc(240px*var(--ui-scale)*var(--char-boost,1));pointer-events:none"></svg>
+      <svg id="num-overlay" viewBox="0 0 1024 1024" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></svg>
     </div>`;
 
   try{

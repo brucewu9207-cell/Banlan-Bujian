@@ -506,19 +506,19 @@ body::after{
   .struct-bar-header{padding:8px 10px 9px}
   #header-actions-bar{
     display:flex;justify-content:center;align-items:center;
-    gap:8px;flex-wrap:wrap;
-    padding:8px 10px 2px;          /* 落在浅墨绿页面区，背景透明 */
+    gap:5px;flex-wrap:nowrap;       /* ★ 4个按钮强制挤在一行，不换行 */
+    padding:8px 8px 2px;          /* 落在浅墨绿页面区，背景透明 */
   }
   #header-actions-bar > div{
     position:static !important;     /* 覆盖内联的 position:absolute */
     transform:none !important;      /* 覆盖内联的 translateY(-50%) */
     right:auto !important;left:auto !important;top:auto !important;
     display:flex;justify-content:center;align-items:center;
-    gap:6px !important;flex:0 0 auto;flex-wrap:nowrap;
+    gap:5px !important;flex:0 1 auto;min-width:0;flex-wrap:nowrap;
   }
   /* 按钮整体缩小一号 */
-  .struct-action-btn{padding:5px 9px !important;font-size:0.74rem !important;border-radius:7px}
-  .struct-action-btn svg{width:12px;height:12px}
+  .struct-action-btn{padding:4px 7px !important;font-size:0.6rem !important;border-radius:6px;white-space:nowrap}
+  .struct-action-btn svg{width:10px;height:10px}
 }
 
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
@@ -566,20 +566,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
     border-top:1px solid rgba(255,255,255,0.16);
   }
   /* 向导模式：一次只显示「一步」 */
-  /* ★★ fixed 锁底策略（替代原 calc 公式）：原公式 fit-vh - struct-h - wiz-h - 8px 没把
-     main-content 的 padding(16px×2) 和 transform:scale 算进去，所以卡片永远比预期矮。
-     改为：卡片用 position:fixed 直接锁定到「标题栏下方 → 导航条上方」之间，
-     完全绕开父级的 padding/scale 干扰，卡片底部精确贴近导航条。 */
+  /* ★ 一屏适配：向导页高度 = 视口 − 顶栏 − 底部导航，配合 --ui-scale 自动缩放，免滑动 */
   .practice-layout.wizard{
-    position:fixed;
-    left:16px;right:16px;                                    /* 对齐 main-content 左右 padding */
-    top:calc(var(--struct-h,0px) + 16px);                    /* 标题栏 + main-content 顶 padding */
-    bottom:calc(var(--wiz-h,70px) + 8px);                    /* 导航条上方留 8px 间距 */
-    height:auto !important;                                  /* 覆盖任何 height calc */
-    min-height:0 !important;                                 /* 解除 320px 保底，由 top/bottom 自然撑开 */
     padding-bottom:0;
+    height:calc(var(--fit-vh,100vh) - var(--struct-h,0px) - var(--wiz-h,70px) - 8px) !important;
+    min-height:320px;              /* ★ 保底：计算异常时内容也绝不消失（宁可临时可滚） */
     overflow:hidden;
-    z-index:5;                                               /* 高于背景，低于 modal/导航 */
   }
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,

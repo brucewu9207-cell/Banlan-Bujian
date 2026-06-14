@@ -47,7 +47,7 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ══ 首页：二选一入口 ══ */
 .home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto}
+.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto;position:relative;z-index:1}
 .home-entry{display:flex;flex-direction:column;align-items:center;padding:34px 26px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:268px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 .home-entry-icon{font-size:2.6rem;margin-bottom:14px}
@@ -60,6 +60,64 @@ body::before{content:'';position:fixed;inset:0;background:
 .teacher-input:focus{border-color:var(--bamboo-light)}
 .teacher-go{padding:12px 16px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;cursor:pointer;white-space:nowrap;transition:all .2s}
 .teacher-go:hover{background:var(--bamboo-light)}
+
+/* ══ v67：首页漂浮部件装饰层 ══ */
+.deco-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.deco-piece{
+  position:absolute;pointer-events:auto;cursor:pointer;opacity:0;
+  transition:left .7s cubic-bezier(.4,0,.2,1), top .7s cubic-bezier(.4,0,.2,1), opacity .6s ease, filter .25s ease;
+  user-select:none;-webkit-user-select:none;
+  display:flex;align-items:center;justify-content:center;
+}
+.deco-piece.visible{opacity:var(--op,0.13)}
+.deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.18))}
+.deco-piece-inner{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  will-change:transform;
+}
+.deco-piece-inner svg{width:100%;height:100%;display:block}
+.deco-piece.merging .deco-piece-inner{animation-play-state:paused}
+
+@keyframes deco-float-A{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(6px,-14px) rotate(2deg)}}
+@keyframes deco-float-B{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-8px,-10px) rotate(-3deg)}}
+@keyframes deco-float-C{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4px,-18px) rotate(-1.5deg)}}
+@keyframes deco-float-D{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-5px,-8px) rotate(3deg)}}
+.deco-piece.f-a .deco-piece-inner{animation:deco-float-A var(--dur,12s) ease-in-out infinite}
+.deco-piece.f-b .deco-piece-inner{animation:deco-float-B var(--dur,14s) ease-in-out infinite}
+.deco-piece.f-c .deco-piece-inner{animation:deco-float-C var(--dur,11s) ease-in-out infinite}
+.deco-piece.f-d .deco-piece-inner{animation:deco-float-D var(--dur,15s) ease-in-out infinite}
+
+/* 合体展示卡：在合体点旁边显示完整字 + 拼音 */
+.deco-merge-display{
+  position:fixed;pointer-events:none;z-index:6;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  opacity:0;transform:translate(-50%,0) scale(0.85);
+  transition:opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.deco-merge-display.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.deco-merge-char{
+  width:96px;height:96px;
+  background:rgba(255,255,255,0.94);
+  border-radius:14px;
+  box-shadow:0 8px 28px rgba(20,40,30,0.22);
+  display:flex;align-items:center;justify-content:center;
+}
+.deco-merge-char svg{width:84%;height:84%;display:block}
+.deco-merge-pinyin{
+  background:rgba(20,40,30,0.88);color:#fff;
+  padding:4px 14px;border-radius:14px;
+  font-size:0.95rem;font-family:Georgia,serif;font-style:italic;
+  letter-spacing:0.02em;white-space:nowrap;
+  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .deco-piece-inner{animation:none !important}
+  .deco-piece{transition:opacity .3s ease}
+}
+/* ══ end 漂浮部件装饰层 ══ */
+
 .level-select-screen{position:relative;text-align:center;padding:14px;max-width:760px;margin:0 auto;background:transparent;border:none;box-shadow:none;backdrop-filter:none}
 .level-select-screen h2{font-size:1.5rem;color:#ffffff;margin-bottom:14px;letter-spacing:0.1em}
 .level-select-screen .subtitle{color:#ffffff;font-size:0.88rem;margin-bottom:14px;font-style:italic;font-family:Georgia,serif}
@@ -629,8 +687,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 @media(min-width:769px){
   /* ① 释义框整体放大约 1.5 倍（内层字号用 !important 盖过 JS 写死的内联值） */
   #char-info{padding:20px 26px !important;border-radius:12px !important;margin-top:18px !important;line-height:1.5 !important}
-  #char-info strong{font-size:2rem !important}
-  #char-info span{font-size:1.3rem !important}
+  #char-info strong{font-size:3rem !important}     /* v60：在 v59 (2rem) 基础上再 ×1.5 */
+  #char-info span{font-size:1.95rem !important}    /* v60：在 v59 (1.3rem) 基础上再 ×1.5 */
 
   /* ③ 例词内框：竖排三行 → 单行横排（中文 拼音 英文底部对齐） */
   .ex-word-inner{
@@ -639,6 +697,13 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
     flex-wrap:nowrap !important;
     gap:calc(16px*var(--ui-scale)) !important;
   }
+
+  /* ★ v61：拼合成功后 step② 右侧弹出的「汉字」放大到 2 倍（SVG 用 1em，跟随 font-size） */
+  .drag-right .result-char{font-size:calc(10rem*var(--ui-scale)) !important}
+
+  /* ★ v63：「下一个字 · Next」按钮配色对齐「返回 / Back」按钮（var(--bamboo) 橙褐 + 同款 hover） */
+  .next-btn{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
+  .next-btn:hover{background:var(--bamboo-light) !important}
 }
 </style>
 </head>
@@ -681,7 +746,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 <div class="struct-bar" id="struct-bar">
   <div class="struct-bar-header" onclick="toggleStructBar()">
     <div class="struct-bar-title" style="text-align:center">
-      <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+      <div onclick="event.stopPropagation();showHome();" title="回到主页面 / Back to Home" style="display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
         <span class="struct-bar-zh">斑斓部件</span>
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
@@ -828,6 +893,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   <div id="learn-mode">
     <!-- ══ 首页：二选一入口 ══ -->
     <div id="home-screen" class="home-screen">
+      <!-- v67：漂浮部件装饰层（position:fixed，父级 display:none 时自动隐藏） -->
+      <div class="deco-layer" id="deco-layer" aria-hidden="true"></div>
+      <div class="deco-merge-display" id="deco-merge-display" aria-hidden="true">
+        <div class="deco-merge-char" id="deco-merge-char"></div>
+        <div class="deco-merge-pinyin" id="deco-merge-pinyin"></div>
+      </div>
       <div class="home-grid">
         <!-- 入口 A：HSK 分级挑战 -->
         <button class="home-entry" onclick="showLevelSelect()">
@@ -2123,6 +2194,9 @@ function loadStrokeOnlyChar(char){
   document.getElementById('drag-content').style.display='none';
   const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
   const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
+  // ★ v62：清空 step② 标题左侧 hint（仅笔顺模式 step② 是 lock 的，hint 显示前字残留无意义）
+  const _hint=document.getElementById('drag-hint-char');
+  if(_hint){ _hint.dataset.glyph=''; _hint.textContent=''; }
   requestAnimationFrame(fitPracticeUI);
   setTimeout(fitPracticeUI, 200);
 }
@@ -2195,6 +2269,9 @@ function loadCharacter(char){
   if(sb2) sb2.style.display='block';
   const rs=document.getElementById('result-side');
   if(rs){rs.style.animation='none';rs.style.opacity='0';rs.style.pointerEvents='none';} // ★清掉残留 mergeIn，防止重播闪动
+  // ★ v62：同步 step② 标题左侧的小字 hint 到当前字（修复切字后残留上一字的 bug）
+  const _hint=document.getElementById('drag-hint-char');
+  if(_hint){ renderGlyphInto(_hint, char); }
   // 内容更新后重新适配一屏（笔画 SVG 异步渲染，故延时再测一次）
   // ★ 改用 updateStructHeight：它会先重新测量顶栏真实高度(--struct-h)再适配，
   //   修复「首页13结构展开时测得的陈旧 --struct-h(过大) 导致卡片高度算成负数、塌缩成320px」的根因。
@@ -2232,8 +2309,15 @@ function checkPinyin(btn,chosen,correct,data,char){
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
     const enShort=(data.en||'').split(/[;,；，]/)[0].trim();   // ★ 英文只保留第一个释义
-    info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
+    // ★ v64：手机端（≤768px）释义框中的字头改用笔画 SVG 渲染（同例词 ex-word-zh 路径，楷体），电脑端保持原字体显示
+    const _isMobile=window.matchMedia('(max-width:768px)').matches;
+    if(_isMobile){
+      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:1.25rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;
+    } else {
+      info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
+    }
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
+    if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
     // ★ v37 ②：选对的"瞬间"就在后台把 step2 的拖拽区 + 部件卡渲染好（此刻 drag-content 仍被 locked-overlay 盖住/隐藏，
     //          但 DOM 与笔画 SVG 已就绪）。等下面 1.8s 停留结束 unlockDragSection 揭开时，部件已经画好直接显示，不再现场加载。
@@ -3158,8 +3242,7 @@ function mergeCharacter(){
   renderGlyphInto(document.getElementById('result-char'), char);   // ★ v40：用米字格那种笔画字形（原 textContent 字体）
   const side=document.getElementById('result-side');
   side.style.opacity='1';side.style.pointerEvents='auto';
-  const nbw=document.getElementById('next-btn-wrap');
-  if(nbw) nbw.style.display='block';
+  // ★ v64：电脑端「下一个字」按钮改到「写对汉字」后才点亮（见 startWritingQuiz 的 onComplete），此处不再立即显示
   // ✅ 拖拽成功：轻快提示音（撒花改到写对汉字后）
   playCorrectSound();
   // 🔓 解锁 ③ 书写练习（④ 例词改到写对汉字后才解锁）
@@ -3650,6 +3733,8 @@ function startWritingQuiz(){
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
         wizUnlock(4);   // ★ v52④：只解锁④,不自动翻页;用户点「下一步」才翻
+        // ★ v64：电脑端「下一个字」按钮改到此处才点亮（原本在 mergeCharacter 拼对部件后就亮，已改为只有写对汉字后才亮）
+        const nbw=document.getElementById('next-btn-wrap'); if(nbw) nbw.style.display='block';
       },
     });
   }catch(err){
@@ -3961,6 +4046,411 @@ function showToast(msg,type=''){
   clearTimeout(window._toastTimer);
   window._toastTimer=setTimeout(()=>t.className='toast',2400);
 }
+
+// ══════════════════════════════════════════════════════════════
+// v67：首页漂浮部件装饰层
+// 方案：D混搭(部件为主+笔画为辅) + HanziWriter SVG渲染 + 缓慢漂浮 +
+//      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
+// ══════════════════════════════════════════════════════════════
+const DECO_CFG = {
+  pairCount:   14,    // 桌面端：配对数（→ 28 个部件 piece）
+  pairCountMb:  7,    // 手机端：配对数
+  loneStroke:   8,    // 桌面端：单笔画装饰数
+  loneStrokeMb: 4,    // 手机端：单笔画装饰数
+  baseOpacity: 0.13,  // 静态透明度（12-15% 区间）
+  safeMargin:  28,    // 离卡片的安全距离 px
+  sideEdge:    10,    // 离视口边缘的最小距离 px
+  minSize:     38,    // 部件最小尺寸 px
+  maxSize:     68,    // 部件最大尺寸 px
+  driftMin:     9,    // 浮动动画最短时长 s
+  driftMax:    16,    // 浮动动画最长时长 s
+  mergeDelay: 720,    // 合体后展示完整字的等待 ms
+  leaveGrace: 160,    // mouseleave 宽限期 ms（避免在 pair 内部跳动时闪烁）
+};
+
+// 单笔画装饰库：从字库中取单个笔画作为装饰图形
+// 每个条目 {src:'源字', sIdx:笔画索引}
+const _decoLoneStrokes = [
+  {src:'一', sIdx:'all'},   // 横（整字单笔）
+  {src:'十', sIdx:[1]},     // 竖
+  {src:'人', sIdx:[0]},     // 撇
+  {src:'人', sIdx:[1]},     // 捺
+  {src:'乙', sIdx:'all'},   // 折
+  {src:'心', sIdx:[0]},     // 卧钩
+  {src:'九', sIdx:[1]},     // 横折弯钩
+  {src:'小', sIdx:[0]},     // 竖钩
+];
+
+let _decoState = {
+  inited: false,
+  pieces: [],           // [{el, pairId, role, baseLeft, baseTop, size, fullChar, py, structure, ranges, ...}]
+  activePair: null,     // 当前合体的 pairId
+  leaveTimer: null,
+  isMobile: false,
+};
+
+// 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
+function _buildDecoPairPool(){
+  const all = [];
+  Object.entries(CHAR_DB).forEach(([char, d])=>{
+    if((d.structure === 'lr' || d.structure === 'tb') &&
+       d.components && d.components.length === 2 &&
+       d.splitRanges && d.splitRanges.length === 2){
+      // 过滤：两个 splitRange 都非空
+      if(d.splitRanges[0].length > 0 && d.splitRanges[1].length > 0){
+        all.push({
+          char, py: d.py, structure: d.structure,
+          comps: d.components, ranges: d.splitRanges
+        });
+      }
+    }
+  });
+  return all;
+}
+
+// 从数组中无放回随机抽取 n 个
+function _sampleN(arr, n){
+  const a = [...arr];
+  const out = [];
+  while(out.length < n && a.length > 0){
+    const i = Math.floor(Math.random() * a.length);
+    out.push(a.splice(i, 1)[0]);
+  }
+  return out;
+}
+
+// 生成一个不与卡片重叠、且不出视口的随机位置
+function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin){
+  for(let i = 0; i < 50; i++){
+    const x = sideEdge + Math.random() * (viewport.w - 2*sideEdge - size);
+    const y = topMargin + Math.random() * (viewport.h - topMargin - sideEdge - size);
+    // 与安全区检测（卡片矩形 + safeMargin）
+    const m = DECO_CFG.safeMargin;
+    const overlaps = !(x + size < safeRect.x - m ||
+                       x > safeRect.x + safeRect.w + m ||
+                       y + size < safeRect.y - m ||
+                       y > safeRect.y + safeRect.h + m);
+    if(!overlaps) return {x, y};
+  }
+  // 兜底：放在视口底部
+  return {
+    x: sideEdge + Math.random() * (viewport.w - 2*sideEdge - size),
+    y: viewport.h - size - 24 - Math.random() * 60,
+  };
+}
+
+// 异步把 SVG 笔画图形画进 piece 的 inner 容器
+async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText){
+  try{
+    const svg = await renderComponentStrokes(srcChar, strokeIdx, color, false);
+    if(svg){
+      svg.style.cssText = 'width:100%;height:100%;display:block';
+      innerEl.appendChild(svg);
+      return true;
+    }
+  }catch(e){}
+  // 兜底：用字体字形
+  if(fallbackText){
+    innerEl.innerHTML = `<span style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
+  }
+  return false;
+}
+
+// 初始化整个装饰层
+function initDeco(){
+  const layer = document.getElementById('deco-layer');
+  if(!layer) return;
+  const home = document.getElementById('home-screen');
+  if(!home || home.style.display === 'none') return;
+  const grid = home.querySelector('.home-grid');
+  if(!grid) return;
+
+  // 清理旧的
+  layer.innerHTML = '';
+  _decoState.pieces = [];
+  _decoState.activePair = null;
+  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  const disp = document.getElementById('deco-merge-display');
+  if(disp) disp.classList.remove('show');
+
+  // 探测平台
+  _decoState.isMobile = window.matchMedia('(max-width:760px)').matches;
+  const targetPairs = _decoState.isMobile ? DECO_CFG.pairCountMb : DECO_CFG.pairCount;
+  const targetLone  = _decoState.isMobile ? DECO_CFG.loneStrokeMb : DECO_CFG.loneStroke;
+
+  // 抽取配对池
+  const pool = _buildDecoPairPool();
+  const pairs = _sampleN(pool, Math.min(targetPairs, pool.length));
+
+  // 计算安全区（卡片网格 bounding rect，相对视口）
+  const gridRect = grid.getBoundingClientRect();
+  const safeRect = {x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height};
+  const viewport = {w: window.innerWidth, h: window.innerHeight};
+
+  // 顶部留白：让出顶栏（struct-bar）高度
+  const structH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--struct-h')) || 80;
+  const topMargin = structH + 14;
+  const sideEdge = DECO_CFG.sideEdge;
+
+  // 浮动动画变体（A/B/C/D 四种轨迹）
+  const floatVars = ['f-a','f-b','f-c','f-d'];
+
+  // —— 渲染配对部件（两两同色，暗示是同一对） ——
+  pairs.forEach((pair, pairIdx)=>{
+    const colorIdx = pairIdx % COMP_COLORS.length;
+    const color = COMP_COLORS[colorIdx].text;
+    pair.comps.forEach((comp, roleIdx)=>{
+      // 随机尺寸（提供远近层次感）
+      const size = DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize);
+      const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin);
+      const dur = (DECO_CFG.driftMin + Math.random() * (DECO_CFG.driftMax - DECO_CFG.driftMin)).toFixed(1);
+      const vari = floatVars[Math.floor(Math.random() * floatVars.length)];
+
+      const el = document.createElement('div');
+      el.className = 'deco-piece ' + vari;
+      el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;--dur:${dur}s;--op:${DECO_CFG.baseOpacity}`;
+      el.dataset.role = 'pair';
+      el.dataset.pairId = pairIdx;
+      el.dataset.roleIdx = roleIdx;
+      el.title = `${pair.char} ${pair.py}`;
+
+      const inner = document.createElement('div');
+      inner.className = 'deco-piece-inner';
+      el.appendChild(inner);
+
+      // 异步渲染 SVG
+      _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, comp);
+
+      // 事件绑定
+      if(_decoState.isMobile){
+        el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
+      } else {
+        el.addEventListener('mouseenter', ()=> _activateMergePair(pairIdx, roleIdx));
+        el.addEventListener('mouseleave', ()=> _scheduleDeactivate(pairIdx));
+      }
+
+      layer.appendChild(el);
+      _decoState.pieces.push({
+        el, inner, pairId: pairIdx, roleIdx, role: 'pair',
+        baseLeft: pos.x, baseTop: pos.y, size,
+        fullChar: pair.char, py: pair.py, structure: pair.structure,
+        comps: pair.comps, ranges: pair.ranges,
+      });
+    });
+  });
+
+  // —— 渲染单笔画装饰（不参与合体） ——
+  for(let i = 0; i < targetLone; i++){
+    const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
+    // 笔画稍小（更点缀）
+    const size = (DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize)) * 0.78;
+    const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin);
+    const dur = (DECO_CFG.driftMin + Math.random() * (DECO_CFG.driftMax - DECO_CFG.driftMin)).toFixed(1);
+    const vari = floatVars[Math.floor(Math.random() * floatVars.length)];
+    const color = COMP_COLORS[(i + 3) % COMP_COLORS.length].text;
+
+    const el = document.createElement('div');
+    el.className = 'deco-piece ' + vari;
+    el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;--dur:${dur}s;--op:${DECO_CFG.baseOpacity};cursor:default`;
+    el.dataset.role = 'stroke';
+
+    const inner = document.createElement('div');
+    inner.className = 'deco-piece-inner';
+    el.appendChild(inner);
+
+    _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '');
+    layer.appendChild(el);
+    _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
+  }
+
+  // 全部就位后淡入
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      _decoState.pieces.forEach(p => p.el.classList.add('visible'));
+    }, 80);
+  });
+
+  _decoState.inited = true;
+}
+
+// 桌面端：激活某一对
+// 关键设计：被悬停的那一片**保持不动**(光标始终在它上面，hover 不会丢失),
+//          仅 partner 滑过来与之并列。这样用户即便不移动鼠标也能稳定看到合体效果。
+async function _activateMergePair(pairIdx, hoveredRoleIdx){
+  // 取消任何 pending 的 deactivate
+  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  if(_decoState.activePair === pairIdx) return;
+  // 若已有别的对激活,先解散
+  if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
+
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  if(pieces.length !== 2) return;
+
+  // 找出被悬停的那一片 与 partner（默认 hover 第一片）
+  const hovered = pieces.find(p => p.roleIdx === hoveredRoleIdx) || pieces[0];
+  const partner = pieces.find(p => p !== hovered);
+  if(!partner) return;
+
+  // 被悬停片**保持原位**——partner 滑过来
+  // 计算 partner 目标位置：根据结构(lr / tb)和被悬停片的角色(0/1)推断方位
+  // 结构 lr: roleIdx 0 在左、roleIdx 1 在右
+  // 结构 tb: roleIdx 0 在上、roleIdx 1 在下
+  const tgt = Math.max(hovered.size, partner.size);
+  const gap = tgt * 0.10;  // 部件紧贴间距(约 10% 尺寸)
+
+  let pX, pY;
+  if(hovered.structure === 'lr'){
+    if(hovered.roleIdx === 0){
+      // hovered 是左件, partner(右件)放到 hovered 右边
+      pX = hovered.baseLeft + hovered.size + gap;
+      pY = hovered.baseTop + (hovered.size - partner.size) / 2;
+    } else {
+      // hovered 是右件, partner(左件)放到 hovered 左边
+      pX = hovered.baseLeft - partner.size - gap;
+      pY = hovered.baseTop + (hovered.size - partner.size) / 2;
+    }
+  } else {
+    // tb
+    if(hovered.roleIdx === 0){
+      // hovered 是上件, partner(下件)放到 hovered 下方
+      pX = hovered.baseLeft + (hovered.size - partner.size) / 2;
+      pY = hovered.baseTop + hovered.size + gap;
+    } else {
+      // hovered 是下件, partner(上件)放到 hovered 上方
+      pX = hovered.baseLeft + (hovered.size - partner.size) / 2;
+      pY = hovered.baseTop - partner.size - gap;
+    }
+  }
+
+  // 边界保护：partner 不能跑出视口
+  const vw = window.innerWidth, vh = window.innerHeight;
+  pX = Math.max(6, Math.min(vw - partner.size - 6, pX));
+  pY = Math.max(60, Math.min(vh - partner.size - 6, pY));
+
+  // 标记 merging（暂停 inner 抖动；提升透明度 & 阴影）
+  hovered.el.classList.add('merging');
+  partner.el.classList.add('merging');
+  // partner 滑动到目标位置；hovered 不动
+  partner.el.style.left = pX + 'px';
+  partner.el.style.top  = pY + 'px';
+
+  _decoState.activePair = pairIdx;
+
+  // 等到滑入到位后显示完整字 + 拼音
+  setTimeout(async ()=>{
+    if(_decoState.activePair !== pairIdx) return;  // 用户已离开
+    const disp = document.getElementById('deco-merge-display');
+    const charBox = document.getElementById('deco-merge-char');
+    const pyBox = document.getElementById('deco-merge-pinyin');
+    if(!disp || !charBox || !pyBox) return;
+
+    // 渲染完整字(深墨绿色)
+    charBox.innerHTML = '';
+    let fullSvg = null;
+    try{ fullSvg = await renderComponentStrokes(hovered.fullChar, 'all', '#2a3a30', false); }catch(e){}
+    if(_decoState.activePair !== pairIdx) return;  // 二次检查
+    if(fullSvg){
+      fullSvg.style.cssText = 'width:84%;height:84%;display:block';
+      charBox.appendChild(fullSvg);
+    } else {
+      charBox.innerHTML = `<span style="font-size:3rem;color:#2a3a30;font-family:'Kaiti SC',serif;line-height:1">${hovered.fullChar}</span>`;
+    }
+    pyBox.textContent = hovered.py;
+
+    // 定位：合体后两片的中央正下方
+    const minL = Math.min(hovered.baseLeft, pX);
+    const maxR = Math.max(hovered.baseLeft + hovered.size, pX + partner.size);
+    const maxB = Math.max(hovered.baseTop + hovered.size, pY + partner.size);
+    const finalCx = (minL + maxR) / 2;
+    const dispTop = Math.min(vh - 150, maxB + 14);
+    disp.style.left = finalCx + 'px';
+    disp.style.top  = dispTop + 'px';
+    disp.classList.add('show');
+  }, DECO_CFG.mergeDelay);
+}
+
+// 关掉合体状态：两片回归原位
+function _deactivateMergePair(pairIdx, immediate){
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  pieces.forEach(p => {
+    p.el.style.left = p.baseLeft + 'px';
+    p.el.style.top  = p.baseTop  + 'px';
+    p.el.classList.remove('merging');
+  });
+  const disp = document.getElementById('deco-merge-display');
+  if(disp) disp.classList.remove('show');
+  if(_decoState.activePair === pairIdx) _decoState.activePair = null;
+}
+
+// mouseleave 宽限：避免 pair 内部跳动闪烁
+function _scheduleDeactivate(pairIdx){
+  if(_decoState.leaveTimer) clearTimeout(_decoState.leaveTimer);
+  _decoState.leaveTimer = setTimeout(()=>{
+    _deactivateMergePair(pairIdx, false);
+    _decoState.leaveTimer = null;
+  }, DECO_CFG.leaveGrace);
+}
+
+// 移动端：点击切换合体/分散
+function _toggleMergePair(pairIdx, roleIdx){
+  if(_decoState.activePair === pairIdx){
+    _deactivateMergePair(pairIdx, false);
+  } else {
+    if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
+    _activateMergePair(pairIdx, roleIdx);
+  }
+}
+
+// 离开首页时：清理合体态（防止回来时残留）
+function _decoOnHide(){
+  if(_decoState.activePair !== null){
+    _deactivateMergePair(_decoState.activePair, true);
+  }
+  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+}
+
+// resize / 进入首页时：重新布局（避免位置错位）
+let _decoResizeTimer = null;
+function _onDecoResize(){
+  if(_decoResizeTimer) clearTimeout(_decoResizeTimer);
+  _decoResizeTimer = setTimeout(()=>{
+    const home = document.getElementById('home-screen');
+    if(!home || home.style.display === 'none') return;
+    initDeco();
+  }, 280);
+}
+window.addEventListener('resize', _onDecoResize);
+
+// 给 showHome / showLevelSelect / startTeacherSession 包一层（不改原函数,只追加副作用）
+// 注：用 MutationObserver 监听 #home-screen 的 display 变化更可靠
+//     —— 函数声明 vs window.showHome 的脚本内调用绑定不一致,wrap 会失效
+(function _hookDecoToHomeVisibility(){
+  const hs = document.getElementById('home-screen');
+  if(!hs || !('MutationObserver' in window)) return;
+  let wasVisible = (hs.style.display !== 'none');
+  const obs = new MutationObserver(()=>{
+    const nowVisible = (hs.style.display !== 'none');
+    if(nowVisible && !wasVisible){
+      // 进入首页：延后一帧确保布局稳定再初始化
+      setTimeout(()=> initDeco(), 50);
+    } else if(!nowVisible && wasVisible){
+      // 离开首页：清理合体态
+      _decoOnHide();
+    }
+    wasVisible = nowVisible;
+  });
+  obs.observe(hs, {attributes:true, attributeFilter:['style']});
+})();
+
+// 页面首次加载：稍等 CHAR_DB 与 HanziWriter 就绪后初始化
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{
+    if(document.getElementById('home-screen').style.display !== 'none'){
+      initDeco();
+    }
+  }, 350);
+});
+// ══ end v67 漂浮部件装饰层 ══
 
 // 捕获右/中栏锁定区原始HTML，供"仅笔顺模式"切回时还原
 window._origLocked = document.getElementById('locked-overlay').innerHTML;

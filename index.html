@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v90 (2026-06-14) — ① 进入网页 2 秒后自动演示 1 对部件拼合(全端通用,首次访问触发一次)② 合体卡 renderGlyphInto 等 hsk.json 整包就绪才认输,保证 SVG 笔画呈现 -->
+<!-- 斑斓部件 · v91 (2026-06-14) — ① 自动演示扩展:手机 2 对 / 电脑 3 对,间隔 3.5s 依次 ② renderGlyphInto 移除印刷字 fallback — 失败保持空白,绝不出现宋体/黑体 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v90">
+<meta name="version" content="v91">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -3403,12 +3403,13 @@ async function renderGlyphInto(el, char){
   el.dataset.glyph = char;          // 标记当前应显示的字（防异步过期覆盖）
   el.textContent = '';              // ★ v89:清空,避免显示残留旧字
   try{
-    // ★ v90:更鲁棒的重试 — 第一次失败 → 等 hsk.json 整包加载完成再试 → 再失败等 3s 最后一搏
-    //        只要这个字在 hsk.json 里有,必定能渲染为 SVG 笔画(避免 fallback 到印刷字体)
+    // ★ v91:用户明确要求"全部所有毫无例外"用笔画 SVG 渲染 → **完全移除印刷字 fallback**
+    //        重试策略:立即 → 等 hsk.json 整包 → 等 2s → 等 5s → 等 10s
+    //        若最终仍拿不到(网络极差极小概率) → 保持空白,绝不显示印刷字
     let data = null;
     try{ data = await loadStrokeData(char); }catch(e){}
 
-    // ① 第一次失败 → 等 hsk.json 整包加载完成
+    // ① 等 hsk.json 整包加载完成后再试
     if((!data || !data.strokes || !data.strokes.length) && typeof _hskBundlePromise !== 'undefined' && _hskBundlePromise){
       if(el.dataset.glyph !== char) return;
       try{ await _hskBundlePromise; }catch(e){}
@@ -3416,16 +3417,18 @@ async function renderGlyphInto(el, char){
       try{ data = await loadStrokeData(char); }catch(e){}
     }
 
-    // ② 再失败 → 等 3s 最后一搏(让 CDN 偶发丢包有重试机会)
-    if(!data || !data.strokes || !data.strokes.length){
-      await new Promise(r => setTimeout(r, 3000));
+    // ② 继续延时重试:2s / 5s / 10s — 给 CDN 偶发丢包足够多的机会
+    const delays = [2000, 5000, 10000];
+    for(const d of delays){
+      if(data && data.strokes && data.strokes.length) break;
+      await new Promise(r => setTimeout(r, d));
       if(el.dataset.glyph !== char) return;
       try{ data = await loadStrokeData(char); }catch(e){}
     }
 
     if(el.dataset.glyph !== char) return;
     if(!data || !data.strokes || !data.strokes.length){
-      el.textContent = char;        // 极端兜底（hsk.json 失败且这个字 CDN 也拉不到 — 现实中几乎不会发生）
+      // ★ v91:全部失败 → **保持空白**,绝不 fallback 到印刷字(用户明确要求)
       return;
     }
     const NS = 'http://www.w3.org/2000/svg';
@@ -3444,7 +3447,7 @@ async function renderGlyphInto(el, char){
     el.textContent = '';
     el.appendChild(svg);
   }catch(e){
-    if(el.dataset.glyph === char) el.textContent = char;          // 出错也保底显示文字
+    // ★ v91:即使出错也不显示文字 — 保持空白
   }
 }
 
@@ -4534,26 +4537,36 @@ function initDeco(){
     pairs.forEach(p => { if(p && p.char){ try{ loadStrokeData(p.char); }catch(e){} } });
   }
 
-  // ★ v90:进入网页时自动演示 1 对部件的拼合过程 — 引导用户理解"点击部件 → 拼合 → 显示字+拼音"
-  //        延迟 2 秒等部件 SVG 渲染好;只在本会话首次跑(autoDemoDone 标记)
+  // ★ v91:进入网页时自动演示 N 对部件拼合 — 手机 2 对 / 电脑 3 对
+  //        每对依次触发,间隔 3.5 秒(合体 0.7s + 卡片显示 2s + 隐藏过渡 + 留白)
+  //        只在本会话首次跑(autoDemoDone 标记)
   if(!_decoState.autoDemoDone){
     _decoState.autoDemoDone = true;
+    const demoCount = _decoState.isMobile ? 2 : 3;
     setTimeout(()=>{
-      // 找一对**两片都已 visible** 的(确认渲染完成);优先 pairId 0,否则取首个就绪对
+      // ① 优先挑"两片都已 visible"(SVG 已就绪)的对
       const pairIds = [...new Set(_decoState.pieces.filter(p => p.role === 'pair').map(p => p.pairId))];
+      const readyPairs = [];
       for(const pid of pairIds){
         const pieces = _decoState.pieces.filter(p => p.pairId === pid);
         if(pieces.length === 2 && pieces.every(p => p.el.classList.contains('visible'))){
-          // 模拟从该对左/上片(roleIdx=0)触发合体
-          try{ _activateMergePair(pid, 0); }catch(e){}
-          return;
+          readyPairs.push(pid);
+          if(readyPairs.length >= demoCount) break;
         }
       }
-      // 没有完全就绪的对 → 再等 2 秒兜底试一次(SVG 网络慢的情况)
-      setTimeout(()=>{
-        const piece = _decoState.pieces.find(p => p.role === 'pair' && p.pairId === pairIds[0]);
-        if(piece){ try{ _activateMergePair(piece.pairId, 0); }catch(e){} }
-      }, 2000);
+      // ② 如果就绪的不足,补未就绪的对(部件 DOM 已创建,SVG 可能仍在加载)
+      if(readyPairs.length < demoCount){
+        for(const pid of pairIds){
+          if(readyPairs.indexOf(pid) === -1){
+            readyPairs.push(pid);
+            if(readyPairs.length >= demoCount) break;
+          }
+        }
+      }
+      // ③ 依次触发,间隔 3.5 秒
+      readyPairs.forEach((pid, i)=>{
+        setTimeout(()=>{ try{ _activateMergePair(pid, 0); }catch(e){} }, i * 3500);
+      });
     }, 2000);
   }
 

@@ -2245,8 +2245,15 @@ function checkPinyin(btn,chosen,correct,data,char){
     // ★ 例词不再在选对拼音时显示，改到写对汉字后（见 startWritingQuiz 的 onComplete → showExampleWord）
     const info=document.getElementById('char-info');
     const enShort=(data.en||'').split(/[;,；，]/)[0].trim();   // ★ 英文只保留第一个释义
-    info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
+    // ★ v64：手机端（≤768px）释义框中的字头改用笔画 SVG 渲染（同例词 ex-word-zh 路径，楷体），电脑端保持原字体显示
+    const _isMobile=window.matchMedia('(max-width:768px)').matches;
+    if(_isMobile){
+      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:1.25rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;
+    } else {
+      info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
+    }
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
+    if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
     // ★ v37 ②：选对的"瞬间"就在后台把 step2 的拖拽区 + 部件卡渲染好（此刻 drag-content 仍被 locked-overlay 盖住/隐藏，
     //          但 DOM 与笔画 SVG 已就绪）。等下面 1.8s 停留结束 unlockDragSection 揭开时，部件已经画好直接显示，不再现场加载。

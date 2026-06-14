@@ -688,7 +688,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 <div class="struct-bar" id="struct-bar">
   <div class="struct-bar-header" onclick="toggleStructBar()">
     <div class="struct-bar-title" style="text-align:center">
-      <div style="display:flex;align-items:center;justify-content:center;gap:14px">
+      <div onclick="event.stopPropagation();showHome();" title="回到主页面 / Back to Home" style="display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
         <span class="struct-bar-zh">斑斓部件</span>
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>

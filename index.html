@@ -71,15 +71,15 @@ body::before{content:'';position:fixed;inset:0;background:
   user-select:none;-webkit-user-select:none;
   display:flex;align-items:center;justify-content:center;
 }
-.deco-piece.visible{opacity:var(--op,0.42)}
-.deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.18))}
+.deco-piece.visible{opacity:var(--op,1)}
+.deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.28)) brightness(1.08)}
 .deco-piece-inner{
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;
   will-change:transform;
 }
 .deco-piece-inner svg{width:100%;height:100%;display:block}
-.deco-piece.merging .deco-piece-inner{animation-play-state:paused}
+.deco-piece.merging .deco-piece-inner{animation-play-state:paused;transform:scale(1.12)}
 
 @keyframes deco-float-A{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(6px,-14px) rotate(2deg)}}
 @keyframes deco-float-B{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-8px,-10px) rotate(-3deg)}}
@@ -4055,12 +4055,12 @@ function showToast(msg,type=''){
 //      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
-  pairCount:   14,    // 桌面端：配对数（→ 28 个部件 piece）
-  pairCountMb:  7,    // 手机端：配对数
-  loneStroke:   8,    // 桌面端：单笔画装饰数
-  loneStrokeMb: 4,    // 手机端：单笔画装饰数
-  baseOpacity: 0.42,  // 静态透明度（先前 0.13 在米绿背景上几乎不可见,提到 42%）
-  safeMargin:  28,    // 离卡片的安全距离 px
+  pairCount:   26,    // 桌面端：配对数（→ 52 个部件 piece,密度比原 14 翻一倍）
+  pairCountMb: 12,    // 手机端：配对数
+  loneStroke:  14,    // 桌面端：单笔画装饰数
+  loneStrokeMb: 7,    // 手机端：单笔画装饰数
+  baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
+  safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
   minSize:     38,    // 部件最小尺寸 px
   maxSize:     68,    // 部件最大尺寸 px

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v80 (2026-06-14) — 合体卡放大 1.3 倍 + 首页卡片内容居中 & 紧凑 -->
+<!-- 斑斓部件 · v81 (2026-06-14) — 合体卡修正层级避开结构表 + 首页英文与中文居中对齐 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v80">
+<meta name="version" content="v81">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -52,9 +52,10 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto;position:relative;z-index:1}
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
-.home-entry-header{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:2px}
-.home-entry-icon{font-size:2rem;line-height:1}
-.home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em}
+/* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
+.home-entry-header{position:relative;display:inline-block;margin-bottom:4px}
+.home-entry-icon{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);font-size:2rem;line-height:1}
+.home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em;display:inline-block}
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
 .home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}
 .home-entry-input{cursor:default}
@@ -97,7 +98,7 @@ body::before{content:'';position:fixed;inset:0;background:
    ④ 动效更轻：纯淡入,无弹跳
 */
 .deco-merge-display{
-  position:fixed;pointer-events:none;z-index:6;
+  position:fixed;pointer-events:none;z-index:10;   /* v81：高于结构表(9),避免被遮挡 */
   width:101px;height:140px;       /* v80：尺寸 ×1.3 */
   background:rgba(255,255,255,0.96);
   border-radius:14px;
@@ -4692,7 +4693,9 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
     }
   }
 
-  const safeMargin = 8, topMargin = 70, cardMargin = 6;
+  const safeMargin = 8;
+  const topMargin = _decoState.topMargin || 280;   // v81：用 state 真实值,避免压到结构表
+  const cardMargin = 6;
   let bestScore = Infinity;
   let bestPos = null;
 

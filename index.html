@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v71 (2026-06-14) — 修复部件间距，避免重叠 -->
+<!-- 斑斓部件 · v73 (2026-06-14) — 统一部件尺寸,消除视觉粗细差异 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v71">
+<meta name="version" content="v73">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -88,28 +88,36 @@ body::before{content:'';position:fixed;inset:0;background:
 @keyframes deco-float-C{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(4px,-18px) rotate(-1.5deg)}}
 @keyframes deco-float-D{0%,100%{transform:translate(0,0) rotate(0deg)}50%{transform:translate(-5px,-8px) rotate(3deg)}}
 
-/* 合体展示卡：在合体点旁边显示完整字 + 拼音 */
+/* 合体展示卡：v72 改版
+   ① 字 + 拼音 同框（去掉外置拼音胶囊）
+   ② 字用楷体直接显示（去掉 SVG 笔画渲染,工整、教学常用）
+   ③ 用 translate(-50%,-50%) 居中,JS 设定的 left/top 是卡的几何中心
+   ④ 动效更轻：纯淡入,无弹跳
+*/
 .deco-merge-display{
   position:fixed;pointer-events:none;z-index:6;
-  display:flex;flex-direction:column;align-items:center;gap:6px;
-  opacity:0;transform:translate(-50%,0) scale(0.85);
-  transition:opacity .35s ease, transform .35s cubic-bezier(.34,1.56,.64,1);
+  width:72px;height:92px;
+  background:rgba(255,255,255,0.96);
+  border-radius:12px;
+  box-shadow:0 6px 20px rgba(20,40,30,0.22);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:4px 4px 3px;box-sizing:border-box;
+  opacity:0;transform:translate(-50%,-50%) scale(0.96);
+  transition:opacity .15s ease, transform .15s ease;
 }
-.deco-merge-display.show{opacity:1;transform:translate(-50%,0) scale(1)}
+.deco-merge-display.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .deco-merge-char{
-  width:96px;height:96px;
-  background:rgba(255,255,255,0.94);
-  border-radius:14px;
-  box-shadow:0 8px 28px rgba(20,40,30,0.22);
+  flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
+  font-family:'Kaiti SC','STKaiti','Songti SC',serif;
+  font-size:48px;line-height:1;
+  color:#2a3a30;
 }
-.deco-merge-char svg{width:84%;height:84%;display:block}
 .deco-merge-pinyin{
-  background:rgba(20,40,30,0.88);color:#fff;
-  padding:4px 14px;border-radius:14px;
-  font-size:0.95rem;font-family:Georgia,serif;font-style:italic;
-  letter-spacing:0.02em;white-space:nowrap;
-  box-shadow:0 4px 12px rgba(0,0,0,0.18);
+  font-family:Georgia,serif;font-style:italic;
+  font-size:12px;line-height:1.2;
+  color:#7a8a80;
+  margin-top:1px;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -4063,8 +4071,8 @@ const DECO_CFG = {
   pieceSpacing: 14,   // v70：部件与部件之间的最小间距 px（避免重叠）
   pairProxMin:  90,   // v70②：同对两片中心距离的最小值（小于此值会重叠）
   pairProxMax: 220,   // v70②：同对两片中心距离的最大值（太远合体时穿屏不雅）
-  minSize:     48,    // 部件最小尺寸 px（v71：从 38→48,收窄差距）
-  maxSize:     62,    // 部件最大尺寸 px（v71：从 68→62,统一感更强）
+  minSize:     50,    // v73：尺寸跨度从 14px 收到 4px,消除视觉大小差异
+  maxSize:     54,    // v73：原来 62,现在 54,统一容器尺寸
   driftMin:     9,    // 浮动动画最短时长 s
   driftMax:    16,    // 浮动动画最长时长 s
   mergeDelay: 720,    // 合体后展示完整字的等待 ms
@@ -4196,6 +4204,17 @@ async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackT
   return false;
 }
 
+// v73：按笔画数动态算容器尺寸,做"反向视觉补偿"
+//   笔画多的字（如"言"、"庄"、"口"）→ 容器较小,减少视觉墨水量
+//   笔画少的字（如"丿"、"丨"、"夂"）→ 容器较大,增加视觉占比
+//   整体让所有 piece 的"视觉重量"看起来更接近
+function _sizeByStrokeCount(n){
+  if(n <= 2)  return 58;   // 极简笔画
+  if(n <= 4)  return 54;   // 简单部件
+  if(n <= 7)  return 50;   // 中等
+  return 46;               // 复杂部件
+}
+
 // 初始化整个装饰层
 function initDeco(){
   const layer = document.getElementById('deco-layer');
@@ -4246,9 +4265,9 @@ function initDeco(){
     const colorIdx = pairIdx % COMP_COLORS.length;
     const color = COMP_COLORS[colorIdx].text;
 
-    // 预先为这一对生成两片的尺寸（v71：不再要 dur/vari,部件静止）
-    const pieceSpecs = pair.comps.map(()=>({
-      size: DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize),
+    // v73：按笔画数算尺寸,而非随机 —— 笔画多的字容器小,笔画少的字容器大
+    const pieceSpecs = pair.comps.map((comp, idx)=>({
+      size: _sizeByStrokeCount(pair.ranges[idx].length),
     }));
 
     // 尝试给两片各找一个不重叠的位置（用 snapshot 防止部分回滚）
@@ -4317,8 +4336,9 @@ function initDeco(){
   let placedStrokeCount = 0;
   for(let i = 0; i < targetLone; i++){
     const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
-    // 笔画稍小（更点缀）
-    const size = (DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize)) * 0.85;  // v71：从 0.78 提到 0.85,笔画也不太小
+    // v73：单笔画用最大档 size（极简笔画 → 视觉补偿）
+    const strokeN = (stroke.sIdx === 'all') ? 1 : (Array.isArray(stroke.sIdx) ? stroke.sIdx.length : 1);
+    const size = _sizeByStrokeCount(strokeN);
     const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
     if(!pos) continue;
     placed.push({x:pos.x, y:pos.y, w:size, h:size});
@@ -4437,7 +4457,7 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   };
   document.addEventListener('mousemove', _decoState.mouseHandler);
 
-  // 等到滑入到位后显示完整字 + 拼音
+  // 等到滑入到位后显示完整字 + 拼音（同框,楷体,智能定位）
   setTimeout(async ()=>{
     if(_decoState.activePair !== pairIdx) return;  // 用户已离开
     const disp = document.getElementById('deco-merge-display');
@@ -4445,27 +4465,89 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     const pyBox = document.getElementById('deco-merge-pinyin');
     if(!disp || !charBox || !pyBox) return;
 
-    // 渲染完整字(深墨绿色)
-    charBox.innerHTML = '';
-    let fullSvg = null;
-    try{ fullSvg = await renderComponentStrokes(a.fullChar, 'all', '#2a3a30', false); }catch(e){}
-    if(_decoState.activePair !== pairIdx) return;  // 二次检查
-    if(fullSvg){
-      fullSvg.style.cssText = 'width:84%;height:84%;display:block';
-      charBox.appendChild(fullSvg);
-    } else {
-      charBox.innerHTML = `<span style="font-size:3rem;color:#2a3a30;font-family:'Kaiti SC',serif;line-height:1">${a.fullChar}</span>`;
-    }
+    // v72：字 + 拼音都直接用楷体文本(不再渲染 SVG,不再单独胶囊)
+    charBox.textContent = a.fullChar;
     pyBox.textContent = a.py;
 
-    // 定位：合体后两片的中央正下方
-    const finalCx = (aX + a.size/2 + bX + b.size/2) / 2;
-    const finalBottom = Math.max(aY + a.size, bY + b.size);
-    const dispTop = Math.min(vh - 150, finalBottom + 14);
-    disp.style.left = finalCx + 'px';
-    disp.style.top  = dispTop + 'px';
+    // v72：智能避让 —— 在合体两片周围 8 个候选方向中找一个不遮挡其他部件、不出视口、不压卡片的位置
+    const dispW = 72, dispH = 92;
+    const mergeBox = {
+      x: Math.min(aX, bX),
+      y: Math.min(aY, bY),
+      w: Math.max(aX + a.size, bX + b.size) - Math.min(aX, bX),
+      h: Math.max(aY + a.size, bY + b.size) - Math.min(aY, bY),
+    };
+    // 已放置的其他部件（剔除当前合体的 a / b）
+    const others = _decoState.pieces
+      .filter(p => p !== a && p !== b)
+      .map(p => ({x: p.baseLeft, y: p.baseTop, w: p.size, h: p.size}));
+    const gridEl = document.querySelector('.home-grid');
+    const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
+    const bestPos = _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh);
+
+    disp.style.left = bestPos.x + 'px';
+    disp.style.top  = bestPos.y + 'px';
     disp.classList.add('show');
   }, DECO_CFG.mergeDelay);
+}
+
+// v72：智能避让算法
+// 在合体两片周围 8 个方向 × 2 档距离 = 16 个候选位置中找最优解：
+//   ① 硬约束：必须在视口内、不与中央卡片重叠
+//   ② 软约束：与其他部件的总重叠面积尽量小（=0 立即返回；否则取最小者）
+// 入参 dispW/dispH 是合体卡尺寸（CSS 78×100,这里同步）
+// 返回 disp 几何中心的视口坐标 {x, y}
+function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh){
+  const mcx = mergeBox.x + mergeBox.w / 2;
+  const mcy = mergeBox.y + mergeBox.h / 2;
+  const baseH = mergeBox.h / 2 + dispH / 2 + 14;
+  const baseV = mergeBox.w / 2 + dispW / 2 + 14;
+  // 8 个方向（4 正向 + 4 对角）
+  const directions = [
+    [ 0,  1],  [ 1,  0],  [-1, 0],  [ 0, -1],
+    [ 0.7, 0.7], [-0.7, 0.7], [ 0.7, -0.7], [-0.7, -0.7],
+  ];
+  const cands = [];
+  for(const dist of [1.0, 1.55]){
+    for(const [dx, dy] of directions){
+      cands.push({x: mcx + baseV * dx * dist, y: mcy + baseH * dy * dist});
+    }
+  }
+
+  const safeMargin = 8, topMargin = 70, cardMargin = 6;
+  let bestScore = Infinity;
+  let bestPos = null;
+
+  for(const c of cands){
+    const dl = c.x - dispW/2, dt = c.y - dispH/2;
+    const dr = dl + dispW,    db = dt + dispH;
+    // 硬约束①：视口内
+    if(dl < safeMargin || dr > vw - safeMargin || dt < topMargin || db > vh - safeMargin) continue;
+    // 硬约束②：不压中央卡片
+    if(cardRect){
+      const cL = cardRect.left - cardMargin, cR = cardRect.right + cardMargin;
+      const cT = cardRect.top  - cardMargin, cB = cardRect.bottom + cardMargin;
+      if(!(dr < cL || dl > cR || db < cT || dt > cB)) continue;
+    }
+    // 软约束：累计重叠面积（越小越好）
+    let overlapArea = 0;
+    for(const p of others){
+      const ow = Math.max(0, Math.min(dr, p.x + p.w) - Math.max(dl, p.x));
+      const oh = Math.max(0, Math.min(db, p.y + p.h) - Math.max(dt, p.y));
+      overlapArea += ow * oh;
+    }
+    if(overlapArea === 0){
+      return {x: c.x, y: c.y, name: 'clean'};
+    }
+    if(overlapArea < bestScore){
+      bestScore = overlapArea;
+      bestPos = {x: c.x, y: c.y, name: 'best-effort'};
+    }
+  }
+
+  if(bestPos) return bestPos;
+  // 兜底：实在没位置时放视口右下角
+  return {x: vw - dispW/2 - safeMargin, y: vh - dispH/2 - safeMargin, name: 'corner'};
 }
 
 // 关掉合体状态：两片回归原位

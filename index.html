@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v84 (2026-06-14) — 手机端:点标题栏回主页时同步折叠 13 种结构 -->
+<!-- 斑斓部件 · v85 (2026-06-14) — 手机端:① 部件沉到卡片背后 ② 部件缩小到 30~34px、配对距离收紧 ③ 卡片整体 zoom:0.7 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v84">
+<meta name="version" content="v85">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -379,7 +379,10 @@ body::before{content:'';position:fixed;inset:0;background:
   .query-result-grid{grid-template-columns:1fr}
   /* ★ 首页两卡：居中 + 压缩尺寸，整个首页一屏装下不滑动 */
   .home-screen{padding:10px 12px}
-  .home-grid{grid-template-columns:1fr;justify-items:center;gap:14px;width:100%}
+  .home-grid{
+    grid-template-columns:1fr;justify-items:center;gap:14px;width:100%;
+    zoom:0.7;                         /* ★ v85:整体缩到 0.7,真实压缩占位高度,给装饰部件让出空间 */
+  }
   .home-grid .home-entry{
     width:100%;max-width:440px;margin:0 auto;
     min-height:0;                 /* 解除 268px 死高度（一屏装不下的元凶） */
@@ -4109,17 +4112,22 @@ function showToast(msg,type=''){
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
   pairCount:   34,    // v74：从 30 增到 34,补偿去掉笔画装饰后的密度
-  pairCountMb: 16,    // 手机端：配对数
+  pairCountMb: 10,    // ★ v85:从 16 降到 10 — 手机端可用区小,过多必失败,降数提高成功率
   loneStroke:   0,    // v74：去掉单笔画装饰（不参与合体,纯装饰太被动）
   loneStrokeMb: 0,    // 同上
   baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
   safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
   pieceSpacing: 14,   // v70：部件与部件之间的最小间距 px（避免重叠）
+  pieceSpacingMb: 8,  // ★ v85:手机端间距收紧
   pairProxMin:  90,   // v70②：同对两片中心距离的最小值（小于此值会重叠）
   pairProxMax: 220,   // v70②：同对两片中心距离的最大值（太远合体时穿屏不雅）
+  pairProxMinMb: 50,  // ★ v85:手机端配对距离区间显著收窄,适配狭窄可用区
+  pairProxMaxMb:130,
   minSize:     50,    // v73：尺寸跨度从 14px 收到 4px,消除视觉大小差异
   maxSize:     54,    // v73：原来 62,现在 54,统一容器尺寸
+  minSizeMb:   30,    // ★ v85:手机端部件缩到 30~34,可叠卡片背后做"纹理"也不会压住卡片内容
+  maxSizeMb:   34,
   driftMin:     9,    // 浮动动画最短时长 s
   driftMax:    16,    // 浮动动画最长时长 s
   mergeDelay: 720,    // 合体后展示完整字的等待 ms
@@ -4209,11 +4217,15 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
       const x = sideEdge + Math.random() * maxX;
       const y = topMargin + Math.random() * maxY;
       // ① 卡片安全区检测
-      const cardClear = (x + size < safeRect.x - m ||
-                         x > safeRect.x + safeRect.w + m ||
-                         y + size < safeRect.y - m ||
-                         y > safeRect.y + safeRect.h + m);
-      if(!cardClear) continue;
+      // ★ v85 方案A：手机端跳过此检测 —— 可用区被卡片挤掉 90% 导致几乎全 pair 失败;
+      //   改让部件沉到卡片背后(deco-layer z-index:0,卡片 z-index:1),像纹理水印
+      if(!_decoState.isMobile){
+        const cardClear = (x + size < safeRect.x - m ||
+                           x > safeRect.x + safeRect.w + m ||
+                           y + size < safeRect.y - m ||
+                           y > safeRect.y + safeRect.h + m);
+        if(!cardClear) continue;
+      }
       // ② 锚点距离检测（始终严格,放不下就跳过这对,不允许跨屏配对）
       if(anchor){
         const acx = anchor.x + anchor.w/2;
@@ -4271,6 +4283,14 @@ async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackT
 // v74：配对两片用**同一个 size**,按这对的总笔画数算（避免对内大小差异）
 // 笔画总数越多 → 容器越小（避免视觉过重）；越少 → 越大（避免显得稀薄）
 function _sizeForPair(totalStrokes){
+  // ★ v85 方案B:手机端整体缩小到 30~34px,与卡片背后并存不显突兀
+  if(_decoState.isMobile){
+    if(totalStrokes <= 4)   return 34;
+    if(totalStrokes <= 8)   return 33;
+    if(totalStrokes <= 12)  return 32;
+    if(totalStrokes <= 16)  return 31;
+    return 30;
+  }
   if(totalStrokes <= 4)   return 60;
   if(totalStrokes <= 8)   return 56;
   if(totalStrokes <= 12)  return 52;
@@ -4348,10 +4368,12 @@ function initDeco(){
       const anchor = (r === 0) ? null : {
         x: positions[0].x, y: positions[0].y,
         w: pieceSpecs[0].size, h: pieceSpecs[0].size,
-        minDist: DECO_CFG.pairProxMin,
-        maxDist: DECO_CFG.pairProxMax,
+        // ★ v85 方案B:手机端配对距离收紧到 50~130,匹配窄可用区
+        minDist: _decoState.isMobile ? DECO_CFG.pairProxMinMb : DECO_CFG.pairProxMin,
+        maxDist: _decoState.isMobile ? DECO_CFG.pairProxMaxMb : DECO_CFG.pairProxMax,
       };
-      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing, anchor);
+      const spacing = _decoState.isMobile ? DECO_CFG.pieceSpacingMb : DECO_CFG.pieceSpacing;
+      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, spacing, anchor);
       if(!pos){
         // 放置失败,回滚已加入的本对部件
         placed.length = placedSnapshot;

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v86 (2026-06-14) — 手机端:① 撤销"沉到卡背后"(部件可见)② 卡片内部数值真实缩到0.7 ③ safeMargin=4 紧贴卡边 ④ 合体卡的字改用HanziWriter笔画SVG -->
+<!-- 斑斓部件 · v87 (2026-06-14) — ① 按钮重命名"13种结构"(全端) ② 手机端 initDeco 重试机制 + visualViewport + 强制刷新 struct-h ③ ?dbg=1 显示诊断条 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v86">
+<meta name="version" content="v87">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -787,7 +787,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       反馈 / Feedback
     </button>
-    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">折叠 / Collapse</button></div>
+    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">13种结构 / 13 Structures</button></div>
     <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="display:none;background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
@@ -1997,11 +1997,8 @@ function toggleStructBar(){
   const chevron=document.getElementById('struct-chevron');
   body.classList.toggle('open');
   chevron.classList.toggle('open');
-  // 同步切换按钮文字
-  const btn=document.getElementById('toggle-struct-btn');
-  if(btn){
-    btn.textContent = body.classList.contains('open') ? '折叠 / Collapse' : '展开 / Expand';
-  }
+  // ★ v87:按钮文字固定为"13种结构 / 13 Structures",不再切换 — 展开/折叠状态通过 body.open class 即可
+  // (保留 btn 引用以便未来需要时用,但不动 textContent)
   setTimeout(updateStructHeight, 420);
 }
 
@@ -2011,11 +2008,10 @@ function applyMobileStructDefault(){
   if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
     const body=document.getElementById('struct-body');
     const chevron=document.getElementById('struct-chevron');
-    const btn=document.getElementById('toggle-struct-btn');
     if(body && body.classList.contains('open')){
       body.classList.remove('open');
       if(chevron) chevron.classList.remove('open');
-      if(btn) btn.textContent='展开 / Expand';
+      // ★ v87:按钮文字固定为"13种结构 / 13 Structures",不再覆盖
     }
   }
   updateStructHeight();
@@ -4324,10 +4320,22 @@ function initDeco(){
   const pool = _buildDecoPairPool();
   const pairs = _sampleN(pool, Math.min(targetPairs, pool.length));
 
+  // ★ v87:进 initDeco 之前先强制刷新 --struct-h,避免顶栏高度滞后导致 topMargin 错位
+  if(typeof updateStructHeight === 'function') updateStructHeight();
+
   // 计算安全区（卡片网格 bounding rect，相对视口）
   const gridRect = grid.getBoundingClientRect();
   const safeRect = {x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height};
-  const viewport = {w: window.innerWidth, h: window.innerHeight};
+  // ★ v87:viewport 优先用 visualViewport(iOS Safari 上更准确,会扣掉 URL 栏/工具栏的占位)
+  const vpW = (window.visualViewport && window.visualViewport.width)  || window.innerWidth  || document.documentElement.clientWidth;
+  const vpH = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight;
+  const viewport = {w: vpW, h: vpH};
+
+  // ★ v87:gridRect 异常(布局未完成,height < 50)时,跳过本次,留给外层重试机制
+  if(gridRect.height < 50){
+    if(window._DECO_DEBUG) console.warn('[deco] gridRect.height too small:', gridRect.height, '→ skip & retry later');
+    return;
+  }
 
   // 顶部留白：让出顶栏（struct-bar）高度
   const structH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--struct-h')) || 80;
@@ -4460,6 +4468,19 @@ function initDeco(){
       _decoState.pieces.forEach(p => p.el.classList.add('visible'));
     }, 80);
   });
+
+  // ★ v87:URL 加 ?dbg=1 时,在屏幕底部显示一个微型诊断条(给手机端排错用)
+  //   显示:viewport / struct-h / gridRect / 放下的对数 — 你给我截这一行就够诊断
+  if(typeof URLSearchParams !== 'undefined' && new URLSearchParams(location.search).get('dbg') === '1'){
+    let bar = document.getElementById('deco-debug-bar');
+    if(!bar){
+      bar = document.createElement('div');
+      bar.id = 'deco-debug-bar';
+      bar.style.cssText = 'position:fixed;left:4px;right:4px;bottom:4px;z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.4 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;text-align:left;word-break:break-all';
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = `vp:${vpW}×${vpH} | struct-h:${structH} | grid:(${gridRect.left.toFixed(0)},${gridRect.top.toFixed(0)},${gridRect.width.toFixed(0)}×${gridRect.height.toFixed(0)}) | placed:${placedPairCount}/${pairs.length} pairs · pieces:${_decoState.pieces.length} | mb:${_decoState.isMobile}`;
+  }
 
   _decoState.inited = true;
 }
@@ -4865,12 +4886,23 @@ window.addEventListener('resize', _onDecoResize);
 })();
 
 // 页面首次加载：稍等 CHAR_DB 与 HanziWriter 就绪后初始化
+// ★ v87:增加重试机制 —— 手机端 iOS Safari 上,载入后布局/视口测量可能滞后,
+//        首次跑没放下任何部件时,自动延后再试,直到放下或重试次数耗尽。
 window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    if(document.getElementById('home-screen').style.display !== 'none'){
-      initDeco();
+  let attempts = 0;
+  function tryInit(){
+    attempts++;
+    const home = document.getElementById('home-screen');
+    if(!home || home.style.display === 'none') return;
+    initDeco();
+    // 验证:如果一对都没放下,延后再来 — 重试间隔逐步拉长
+    if(_decoState.pieces.length === 0 && attempts < 5){
+      const nextDelay = [600, 1200, 2000, 3000][attempts - 1] || 3000;
+      if(window._DECO_DEBUG) console.warn(`[deco] attempt ${attempts} placed 0 pieces; retry in ${nextDelay}ms`);
+      setTimeout(tryInit, nextDelay);
     }
-  }, 350);
+  }
+  setTimeout(tryInit, 350);
 });
 // ══ end v67 漂浮部件装饰层 ══
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v89 (2026-06-14) — ① 合体卡 renderGlyphInto 加 3 次重试(0/1.5s/4s),全部字保证 SVG 笔画呈现 ② initDeco 预拉取装饰字 stroke 数据(加速) ③ 部件兜底时间 5s→2.5s -->
+<!-- 斑斓部件 · v90 (2026-06-14) — ① 进入网页 2 秒后自动演示 1 对部件拼合(全端通用,首次访问触发一次)② 合体卡 renderGlyphInto 等 hsk.json 整包就绪才认输,保证 SVG 笔画呈现 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v89">
+<meta name="version" content="v90">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -3354,7 +3354,7 @@ function _loadHskBundle(){
   _hskBundlePromise = fetch('hsk.json')
     .then(r => r.ok ? r.json() : {})
     .then(j => { _hskBundleData = j; return j; })   // ★ 标记整包就绪
-    .catch(() => ({}));
+    .catch(() => { _hskBundleData = {}; return {}; });   // ★ v90:失败时也设 _hskBundleData={},确保 await 解除
   return _hskBundlePromise;
 }
 // ★ v37 ②A：开屏即预载 hsk.json 整包（7.9MB），不等到 step2 才下载 → 部件随取随有
@@ -3403,20 +3403,29 @@ async function renderGlyphInto(el, char){
   el.dataset.glyph = char;          // 标记当前应显示的字（防异步过期覆盖）
   el.textContent = '';              // ★ v89:清空,避免显示残留旧字
   try{
-    // ★ v89:重试机制 — 第一次失败往往是 hsk.json 还在下载 / CDN 偶发丢包
-    //        最多 3 次尝试:立即 → 等 1.5s → 等 4s,给 hsk.json 完成 + CDN 重试的机会
-    //        若全部失败才 fallback 到 textContent(印刷字体),保证用户**绝大多数情况下看到 SVG 笔画**
-    const delays = [0, 1500, 4000];
+    // ★ v90:更鲁棒的重试 — 第一次失败 → 等 hsk.json 整包加载完成再试 → 再失败等 3s 最后一搏
+    //        只要这个字在 hsk.json 里有,必定能渲染为 SVG 笔画(避免 fallback 到印刷字体)
     let data = null;
-    for(let i = 0; i < delays.length; i++){
-      if(i > 0) await new Promise(r => setTimeout(r, delays[i]));
-      if(el.dataset.glyph !== char) return;   // 期间已换字 → 丢弃
+    try{ data = await loadStrokeData(char); }catch(e){}
+
+    // ① 第一次失败 → 等 hsk.json 整包加载完成
+    if((!data || !data.strokes || !data.strokes.length) && typeof _hskBundlePromise !== 'undefined' && _hskBundlePromise){
+      if(el.dataset.glyph !== char) return;
+      try{ await _hskBundlePromise; }catch(e){}
+      if(el.dataset.glyph !== char) return;
       try{ data = await loadStrokeData(char); }catch(e){}
-      if(data && data.strokes && data.strokes.length) break;   // 拿到了 → 跳出重试
     }
+
+    // ② 再失败 → 等 3s 最后一搏(让 CDN 偶发丢包有重试机会)
+    if(!data || !data.strokes || !data.strokes.length){
+      await new Promise(r => setTimeout(r, 3000));
+      if(el.dataset.glyph !== char) return;
+      try{ data = await loadStrokeData(char); }catch(e){}
+    }
+
     if(el.dataset.glyph !== char) return;
     if(!data || !data.strokes || !data.strokes.length){
-      el.textContent = char;        // 三次都失败 → 回退文字（最末兜底）
+      el.textContent = char;        // 极端兜底（hsk.json 失败且这个字 CDN 也拉不到 — 现实中几乎不会发生）
       return;
     }
     const NS = 'http://www.w3.org/2000/svg';
@@ -4523,6 +4532,29 @@ function initDeco(){
   //        loadStrokeData 内部有 _strokeInflight 去重 + _strokeCache 缓存,这里只是触发拉取
   if(typeof loadStrokeData === 'function'){
     pairs.forEach(p => { if(p && p.char){ try{ loadStrokeData(p.char); }catch(e){} } });
+  }
+
+  // ★ v90:进入网页时自动演示 1 对部件的拼合过程 — 引导用户理解"点击部件 → 拼合 → 显示字+拼音"
+  //        延迟 2 秒等部件 SVG 渲染好;只在本会话首次跑(autoDemoDone 标记)
+  if(!_decoState.autoDemoDone){
+    _decoState.autoDemoDone = true;
+    setTimeout(()=>{
+      // 找一对**两片都已 visible** 的(确认渲染完成);优先 pairId 0,否则取首个就绪对
+      const pairIds = [...new Set(_decoState.pieces.filter(p => p.role === 'pair').map(p => p.pairId))];
+      for(const pid of pairIds){
+        const pieces = _decoState.pieces.filter(p => p.pairId === pid);
+        if(pieces.length === 2 && pieces.every(p => p.el.classList.contains('visible'))){
+          // 模拟从该对左/上片(roleIdx=0)触发合体
+          try{ _activateMergePair(pid, 0); }catch(e){}
+          return;
+        }
+      }
+      // 没有完全就绪的对 → 再等 2 秒兜底试一次(SVG 网络慢的情况)
+      setTimeout(()=>{
+        const piece = _decoState.pieces.find(p => p.role === 'pair' && p.pairId === pairIds[0]);
+        if(piece){ try{ _activateMergePair(piece.pairId, 0); }catch(e){} }
+      }, 2000);
+    }, 2000);
   }
 
   // ★ v87:URL 加 ?dbg=1 时,在屏幕底部显示一个微型诊断条(给手机端排错用)

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v77 (2026-06-14) — 已合体的对永久保留,新对合体不打散旧对 -->
+<!-- 斑斓部件 · v78 (2026-06-14) — 合体位置智能避让,避免重叠+避开顶部结构表 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v77">
+<meta name="version" content="v78">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -4102,9 +4102,9 @@ const _decoLoneStrokes = [
 
 let _decoState = {
   inited: false,
-  pieces: [],           // [{el, pairId, role, baseLeft, baseTop, size, fullChar, py, structure, ranges, ...}]
-  cardActivePair: null, // v77：当前显示合体卡的 pairId（仅一个卡显示）
-  mergedPairs: new Set(),  // v77：所有已合体的 pairId（永久保留,直到 init 重置）
+  pieces: [],
+  cardActivePair: null,
+  mergedPairs: new Set(),
   leaveTimer: null,
   isMobile: false,
   mergeCenter: null,
@@ -4113,6 +4113,8 @@ let _decoState = {
   lastMouseY: 0,
   trackRadius: 0,
   dispHideTimer: null,
+  topMargin: 80,           // v78：合体时也要避开顶部结构表
+  sideEdge: 10,            // v78：合体时也要避开侧边
 };
 
 // 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
@@ -4273,6 +4275,9 @@ function initDeco(){
   const structH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--struct-h')) || 80;
   const topMargin = structH + 14;
   const sideEdge = DECO_CFG.sideEdge;
+  // v78：记到 state,供合体时的避让计算用
+  _decoState.topMargin = topMargin;
+  _decoState.sideEdge = sideEdge;
 
   // v71：部件保持静止,不再添加 f-a/f-b/f-c/f-d 浮动 class
   // const floatVars = ['f-a','f-b','f-c','f-d'];  // 已废弃
@@ -4428,17 +4433,23 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   const [a, b] = pieces;
 
   // 合体中心：两片当前中心的中点
-  const cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
-  const cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
+  let cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
+  let cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
+
+  // v78：避让 —— 找一个不与已合体对/中央卡片/顶部结构表冲突的位置
+  //      （a 和 b 同 size,直接传 a.size）
+  const cleared = _findClearMergeCenter(cx, cy, a.size, pairIdx);
+  cx = cleared.x; cy = cleared.y;
 
   // v75：两片完全叠加在同一位置（aligned SVG 按整字坐标绘制）
   const aX = cx - a.size/2,  aY = cy - a.size/2;
   const bX = cx - b.size/2,  bY = cy - b.size/2;
 
-  // 边界保护：合体点不能跑出视口
+  // 边界保护：合体点不能跑出视口（v78：顶部用 state.topMargin 避开结构表）
   const vw = window.innerWidth, vh = window.innerHeight;
+  const topM = _decoState.topMargin || 100;
   const clampX = (x, s) => Math.max(6, Math.min(vw - s - 6, x));
-  const clampY = (y, s) => Math.max(60, Math.min(vh - s - 6, y));
+  const clampY = (y, s) => Math.max(topM, Math.min(vh - s - 6, y));
   const aXc = clampX(aX, a.size), aYc = clampY(aY, a.size);
   const bXc = clampX(bX, b.size), bYc = clampY(bY, b.size);
 
@@ -4517,6 +4528,72 @@ function _collectOtherPiecesRects(excludePairId){
     result.push({x, y, w: p.size, h: p.size});
   });
   return result;
+}
+
+// v78：找一个不与已合体对/卡片/顶部结构表/视口冲突的合体中心位置
+//   - 先试两片中点（pcx, pcy）,如果合法直接用
+//   - 否则螺旋向外搜索（步长 8px,最多 ~300px 半径）
+//   - 都找不到时返回最少重叠的位置（兜底）
+//   入参 size: 合体部件单边长度（两片同 size,所以是 a.size）
+function _findClearMergeCenter(pcx, pcy, size, excludePairId){
+  const others = _collectOtherPiecesRects(excludePairId);
+  const grid = document.querySelector('.home-grid');
+  const cardRect = grid ? grid.getBoundingClientRect() : null;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const topM = _decoState.topMargin || 100;
+  const sideE = _decoState.sideEdge || 10;
+  const gap = 14;  // 合体字之间的最小间距 px
+
+  // 检查 (tx, ty) 中心位置是否合法（不重叠 + 在边界内）
+  // 返回 0 = 干净,正数 = 重叠面积总和（用于评分）;-1 = 违反硬约束（视口/卡片）
+  function score(tx, ty){
+    const tl = tx - size/2 - gap, tt = ty - size/2 - gap;
+    const tr = tx + size/2 + gap, tb = ty + size/2 + gap;
+    // 硬约束①：在视口内（含顶部结构表避让）
+    if(tl < sideE || tr > vw - sideE || tt < topM || tb > vh - sideE) return -1;
+    // 硬约束②：不压中央卡片
+    if(cardRect){
+      const cL = cardRect.left - 6, cR = cardRect.right + 6;
+      const cT = cardRect.top  - 6, cB = cardRect.bottom + 6;
+      if(!(tr < cL || tl > cR || tb < cT || tt > cB)) return -1;
+    }
+    // 软约束：累计与其他部件的重叠面积
+    let area = 0;
+    for(const p of others){
+      const ow = Math.max(0, Math.min(tr, p.x + p.w) - Math.max(tl, p.x));
+      const oh = Math.max(0, Math.min(tb, p.y + p.h) - Math.max(tt, p.y));
+      area += ow * oh;
+    }
+    return area;
+  }
+
+  // 试原始位置
+  let s = score(pcx, pcy);
+  if(s === 0) return {x: pcx, y: pcy};
+
+  // 螺旋搜索：从近到远扫描周围空位
+  const stepR = 10, stepA = 30;  // 半径步长 10px,角度步长 30°
+  let best = (s >= 0) ? {x: pcx, y: pcy, score: s} : null;
+  for(let r = stepR; r <= 320; r += stepR){
+    for(let a = 0; a < 360; a += stepA){
+      const rad = a * Math.PI / 180;
+      const tx = pcx + r * Math.cos(rad);
+      const ty = pcy + r * Math.sin(rad);
+      const sc = score(tx, ty);
+      if(sc === 0) return {x: tx, y: ty};
+      if(sc > 0 && (!best || sc < best.score)){
+        best = {x: tx, y: ty, score: sc};
+      }
+    }
+  }
+
+  // 实在找不到完全干净的位置 → 用最少重叠的近似
+  if(best) return {x: best.x, y: best.y};
+  // 最最兜底：clamp 到视口内
+  return {
+    x: Math.max(sideE + size/2, Math.min(vw - sideE - size/2, pcx)),
+    y: Math.max(topM + size/2, Math.min(vh - sideE - size/2, pcy)),
+  };
 }
 
 // v76：同一对再次 hover 时仅重新显示合体卡（无需重新动画）

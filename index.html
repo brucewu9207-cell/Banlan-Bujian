@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v94 (2026-06-14) — ① 顶部 4 按钮 grid 等宽+居中 ② 返回按钮默认显示(首页 no-op) ③ 等级方框只剩 HSK N ④ HSK 4-9 加 🔒 锁头 -->
+<!-- 斑斓部件 · v95 (2026-06-14) — 手机端:① 9 个 HSK 方框 flex 等高(min-height:78px) ② 顶部 4 按钮与 HSK 网格对齐(padding 一致)+ font-family:inherit 同字体 ③ QR popover 改为 fixed 居中,绝不溢出屏幕 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v94">
+<meta name="version" content="v95">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -140,7 +140,13 @@ body::before{content:'';position:fixed;inset:0;background:
 .level-select-screen h2{font-size:1.5rem;color:#ffffff;margin-bottom:14px;letter-spacing:0.1em}
 .level-select-screen .subtitle{color:#ffffff;font-size:0.88rem;margin-bottom:14px;font-style:italic;font-family:Georgia,serif}
 .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:680px;margin:0 auto}
-.level-btn{padding:18px 14px;border:2px solid rgba(255,255,255,0.25);border-radius:var(--radius);background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s}
+.level-btn{
+  padding:18px 14px;border:2px solid rgba(255,255,255,0.25);border-radius:var(--radius);
+  background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s;
+  /* ★ v95:flex column + min-height 让 9 个方框等高,锁头/无锁头都一致 */
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:108px;
+}
 .level-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--bamboo-light)}
 .level-btn .level-num{font-size:1.6rem;font-weight:bold;color:#ffffff;display:block;line-height:1}
 .level-btn .level-label{font-size:0.72rem;color:#ffffff;margin-top:4px;display:block}
@@ -401,7 +407,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .mode-tab{padding:6px 12px;font-size:0.78rem}
   /* ★ v93:手机端缩小等级方框内"HSK 1"字号,让 HSK 和数字保持同一行(不再换行) */
   .level-btn .level-num{font-size:1.15rem;white-space:nowrap}
-  .level-btn{padding:14px 8px}       /* 配套:卡片 padding 略收紧,避免字号变小后留白过大 */
+  .level-btn{padding:14px 8px;min-height:78px}    /* ★ v95:手机端等高 78px(适配缩小后的字号) */
   .level-btn .level-label{font-size:0.66rem}
   .level-btn .level-count{font-size:0.62rem}
   /* ★ v94:手机端锁头跟随大字号 */
@@ -620,18 +626,18 @@ body::after{
     flex-direction:column;          /* ★ v93:改为两行布局 */
     align-items:center;             /* ★ v94:整组水平居中 */
     gap:6px;
-    padding:8px 12px 4px;
+    padding:8px 14px 4px;           /* ★ v95:左右 padding 14 与 .level-select-screen 一致 → 与 HSK 网格对齐 */
   }
   #header-actions-bar > div{
     position:static !important;     /* 覆盖内联的 position:absolute */
     transform:none !important;      /* 覆盖内联的 translateY(-50%) */
     right:auto !important;left:auto !important;top:auto !important;
-    /* ★ v94:每行用 grid 平均分两栏,两个按钮等宽;整组宽度固定居中 */
+    /* ★ v94:每行用 grid 平均分两栏,两个按钮等宽 */
     display:grid !important;
     grid-template-columns:1fr 1fr !important;
     gap:8px !important;
+    /* ★ v95:去掉 max-width 限制,让顶部按钮组占满与 HSK 网格相同的内宽 */
     width:100%;
-    max-width:340px;                /* 限定整组最大宽,在大屏手机/小平板也居中 */
     flex-wrap:nowrap;
   }
   /* ★ v94:按钮占满 grid 单元 → 4 个完全等宽;text-align 居中保持文字视觉平衡 */
@@ -644,12 +650,30 @@ body::after{
     width:100%;
     text-align:center;
     justify-content:center;         /* 内部 icon+text 容器也居中 */
+    font-family:inherit !important; /* ★ v95:跟随 body 字体(Noto Serif SC),与 HSK 方框一致 */
   }
   .struct-action-btn svg{width:11px;height:11px;flex-shrink:0}
-  /* ★ v94:qr-btn 外层 span 也占满 grid cell,保证 qr-btn 与其他按钮等宽 */
+  /* ★ v95:qr-btn 外层 span 也占满 grid cell,保证 qr-btn 与其他按钮等宽 */
   #header-actions-bar > div > span{
     width:100% !important;
     display:inline-flex !important;
+  }
+  /* ★ v95:手机端 QR popover 改为 fixed 居中,不再从父按钮位置左下展开 → 永远不会被挤出屏幕 */
+  .qr-popover{
+    position:fixed !important;
+    left:50% !important;
+    top:50% !important;
+    right:auto !important;
+    margin:0 !important;
+    transform:translate(-50%,-50%) scaleY(0.85) !important;
+    transform-origin:center center !important;
+    max-width:calc(100vw - 32px);
+    max-height:calc(100vh - 64px);
+    z-index:9999 !important;
+    overflow:auto;
+  }
+  .qr-popover.open{
+    transform:translate(-50%,-50%) !important;
   }
 }
 

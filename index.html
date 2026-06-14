@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v85 (2026-06-14) — 手机端:① 部件沉到卡片背后 ② 部件缩小到 30~34px、配对距离收紧 ③ 卡片整体 zoom:0.7 -->
+<!-- 斑斓部件 · v86 (2026-06-14) — 手机端:① 撤销"沉到卡背后"(部件可见)② 卡片内部数值真实缩到0.7 ③ safeMargin=4 紧贴卡边 ④ 合体卡的字改用HanziWriter笔画SVG -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v85">
+<meta name="version" content="v86">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -379,21 +379,20 @@ body::before{content:'';position:fixed;inset:0;background:
   .query-result-grid{grid-template-columns:1fr}
   /* ★ 首页两卡：居中 + 压缩尺寸，整个首页一屏装下不滑动 */
   .home-screen{padding:10px 12px}
-  .home-grid{
-    grid-template-columns:1fr;justify-items:center;gap:14px;width:100%;
-    zoom:0.7;                         /* ★ v85:整体缩到 0.7,真实压缩占位高度,给装饰部件让出空间 */
-  }
+  /* ★ v86:撤销 zoom:0.7(iOS Safari 表现不稳),改用直接缩小内部所有数值 → 0.7 倍,layout 真实变化 */
+  .home-grid{grid-template-columns:1fr;justify-items:center;gap:10px;width:100%}   /* gap 14→10 */
   .home-grid .home-entry{
-    width:100%;max-width:440px;margin:0 auto;
-    min-height:0;                 /* 解除 268px 死高度（一屏装不下的元凶） */
-    padding:20px 18px;
+    width:100%;max-width:308px;       /* ★ v86:440→308 (×0.7),卡片真实变小 */
+    margin:0 auto;
+    min-height:0;                     /* 解除 268px 死高度（一屏装不下的元凶） */
+    padding:14px 13px;                /* ★ v86:20 18→14 13 (×0.7) */
   }
-  .home-entry-icon{font-size:1.7rem}
-  .home-entry-zh{font-size:1.25rem}
-  .home-entry-en{font-size:0.85rem;margin-bottom:10px}
-  .home-input-row{margin:4px 0 8px;max-width:280px}
-  .teacher-input{padding:9px 12px;font-size:1.05rem}
-  .teacher-go{padding:9px 12px;font-size:0.9rem}
+  .home-entry-icon{font-size:1.2rem}                  /* ★ v86:1.7→1.2 (×0.7) */
+  .home-entry-zh{font-size:0.9rem}                    /* ★ v86:1.25→0.9 (×0.7) */
+  .home-entry-en{font-size:0.6rem;margin-bottom:7px}  /* ★ v86:0.85, 10→0.6, 7 (×0.7) */
+  .home-input-row{margin:3px 0 6px;max-width:196px}   /* ★ v86:280→196 (×0.7) */
+  .teacher-input{padding:7px 9px;font-size:0.75rem}   /* ★ v86:9 12, 1.05→7 9, 0.75 (×0.7) */
+  .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
 }
@@ -4206,7 +4205,9 @@ function _sampleN(arr, n){
 // v70②：anchor 可选 {x,y,w,h,minDist,maxDist} → 把候选位置约束在某锚点附近
 //        anchor 严格执行（不放宽）：拿不到合格位置宁愿跳过这对,也不让配对横跨整屏
 function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
-  const m = DECO_CFG.safeMargin;
+  // ★ v86:撤销 v85 方案A(部件不再沉到卡片背后,因为半透明卡片叠加后部件几乎隐形)
+  //         手机端用更小 safeMargin=4,部件可紧贴卡片边但不重叠,密度更高
+  const m = _decoState.isMobile ? 4 : DECO_CFG.safeMargin;
   const maxX = viewport.w - 2*sideEdge - size;
   const maxY = viewport.h - topMargin - sideEdge - size;
   if(maxX <= 0 || maxY <= 0) return null;
@@ -4216,16 +4217,12 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
     for(let i = 0; i < 80; i++){
       const x = sideEdge + Math.random() * maxX;
       const y = topMargin + Math.random() * maxY;
-      // ① 卡片安全区检测
-      // ★ v85 方案A：手机端跳过此检测 —— 可用区被卡片挤掉 90% 导致几乎全 pair 失败;
-      //   改让部件沉到卡片背后(deco-layer z-index:0,卡片 z-index:1),像纹理水印
-      if(!_decoState.isMobile){
-        const cardClear = (x + size < safeRect.x - m ||
-                           x > safeRect.x + safeRect.w + m ||
-                           y + size < safeRect.y - m ||
-                           y > safeRect.y + safeRect.h + m);
-        if(!cardClear) continue;
-      }
+      // ① 卡片安全区检测(手机端 m=4,贴边即可;桌面端 m=36 留呼吸感)
+      const cardClear = (x + size < safeRect.x - m ||
+                         x > safeRect.x + safeRect.w + m ||
+                         y + size < safeRect.y - m ||
+                         y > safeRect.y + safeRect.h + m);
+      if(!cardClear) continue;
       // ② 锚点距离检测（始终严格,放不下就跳过这对,不允许跨屏配对）
       if(anchor){
         const acx = anchor.x + anchor.w/2;
@@ -4548,7 +4545,15 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
       if(lv){ lvBox.textContent = 'HSK ' + lv; lvBox.style.display = 'block'; }
       else { lvBox.style.display = 'none'; }
     }
-    charBox.textContent = a.fullChar;
+    charBox.textContent = '';   // ★ v86:清掉旧文字,准备用 SVG 笔画渲染
+    // ★ v86:与米字格中央大字同款 — HanziWriter 笔画数据 → SVG path,Y轴翻转,currentColor 填充
+    //        SVG 用 1em 跟随 .deco-merge-char 的 font-size(57px),颜色继承 color:#2a3a30
+    //        无笔画数据时 renderGlyphInto 内部自动 fallback 到 textContent(原楷体字体栈)
+    if(typeof renderGlyphInto === 'function'){
+      renderGlyphInto(charBox, a.fullChar);
+    } else {
+      charBox.textContent = a.fullChar;
+    }
     pyBox.textContent = a.py;
 
     // v77：避让用**当前所有部件的实际位置**（包括已合体的对都在合体位置）

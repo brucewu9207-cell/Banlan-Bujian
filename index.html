@@ -3178,8 +3178,7 @@ function mergeCharacter(){
   renderGlyphInto(document.getElementById('result-char'), char);   // ★ v40：用米字格那种笔画字形（原 textContent 字体）
   const side=document.getElementById('result-side');
   side.style.opacity='1';side.style.pointerEvents='auto';
-  const nbw=document.getElementById('next-btn-wrap');
-  if(nbw) nbw.style.display='block';
+  // ★ v64：电脑端「下一个字」按钮改到「写对汉字」后才点亮（见 startWritingQuiz 的 onComplete），此处不再立即显示
   // ✅ 拖拽成功：轻快提示音（撒花改到写对汉字后）
   playCorrectSound();
   // 🔓 解锁 ③ 书写练习（④ 例词改到写对汉字后才解锁）
@@ -3670,6 +3669,8 @@ function startWritingQuiz(){
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
         wizUnlock(4);   // ★ v52④：只解锁④,不自动翻页;用户点「下一步」才翻
+        // ★ v64：电脑端「下一个字」按钮改到此处才点亮（原本在 mergeCharacter 拼对部件后就亮，已改为只有写对汉字后才亮）
+        const nbw=document.getElementById('next-btn-wrap'); if(nbw) nbw.style.display='block';
       },
     });
   }catch(err){

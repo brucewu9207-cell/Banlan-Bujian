@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v96 (2026-06-14) — ① 手机端 9 个 HSK 方框组垂直居中 ② 13 种结构展开时点击任意位置可折叠(struct-body 加 onclick) ③ 反馈弹窗顶部条 2 行布局 -->
+<!-- 斑斓部件 · v97 (2026-06-14) — 手机端:① HSK 方框居中改用 --fit-vh 计算更准 ② 反馈弹窗铺满全屏 + iframe 裁底 64px 隐藏 Microsoft 365 水印 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v96">
+<meta name="version" content="v97">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -405,9 +405,10 @@ body::before{content:'';position:fixed;inset:0;background:
   .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
-  /* ★ v96:9 个 HSK 方框组在手机端垂直居中于剩余空间 */
+  /* ★ v97:9 个 HSK 方框组居中于下面空白处 — 用 JS 实测的 --fit-vh 替代 100vh(iOS Safari 更准);
+        只减顶栏高度和少量底部 padding,让 .level-select-screen 占满剩余空间后 flex 居中 */
   .level-select-screen{
-    min-height:calc(100vh - var(--struct-h, 200px) - 80px);    /* 减去顶栏(已含按钮组)和 Safari 底部工具栏估值 */
+    min-height:calc(var(--fit-vh, 100vh) - var(--struct-h, 200px) - 28px);
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -681,6 +682,21 @@ body::after{
   }
   .qr-popover.open{
     transform:translate(-50%,-50%) !important;
+  }
+  /* ★ v97 反馈弹窗:① 铺满整个手机屏幕 ② iframe 容器 overflow:hidden + iframe 高度多 64px → 裁掉底部 Microsoft 365 水印 */
+  #feedback-modal{
+    padding:0 !important;
+  }
+  #feedback-modal > div{
+    width:100vw !important;
+    height:var(--fit-vh, 100vh) !important;
+    max-width:none !important;
+    max-height:none !important;
+    border-radius:0 !important;
+  }
+  /* iframe 比容器多 64px,被父容器(#feedback-iframe-wrap)的 overflow:hidden 裁掉 → 底部 Microsoft 365 logo 消失 */
+  #feedback-modal #feedback-iframe{
+    height:calc(100% + 64px) !important;
   }
 }
 
@@ -5100,7 +5116,7 @@ showHome();
       <a id="feedback-newtab-link" href="https://forms.office.com/Pages/ResponsePage.aspx?id=GDmBaUijT0KBaEskboYkXP-XIYLvRYFDp-c9F9Ke3EJUQlNDOUtESE4wVVJKQ1VXTFcyRkpEVENFRy4u" target="_blank" rel="noopener" style="font-size:0.88rem;color:#ffffff;background:rgba(20,40,30,0.55);text-decoration:none;padding:8px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-family:inherit;letter-spacing:0.04em;transition:all .2s;text-align:center;display:block" onmouseover="this.style.background='rgba(20,40,30,0.85)'" onmouseout="this.style.background='rgba(20,40,30,0.55)'">在新窗口打开 / Open in new tab ↗</a>
     </div>
     <!-- 容器：iframe + 加载提示/备用 -->
-    <div style="position:relative;flex:1;background:#fff">
+    <div id="feedback-iframe-wrap" style="position:relative;flex:1;background:#fff;overflow:hidden">
       <!-- 加载提示 -->
       <div id="feedback-loading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:#fff;z-index:1">
         <div style="font-size:0.95rem;color:var(--ink-light);margin-bottom:8px">正在加载反馈表单...</div>

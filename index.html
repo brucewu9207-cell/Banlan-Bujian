@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v87 (2026-06-14) — ① 按钮重命名"13种结构"(全端) ② 手机端 initDeco 重试机制 + visualViewport + 强制刷新 struct-h ③ ?dbg=1 显示诊断条 -->
+<!-- 斑斓部件 · v88 (2026-06-14) — ① 部件等 SVG 就绪才淡入(去掉"文字→笔画"过渡)② 手机端 13 种结构卡片整体×0.6 ③ 部件可落到卡片之间和旁边的留白 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v87">
+<meta name="version" content="v88">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -463,9 +463,19 @@ body::before{content:'';position:fixed;inset:0;background:
   .struct-bar-body.open{max-height:320px}
 }
 @media(max-width:500px){
-  .struct-grid{grid-template-columns:repeat(4,1fr)}
+  .struct-grid{
+    grid-template-columns:repeat(4,1fr);
+    padding:4px 0 5px;                         /* ★ v88:6 0 8 → 4 0 5 (×0.6) */
+  }
   .struct-bar-body.open{max-height:900px}
   .struct-bar-header{padding:10px 16px}
+  /* ★ v88:手机端 13 种汉字结构卡片整体缩到 0.6 倍 — padding / 字号 / SVG 尺寸 全部 ×0.6 */
+  .struct-card{padding:3px 2px}                                  /* 6 4 → 3 2 */
+  .struct-card-num{font-size:0.84rem;margin-bottom:0}            /* 1.4rem → 0.84rem */
+  .struct-card-svg{width:40px;height:40px;margin-bottom:2px}     /* 66 → 40 (×0.6) */
+  .struct-card-name{font-size:0.45rem;margin-bottom:0;line-height:1.15}   /* 0.72rem → 0.43→0.45rem (微调可读) */
+  .struct-card-en{font-size:0.48rem;margin-bottom:1px;line-height:1.15}   /* 0.8rem → 0.48rem */
+  .struct-card-ex{font-size:0.47rem;line-height:1.2}             /* 0.78rem → 0.47rem */
 }
 
 .step-title{
@@ -4200,9 +4210,10 @@ function _sampleN(arr, n){
 // v70：placed 参数 → 部件之间不重叠
 // v70②：anchor 可选 {x,y,w,h,minDist,maxDist} → 把候选位置约束在某锚点附近
 //        anchor 严格执行（不放宽）：拿不到合格位置宁愿跳过这对,也不让配对横跨整屏
-function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
+function _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
   // ★ v86:撤销 v85 方案A(部件不再沉到卡片背后,因为半透明卡片叠加后部件几乎隐形)
   //         手机端用更小 safeMargin=4,部件可紧贴卡片边但不重叠,密度更高
+  // ★ v88:safeRects 由"整个 grid"改为"每张卡片各自" → 遍历每张卡片检测,允许部件落到卡片之间和旁边
   const m = _decoState.isMobile ? 4 : DECO_CFG.safeMargin;
   const maxX = viewport.w - 2*sideEdge - size;
   const maxY = viewport.h - topMargin - sideEdge - size;
@@ -4213,11 +4224,16 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
     for(let i = 0; i < 80; i++){
       const x = sideEdge + Math.random() * maxX;
       const y = topMargin + Math.random() * maxY;
-      // ① 卡片安全区检测(手机端 m=4,贴边即可;桌面端 m=36 留呼吸感)
-      const cardClear = (x + size < safeRect.x - m ||
-                         x > safeRect.x + safeRect.w + m ||
-                         y + size < safeRect.y - m ||
-                         y > safeRect.y + safeRect.h + m);
+      // ① 卡片安全区检测(手机端 m=4 紧贴卡边;桌面端 m=36 留呼吸)— 遍历每张卡片
+      let cardClear = true;
+      for(let k = 0; k < safeRects.length; k++){
+        const sr = safeRects[k];
+        const clearOfThis = (x + size < sr.x - m ||
+                             x > sr.x + sr.w + m ||
+                             y + size < sr.y - m ||
+                             y > sr.y + sr.h + m);
+        if(!clearOfThis){ cardClear = false; break; }
+      }
       if(!cardClear) continue;
       // ② 锚点距离检测（始终严格,放不下就跳过这对,不允许跨屏配对）
       if(anchor){
@@ -4244,19 +4260,26 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
 }
 
 // 异步把 SVG 笔画图形画进 piece 的 inner 容器
-async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText){
-  // v79：立即显示文字 fallback —— 不等 hsk.json,首屏部件马上可见
-  if(fallbackText){
-    innerEl.innerHTML = `<span class="deco-fallback-text" style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
-  }
-  // SVG 后台渲染,准备好后替换文字
+// ★ v88:去掉"先显示文字 fallback,再替换成 SVG"的过渡过程 —— 用户不希望看到从文字到笔画的渐变
+//        改造为:piece 初始 opacity:0,SVG 加载完成才加 visible class(平滑淡入)
+//        兜底:5 秒后 SVG 仍未来 → 显示 fallback 文字 + visible,避免永远空白
+async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText, pieceEl){
+  // 5 秒兜底:如果 SVG 还没好,显示文字 fallback + visible
+  const fallbackTimer = setTimeout(()=>{
+    if(pieceEl && !pieceEl.classList.contains('visible')){
+      if(fallbackText && innerEl && !innerEl.querySelector('svg')){
+        innerEl.innerHTML = `<span class="deco-fallback-text" style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
+      }
+      pieceEl.classList.add('visible');
+    }
+  }, 5000);
+
   try{
     const svgSolo = await renderComponentStrokes(srcChar, strokeIdx, color, true);
     const svgAligned = await renderComponentStrokes(srcChar, strokeIdx, color, 'whole');
     if(svgSolo || svgAligned){
-      // 清掉 fallback 文字
-      const fb = innerEl.querySelector('.deco-fallback-text');
-      if(fb) fb.remove();
+      // 清空容器(防止 5s 兜底已经塞了 fallback)
+      innerEl.innerHTML = '';
       if(svgSolo){
         svgSolo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
         svgSolo.dataset.mode = 'solo';
@@ -4267,9 +4290,18 @@ async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackT
         svgAligned.dataset.mode = 'aligned';
         innerEl.appendChild(svgAligned);
       }
+      clearTimeout(fallbackTimer);
+      // SVG 就绪 → 让 piece 显示(transition 触发 0.6s 淡入)
+      if(pieceEl) pieceEl.classList.add('visible');
       return true;
     }
   }catch(e){}
+  // SVG 拿不到 → 立即 fallback + visible(不等 5s 兜底)
+  clearTimeout(fallbackTimer);
+  if(fallbackText && innerEl){
+    innerEl.innerHTML = `<span class="deco-fallback-text" style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
+  }
+  if(pieceEl) pieceEl.classList.add('visible');
   return false;
 }
 
@@ -4325,7 +4357,18 @@ function initDeco(){
 
   // 计算安全区（卡片网格 bounding rect，相对视口）
   const gridRect = grid.getBoundingClientRect();
-  const safeRect = {x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height};
+  // ★ v88:safeRect 从"整个 grid 的大矩形"改为"每张卡片各自的 rect"数组
+  //        意义:grid 100% 宽,但卡片实际只占 308 宽(手机端) — 旧逻辑禁止部件落到卡片左右两侧的留白和卡片之间的 gap
+  //        新逻辑只规避每张卡片本身,允许部件落到卡片"周围"和"之间"
+  const entries = home.querySelectorAll('.home-grid .home-entry');
+  const safeRects = [...entries].map(el => {
+    const r = el.getBoundingClientRect();
+    return {x: r.left, y: r.top, w: r.width, h: r.height};
+  });
+  // 兜底:取不到 entry rect 时,退回到 gridRect
+  if(!safeRects.length){
+    safeRects.push({x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height});
+  }
   // ★ v87:viewport 优先用 visualViewport(iOS Safari 上更准确,会扣掉 URL 栏/工具栏的占位)
   const vpW = (window.visualViewport && window.visualViewport.width)  || window.innerWidth  || document.documentElement.clientWidth;
   const vpH = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight;
@@ -4378,7 +4421,7 @@ function initDeco(){
         maxDist: _decoState.isMobile ? DECO_CFG.pairProxMaxMb : DECO_CFG.pairProxMax,
       };
       const spacing = _decoState.isMobile ? DECO_CFG.pieceSpacingMb : DECO_CFG.pieceSpacing;
-      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, spacing, anchor);
+      const pos = _randomDecoPos(safeRects, viewport, spec.size, sideEdge, topMargin, placed, spacing, anchor);
       if(!pos){
         // 放置失败,回滚已加入的本对部件
         placed.length = placedSnapshot;
@@ -4409,7 +4452,7 @@ function initDeco(){
       inner.className = 'deco-piece-inner';
       el.appendChild(inner);
 
-      _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, cleanLabel);
+      _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, cleanLabel, el);   // ★ v88:传 el 用于 SVG 就绪后再 visible
 
       if(_decoState.isMobile){
         el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
@@ -4436,7 +4479,7 @@ function initDeco(){
     //      留这段代码以便未来若想恢复笔画装饰再开启。下面用固定 size 兜底,避免引用已删的函数。
     const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
     const size = 56;
-    const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
+    const pos = _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
     if(!pos) continue;
     placed.push({x:pos.x, y:pos.y, w:size, h:size});
     placedStrokeCount++;
@@ -4452,7 +4495,7 @@ function initDeco(){
     inner.className = 'deco-piece-inner';
     el.appendChild(inner);
 
-    _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '');
+    _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '', el);   // ★ v88
     layer.appendChild(el);
     _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
   }
@@ -4462,12 +4505,8 @@ function initDeco(){
     console.log(`[deco] placed ${placedPairCount}/${pairs.length} pairs, ${placedStrokeCount}/${targetLone} strokes; total pieces: ${_decoState.pieces.length}`);
   }
 
-  // 全部就位后淡入
-  requestAnimationFrame(()=>{
-    setTimeout(()=>{
-      _decoState.pieces.forEach(p => p.el.classList.add('visible'));
-    }, 80);
-  });
+  // ★ v88:不再统一加 visible —— 改为每个 piece 在自己的 SVG 就绪后单独 visible(_renderDecoPieceSVG 内部处理)
+  //        这样消除了"先文字、后笔画"的过渡过程,用户只会看到最终笔画 SVG 平滑淡入。
 
   // ★ v87:URL 加 ?dbg=1 时,在屏幕底部显示一个微型诊断条(给手机端排错用)
   //   显示:viewport / struct-h / gridRect / 放下的对数 — 你给我截这一行就够诊断

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v88 (2026-06-14) — ① 部件等 SVG 就绪才淡入(去掉"文字→笔画"过渡)② 手机端 13 种结构卡片整体×0.6 ③ 部件可落到卡片之间和旁边的留白 -->
+<!-- 斑斓部件 · v89 (2026-06-14) — ① 合体卡 renderGlyphInto 加 3 次重试(0/1.5s/4s),全部字保证 SVG 笔画呈现 ② initDeco 预拉取装饰字 stroke 数据(加速) ③ 部件兜底时间 5s→2.5s -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v88">
+<meta name="version" content="v89">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -3401,11 +3401,22 @@ async function loadStrokeData(char){
 async function renderGlyphInto(el, char){
   if(!el) return;
   el.dataset.glyph = char;          // 标记当前应显示的字（防异步过期覆盖）
+  el.textContent = '';              // ★ v89:清空,避免显示残留旧字
   try{
-    const data = await loadStrokeData(char);
-    if(el.dataset.glyph !== char) return;   // 期间已换字 → 丢弃过期结果
+    // ★ v89:重试机制 — 第一次失败往往是 hsk.json 还在下载 / CDN 偶发丢包
+    //        最多 3 次尝试:立即 → 等 1.5s → 等 4s,给 hsk.json 完成 + CDN 重试的机会
+    //        若全部失败才 fallback 到 textContent(印刷字体),保证用户**绝大多数情况下看到 SVG 笔画**
+    const delays = [0, 1500, 4000];
+    let data = null;
+    for(let i = 0; i < delays.length; i++){
+      if(i > 0) await new Promise(r => setTimeout(r, delays[i]));
+      if(el.dataset.glyph !== char) return;   // 期间已换字 → 丢弃
+      try{ data = await loadStrokeData(char); }catch(e){}
+      if(data && data.strokes && data.strokes.length) break;   // 拿到了 → 跳出重试
+    }
+    if(el.dataset.glyph !== char) return;
     if(!data || !data.strokes || !data.strokes.length){
-      el.textContent = char;        // 无数据 → 回退文字（宿主自带楷体字体栈）
+      el.textContent = char;        // 三次都失败 → 回退文字（最末兜底）
       return;
     }
     const NS = 'http://www.w3.org/2000/svg';
@@ -4264,7 +4275,7 @@ function _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, 
 //        改造为:piece 初始 opacity:0,SVG 加载完成才加 visible class(平滑淡入)
 //        兜底:5 秒后 SVG 仍未来 → 显示 fallback 文字 + visible,避免永远空白
 async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText, pieceEl){
-  // 5 秒兜底:如果 SVG 还没好,显示文字 fallback + visible
+  // ★ v89:兜底时间 5 秒 → 2.5 秒,部件更快显示;失败时显示 fallback 文字 + visible,避免长时间空白
   const fallbackTimer = setTimeout(()=>{
     if(pieceEl && !pieceEl.classList.contains('visible')){
       if(fallbackText && innerEl && !innerEl.querySelector('svg')){
@@ -4272,7 +4283,7 @@ async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackT
       }
       pieceEl.classList.add('visible');
     }
-  }, 5000);
+  }, 2500);
 
   try{
     const svgSolo = await renderComponentStrokes(srcChar, strokeIdx, color, true);
@@ -4507,6 +4518,12 @@ function initDeco(){
 
   // ★ v88:不再统一加 visible —— 改为每个 piece 在自己的 SVG 就绪后单独 visible(_renderDecoPieceSVG 内部处理)
   //        这样消除了"先文字、后笔画"的过渡过程,用户只会看到最终笔画 SVG 平滑淡入。
+
+  // ★ v89:并行预拉取所有装饰对应字的笔画数据 — 让合体卡片显示时数据已就绪,避免"印刷字 → SVG"过渡
+  //        loadStrokeData 内部有 _strokeInflight 去重 + _strokeCache 缓存,这里只是触发拉取
+  if(typeof loadStrokeData === 'function'){
+    pairs.forEach(p => { if(p && p.char){ try{ loadStrokeData(p.char); }catch(e){} } });
+  }
 
   // ★ v87:URL 加 ?dbg=1 时,在屏幕底部显示一个微型诊断条(给手机端排错用)
   //   显示:viewport / struct-h / gridRect / 放下的对数 — 你给我截这一行就够诊断

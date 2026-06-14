@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v74 (2026-06-14) — 同对两片同尺寸 + 合体更紧 + 去笔画装饰 -->
+<!-- 斑斓部件 · v75 (2026-06-14) — sharedScale + 合体不复位 + 拼音放大贴近字 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v74">
+<meta name="version" content="v75">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -75,6 +75,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.28)) brightness(1.08)}
 .deco-piece-inner{
   width:100%;height:100%;
+  position:relative;           /* v75：容纳叠加的 solo + aligned SVG */
   display:flex;align-items:center;justify-content:center;
   will-change:transform;
 }
@@ -96,12 +97,12 @@ body::before{content:'';position:fixed;inset:0;background:
 */
 .deco-merge-display{
   position:fixed;pointer-events:none;z-index:6;
-  width:72px;height:92px;
+  width:72px;height:96px;       /* v75：高度 92→96,容纳放大的拼音 */
   background:rgba(255,255,255,0.96);
   border-radius:12px;
   box-shadow:0 6px 20px rgba(20,40,30,0.22);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:4px 4px 3px;box-sizing:border-box;
+  padding:4px 4px 6px;box-sizing:border-box;  /* v75：底部多 padding,拼音不靠边 */
   opacity:0;transform:translate(-50%,-50%) scale(0.96);
   transition:opacity .15s ease, transform .15s ease;
 }
@@ -110,14 +111,14 @@ body::before{content:'';position:fixed;inset:0;background:
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
   font-family:'Kaiti SC','STKaiti','Songti SC',serif;
-  font-size:48px;line-height:1;
+  font-size:46px;line-height:1;   /* v75：48→46,留空间给放大的拼音 */
   color:#2a3a30;
 }
 .deco-merge-pinyin{
   font-family:Georgia,serif;font-style:italic;
-  font-size:13px;line-height:1;
+  font-size:16px;line-height:1;   /* v75：13→16 (1.23倍),用户要求 */
   color:#1a2a20;
-  margin-top:-2px;  /* v74：负边距,拼音紧贴汉字底部 */
+  margin-top:-3px;                /* v75：再贴近字一些 */
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -2745,7 +2746,14 @@ async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
   }
   document.body.removeChild(svg);
   if(bb && bb.width && bb.height){
-    if(sharedScale && full && full.width && full.height){
+    if(sharedScale === 'whole' && full && full.width && full.height){
+      // v75：以**整字中心**为原点（而非部件中心）,部件按原字坐标显示
+      //      用于合体时两片完全叠加 → 视觉上拼成完整字
+      const S=Math.max(full.width, full.height)*1.16;
+      const wcx=full.x+full.width/2, wcy=full.y+full.height/2;
+      const fx=wcx-S/2, fy=(900-wcy)-S/2;
+      svg.setAttribute('viewBox',`${fx} ${fy} ${S} ${S}`);
+    } else if(sharedScale && full && full.width && full.height){
       // 统一缩放：视窗边长 = 整字最大边*1.16，以部件中心定位 → 部件真实大小、粗细与整字一致
       const S=Math.max(full.width, full.height)*1.16;
       const pcx=bb.x+bb.width/2, pcy=bb.y+bb.height/2;
@@ -4190,12 +4198,23 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
 // 异步把 SVG 笔画图形画进 piece 的 inner 容器
 async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText){
   try{
-    const svg = await renderComponentStrokes(srcChar, strokeIdx, color, false);
-    if(svg){
-      svg.style.cssText = 'width:100%;height:100%;display:block';
-      innerEl.appendChild(svg);
-      return true;
+    // v75：每片渲染两个 SVG
+    //   ① solo：sharedScale=true,部件居中,笔画粗细按整字比例（静止时显示）
+    //   ② aligned：sharedScale='whole',以整字中心定位,按原字坐标显示（合体时显示）
+    // 合体时两片切到 aligned + 容器完全叠加 → 视觉拼成完整字
+    const svgSolo = await renderComponentStrokes(srcChar, strokeIdx, color, true);
+    if(svgSolo){
+      svgSolo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
+      svgSolo.dataset.mode = 'solo';
+      innerEl.appendChild(svgSolo);
     }
+    const svgAligned = await renderComponentStrokes(srcChar, strokeIdx, color, 'whole');
+    if(svgAligned){
+      svgAligned.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:none';
+      svgAligned.dataset.mode = 'aligned';
+      innerEl.appendChild(svgAligned);
+    }
+    if(svgSolo || svgAligned) return true;
   }catch(e){}
   // 兜底：用字体字形
   if(fallbackText){
@@ -4318,7 +4337,8 @@ function initDeco(){
         el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
       } else {
         el.addEventListener('mouseenter', (e)=> _activateMergePair(pairIdx, roleIdx, e));
-        el.addEventListener('mouseleave', ()=> _maybeScheduleDeactivate(pairIdx));
+        // v75：mouseleave 不再触发解散——合体后保持原状,只有 hover 新对才切换
+        // el.addEventListener('mouseleave', ()=> _maybeScheduleDeactivate(pairIdx));
       }
 
       layer.appendChild(el);
@@ -4401,59 +4421,45 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   const cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
   const cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
 
-  // 合体后两片紧贴
-  // v71：renderComponentStrokes 在 sharedScale=false 时给 SVG 加了 14% padding,
-  //      所以容器边对齐时,视觉上还是有 ~28% 空隙。用负 gap 把这个 padding 抵消掉。
-  // v74：从 0.30 加大到 0.42,让两片真正"咬合"（用户反馈：再靠近一些）
-  const avgSize = (a.size + b.size) / 2;
-  const gap = -avgSize * 0.42;
-
-  let aX, aY, bX, bY;
-  if(a.structure === 'lr'){
-    // 左右结构：a 在左、b 在右
-    aX = cx - gap/2 - a.size;     aY = cy - a.size/2;
-    bX = cx + gap/2;              bY = cy - b.size/2;
-  } else {
-    // 上下结构：a 在上、b 在下
-    aX = cx - a.size/2;  aY = cy - gap/2 - a.size;
-    bX = cx - b.size/2;  bY = cy + gap/2;
-  }
+  // v75：两片**完全叠加在同一位置**（aligned SVG 按整字坐标绘制,
+  //      两片叠加后视觉上正好拼成完整字）
+  //      原 lr/tb 错位重叠的逻辑不再需要,因为 SVG 内部已经包含正确相对位置。
+  const aX = cx - a.size/2,  aY = cy - a.size/2;
+  const bX = cx - b.size/2,  bY = cy - b.size/2;
 
   // 边界保护：合体点不能跑出视口
   const vw = window.innerWidth, vh = window.innerHeight;
   const clampX = (x, s) => Math.max(6, Math.min(vw - s - 6, x));
   const clampY = (y, s) => Math.max(60, Math.min(vh - s - 6, y));
-  aX = clampX(aX, a.size); aY = clampY(aY, a.size);
-  bX = clampX(bX, b.size); bY = clampY(bY, b.size);
+  const aXc = clampX(aX, a.size), aYc = clampY(aY, a.size);
+  const bXc = clampX(bX, b.size), bYc = clampY(bY, b.size);
 
-  pieces.forEach(p => p.el.classList.add('merging'));
-  a.el.style.left = aX + 'px'; a.el.style.top = aY + 'px';
-  b.el.style.left = bX + 'px'; b.el.style.top = bY + 'px';
+  // v75：切换到 aligned 模式（隐藏 solo,显示 aligned）
+  pieces.forEach(p => {
+    p.el.classList.add('merging');
+    const solo = p.inner.querySelector('[data-mode="solo"]');
+    const aligned = p.inner.querySelector('[data-mode="aligned"]');
+    if(solo) solo.style.display = 'none';
+    if(aligned) aligned.style.display = 'block';
+  });
+  a.el.style.left = aXc + 'px'; a.el.style.top = aYc + 'px';
+  b.el.style.left = bXc + 'px'; b.el.style.top = bYc + 'px';
 
   _decoState.activePair = pairIdx;
   // v70②：合体中心(目标位置) + 悬停宽容半径
   _decoState.mergeCenter = {
-    x: (aX + a.size/2 + bX + b.size/2) / 2,
-    y: (aY + a.size/2 + bY + b.size/2) / 2,
+    x: (aXc + a.size/2 + bXc + b.size/2) / 2,
+    y: (aYc + a.size/2 + bYc + b.size/2) / 2,
   };
   _decoState.trackRadius = Math.max(a.size, b.size) * 2.4 + 20;  // 略宽于两片对角线长
 
-  // v70②：document 级 mousemove —— 同时更新 lastMousePos 并做半径检查
+  // v75：mousemove 只更新 lastMousePos,不再触发解散
+  //      用户反馈"合并完的部件不要复位",所以只在 hover 新对时才切换
   if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); }
   _decoState.mouseHandler = (e)=>{
     _decoState.lastMouseX = e.clientX;
     _decoState.lastMouseY = e.clientY;
-    if(_decoState.activePair !== pairIdx) return;
-    const mc = _decoState.mergeCenter;
-    if(!mc) return;
-    const dist = Math.hypot(e.clientX - mc.x, e.clientY - mc.y);
-    if(dist <= _decoState.trackRadius){
-      // 仍在悬停区：取消任何 pending 解散
-      if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
-    } else {
-      // 离开悬停区：触发解散（带宽限）
-      if(!_decoState.leaveTimer) _scheduleDeactivate(pairIdx);
-    }
+    // v75：不再有 dist > radius → 解散 的逻辑
   };
   document.addEventListener('mousemove', _decoState.mouseHandler);
 
@@ -4470,12 +4476,12 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     pyBox.textContent = a.py;
 
     // v72：智能避让 —— 在合体两片周围 8 个候选方向中找一个不遮挡其他部件、不出视口、不压卡片的位置
-    const dispW = 72, dispH = 92;
+    const dispW = 72, dispH = 96;  // v75：高度从 92 增到 96,容纳放大的拼音
     const mergeBox = {
-      x: Math.min(aX, bX),
-      y: Math.min(aY, bY),
-      w: Math.max(aX + a.size, bX + b.size) - Math.min(aX, bX),
-      h: Math.max(aY + a.size, bY + b.size) - Math.min(aY, bY),
+      x: Math.min(aXc, bXc),
+      y: Math.min(aYc, bYc),
+      w: Math.max(aXc + a.size, bXc + b.size) - Math.min(aXc, bXc),
+      h: Math.max(aYc + a.size, bYc + b.size) - Math.min(aYc, bYc),
     };
     // 已放置的其他部件（剔除当前合体的 a / b）
     const others = _decoState.pieces
@@ -4550,18 +4556,23 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
   return {x: vw - dispW/2 - safeMargin, y: vh - dispH/2 - safeMargin, name: 'corner'};
 }
 
-// 关掉合体状态：两片回归原位
+// 关掉合体状态：两片回归原位 + 切回 solo SVG
 function _deactivateMergePair(pairIdx, immediate){
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
   pieces.forEach(p => {
     p.el.style.left = p.baseLeft + 'px';
     p.el.style.top  = p.baseTop  + 'px';
     p.el.classList.remove('merging');
+    // v75：切回 solo SVG 显示
+    const solo = p.inner && p.inner.querySelector('[data-mode="solo"]');
+    const aligned = p.inner && p.inner.querySelector('[data-mode="aligned"]');
+    if(solo) solo.style.display = 'block';
+    if(aligned) aligned.style.display = 'none';
   });
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
   if(_decoState.activePair === pairIdx) _decoState.activePair = null;
-  // v70②：清理 document 级 mousemove 监听
+  // 清理 document 级 mousemove 监听
   if(_decoState.mouseHandler){
     document.removeEventListener('mousemove', _decoState.mouseHandler);
     _decoState.mouseHandler = null;

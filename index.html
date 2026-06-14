@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v75 (2026-06-14) — sharedScale + 合体不复位 + 拼音放大贴近字 -->
+<!-- 斑斓部件 · v76 (2026-06-14) — 合体卡 2 秒自动消失,部件保持合体位置 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v75">
+<meta name="version" content="v76">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -4111,6 +4111,7 @@ let _decoState = {
   lastMouseX: 0,        // v70②：最近一次已知的光标屏幕位置（用于 mouseleave 时复核）
   lastMouseY: 0,
   trackRadius: 0,       // v70②：当前合体的悬停宽容半径
+  dispHideTimer: null,  // v76：合体卡 2 秒自动消失的 timer
 };
 
 // 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
@@ -4400,18 +4401,24 @@ function initDeco(){
 async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   // 取消任何 pending 的 deactivate
   if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
-  if(_decoState.activePair === pairIdx) return;
-  // 若已有别的对激活,先解散
-  if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
-
-  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
-  if(pieces.length !== 2) return;
 
   // 初始化光标位置（从触发事件取,若无则用上一次记录）
   if(evt && typeof evt.clientX === 'number'){
     _decoState.lastMouseX = evt.clientX;
     _decoState.lastMouseY = evt.clientY;
   }
+
+  // v76：如果是同一对再次 hover —— 不重新合体（部件已经在合体位置）,
+  //      只把合体卡重新显示出来,并重置 2 秒自动隐藏 timer。
+  if(_decoState.activePair === pairIdx){
+    _showMergeCard(pairIdx);
+    return;
+  }
+  // 若已有别的对激活,先解散
+  if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
+
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  if(pieces.length !== 2) return;
 
   // 按 roleIdx 排序：a = roleIdx 0（左/上）, b = roleIdx 1（右/下）
   pieces.sort((p1, p2) => p1.roleIdx - p2.roleIdx);
@@ -4494,7 +4501,57 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     disp.style.left = bestPos.x + 'px';
     disp.style.top  = bestPos.y + 'px';
     disp.classList.add('show');
+
+    // v76：合体卡显示后 2 秒自动隐藏（部件保留在合体位置）
+    if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); }
+    _decoState.dispHideTimer = setTimeout(()=>{
+      const d = document.getElementById('deco-merge-display');
+      if(d) d.classList.remove('show');
+      _decoState.dispHideTimer = null;
+    }, 2000);
   }, DECO_CFG.mergeDelay);
+}
+
+// v76：同一对再次 hover 时仅重新显示合体卡（无需重新动画）
+function _showMergeCard(pairIdx){
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  if(pieces.length !== 2) return;
+  const a = pieces.sort((p1,p2)=>p1.roleIdx - p2.roleIdx)[0];
+  const disp = document.getElementById('deco-merge-display');
+  const charBox = document.getElementById('deco-merge-char');
+  const pyBox = document.getElementById('deco-merge-pinyin');
+  if(!disp || !charBox || !pyBox) return;
+
+  charBox.textContent = a.fullChar;
+  pyBox.textContent = a.py;
+
+  // 根据当前两片实际位置算 mergeBox + 智能避让定位
+  const aR = pieces[0].el.getBoundingClientRect();
+  const bR = pieces[1].el.getBoundingClientRect();
+  const mergeBox = {
+    x: Math.min(aR.left, bR.left),
+    y: Math.min(aR.top, bR.top),
+    w: Math.max(aR.right, bR.right) - Math.min(aR.left, bR.left),
+    h: Math.max(aR.bottom, bR.bottom) - Math.min(aR.top, bR.top),
+  };
+  const others = _decoState.pieces.filter(p => p.pairId !== pairIdx)
+    .map(p => ({x: p.baseLeft, y: p.baseTop, w: p.size, h: p.size}));
+  const gridEl = document.querySelector('.home-grid');
+  const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const bestPos = _findBestDispPosition(mergeBox, 72, 96, others, cardRect, vw, vh);
+
+  disp.style.left = bestPos.x + 'px';
+  disp.style.top  = bestPos.y + 'px';
+  disp.classList.add('show');
+
+  // 重置 2 秒自动隐藏 timer
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); }
+  _decoState.dispHideTimer = setTimeout(()=>{
+    const d = document.getElementById('deco-merge-display');
+    if(d) d.classList.remove('show');
+    _decoState.dispHideTimer = null;
+  }, 2000);
 }
 
 // v72：智能避让算法
@@ -4558,6 +4615,9 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
 
 // 关掉合体状态：两片回归原位 + 切回 solo SVG
 function _deactivateMergePair(pairIdx, immediate){
+  // v76：清理 2 秒自动隐藏 timer
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
+
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
   pieces.forEach(p => {
     p.el.style.left = p.baseLeft + 'px';

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v81 (2026-06-14) — 合体卡修正层级避开结构表 + 首页英文与中文居中对齐 -->
+<!-- 斑斓部件 · v83 (2026-06-14) — 手机端:整个标题栏(.struct-bar-header)点击任意位置回主页 + 触摸反馈 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v81">
+<meta name="version" content="v83">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -584,7 +584,14 @@ body::after{
   /* 顶部操作按钮在窄屏不至于挤压换行难看 */
   .struct-action-btn{padding:8px 14px;font-size:1rem}
   /* ★ 顶部四按钮已被 JS 搬到 #header-actions-bar（浅色页面区）；标题栏只留标题 */
-  .struct-bar-header{padding:8px 10px 9px}
+  .struct-bar-header{
+    padding:8px 10px 9px;
+    cursor:pointer;                         /* ★ v83 ① 明确告知整条可点 */
+    transition:background .15s ease;
+  }
+  .struct-bar-header:active{
+    background:rgba(255,255,255,0.10);      /* ★ v83 ① 触摸瞬间的"按下"反馈,让用户确信点击命中 */
+  }
   #header-actions-bar{
     display:flex;justify-content:center;align-items:center;
     gap:4px;flex-wrap:nowrap;       /* ★ 4个按钮强制挤在一行，不换行 */
@@ -762,7 +769,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 <!-- ══ 13种汉字结构参考栏 ══ -->
 <div class="struct-bar" id="struct-bar">
-  <div class="struct-bar-header" onclick="toggleStructBar()">
+  <div class="struct-bar-header" onclick="onHeaderClick(event)">
     <div class="struct-bar-title" style="text-align:center">
       <div onclick="event.stopPropagation();showHome();" title="回到主页面 / Back to Home" style="display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
@@ -1965,6 +1972,18 @@ document.addEventListener("click",function(e){
     pop.classList.remove("open"); btn.classList.remove("open");
   }
 });
+// ★ v83 ① 顶部标题栏(.struct-bar-header)统一点击入口:
+//   手机端 → 整条点击回主页(showHome)— 包括 logo、"斑斓部件"四字、英文、Mozhou 副标题、空白
+//   电脑端 → 维持原行为(切换 13 种结构表的展开/收起)
+//   子按钮(返回/二维码/反馈/展开/logo 子 div)它们的 onclick 都已 event.stopPropagation,不受影响
+function onHeaderClick(event){
+  if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    showHome();
+  } else {
+    toggleStructBar();
+  }
+}
+
 function toggleStructBar(){
   const body=document.getElementById('struct-body');
   const chevron=document.getElementById('struct-chevron');

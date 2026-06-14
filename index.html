@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v91 (2026-06-14) — ① 自动演示扩展:手机 2 对 / 电脑 3 对,间隔 3.5s 依次 ② renderGlyphInto 移除印刷字 fallback — 失败保持空白,绝不出现宋体/黑体 -->
+<!-- 斑斓部件 · v92 (2026-06-14) — ① 自动演示统一为 3 对(手机+电脑同) ② 修复"再次点击合体字"显示印刷字的 bug:_showMergeCard 也走 renderGlyphInto,所有合体卡字 100% 笔画 SVG -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v91">
+<meta name="version" content="v92">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -4537,12 +4537,12 @@ function initDeco(){
     pairs.forEach(p => { if(p && p.char){ try{ loadStrokeData(p.char); }catch(e){} } });
   }
 
-  // ★ v91:进入网页时自动演示 N 对部件拼合 — 手机 2 对 / 电脑 3 对
+  // ★ v92:进入网页时自动演示 3 对部件拼合 — 手机和电脑端统一 3 对
   //        每对依次触发,间隔 3.5 秒(合体 0.7s + 卡片显示 2s + 隐藏过渡 + 留白)
   //        只在本会话首次跑(autoDemoDone 标记)
   if(!_decoState.autoDemoDone){
     _decoState.autoDemoDone = true;
-    const demoCount = _decoState.isMobile ? 2 : 3;
+    const demoCount = 3;
     setTimeout(()=>{
       // ① 优先挑"两片都已 visible"(SVG 已就绪)的对
       const pairIds = [...new Set(_decoState.pieces.filter(p => p.role === 'pair').map(p => p.pairId))];
@@ -4668,13 +4668,10 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
       else { lvBox.style.display = 'none'; }
     }
     charBox.textContent = '';   // ★ v86:清掉旧文字,准备用 SVG 笔画渲染
-    // ★ v86:与米字格中央大字同款 — HanziWriter 笔画数据 → SVG path,Y轴翻转,currentColor 填充
-    //        SVG 用 1em 跟随 .deco-merge-char 的 font-size(57px),颜色继承 color:#2a3a30
-    //        无笔画数据时 renderGlyphInto 内部自动 fallback 到 textContent(原楷体字体栈)
+    // ★ v92:renderGlyphInto 保证全程笔画 SVG;不再保留任何"显示原字符"的防御 fallback —
+    //        renderGlyphInto 是同文件函数,必然存在;若极端情况未定义则保持空白(不显示印刷字)
     if(typeof renderGlyphInto === 'function'){
       renderGlyphInto(charBox, a.fullChar);
-    } else {
-      charBox.textContent = a.fullChar;
     }
     pyBox.textContent = a.py;
 
@@ -4811,7 +4808,13 @@ function _showMergeCard(pairIdx){
     if(lv){ lvBox.textContent = 'HSK ' + lv; lvBox.style.display = 'block'; }
     else { lvBox.style.display = 'none'; }
   }
-  charBox.textContent = a.fullChar;
+  // ★ v92:再次点击合体后的字 — 之前直接用 textContent → 印刷字
+  //        改为与首次合体一致:走 renderGlyphInto(笔画 SVG),保证全部场景都用笔画渲染
+  //        不保留印刷字 fallback,renderGlyphInto 永不 fallback(v91 设计)
+  charBox.textContent = '';
+  if(typeof renderGlyphInto === 'function'){
+    renderGlyphInto(charBox, a.fullChar);
+  }
   pyBox.textContent = a.py;
 
   // 根据当前两片实际位置算 mergeBox + 智能避让定位

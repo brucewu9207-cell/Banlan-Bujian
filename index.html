@@ -4063,12 +4063,14 @@ const DECO_CFG = {
   safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
   pieceSpacing: 14,   // v70：部件与部件之间的最小间距 px（避免重叠）
+  pairProxMin:  90,   // v70②：同对两片中心距离的最小值（小于此值会重叠）
+  pairProxMax: 220,   // v70②：同对两片中心距离的最大值（太远合体时穿屏不雅）
   minSize:     38,    // 部件最小尺寸 px
   maxSize:     68,    // 部件最大尺寸 px
   driftMin:     9,    // 浮动动画最短时长 s
   driftMax:    16,    // 浮动动画最长时长 s
   mergeDelay: 720,    // 合体后展示完整字的等待 ms
-  leaveGrace: 160,    // mouseleave 宽限期 ms（避免在 pair 内部跳动时闪烁）
+  leaveGrace: 400,    // mouseleave 宽限期 ms（v70②：拉长到 400ms,确保两片移动期间不误触发解散）
 };
 
 // 单笔画装饰库：从字库中取单个笔画作为装饰图形
@@ -4090,6 +4092,11 @@ let _decoState = {
   activePair: null,     // 当前合体的 pairId
   leaveTimer: null,
   isMobile: false,
+  mergeCenter: null,    // v70②：当前合体中心 {x,y},供 document mousemove 计算距离
+  mouseHandler: null,   // v70②：合体期间 document 级 mousemove 监听器引用
+  lastMouseX: 0,        // v70②：最近一次已知的光标屏幕位置（用于 mouseleave 时复核）
+  lastMouseY: 0,
+  trackRadius: 0,       // v70②：当前合体的悬停宽容半径
 };
 
 // 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
@@ -4130,9 +4137,10 @@ function _sampleN(arr, n){
 }
 
 // 生成一个不与卡片重叠、且不出视口、且与已放置部件有最小间距的随机位置
-// v70：新增 placed 数组参数,确保部件之间不重叠
-// 多轮递降 gap：先尝试理想间距,实在没空再缩到最小,保证大多数能放下
-function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap){
+// v70：placed 参数 → 部件之间不重叠
+// v70②：anchor 可选 {x,y,w,h,minDist,maxDist} → 把候选位置约束在某锚点附近
+//        anchor 严格执行（不放宽）：拿不到合格位置宁愿跳过这对,也不让配对横跨整屏
+function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
   const m = DECO_CFG.safeMargin;
   const maxX = viewport.w - 2*sideEdge - size;
   const maxY = viewport.h - topMargin - sideEdge - size;
@@ -4140,7 +4148,7 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
   // 4 轮放置：gap 从理想值递降到最低 4px,每轮 60 次随机尝试
   for(let round = 0; round < 4; round++){
     const gap = Math.max(4, initialGap - round * 3);
-    for(let i = 0; i < 60; i++){
+    for(let i = 0; i < 80; i++){
       const x = sideEdge + Math.random() * maxX;
       const y = topMargin + Math.random() * maxY;
       // ① 卡片安全区检测
@@ -4149,7 +4157,16 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
                          y + size < safeRect.y - m ||
                          y > safeRect.y + safeRect.h + m);
       if(!cardClear) continue;
-      // ② 与已放置部件的间距检测
+      // ② 锚点距离检测（始终严格,放不下就跳过这对,不允许跨屏配对）
+      if(anchor){
+        const acx = anchor.x + anchor.w/2;
+        const acy = anchor.y + anchor.h/2;
+        const ncx = x + size/2;
+        const ncy = y + size/2;
+        const dist = Math.hypot(ncx - acx, ncy - acy);
+        if(dist < anchor.minDist || dist > anchor.maxDist) continue;
+      }
+      // ③ 与已放置部件的间距检测
       let bad = false;
       for(let j = 0; j < placed.length; j++){
         const p = placed[j];
@@ -4239,11 +4256,18 @@ function initDeco(){
     }));
 
     // 尝试给两片各找一个不重叠的位置（用 snapshot 防止部分回滚）
+    // v70②：第二片用 anchor 约束,确保和第一片中心距离在 [pairProxMin, pairProxMax]
     const placedSnapshot = placed.length;
     const positions = [];
     for(let r = 0; r < pieceSpecs.length; r++){
       const spec = pieceSpecs[r];
-      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
+      const anchor = (r === 0) ? null : {
+        x: positions[0].x, y: positions[0].y,
+        w: pieceSpecs[0].size, h: pieceSpecs[0].size,
+        minDist: DECO_CFG.pairProxMin,
+        maxDist: DECO_CFG.pairProxMax,
+      };
+      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing, anchor);
       if(!pos){
         // 放置失败,回滚已加入的本对部件
         placed.length = placedSnapshot;
@@ -4279,8 +4303,8 @@ function initDeco(){
       if(_decoState.isMobile){
         el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
       } else {
-        el.addEventListener('mouseenter', ()=> _activateMergePair(pairIdx, roleIdx));
-        el.addEventListener('mouseleave', ()=> _scheduleDeactivate(pairIdx));
+        el.addEventListener('mouseenter', (e)=> _activateMergePair(pairIdx, roleIdx, e));
+        el.addEventListener('mouseleave', ()=> _maybeScheduleDeactivate(pairIdx));
       }
 
       layer.appendChild(el);
@@ -4338,9 +4362,9 @@ function initDeco(){
 }
 
 // 桌面端：激活某一对
-// 关键设计：被悬停的那一片**保持不动**(光标始终在它上面，hover 不会丢失),
-//          仅 partner 滑过来与之并列。这样用户即便不移动鼠标也能稳定看到合体效果。
-async function _activateMergePair(pairIdx, hoveredRoleIdx){
+// v70②：恢复"双方共同移动到中点"的对称合体（用户反馈：拼合要两片一起走）
+//        + document 级 mousemove 兜底 + 真实光标位置追踪,避免元素移动触发的误 mouseleave
+async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   // 取消任何 pending 的 deactivate
   if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
   if(_decoState.activePair === pairIdx) return;
@@ -4350,55 +4374,71 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx){
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
   if(pieces.length !== 2) return;
 
-  // 找出被悬停的那一片 与 partner（默认 hover 第一片）
-  const hovered = pieces.find(p => p.roleIdx === hoveredRoleIdx) || pieces[0];
-  const partner = pieces.find(p => p !== hovered);
-  if(!partner) return;
-
-  // 被悬停片**保持原位**——partner 滑过来
-  // 计算 partner 目标位置：根据结构(lr / tb)和被悬停片的角色(0/1)推断方位
-  // 结构 lr: roleIdx 0 在左、roleIdx 1 在右
-  // 结构 tb: roleIdx 0 在上、roleIdx 1 在下
-  const tgt = Math.max(hovered.size, partner.size);
-  const gap = tgt * 0.10;  // 部件紧贴间距(约 10% 尺寸)
-
-  let pX, pY;
-  if(hovered.structure === 'lr'){
-    if(hovered.roleIdx === 0){
-      // hovered 是左件, partner(右件)放到 hovered 右边
-      pX = hovered.baseLeft + hovered.size + gap;
-      pY = hovered.baseTop + (hovered.size - partner.size) / 2;
-    } else {
-      // hovered 是右件, partner(左件)放到 hovered 左边
-      pX = hovered.baseLeft - partner.size - gap;
-      pY = hovered.baseTop + (hovered.size - partner.size) / 2;
-    }
-  } else {
-    // tb
-    if(hovered.roleIdx === 0){
-      // hovered 是上件, partner(下件)放到 hovered 下方
-      pX = hovered.baseLeft + (hovered.size - partner.size) / 2;
-      pY = hovered.baseTop + hovered.size + gap;
-    } else {
-      // hovered 是下件, partner(上件)放到 hovered 上方
-      pX = hovered.baseLeft + (hovered.size - partner.size) / 2;
-      pY = hovered.baseTop - partner.size - gap;
-    }
+  // 初始化光标位置（从触发事件取,若无则用上一次记录）
+  if(evt && typeof evt.clientX === 'number'){
+    _decoState.lastMouseX = evt.clientX;
+    _decoState.lastMouseY = evt.clientY;
   }
 
-  // 边界保护：partner 不能跑出视口
-  const vw = window.innerWidth, vh = window.innerHeight;
-  pX = Math.max(6, Math.min(vw - partner.size - 6, pX));
-  pY = Math.max(60, Math.min(vh - partner.size - 6, pY));
+  // 按 roleIdx 排序：a = roleIdx 0（左/上）, b = roleIdx 1（右/下）
+  pieces.sort((p1, p2) => p1.roleIdx - p2.roleIdx);
+  const [a, b] = pieces;
 
-  // 标记 merging（暂停 inner 抖动；提升透明度 & 阴影）
-  hovered.el.classList.add('merging');
-  partner.el.classList.add('merging');
-  // partner 滑动到目标位置；hovered 不动
-  partner.el.style.left = pX + 'px';
-  partner.el.style.top  = pY + 'px';
+  // 合体中心：两片当前中心的中点
+  const cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
+  const cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
+
+  // 合体后两片紧贴（间距 = 0,无缝拼合）
+  const gap = 0;
+
+  let aX, aY, bX, bY;
+  if(a.structure === 'lr'){
+    // 左右结构：a 在左、b 在右
+    aX = cx - gap/2 - a.size;     aY = cy - a.size/2;
+    bX = cx + gap/2;              bY = cy - b.size/2;
+  } else {
+    // 上下结构：a 在上、b 在下
+    aX = cx - a.size/2;  aY = cy - gap/2 - a.size;
+    bX = cx - b.size/2;  bY = cy + gap/2;
+  }
+
+  // 边界保护：合体点不能跑出视口
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const clampX = (x, s) => Math.max(6, Math.min(vw - s - 6, x));
+  const clampY = (y, s) => Math.max(60, Math.min(vh - s - 6, y));
+  aX = clampX(aX, a.size); aY = clampY(aY, a.size);
+  bX = clampX(bX, b.size); bY = clampY(bY, b.size);
+
+  pieces.forEach(p => p.el.classList.add('merging'));
+  a.el.style.left = aX + 'px'; a.el.style.top = aY + 'px';
+  b.el.style.left = bX + 'px'; b.el.style.top = bY + 'px';
 
   _decoState.activePair = pairIdx;
+  // v70②：合体中心(目标位置) + 悬停宽容半径
+  _decoState.mergeCenter = {
+    x: (aX + a.size/2 + bX + b.size/2) / 2,
+    y: (aY + a.size/2 + bY + b.size/2) / 2,
+  };
+  _decoState.trackRadius = Math.max(a.size, b.size) * 2.4 + 20;  // 略宽于两片对角线长
+
+  // v70②：document 级 mousemove —— 同时更新 lastMousePos 并做半径检查
+  if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); }
+  _decoState.mouseHandler = (e)=>{
+    _decoState.lastMouseX = e.clientX;
+    _decoState.lastMouseY = e.clientY;
+    if(_decoState.activePair !== pairIdx) return;
+    const mc = _decoState.mergeCenter;
+    if(!mc) return;
+    const dist = Math.hypot(e.clientX - mc.x, e.clientY - mc.y);
+    if(dist <= _decoState.trackRadius){
+      // 仍在悬停区：取消任何 pending 解散
+      if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+    } else {
+      // 离开悬停区：触发解散（带宽限）
+      if(!_decoState.leaveTimer) _scheduleDeactivate(pairIdx);
+    }
+  };
+  document.addEventListener('mousemove', _decoState.mouseHandler);
 
   // 等到滑入到位后显示完整字 + 拼音
   setTimeout(async ()=>{
@@ -4411,22 +4451,20 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx){
     // 渲染完整字(深墨绿色)
     charBox.innerHTML = '';
     let fullSvg = null;
-    try{ fullSvg = await renderComponentStrokes(hovered.fullChar, 'all', '#2a3a30', false); }catch(e){}
+    try{ fullSvg = await renderComponentStrokes(a.fullChar, 'all', '#2a3a30', false); }catch(e){}
     if(_decoState.activePair !== pairIdx) return;  // 二次检查
     if(fullSvg){
       fullSvg.style.cssText = 'width:84%;height:84%;display:block';
       charBox.appendChild(fullSvg);
     } else {
-      charBox.innerHTML = `<span style="font-size:3rem;color:#2a3a30;font-family:'Kaiti SC',serif;line-height:1">${hovered.fullChar}</span>`;
+      charBox.innerHTML = `<span style="font-size:3rem;color:#2a3a30;font-family:'Kaiti SC',serif;line-height:1">${a.fullChar}</span>`;
     }
-    pyBox.textContent = hovered.py;
+    pyBox.textContent = a.py;
 
     // 定位：合体后两片的中央正下方
-    const minL = Math.min(hovered.baseLeft, pX);
-    const maxR = Math.max(hovered.baseLeft + hovered.size, pX + partner.size);
-    const maxB = Math.max(hovered.baseTop + hovered.size, pY + partner.size);
-    const finalCx = (minL + maxR) / 2;
-    const dispTop = Math.min(vh - 150, maxB + 14);
+    const finalCx = (aX + a.size/2 + bX + b.size/2) / 2;
+    const finalBottom = Math.max(aY + a.size, bY + b.size);
+    const dispTop = Math.min(vh - 150, finalBottom + 14);
     disp.style.left = finalCx + 'px';
     disp.style.top  = dispTop + 'px';
     disp.classList.add('show');
@@ -4444,6 +4482,12 @@ function _deactivateMergePair(pairIdx, immediate){
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
   if(_decoState.activePair === pairIdx) _decoState.activePair = null;
+  // v70②：清理 document 级 mousemove 监听
+  if(_decoState.mouseHandler){
+    document.removeEventListener('mousemove', _decoState.mouseHandler);
+    _decoState.mouseHandler = null;
+  }
+  _decoState.mergeCenter = null;
 }
 
 // mouseleave 宽限：避免 pair 内部跳动闪烁
@@ -4453,6 +4497,19 @@ function _scheduleDeactivate(pairIdx){
     _deactivateMergePair(pairIdx, false);
     _decoState.leaveTimer = null;
   }, DECO_CFG.leaveGrace);
+}
+
+// v70②：mouseleave 触发时,先用真实光标位置复核 —— 元素只是移动到了别处,
+//         若光标其实还在合体半径内,就不该解散
+function _maybeScheduleDeactivate(pairIdx){
+  if(_decoState.activePair !== pairIdx) return;
+  const mc = _decoState.mergeCenter;
+  if(!mc){ _scheduleDeactivate(pairIdx); return; }
+  const dist = Math.hypot(_decoState.lastMouseX - mc.x, _decoState.lastMouseY - mc.y);
+  if(dist > _decoState.trackRadius){
+    _scheduleDeactivate(pairIdx);
+  }
+  // 否则光标其实还在范围内,忽略这次 mouseleave（多半是元素动了,不是光标走了）
 }
 
 // 移动端：点击切换合体/分散

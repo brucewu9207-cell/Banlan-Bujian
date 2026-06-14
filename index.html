@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v76 (2026-06-14) — 合体卡 2 秒自动消失,部件保持合体位置 -->
+<!-- 斑斓部件 · v77 (2026-06-14) — 已合体的对永久保留,新对合体不打散旧对 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v76">
+<meta name="version" content="v77">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -4103,15 +4103,16 @@ const _decoLoneStrokes = [
 let _decoState = {
   inited: false,
   pieces: [],           // [{el, pairId, role, baseLeft, baseTop, size, fullChar, py, structure, ranges, ...}]
-  activePair: null,     // 当前合体的 pairId
+  cardActivePair: null, // v77：当前显示合体卡的 pairId（仅一个卡显示）
+  mergedPairs: new Set(),  // v77：所有已合体的 pairId（永久保留,直到 init 重置）
   leaveTimer: null,
   isMobile: false,
-  mergeCenter: null,    // v70②：当前合体中心 {x,y},供 document mousemove 计算距离
-  mouseHandler: null,   // v70②：合体期间 document 级 mousemove 监听器引用
-  lastMouseX: 0,        // v70②：最近一次已知的光标屏幕位置（用于 mouseleave 时复核）
+  mergeCenter: null,
+  mouseHandler: null,
+  lastMouseX: 0,
   lastMouseY: 0,
-  trackRadius: 0,       // v70②：当前合体的悬停宽容半径
-  dispHideTimer: null,  // v76：合体卡 2 秒自动消失的 timer
+  trackRadius: 0,
+  dispHideTimer: null,
 };
 
 // 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
@@ -4246,8 +4247,11 @@ function initDeco(){
   // 清理旧的
   layer.innerHTML = '';
   _decoState.pieces = [];
-  _decoState.activePair = null;
+  _decoState.cardActivePair = null;
+  _decoState.mergedPairs = new Set();          // v77：清空所有合体记录
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
   if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); _decoState.mouseHandler = null; }
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
 
@@ -4399,23 +4403,22 @@ function initDeco(){
 // v70②：恢复"双方共同移动到中点"的对称合体（用户反馈：拼合要两片一起走）
 //        + document 级 mousemove 兜底 + 真实光标位置追踪,避免元素移动触发的误 mouseleave
 async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
-  // 取消任何 pending 的 deactivate
-  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
-
   // 初始化光标位置（从触发事件取,若无则用上一次记录）
   if(evt && typeof evt.clientX === 'number'){
     _decoState.lastMouseX = evt.clientX;
     _decoState.lastMouseY = evt.clientY;
   }
 
-  // v76：如果是同一对再次 hover —— 不重新合体（部件已经在合体位置）,
-  //      只把合体卡重新显示出来,并重置 2 秒自动隐藏 timer。
-  if(_decoState.activePair === pairIdx){
+  // v77：先把当前显示的合体卡藏掉（如果是不同对的话）—— 仅藏卡,不复位部件
+  if(_decoState.cardActivePair !== null && _decoState.cardActivePair !== pairIdx){
+    _hideMergeCardOnly();
+  }
+
+  // v77：如果该对已经合体（且仍在合体位置）—— 只重新显示卡片,不再触发合体动画
+  if(_decoState.mergedPairs.has(pairIdx)){
     _showMergeCard(pairIdx);
     return;
   }
-  // 若已有别的对激活,先解散
-  if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
 
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
   if(pieces.length !== 2) return;
@@ -4428,9 +4431,7 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   const cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
   const cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
 
-  // v75：两片**完全叠加在同一位置**（aligned SVG 按整字坐标绘制,
-  //      两片叠加后视觉上正好拼成完整字）
-  //      原 lr/tb 错位重叠的逻辑不再需要,因为 SVG 内部已经包含正确相对位置。
+  // v75：两片完全叠加在同一位置（aligned SVG 按整字坐标绘制）
   const aX = cx - a.size/2,  aY = cy - a.size/2;
   const bX = cx - b.size/2,  bY = cy - b.size/2;
 
@@ -4441,7 +4442,7 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   const aXc = clampX(aX, a.size), aYc = clampY(aY, a.size);
   const bXc = clampX(bX, b.size), bYc = clampY(bY, b.size);
 
-  // v75：切换到 aligned 模式（隐藏 solo,显示 aligned）
+  // 切换到 aligned 模式（隐藏 solo,显示 aligned）
   pieces.forEach(p => {
     p.el.classList.add('merging');
     const solo = p.inner.querySelector('[data-mode="solo"]');
@@ -4452,48 +4453,32 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   a.el.style.left = aXc + 'px'; a.el.style.top = aYc + 'px';
   b.el.style.left = bXc + 'px'; b.el.style.top = bYc + 'px';
 
-  _decoState.activePair = pairIdx;
-  // v70②：合体中心(目标位置) + 悬停宽容半径
-  _decoState.mergeCenter = {
-    x: (aXc + a.size/2 + bXc + b.size/2) / 2,
-    y: (aYc + a.size/2 + bYc + b.size/2) / 2,
-  };
-  _decoState.trackRadius = Math.max(a.size, b.size) * 2.4 + 20;  // 略宽于两片对角线长
+  // 记录合体后的实际位置（用于后续避让计算）+ 标记为已合体
+  a._mergedX = aXc; a._mergedY = aYc;
+  b._mergedX = bXc; b._mergedY = bYc;
+  _decoState.mergedPairs.add(pairIdx);
+  _decoState.cardActivePair = pairIdx;
 
-  // v75：mousemove 只更新 lastMousePos,不再触发解散
-  //      用户反馈"合并完的部件不要复位",所以只在 hover 新对时才切换
-  if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); }
-  _decoState.mouseHandler = (e)=>{
-    _decoState.lastMouseX = e.clientX;
-    _decoState.lastMouseY = e.clientY;
-    // v75：不再有 dist > radius → 解散 的逻辑
-  };
-  document.addEventListener('mousemove', _decoState.mouseHandler);
-
-  // 等到滑入到位后显示完整字 + 拼音（同框,楷体,智能定位）
+  // 等到滑入到位后显示完整字 + 拼音
   setTimeout(async ()=>{
-    if(_decoState.activePair !== pairIdx) return;  // 用户已离开
+    if(_decoState.cardActivePair !== pairIdx) return;  // 用户已 hover 其他对
     const disp = document.getElementById('deco-merge-display');
     const charBox = document.getElementById('deco-merge-char');
     const pyBox = document.getElementById('deco-merge-pinyin');
     if(!disp || !charBox || !pyBox) return;
 
-    // v72：字 + 拼音都直接用楷体文本(不再渲染 SVG,不再单独胶囊)
     charBox.textContent = a.fullChar;
     pyBox.textContent = a.py;
 
-    // v72：智能避让 —— 在合体两片周围 8 个候选方向中找一个不遮挡其他部件、不出视口、不压卡片的位置
-    const dispW = 72, dispH = 96;  // v75：高度从 92 增到 96,容纳放大的拼音
+    // v77：避让用**当前所有部件的实际位置**（包括已合体的对都在合体位置）
+    const dispW = 72, dispH = 96;
     const mergeBox = {
       x: Math.min(aXc, bXc),
       y: Math.min(aYc, bYc),
       w: Math.max(aXc + a.size, bXc + b.size) - Math.min(aXc, bXc),
       h: Math.max(aYc + a.size, bYc + b.size) - Math.min(aYc, bYc),
     };
-    // 已放置的其他部件（剔除当前合体的 a / b）
-    const others = _decoState.pieces
-      .filter(p => p !== a && p !== b)
-      .map(p => ({x: p.baseLeft, y: p.baseTop, w: p.size, h: p.size}));
+    const others = _collectOtherPiecesRects(pairIdx);
     const gridEl = document.querySelector('.home-grid');
     const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
     const bestPos = _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh);
@@ -4502,14 +4487,36 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     disp.style.top  = bestPos.y + 'px';
     disp.classList.add('show');
 
-    // v76：合体卡显示后 2 秒自动隐藏（部件保留在合体位置）
+    // 2 秒后自动隐藏卡片（但部件保留在合体位置）
     if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); }
     _decoState.dispHideTimer = setTimeout(()=>{
       const d = document.getElementById('deco-merge-display');
       if(d) d.classList.remove('show');
       _decoState.dispHideTimer = null;
+      _decoState.cardActivePair = null;
     }, 2000);
   }, DECO_CFG.mergeDelay);
+}
+
+// v77：仅藏卡片,不复位部件
+function _hideMergeCardOnly(){
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
+  const disp = document.getElementById('deco-merge-display');
+  if(disp) disp.classList.remove('show');
+  _decoState.cardActivePair = null;
+}
+
+// v77：收集**除某对外**所有部件的当前实际位置（含已合体对的合体位置）
+function _collectOtherPiecesRects(excludePairId){
+  const result = [];
+  _decoState.pieces.forEach(p => {
+    if(p.pairId === excludePairId) return;
+    // 已合体的部件：用合体后位置；其他用 baseLeft/baseTop
+    const x = (p._mergedX != null) ? p._mergedX : p.baseLeft;
+    const y = (p._mergedY != null) ? p._mergedY : p.baseTop;
+    result.push({x, y, w: p.size, h: p.size});
+  });
+  return result;
 }
 
 // v76：同一对再次 hover 时仅重新显示合体卡（无需重新动画）
@@ -4522,6 +4529,7 @@ function _showMergeCard(pairIdx){
   const pyBox = document.getElementById('deco-merge-pinyin');
   if(!disp || !charBox || !pyBox) return;
 
+  _decoState.cardActivePair = pairIdx;
   charBox.textContent = a.fullChar;
   pyBox.textContent = a.py;
 
@@ -4534,8 +4542,8 @@ function _showMergeCard(pairIdx){
     w: Math.max(aR.right, bR.right) - Math.min(aR.left, bR.left),
     h: Math.max(aR.bottom, bR.bottom) - Math.min(aR.top, bR.top),
   };
-  const others = _decoState.pieces.filter(p => p.pairId !== pairIdx)
-    .map(p => ({x: p.baseLeft, y: p.baseTop, w: p.size, h: p.size}));
+  // v77：用 _collectOtherPiecesRects,考虑所有已合体对的当前位置
+  const others = _collectOtherPiecesRects(pairIdx);
   const gridEl = document.querySelector('.home-grid');
   const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
   const vw = window.innerWidth, vh = window.innerHeight;
@@ -4551,6 +4559,7 @@ function _showMergeCard(pairIdx){
     const d = document.getElementById('deco-merge-display');
     if(d) d.classList.remove('show');
     _decoState.dispHideTimer = null;
+    _decoState.cardActivePair = null;
   }, 2000);
 }
 
@@ -4613,9 +4622,9 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
   return {x: vw - dispW/2 - safeMargin, y: vh - dispH/2 - safeMargin, name: 'corner'};
 }
 
-// 关掉合体状态：两片回归原位 + 切回 solo SVG
+// 关掉合体状态：两片回归原位 + 切回 solo SVG（v77 中很少调用,只在 init/离开页面时用）
 function _deactivateMergePair(pairIdx, immediate){
-  // v76：清理 2 秒自动隐藏 timer
+  // 清理 2 秒自动隐藏 timer
   if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
 
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
@@ -4623,7 +4632,9 @@ function _deactivateMergePair(pairIdx, immediate){
     p.el.style.left = p.baseLeft + 'px';
     p.el.style.top  = p.baseTop  + 'px';
     p.el.classList.remove('merging');
-    // v75：切回 solo SVG 显示
+    // 清掉合体后的位置标记
+    delete p._mergedX; delete p._mergedY;
+    // 切回 solo SVG 显示
     const solo = p.inner && p.inner.querySelector('[data-mode="solo"]');
     const aligned = p.inner && p.inner.querySelector('[data-mode="aligned"]');
     if(solo) solo.style.display = 'block';
@@ -4631,8 +4642,8 @@ function _deactivateMergePair(pairIdx, immediate){
   });
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
-  if(_decoState.activePair === pairIdx) _decoState.activePair = null;
-  // 清理 document 级 mousemove 监听
+  if(_decoState.cardActivePair === pairIdx) _decoState.cardActivePair = null;
+  _decoState.mergedPairs.delete(pairIdx);   // v77：从合体记录中移除
   if(_decoState.mouseHandler){
     document.removeEventListener('mousemove', _decoState.mouseHandler);
     _decoState.mouseHandler = null;
@@ -4640,44 +4651,23 @@ function _deactivateMergePair(pairIdx, immediate){
   _decoState.mergeCenter = null;
 }
 
-// mouseleave 宽限：避免 pair 内部跳动闪烁
-function _scheduleDeactivate(pairIdx){
-  if(_decoState.leaveTimer) clearTimeout(_decoState.leaveTimer);
-  _decoState.leaveTimer = setTimeout(()=>{
-    _deactivateMergePair(pairIdx, false);
-    _decoState.leaveTimer = null;
-  }, DECO_CFG.leaveGrace);
-}
+// v77：_scheduleDeactivate / _maybeScheduleDeactivate 在 v75 之后不再使用,已删除。
+//      合体的解散现在只发生在 init/_decoOnHide,且通过遍历 mergedPairs 完成。
 
-// v70②：mouseleave 触发时,先用真实光标位置复核 —— 元素只是移动到了别处,
-//         若光标其实还在合体半径内,就不该解散
-function _maybeScheduleDeactivate(pairIdx){
-  if(_decoState.activePair !== pairIdx) return;
-  const mc = _decoState.mergeCenter;
-  if(!mc){ _scheduleDeactivate(pairIdx); return; }
-  const dist = Math.hypot(_decoState.lastMouseX - mc.x, _decoState.lastMouseY - mc.y);
-  if(dist > _decoState.trackRadius){
-    _scheduleDeactivate(pairIdx);
-  }
-  // 否则光标其实还在范围内,忽略这次 mouseleave（多半是元素动了,不是光标走了）
-}
-
-// 移动端：点击切换合体/分散
+// 移动端：点击合体（v77：跟桌面一致,合体后保留,不会被点击解散）
 function _toggleMergePair(pairIdx, roleIdx){
-  if(_decoState.activePair === pairIdx){
-    _deactivateMergePair(pairIdx, false);
-  } else {
-    if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
-    _activateMergePair(pairIdx, roleIdx);
-  }
+  // 点击始终走 activate（已合体的会自动跳过动画,仅重显示卡片）
+  _activateMergePair(pairIdx, roleIdx);
 }
 
-// 离开首页时：清理合体态（防止回来时残留）
+// 离开首页时：清理所有合体态（防止回来时残留）
 function _decoOnHide(){
-  if(_decoState.activePair !== null){
-    _deactivateMergePair(_decoState.activePair, true);
-  }
-  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  // v77：把所有已合体的对都复位
+  const toClear = Array.from(_decoState.mergedPairs);
+  toClear.forEach(pid => _deactivateMergePair(pid, true));
+  _decoState.mergedPairs.clear();
+  _decoState.cardActivePair = null;
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
 }
 
 // resize / 进入首页时：重新布局（避免位置错位）

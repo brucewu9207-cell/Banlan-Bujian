@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v79 (2026-06-14) — 加速加载+HSK等级显示+卡片图标横排 -->
+<!-- 斑斓部件 · v80 (2026-06-14) — 合体卡放大 1.3 倍 + 首页卡片内容居中 & 紧凑 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v79">
+<meta name="version" content="v80">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -50,7 +50,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto;position:relative;z-index:1}
-.home-entry{display:flex;flex-direction:column;align-items:center;padding:22px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:216px;text-align:center}
+.home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 .home-entry-header{display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:2px}
 .home-entry-icon{font-size:2rem;line-height:1}
@@ -98,35 +98,35 @@ body::before{content:'';position:fixed;inset:0;background:
 */
 .deco-merge-display{
   position:fixed;pointer-events:none;z-index:6;
-  width:78px;height:108px;        /* v79：稍微增高 96→108,容纳 HSK 等级标签 */
+  width:101px;height:140px;       /* v80：尺寸 ×1.3 */
   background:rgba(255,255,255,0.96);
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(20,40,30,0.22);
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(20,40,30,0.24);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:5px 4px 6px;box-sizing:border-box;
+  padding:7px 5px 8px;box-sizing:border-box;
   opacity:0;transform:translate(-50%,-50%) scale(0.96);
   transition:opacity .15s ease, transform .15s ease;
 }
 .deco-merge-display.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
 .deco-merge-level{
-  font-family:Georgia,serif;font-weight:700;font-size:9px;line-height:1;
+  font-family:Georgia,serif;font-weight:700;font-size:12px;line-height:1;
   letter-spacing:0.06em;
   color:#fff;background:#5a8a6a;
-  padding:2px 6px;border-radius:4px;
-  margin-bottom:2px;
+  padding:3px 8px;border-radius:5px;
+  margin-bottom:3px;
 }
 .deco-merge-char{
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
   font-family:'Kaiti SC','STKaiti','Songti SC',serif;
-  font-size:44px;line-height:1;
+  font-size:57px;line-height:1;
   color:#2a3a30;
 }
 .deco-merge-pinyin{
   font-family:Georgia,serif;font-style:italic;
-  font-size:16px;line-height:1;
+  font-size:21px;line-height:1;
   color:#1a2a20;
-  margin-top:-2px;
+  margin-top:-3px;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -4504,7 +4504,7 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     pyBox.textContent = a.py;
 
     // v77：避让用**当前所有部件的实际位置**（包括已合体的对都在合体位置）
-    const dispW = 78, dispH = 108;
+    const dispW = 101, dispH = 140;
     const mergeBox = {
       x: Math.min(aXc, bXc),
       y: Math.min(aYc, bYc),
@@ -4653,7 +4653,7 @@ function _showMergeCard(pairIdx){
   const gridEl = document.querySelector('.home-grid');
   const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
   const vw = window.innerWidth, vh = window.innerHeight;
-  const bestPos = _findBestDispPosition(mergeBox, 78, 108, others, cardRect, vw, vh);
+  const bestPos = _findBestDispPosition(mergeBox, 101, 140, others, cardRect, vw, vh);
 
   disp.style.left = bestPos.x + 'px';
   disp.style.top  = bestPos.y + 'px';

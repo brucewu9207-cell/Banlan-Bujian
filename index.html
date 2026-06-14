@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v67 (2026-06-14) — 首页漂浮部件装饰层 -->
+<!-- 斑斓部件 · v70 (2026-06-14) — 修复部件间距，避免重叠 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v67">
+<meta name="version" content="v70">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -4055,13 +4055,14 @@ function showToast(msg,type=''){
 //      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
-  pairCount:   26,    // 桌面端：配对数（→ 52 个部件 piece,密度比原 14 翻一倍）
-  pairCountMb: 12,    // 手机端：配对数
-  loneStroke:  14,    // 桌面端：单笔画装饰数
-  loneStrokeMb: 7,    // 手机端：单笔画装饰数
+  pairCount:   30,    // 桌面端：配对数（→ 最多 60 个部件 piece；含间距约束,实际放置数会略少）
+  pairCountMb: 14,    // 手机端：配对数
+  loneStroke:  18,    // 桌面端：单笔画装饰数
+  loneStrokeMb: 9,    // 手机端：单笔画装饰数
   baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
   safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
+  pieceSpacing: 14,   // v70：部件与部件之间的最小间距 px（避免重叠）
   minSize:     38,    // 部件最小尺寸 px
   maxSize:     68,    // 部件最大尺寸 px
   driftMin:     9,    // 浮动动画最短时长 s
@@ -4128,24 +4129,39 @@ function _sampleN(arr, n){
   return out;
 }
 
-// 生成一个不与卡片重叠、且不出视口的随机位置
-function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin){
-  for(let i = 0; i < 50; i++){
-    const x = sideEdge + Math.random() * (viewport.w - 2*sideEdge - size);
-    const y = topMargin + Math.random() * (viewport.h - topMargin - sideEdge - size);
-    // 与安全区检测（卡片矩形 + safeMargin）
-    const m = DECO_CFG.safeMargin;
-    const overlaps = !(x + size < safeRect.x - m ||
-                       x > safeRect.x + safeRect.w + m ||
-                       y + size < safeRect.y - m ||
-                       y > safeRect.y + safeRect.h + m);
-    if(!overlaps) return {x, y};
+// 生成一个不与卡片重叠、且不出视口、且与已放置部件有最小间距的随机位置
+// v70：新增 placed 数组参数,确保部件之间不重叠
+// 多轮递降 gap：先尝试理想间距,实在没空再缩到最小,保证大多数能放下
+function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap){
+  const m = DECO_CFG.safeMargin;
+  const maxX = viewport.w - 2*sideEdge - size;
+  const maxY = viewport.h - topMargin - sideEdge - size;
+  if(maxX <= 0 || maxY <= 0) return null;
+  // 4 轮放置：gap 从理想值递降到最低 4px,每轮 60 次随机尝试
+  for(let round = 0; round < 4; round++){
+    const gap = Math.max(4, initialGap - round * 3);
+    for(let i = 0; i < 60; i++){
+      const x = sideEdge + Math.random() * maxX;
+      const y = topMargin + Math.random() * maxY;
+      // ① 卡片安全区检测
+      const cardClear = (x + size < safeRect.x - m ||
+                         x > safeRect.x + safeRect.w + m ||
+                         y + size < safeRect.y - m ||
+                         y > safeRect.y + safeRect.h + m);
+      if(!cardClear) continue;
+      // ② 与已放置部件的间距检测
+      let bad = false;
+      for(let j = 0; j < placed.length; j++){
+        const p = placed[j];
+        if(!(x + size + gap < p.x || p.x + p.w + gap < x ||
+             y + size + gap < p.y || p.y + p.h + gap < y)){
+          bad = true; break;
+        }
+      }
+      if(!bad) return {x, y};
+    }
   }
-  // 兜底：放在视口底部
-  return {
-    x: sideEdge + Math.random() * (viewport.w - 2*sideEdge - size),
-    y: viewport.h - size - 24 - Math.random() * 60,
-  };
+  return null;  // 放置失败,调用方决定是否跳过
 }
 
 // 异步把 SVG 笔画图形画进 piece 的 inner 容器
@@ -4204,21 +4220,51 @@ function initDeco(){
   // 浮动动画变体（A/B/C/D 四种轨迹）
   const floatVars = ['f-a','f-b','f-c','f-d'];
 
+  // v70：跟踪已放置的所有部件 bounding box,用于后续部件的间距检测
+  // 注：bigger pieces 先放,可以减少放置失败率
+  const placed = [];
+
   // —— 渲染配对部件（两两同色，暗示是同一对） ——
+  // 原子放置：一对必须**两片都能放下**,否则跳过整对（避免落单部件）
+  let placedPairCount = 0;
   pairs.forEach((pair, pairIdx)=>{
     const colorIdx = pairIdx % COMP_COLORS.length;
     const color = COMP_COLORS[colorIdx].text;
+
+    // 预先为这一对生成两片的尺寸+变体+时长
+    const pieceSpecs = pair.comps.map(()=>({
+      size: DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize),
+      dur:  (DECO_CFG.driftMin + Math.random() * (DECO_CFG.driftMax - DECO_CFG.driftMin)).toFixed(1),
+      vari: floatVars[Math.floor(Math.random() * floatVars.length)],
+    }));
+
+    // 尝试给两片各找一个不重叠的位置（用 snapshot 防止部分回滚）
+    const placedSnapshot = placed.length;
+    const positions = [];
+    for(let r = 0; r < pieceSpecs.length; r++){
+      const spec = pieceSpecs[r];
+      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
+      if(!pos){
+        // 放置失败,回滚已加入的本对部件
+        placed.length = placedSnapshot;
+        positions.length = 0;
+        break;
+      }
+      positions.push(pos);
+      placed.push({x:pos.x, y:pos.y, w:spec.size, h:spec.size});
+    }
+    if(positions.length !== pair.comps.length) return; // 整对跳过
+
+    // 两片都能放下 → 渲染
+    placedPairCount++;
     pair.comps.forEach((comp, roleIdx)=>{
-      // 随机尺寸（提供远近层次感）
-      const size = DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize);
-      const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin);
-      const dur = (DECO_CFG.driftMin + Math.random() * (DECO_CFG.driftMax - DECO_CFG.driftMin)).toFixed(1);
-      const vari = floatVars[Math.floor(Math.random() * floatVars.length)];
+      const spec = pieceSpecs[roleIdx];
+      const pos  = positions[roleIdx];
       const cleanLabel = (pair.labels && pair.labels[roleIdx]) || comp;
 
       const el = document.createElement('div');
-      el.className = 'deco-piece ' + vari;
-      el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;--dur:${dur}s;--op:${DECO_CFG.baseOpacity}`;
+      el.className = 'deco-piece ' + spec.vari;
+      el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${spec.size.toFixed(0)}px;height:${spec.size.toFixed(0)}px;--dur:${spec.dur}s;--op:${DECO_CFG.baseOpacity}`;
       el.dataset.role = 'pair';
       el.dataset.pairId = pairIdx;
       el.dataset.roleIdx = roleIdx;
@@ -4228,10 +4274,8 @@ function initDeco(){
       inner.className = 'deco-piece-inner';
       el.appendChild(inner);
 
-      // 异步渲染 SVG (用干净的 label 作 SVG 失败时的文字兜底)
       _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, cleanLabel);
 
-      // 事件绑定
       if(_decoState.isMobile){
         el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
       } else {
@@ -4242,19 +4286,24 @@ function initDeco(){
       layer.appendChild(el);
       _decoState.pieces.push({
         el, inner, pairId: pairIdx, roleIdx, role: 'pair',
-        baseLeft: pos.x, baseTop: pos.y, size,
+        baseLeft: pos.x, baseTop: pos.y, size: spec.size,
         fullChar: pair.char, py: pair.py, structure: pair.structure,
         comps: pair.comps, ranges: pair.ranges,
       });
     });
   });
 
-  // —— 渲染单笔画装饰（不参与合体） ——
+  // —— 渲染单笔画装饰（不参与合体；逐个放置,放不下就跳过） ——
+  let placedStrokeCount = 0;
   for(let i = 0; i < targetLone; i++){
     const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
     // 笔画稍小（更点缀）
     const size = (DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize)) * 0.78;
-    const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin);
+    const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
+    if(!pos) continue;
+    placed.push({x:pos.x, y:pos.y, w:size, h:size});
+    placedStrokeCount++;
+
     const dur = (DECO_CFG.driftMin + Math.random() * (DECO_CFG.driftMax - DECO_CFG.driftMin)).toFixed(1);
     const vari = floatVars[Math.floor(Math.random() * floatVars.length)];
     const color = COMP_COLORS[(i + 3) % COMP_COLORS.length].text;
@@ -4271,6 +4320,11 @@ function initDeco(){
     _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '');
     layer.appendChild(el);
     _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
+  }
+
+  // 调试日志（可在 console 看到实际放置数；正式版可去掉）
+  if(window._DECO_DEBUG){
+    console.log(`[deco] placed ${placedPairCount}/${pairs.length} pairs, ${placedStrokeCount}/${targetLone} strokes; total pieces: ${_decoState.pieces.length}`);
   }
 
   // 全部就位后淡入

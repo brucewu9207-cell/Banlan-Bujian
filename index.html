@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v73 (2026-06-14) — 统一部件尺寸,消除视觉粗细差异 -->
+<!-- 斑斓部件 · v74 (2026-06-14) — 同对两片同尺寸 + 合体更紧 + 去笔画装饰 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v73">
+<meta name="version" content="v74">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -115,9 +115,9 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 .deco-merge-pinyin{
   font-family:Georgia,serif;font-style:italic;
-  font-size:12px;line-height:1.2;
-  color:#7a8a80;
-  margin-top:1px;
+  font-size:13px;line-height:1;
+  color:#1a2a20;
+  margin-top:-2px;  /* v74：负边距,拼音紧贴汉字底部 */
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -4061,10 +4061,10 @@ function showToast(msg,type=''){
 //      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
-  pairCount:   30,    // 桌面端：配对数（→ 最多 60 个部件 piece；含间距约束,实际放置数会略少）
-  pairCountMb: 14,    // 手机端：配对数
-  loneStroke:  18,    // 桌面端：单笔画装饰数
-  loneStrokeMb: 9,    // 手机端：单笔画装饰数
+  pairCount:   34,    // v74：从 30 增到 34,补偿去掉笔画装饰后的密度
+  pairCountMb: 16,    // 手机端：配对数
+  loneStroke:   0,    // v74：去掉单笔画装饰（不参与合体,纯装饰太被动）
+  loneStrokeMb: 0,    // 同上
   baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
   safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
@@ -4204,15 +4204,14 @@ async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackT
   return false;
 }
 
-// v73：按笔画数动态算容器尺寸,做"反向视觉补偿"
-//   笔画多的字（如"言"、"庄"、"口"）→ 容器较小,减少视觉墨水量
-//   笔画少的字（如"丿"、"丨"、"夂"）→ 容器较大,增加视觉占比
-//   整体让所有 piece 的"视觉重量"看起来更接近
-function _sizeByStrokeCount(n){
-  if(n <= 2)  return 58;   // 极简笔画
-  if(n <= 4)  return 54;   // 简单部件
-  if(n <= 7)  return 50;   // 中等
-  return 46;               // 复杂部件
+// v74：配对两片用**同一个 size**,按这对的总笔画数算（避免对内大小差异）
+// 笔画总数越多 → 容器越小（避免视觉过重）；越少 → 越大（避免显得稀薄）
+function _sizeForPair(totalStrokes){
+  if(totalStrokes <= 4)   return 60;
+  if(totalStrokes <= 8)   return 56;
+  if(totalStrokes <= 12)  return 52;
+  if(totalStrokes <= 16)  return 48;
+  return 46;
 }
 
 // 初始化整个装饰层
@@ -4265,10 +4264,10 @@ function initDeco(){
     const colorIdx = pairIdx % COMP_COLORS.length;
     const color = COMP_COLORS[colorIdx].text;
 
-    // v73：按笔画数算尺寸,而非随机 —— 笔画多的字容器小,笔画少的字容器大
-    const pieceSpecs = pair.comps.map((comp, idx)=>({
-      size: _sizeByStrokeCount(pair.ranges[idx].length),
-    }));
+    // v74：一对的两片**完全同尺寸**,按这对总笔画数算
+    const totalStrokes = pair.ranges.reduce((s, r) => s + r.length, 0);
+    const pairSize = _sizeForPair(totalStrokes);
+    const pieceSpecs = pair.comps.map(()=>({ size: pairSize }));
 
     // 尝试给两片各找一个不重叠的位置（用 snapshot 防止部分回滚）
     // v70②：第二片用 anchor 约束,确保和第一片中心距离在 [pairProxMin, pairProxMax]
@@ -4335,10 +4334,10 @@ function initDeco(){
   // —— 渲染单笔画装饰（不参与合体；逐个放置,放不下就跳过） ——
   let placedStrokeCount = 0;
   for(let i = 0; i < targetLone; i++){
+    // v74：笔画装饰已停用（loneStroke=0,该 for 循环不会进入）;
+    //      留这段代码以便未来若想恢复笔画装饰再开启。下面用固定 size 兜底,避免引用已删的函数。
     const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
-    // v73：单笔画用最大档 size（极简笔画 → 视觉补偿）
-    const strokeN = (stroke.sIdx === 'all') ? 1 : (Array.isArray(stroke.sIdx) ? stroke.sIdx.length : 1);
-    const size = _sizeByStrokeCount(strokeN);
+    const size = 56;
     const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
     if(!pos) continue;
     placed.push({x:pos.x, y:pos.y, w:size, h:size});
@@ -4405,8 +4404,9 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
   // 合体后两片紧贴
   // v71：renderComponentStrokes 在 sharedScale=false 时给 SVG 加了 14% padding,
   //      所以容器边对齐时,视觉上还是有 ~28% 空隙。用负 gap 把这个 padding 抵消掉。
+  // v74：从 0.30 加大到 0.42,让两片真正"咬合"（用户反馈：再靠近一些）
   const avgSize = (a.size + b.size) / 2;
-  const gap = -avgSize * 0.30;  // 容器重叠 30%,刚好抵消两侧 padding,视觉无缝
+  const gap = -avgSize * 0.42;
 
   let aX, aY, bX, bY;
   if(a.structure === 'lr'){

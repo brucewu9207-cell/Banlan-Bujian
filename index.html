@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v83 (2026-06-14) — 手机端:整个标题栏(.struct-bar-header)点击任意位置回主页 + 触摸反馈 -->
+<!-- 斑斓部件 · v84 (2026-06-14) — 手机端:点标题栏回主页时同步折叠 13 种结构 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v83">
+<meta name="version" content="v84">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1974,10 +1974,16 @@ document.addEventListener("click",function(e){
 });
 // ★ v83 ① 顶部标题栏(.struct-bar-header)统一点击入口:
 //   手机端 → 整条点击回主页(showHome)— 包括 logo、"斑斓部件"四字、英文、Mozhou 副标题、空白
+//             ★ v84:若此时「13 种结构」处于展开状态,同步折叠它(避免回到主页后下次进来仍是展开态)
 //   电脑端 → 维持原行为(切换 13 种结构表的展开/收起)
 //   子按钮(返回/二维码/反馈/展开/logo 子 div)它们的 onclick 都已 event.stopPropagation,不受影响
 function onHeaderClick(event){
   if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    // 若 13 种结构展开 → 先折叠(toggleStructBar 会同步按钮文字、chevron、高度)
+    const body=document.getElementById('struct-body');
+    if(body && body.classList.contains('open')){
+      toggleStructBar();
+    }
     showHome();
   } else {
     toggleStructBar();

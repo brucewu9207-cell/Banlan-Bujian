@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v99 (2026-06-15) — "BASED ON HSK 3.0" 换回猪肝红 #8b2c2c,字号放大到 1.3 倍(0.63rem → 0.82rem)以提升可读性 -->
+<!-- 斑斓部件 · v100 (2026-06-15) — "BASED ON HSK 3.0":电脑端保持 v99 的 0.82rem(1.3 倍),手机端还原为 v97 的 0.63rem 原字号 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v99">
+<meta name="version" content="v100">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -405,6 +405,8 @@ body::before{content:'';position:fixed;inset:0;background:
   .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
+  /* ★ v100:手机端 "BASED ON HSK 3.0" 字号还原为 v97 之前的 0.63rem(电脑端保持 v99 的 0.82rem 大字号) */
+  .based-on-hsk{font-size:0.63rem !important}
   /* ★ v97:9 个 HSK 方框组居中于下面空白处 — 用 JS 实测的 --fit-vh 替代 100vh(iOS Safari 更准);
         只减顶栏高度和少量底部 padding,让 .level-select-screen 占满剩余空间后 flex 居中 */
   .level-select-screen{
@@ -869,7 +871,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
       </div>
       <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:9px">
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: Mozhou</span>
-        <span style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
+        <span class="based-on-hsk" style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
     <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">

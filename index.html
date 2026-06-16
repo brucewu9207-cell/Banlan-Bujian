@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-7 (2026-06-16) — 视觉:首页三卡片放宽 + 功能:自动拉任务列表(副标题显示新任务数) -->
+<!-- 斑斓部件 · 部件联动-8 (2026-06-16) — 完整任务列表 UI:卡片显示+类型徽章+刷新按钮+点击注入挥毫四步流程 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-7">
+<meta name="version" content="部件联动-8">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5156,7 +5156,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-7';
+  const VERSION = '部件联动-8';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5286,9 +5286,36 @@ showHome();
       /* 班级码 badge - 深墨绿底白字,跟老师端 .bl-class-code badge 一致 */
       .bls-info-value.bls-code{font-family:'SF Mono','Consolas','Monaco',monospace;background:#374a42;color:#fff;padding:3px 10px;border-radius:3px;letter-spacing:1px;font-weight:700;font-size:13px}
 
-      /* 任务列表占位 - 浅薄荷绿 */
+      /* 任务列表占位 - 浅薄荷绿 (保留,空状态可用) */
       .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(106,170,142,0.08);border:1px dashed rgba(106,170,142,0.4);border-radius:6px;text-align:center;color:#3a7a5a;font-size:13px;letter-spacing:.3px}
       .bls-coming-soon-en{font-size:11px;font-style:italic;color:#5c7569;margin-top:3px}
+
+      /* ★ v8: 任务列表区域 */
+      .bls-tasks-section{margin-top:14px}
+      .bls-tasks-header{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#374a42;font-weight:700;padding:0 4px 8px;letter-spacing:.4px}
+      .bls-refresh-btn{background:#fff;border:1px solid #c8d0cb;color:#374a42;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .25s;padding:0}
+      .bls-refresh-btn:hover:not(:disabled){background:#374a42;color:#fff;border-color:#374a42;transform:rotate(180deg)}
+      .bls-refresh-btn:disabled{opacity:.55;cursor:not-allowed}
+
+      .bls-task-list{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;margin:0;padding:2px 0}
+      .bls-task-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #d0d7d3;border-left:3px solid #374a42;border-radius:4px;background:#fafbfa;cursor:pointer;transition:all .2s;text-align:left;font-family:inherit;width:100%;box-shadow:none}
+      .bls-task-card:hover{background:#e8f0eb;border-left-color:#b33939;transform:translateX(2px);box-shadow:0 2px 6px rgba(55,74,66,0.08)}
+      .bls-task-card.bls-completed{opacity:.6;border-left-color:#6aaa8e}
+      .bls-task-card.bls-completed:hover{transform:none;background:#fafbfa;border-left-color:#6aaa8e}
+
+      /* 类型徽章 (跟老师端配色一致) */
+      .bls-task-badge{padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;font-family:'Noto Serif SC','STSong',serif}
+      .bls-task-badge-char{background:rgba(143,39,39,0.12);color:#8f2727}
+      .bls-task-badge-word{background:rgba(202,138,4,0.15);color:#976806}
+      .bls-task-badge-sentence{background:rgba(74,139,111,0.15);color:#2f6b53}
+
+      .bls-task-title{flex:1;font-size:14px;font-weight:600;color:#374a42;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.3px}
+      .bls-task-check{font-size:14px;color:#3a7a5a;flex-shrink:0;font-weight:bold}
+
+      /* 任务列表空状态 */
+      .bls-task-empty{text-align:center;padding:28px 16px;color:#5c7569;font-size:13px;background:rgba(106,170,142,0.06);border:1px dashed rgba(106,170,142,0.3);border-radius:6px}
+      .bls-task-empty-icon{font-size:34px;margin-bottom:8px;opacity:.55}
+      .bls-task-empty-en{font-size:11px;font-style:italic;margin-top:3px;color:rgba(74,63,47,.55)}
 
       /* 手机端适配 */
       @media (max-width: 480px){
@@ -5525,9 +5552,10 @@ showHome();
     if(nameInput) nameInput.disabled = false;
   }
 
-  // ─── 身份面板 (已加入) ─────────────────────────────────────
+  // ─── 身份面板 (已加入 · v8 含完整任务列表) ─────────────────
   function openIdentityPanel(){
-    console.log('[BLS] 打开身份面板');
+    console.log('[BLS] 打开身份面板 · 当前 tasks 数: ' + (state.tasks ? state.tasks.length : 0));
+    const tasksHTML = renderTasksList();
     const html = `
       <div class="bls-modal" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
@@ -5544,9 +5572,12 @@ showHome();
             <span class="bls-info-label">我的名字 / My Name</span>
             <span class="bls-info-value">${escapeHtml(state.name)}</span>
           </div>
-          <div class="bls-coming-soon">
-            📚 任务列表即将上线
-            <div class="bls-coming-soon-en">Task list coming soon</div>
+          <div class="bls-tasks-section">
+            <div class="bls-tasks-header">
+              <span>📚 任务 / Tasks (${state.tasks ? state.tasks.length : 0})</span>
+              <button class="bls-refresh-btn" id="bls-refresh-tasks" title="刷新 / Refresh">↻</button>
+            </div>
+            ${tasksHTML}
           </div>
         </div>
         <div class="bls-modal-footer">
@@ -5559,6 +5590,106 @@ showHome();
     document.getElementById('bls-info-close').onclick = closeDialog;
     document.getElementById('bls-info-ok').onclick = closeDialog;
     document.getElementById('bls-leave-btn').onclick = confirmLeave;
+
+    // 刷新按钮
+    const refreshBtn = document.getElementById('bls-refresh-tasks');
+    if(refreshBtn){
+      refreshBtn.onclick = function(){
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '...';
+        fetchTasksAndUpdate(function(ok){
+          // fetch 完成后重新渲染整个面板 (createOverlay 内部会先 closeDialog)
+          openIdentityPanel();
+          showToast(ok ? '任务已刷新 / Tasks refreshed' : '刷新失败 / Failed to refresh');
+        });
+      };
+    }
+  }
+
+  // ─── 渲染任务列表 HTML ─────────────────────────────────────
+  function renderTasksList(){
+    if(!state.tasks || state.tasks.length === 0){
+      return `
+        <div class="bls-task-empty">
+          <div class="bls-task-empty-icon">📭</div>
+          <div>暂无任务</div>
+          <div class="bls-task-empty-en">No tasks yet · waiting for teacher</div>
+        </div>
+      `;
+    }
+
+    // 排序: 未完成的在前,已完成的在后;同组内按创建时间倒序
+    const sorted = state.tasks.slice().sort(function(a, b){
+      const aDone = state.completedTasks.indexOf(a.taskId) >= 0;
+      const bDone = state.completedTasks.indexOf(b.taskId) >= 0;
+      if(aDone !== bDone) return aDone ? 1 : -1;
+      return (b.createdAt || '').localeCompare(a.createdAt || '');
+    });
+
+    return '<div class="bls-task-list">' + sorted.map(function(task){
+      const isDone = state.completedTasks.indexOf(task.taskId) >= 0;
+      const t = task.type || 'char';
+      const badgeClass = (t === 'word') ? 'bls-task-badge-word' :
+                         (t === 'sentence') ? 'bls-task-badge-sentence' : 'bls-task-badge-char';
+      const badgeText = (t === 'word') ? '词' :
+                        (t === 'sentence') ? '句' : '字';
+      const title = task.title || '(未命名 / Untitled)';
+      return '<button class="bls-task-card' + (isDone ? ' bls-completed' : '') +
+             '" onclick="BLS.openTask(\'' + escapeAttr(task.taskId) + '\')">' +
+             '<span class="bls-task-badge ' + badgeClass + '">' + badgeText + '</span>' +
+             '<span class="bls-task-title">' + escapeHtml(title) + '</span>' +
+             (isDone ? '<span class="bls-task-check" title="已完成">✓</span>' : '') +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  // ─── HTML attribute 转义 (防止 taskId 含特殊字符) ──────────
+  function escapeAttr(s){
+    if(s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ─── 打开任务 → 注入挥毫四步流程 ───────────────────────────
+  function openTask(taskId){
+    const task = (state.tasks || []).find(function(t){ return t.taskId === taskId; });
+    if(!task){
+      console.warn('[BLS] 任务不存在: ' + taskId);
+      showToast('任务不存在 / Task not found');
+      return;
+    }
+    console.log('[BLS] 打开任务', task);
+
+    // 关闭弹窗
+    closeDialog();
+
+    // 把任务内容注入挥毫流程: #teacher-input + startTeacherSession()
+    const input = document.getElementById('teacher-input');
+    if(!input || typeof global.startTeacherSession !== 'function'){
+      console.error('[BLS] 主页面挥毫入口不可用');
+      showToast('启动练习失败 / Failed to start');
+      return;
+    }
+    input.value = task.content || '';
+    global.startTeacherSession();
+    console.log('[BLS] 已注入任务内容到挥毫流程 · content="' + (task.content || '') + '"');
+
+    // 本地标记完成 (前端先记,后续 v9 上报 Worker)
+    markTaskCompletedLocally(task.taskId);
+  }
+
+  // ─── 本地标记任务完成 ─────────────────────────────────────
+  function markTaskCompletedLocally(taskId){
+    if(!taskId) return;
+    if(state.completedTasks.indexOf(taskId) >= 0) return;
+    state.completedTasks.push(taskId);
+    try {
+      localStorage.setItem(LS_KEYS.COMPLETED_TASKS, JSON.stringify(state.completedTasks));
+    } catch(e) {
+      console.warn('[BLS] 完成状态持久化失败', e);
+    }
+    updateCardSubtitle();
+    console.log('[BLS] 任务本地标记完成 · ' + taskId + ' · 总已完成: ' + state.completedTasks.length);
+    // TODO v9: POST /api/student/{classCode}/tasks/{taskId}/complete 上报
   }
 
   // ─── 离开班级 (Worker 无该端点,只清本地) ──────────────────
@@ -5598,10 +5729,11 @@ showHome();
     }
   }
 
-  // ─── 拉任务列表 (静默更新,不打扰用户) ─────────────────────
-  function fetchTasksAndUpdate(){
+  // ─── 拉任务列表 (v8: 支持回调) ─────────────────────────────
+  function fetchTasksAndUpdate(onDone){
     if(!state.classCode){
       console.log('[BLS] fetchTasks 跳过 (无 classCode)');
+      if(onDone) onDone(false);
       return;
     }
     console.log('[BLS] 拉取任务列表 · classCode=' + state.classCode);
@@ -5613,14 +5745,15 @@ showHome();
           state.tasks = res.body.tasks;
           console.log('[BLS] 拉取任务成功 · 共 ' + state.tasks.length + ' 个');
           updateCardSubtitle();
+          if(onDone) onDone(true);
         } else {
-          // 班级不存在等错误,不报警 (用户可能已被老师踢出班级或班级被删)
           console.warn('[BLS] 拉取任务失败', res.status, res.body);
+          if(onDone) onDone(false);
         }
       })
       .catch(function(err){
         console.warn('[BLS] 拉取任务网络错误', err);
-        // 不打扰用户,保持当前 state.tasks 不变
+        if(onDone) onDone(false);
       });
   }
 
@@ -5676,7 +5809,8 @@ showHome();
     openJoinDialog: openJoinDialog,
     openIdentityPanel: openIdentityPanel,
     leaveClass: confirmLeave,
-    refreshTasks: fetchTasksAndUpdate,  // ★ v7: 手动刷新任务 (console 调试用)
+    refreshTasks: fetchTasksAndUpdate,
+    openTask: openTask,                  // ★ v8: 任务点击 (HTML onclick 调用)
     _state: state,
     _LS_KEYS: LS_KEYS,
     _API_BASE: BLS_API_BASE

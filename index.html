@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-5 (2026-06-16) — 关键修复:API 路径加 /api 前缀 + 弹窗配色重做(白底深墨绿,参考老师端) -->
+<!-- 斑斓部件 · 部件联动-6 (2026-06-16) — 重大对齐:全部 API 路径/请求/响应/认证字段跟 Worker 真实 schema 一致 (path 改单数 /api/student/*, 字段 name, 无 token, 离开仅本地清) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-5">
+<meta name="version" content="部件联动-6">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5145,77 +5145,78 @@ showHome();
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
-     斑斓联动学生端模块 (BLS = BanLan Student) · 部件联动-2
-     · 加入班级弹窗 (自定义水墨风格 modal)
-     · POST /students/join API 调用
-     · LocalStorage 持久化 (banlan_student_*)
-     · 启动时自动恢复登录态
-     · 已登录身份面板 (显示班级码 + 学生名 + 离开班级)
-     · POST /students/leave API 调用
+     斑斓联动学生端模块 (BLS = BanLan Student) · 部件联动-6
+     · 全部 API 路径/字段对齐 Worker 真实定义
+     · POST /api/student/join (单数!) · 字段 {classCode, name}
+     · 成功响应 {classInfo, student} (无 ok / 无 token)
+     · 认证: studentCode 作身份标识 (不是 Bearer Token)
+     · 离开班级: Worker 无该端点,仅本地清 localStorage
      ═══════════════════════════════════════════════════════════ -->
 <script id="bls-module">
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-5';
+  const VERSION = '部件联动-6';
 
   // ─── 配置 ──────────────────────────────────────────────────
-  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ v5: 加 /api 前缀,跟老师端 /api/classes 路径规律一致
+  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
 
   const LS_KEYS = {
-    TOKEN:           'banlan_student_token',
-    CLASS_CODE:      'banlan_student_classCode',
-    DISPLAY_NAME:    'banlan_student_displayName',
-    COMPLETED_TASKS: 'banlan_student_completedTasks'
+    STUDENT_CODE:    'banlan_student_studentCode',   // 学生身份标识 (Worker 用它认人)
+    CLASS_CODE:      'banlan_student_classCode',     // 班级码
+    NAME:            'banlan_student_name',          // 学生姓名 (= 加入时 name 字段)
+    COMPLETED_TASKS: 'banlan_student_completedTasks' // 已完成任务 id 数组
   };
 
   // 班级码格式: 2-20 位字母数字横线下划线 (与老师端一致)
   const CLASS_CODE_REGEX = /^[A-Za-z0-9_-]{2,20}$/;
-  const DISPLAY_NAME_MAX = 20;
+  const NAME_MAX_LEN = 20;
 
   // ─── 内部状态 ──────────────────────────────────────────────
   const state = {
-    token: null,
-    classCode: null,
-    displayName: null,
-    tasks: [],
-    completedTasks: []
+    studentCode: null,    // Worker 用的身份标识 (本前端固定 = name)
+    classCode: null,      // 班级码
+    name: null,           // 学生姓名 (跟 Worker 的 name 字段一致)
+    tasks: [],            // 当前班级活跃任务
+    completedTasks: []    // 已完成任务 id 数组
   };
 
   // ─── LocalStorage 读写 ─────────────────────────────────────
   function loadFromStorage(){
     try {
-      state.token        = localStorage.getItem(LS_KEYS.TOKEN);
-      state.classCode    = localStorage.getItem(LS_KEYS.CLASS_CODE);
-      state.displayName  = localStorage.getItem(LS_KEYS.DISPLAY_NAME);
-      const completed    = localStorage.getItem(LS_KEYS.COMPLETED_TASKS);
+      state.studentCode = localStorage.getItem(LS_KEYS.STUDENT_CODE);
+      state.classCode   = localStorage.getItem(LS_KEYS.CLASS_CODE);
+      state.name        = localStorage.getItem(LS_KEYS.NAME);
+      const completed   = localStorage.getItem(LS_KEYS.COMPLETED_TASKS);
       state.completedTasks = completed ? JSON.parse(completed) : [];
     } catch(e) {
       console.warn('[BLS] localStorage 读取失败', e);
     }
   }
-  function saveSession(token, classCode, displayName){
+
+  function saveJoinResult(classCode, studentCode, name){
     try {
-      localStorage.setItem(LS_KEYS.TOKEN, token);
       localStorage.setItem(LS_KEYS.CLASS_CODE, classCode);
-      localStorage.setItem(LS_KEYS.DISPLAY_NAME, displayName);
-      state.token = token;
+      localStorage.setItem(LS_KEYS.STUDENT_CODE, studentCode);
+      localStorage.setItem(LS_KEYS.NAME, name);
       state.classCode = classCode;
-      state.displayName = displayName;
+      state.studentCode = studentCode;
+      state.name = name;
     } catch(e) {
       console.warn('[BLS] localStorage 写入失败', e);
     }
   }
+
   function clearSession(){
     try {
-      localStorage.removeItem(LS_KEYS.TOKEN);
+      localStorage.removeItem(LS_KEYS.STUDENT_CODE);
       localStorage.removeItem(LS_KEYS.CLASS_CODE);
-      localStorage.removeItem(LS_KEYS.DISPLAY_NAME);
+      localStorage.removeItem(LS_KEYS.NAME);
       localStorage.removeItem(LS_KEYS.COMPLETED_TASKS);
     } catch(e) {}
-    state.token = null;
+    state.studentCode = null;
     state.classCode = null;
-    state.displayName = null;
+    state.name = null;
     state.tasks = [];
     state.completedTasks = [];
   }
@@ -5306,12 +5307,11 @@ showHome();
 
   // ─── 通用: 创建/移除遮罩 ───────────────────────────────────
   function createOverlay(modalHTML){
-    closeDialog(); // 先关掉旧的
+    closeDialog();
     const ov = document.createElement('div');
     ov.className = 'bls-overlay bls-show';
     ov.id = 'bls-active-overlay';
     ov.innerHTML = modalHTML;
-    // 点遮罩空白处关闭
     ov.addEventListener('click', function(e){
       if(e.target === ov) closeDialog();
     });
@@ -5345,7 +5345,7 @@ showHome();
             <label class="bls-label" for="bls-join-name">
               我的名字 / My Name <span class="bls-required">*</span>
             </label>
-            <input type="text" id="bls-join-name" class="bls-input" placeholder="如:张三、Tommy、小雨" maxlength="20" autocomplete="off">
+            <input type="text" id="bls-join-name" class="bls-input" placeholder="如：张三、Tommy、小雨" maxlength="20" autocomplete="off">
             <div class="bls-hint">让老师认得你 / Let your teacher recognize you (1-20 字)</div>
           </div>
           <div class="bls-error" id="bls-join-error"></div>
@@ -5357,13 +5357,10 @@ showHome();
       </div>
     `;
     createOverlay(html);
-
-    // 绑定事件
     document.getElementById('bls-join-close').onclick = closeDialog;
     document.getElementById('bls-join-cancel').onclick = closeDialog;
     document.getElementById('bls-join-submit').onclick = submitJoin;
 
-    // 回车提交
     const codeInput = document.getElementById('bls-join-code');
     const nameInput = document.getElementById('bls-join-name');
     [codeInput, nameInput].forEach(function(inp){
@@ -5371,12 +5368,9 @@ showHome();
         if(e.key === 'Enter') submitJoin();
       });
     });
-
-    // 自动聚焦
     setTimeout(function(){ codeInput.focus(); }, 60);
   }
 
-  // ─── 显示错误 ──────────────────────────────────────────────
   function showJoinError(msg){
     const el = document.getElementById('bls-join-error');
     if(!el) return;
@@ -5388,7 +5382,35 @@ showHome();
     if(el) el.classList.remove('bls-show');
   }
 
-  // ─── 提交加入班级 (v4: 大小写智能容错) ─────────────────────
+  // ─── 错误信息中英文友好化 (兼容 Worker 的中文错误) ──────────
+  function friendlyError(rawError, status){
+    if(!rawError){
+      if(status === 404) return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+      if(status === 401 || status === 403) return '权限不足 / Unauthorized';
+      if(status === 429) return '请求过于频繁，稍后再试 / Too many requests';
+      if(status >= 500) return '服务器暂时不可用 / Server error, please try later';
+      return '加入失败 (' + status + ') / Join failed';
+    }
+    const e = String(rawError).trim();
+    // Worker 的中文错误信息直接识别
+    if(/不存在/.test(e) && /班级/.test(e)){
+      return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+    }
+    if(/请填写/.test(e) && (/班级/.test(e) || /姓名/.test(e))){
+      return '请完整填写班级码和姓名 / Please fill in class code and name';
+    }
+    if(/数据异常/.test(e)){
+      return '班级数据异常，请联系老师 / Class data issue, please contact teacher';
+    }
+    // 英文 fallback
+    const el = e.toLowerCase();
+    if(/not\s*found/.test(el)) return '班级码不存在，请向老师确认 / Class not found';
+    if(/unauthorized|forbidden/.test(el)) return '权限不足 / Unauthorized';
+    if(/rate\s*limit|too\s*many/.test(el)) return '请求过于频繁 / Too many requests';
+    return '加入失败 / Failed: ' + e;
+  }
+
+  // ─── 提交加入班级 (大小写智能容错 + Worker 真实 schema) ─────
   function submitJoin(){
     hideJoinError();
     const codeInput = document.getElementById('bls-join-code');
@@ -5397,9 +5419,8 @@ showHome();
     if(!codeInput || !nameInput || !submitBtn) return;
 
     const classCode = codeInput.value.trim();
-    const displayName = nameInput.value.trim();
+    const studentName = nameInput.value.trim();
 
-    // 前端校验
     if(!classCode){
       showJoinError('请输入班级码 / Please enter class code');
       codeInput.focus();
@@ -5410,38 +5431,36 @@ showHome();
       codeInput.focus();
       return;
     }
-    if(!displayName){
+    if(!studentName){
       showJoinError('请输入你的名字 / Please enter your name');
       nameInput.focus();
       return;
     }
-    if(displayName.length > DISPLAY_NAME_MAX){
-      showJoinError('名字过长 (最多 ' + DISPLAY_NAME_MAX + ' 字) / Name too long');
+    if(studentName.length > NAME_MAX_LEN){
+      showJoinError('名字过长 (最多 ' + NAME_MAX_LEN + ' 字) / Name too long');
       nameInput.focus();
       return;
     }
 
-    // 构建大小写变体队列: 原样 → 大写 → 小写 (去重)
+    // 大小写变体队列
     const variants = [classCode];
     const upper = classCode.toUpperCase();
     const lower = classCode.toLowerCase();
     if(variants.indexOf(upper) < 0) variants.push(upper);
     if(variants.indexOf(lower) < 0) variants.push(lower);
 
-    // 提交中状态
     submitBtn.disabled = true;
     submitBtn.textContent = '加入中... / Joining...';
     codeInput.disabled = true;
     nameInput.disabled = true;
 
-    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', displayName=' + displayName);
-    attemptJoinSequence(variants, 0, displayName, submitBtn, codeInput, nameInput);
+    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', name=' + studentName);
+    attemptJoinSequence(variants, 0, studentName, submitBtn, codeInput, nameInput);
   }
 
-  // ─── 按变体顺序尝试加入 (递归式 promise 链) ────────────────
-  function attemptJoinSequence(variants, idx, displayName, submitBtn, codeInput, nameInput){
+  // ─── 按变体顺序尝试加入 ────────────────────────────────────
+  function attemptJoinSequence(variants, idx, name, submitBtn, codeInput, nameInput){
     if(idx >= variants.length){
-      // 全部变体都失败 (理论上 attemptJoinSingle 内部会处理,这里兜底)
       showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
       resetJoinForm(submitBtn, codeInput, nameInput);
       return;
@@ -5449,46 +5468,41 @@ showHome();
     const cc = variants[idx];
     console.log('[BLS] 尝试加入 [' + (idx+1) + '/' + variants.length + ']: classCode=' + cc);
 
-    fetch(BLS_API_BASE + '/students/join', {
+    fetch(BLS_API_BASE + '/student/join', {  // ★ Worker 真实路径: /api/student/join (单数!)
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classCode: cc, displayName: displayName })
+      body: JSON.stringify({ classCode: cc, name: name })  // ★ 字段名 name (不是 displayName)
     })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){
       console.log('[BLS] API 响应 [' + cc + ']', res);
 
-      // 成功路径
-      if(res.body && res.body.ok && res.body.data){
-        const d = res.body.data;
-        const token = d.token || d.studentToken || d.accessToken;
-        const finalCC = d.classCode || cc;
-        const finalDN = d.displayName || displayName;
-        if(!token){
-          showJoinError('服务端未返回 token / Server response missing token');
-          resetJoinForm(submitBtn, codeInput, nameInput);
-          return;
-        }
-        saveSession(token, finalCC, finalDN);
-        console.log('[BLS] 加入成功 · 班级=' + finalCC + ' · 学生=' + finalDN);
+      // ★ 成功判定: Worker 返回 {classInfo, student} 且 status 200
+      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){
+        const cInfo = res.body.classInfo;
+        const student = res.body.student;
+        const finalCC = cInfo.classCode || cc;
+        const finalSC = student.studentCode || name;
+        const finalName = student.name || name;
+
+        saveJoinResult(finalCC, finalSC, finalName);
+        console.log('[BLS] 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
         closeDialog();
         updateCardSubtitle();
         showToast('已加入班级 ' + finalCC + ' 🎉');
         return;
       }
 
-      // 失败路径:判断是否要继续尝试下一个变体
+      // 失败:用 Worker 返回的 error 字段
       const rawErr = (res.body && res.body.error) ? res.body.error : null;
+      // Worker 班级不存在: status=404 + error='班级码不存在'
       const isNotFound = res.status === 404 ||
-                         (rawErr && /not\s*found/i.test(String(rawErr)));
+                         (rawErr && /不存在|not\s*found/i.test(String(rawErr)));
 
       if(isNotFound && idx + 1 < variants.length){
-        // 继续尝试下一个变体
         console.log('[BLS] 班级码 [' + cc + '] not found, 尝试下一变体');
-        attemptJoinSequence(variants, idx + 1, displayName, submitBtn, codeInput, nameInput);
+        attemptJoinSequence(variants, idx + 1, name, submitBtn, codeInput, nameInput);
       } else {
-        // 不是 not found 错误 (如 already joined / unauthorized 等) → 直接报错
-        // 或者已经试完所有变体 → 报错
         const msg = friendlyError(rawErr, res.status);
         showJoinError(msg);
         resetJoinForm(submitBtn, codeInput, nameInput);
@@ -5496,13 +5510,11 @@ showHome();
     })
     .catch(function(err){
       console.error('[BLS] 加入失败 (网络) [' + cc + ']', err);
-      // 网络错误不重试其他变体,直接报错
       showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
       resetJoinForm(submitBtn, codeInput, nameInput);
     });
   }
 
-  // ─── 重置加入表单 (失败后允许用户重试) ─────────────────────
   function resetJoinForm(submitBtn, codeInput, nameInput){
     if(submitBtn){
       submitBtn.disabled = false;
@@ -5512,7 +5524,7 @@ showHome();
     if(nameInput) nameInput.disabled = false;
   }
 
-  // ─── 身份面板 (已登录) ─────────────────────────────────────
+  // ─── 身份面板 (已加入) ─────────────────────────────────────
   function openIdentityPanel(){
     console.log('[BLS] 打开身份面板');
     const html = `
@@ -5529,7 +5541,7 @@ showHome();
           </div>
           <div class="bls-info-row">
             <span class="bls-info-label">我的名字 / My Name</span>
-            <span class="bls-info-value">${escapeHtml(state.displayName)}</span>
+            <span class="bls-info-value">${escapeHtml(state.name)}</span>
           </div>
           <div class="bls-coming-soon">
             📚 任务列表即将上线
@@ -5537,7 +5549,7 @@ showHome();
           </div>
         </div>
         <div class="bls-modal-footer">
-          <button class="bls-btn bls-btn-danger" id="bls-leave-btn">离开班级 / Leave Class</button>
+          <button class="bls-btn bls-btn-danger" id="bls-leave-btn">离开班级 / Leave</button>
           <button class="bls-btn bls-btn-primary" id="bls-info-ok">好 / OK</button>
         </div>
       </div>
@@ -5548,74 +5560,18 @@ showHome();
     document.getElementById('bls-leave-btn').onclick = confirmLeave;
   }
 
-  // ─── 离开班级确认 + 提交 ───────────────────────────────────
+  // ─── 离开班级 (Worker 无该端点,只清本地) ──────────────────
   function confirmLeave(){
     const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后将清除本设备的学生信息。\n\nLeave class ' + state.classCode + '? Your info on this device will be cleared.');
     if(!ok) return;
-    console.log('[BLS] 提交离开班级');
-
-    const leaveBtn = document.getElementById('bls-leave-btn');
-    if(leaveBtn){
-      leaveBtn.disabled = true;
-      leaveBtn.textContent = '离开中... / Leaving...';
-    }
-
-    // 调 API 但不强依赖响应,本地清就行
-    fetch(BLS_API_BASE + '/students/leave', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + (state.token || '')
-      },
-      body: JSON.stringify({})
-    })
-    .catch(function(err){ console.warn('[BLS] 离开 API 失败 (忽略,本地仍清理)', err); })
-    .finally(function(){
-      clearSession();
-      closeDialog();
-      updateCardSubtitle();
-      showToast('已离开班级 / Left class');
-      console.log('[BLS] 本地状态已清空');
-    });
+    console.log('[BLS] 离开班级 (仅本地清空,Worker 无 leave 端点)');
+    clearSession();
+    closeDialog();
+    updateCardSubtitle();
+    showToast('已离开班级 / Left class');
   }
 
-  // ─── 错误信息中英文友好化 ─────────────────────────────────
-  function friendlyError(rawError, status){
-    // 后端可能返回英文短码,如 'Not found'、'Already joined' 等
-    if(!rawError){
-      if(status === 404) return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
-      if(status === 401 || status === 403) return '权限不足 / Unauthorized';
-      if(status === 429) return '请求过于频繁，稍后再试 / Too many requests';
-      if(status >= 500) return '服务器暂时不可用 / Server error, please try later';
-      return '加入失败 (' + status + ') / Join failed';
-    }
-    const e = String(rawError).trim().toLowerCase();
-    if(e === 'not found' || e.indexOf('not found') >= 0 || e.indexOf('class not found') >= 0){
-      return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
-    }
-    if(e.indexOf('already') >= 0 && (e.indexOf('join') >= 0 || e.indexOf('member') >= 0)){
-      return '你已经在这个班级了 / You\'re already in this class';
-    }
-    if(e.indexOf('unauthorized') >= 0 || e.indexOf('forbidden') >= 0){
-      return '权限不足 / Unauthorized';
-    }
-    if(e.indexOf('rate limit') >= 0 || e.indexOf('too many') >= 0){
-      return '请求过于频繁，稍后再试 / Too many requests';
-    }
-    if(e.indexOf('invalid') >= 0 || e.indexOf('format') >= 0){
-      return '格式不正确 / Invalid format: ' + rawError;
-    }
-    if(e.indexOf('display') >= 0 && e.indexOf('name') >= 0){
-      return '名字格式不对 / Invalid name: ' + rawError;
-    }
-    if(e.indexOf('class') >= 0 && e.indexOf('code') >= 0){
-      return '班级码无效 / Invalid class code: ' + rawError;
-    }
-    // 默认: 透传原始错误,前缀提示
-    return '加入失败 / Failed: ' + rawError;
-  }
-
-  // ─── HTML 转义 (防止显示名 XSS) ────────────────────────────
+  // ─── HTML 转义 ─────────────────────────────────────────────
   function escapeHtml(s){
     if(s == null) return '';
     return String(s)
@@ -5626,7 +5582,7 @@ showHome();
       .replace(/'/g, '&#39;');
   }
 
-  // ─── 轻量 Toast (复用现有 #toast 元素,若有) ────────────────
+  // ─── Toast (复用主页面 #toast 元素) ────────────────────────
   function showToast(msg){
     const t = document.getElementById('toast');
     if(t){
@@ -5637,17 +5593,16 @@ showHome();
         t.className = 'toast';
       }, 2400);
     } else {
-      // 主页面没 toast 元素就降级 alert
       console.log('[BLS toast] ' + msg);
     }
   }
 
-  // ─── 更新卡片副标题 ────────────────────────────────────────
+  // ─── 卡片副标题更新 ────────────────────────────────────────
   function updateCardSubtitle(){
     const el = document.getElementById('bls-entry-desc');
     if(!el) return;
 
-    if(!state.token){
+    if(!state.studentCode){
       el.innerHTML = '点此加入班级 / Join a class';
       return;
     }
@@ -5662,9 +5617,9 @@ showHome();
     }
   }
 
-  // ─── 卡片点击 (分发: 未登录 → 加入对话框 / 已登录 → 身份面板) ─
+  // ─── 卡片点击分发 ──────────────────────────────────────────
   function onCardClick(){
-    if(!state.token){
+    if(!state.studentCode){
       openJoinDialog();
     } else {
       openIdentityPanel();
@@ -5678,8 +5633,8 @@ showHome();
     loadFromStorage();
     updateCardSubtitle();
 
-    if(state.token){
-      console.log('[BLS] 已登录 · 班级=' + state.classCode + ' · 学生=' + state.displayName);
+    if(state.studentCode){
+      console.log('[BLS] 已加入 · 班级=' + state.classCode + ' · 姓名=' + state.name + ' · 学号=' + state.studentCode);
       // TODO 下版本: 静默拉任务列表
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
@@ -5694,7 +5649,6 @@ showHome();
     openJoinDialog: openJoinDialog,
     openIdentityPanel: openIdentityPanel,
     leaveClass: confirmLeave,
-    // 调试用
     _state: state,
     _LS_KEYS: LS_KEYS,
     _API_BASE: BLS_API_BASE

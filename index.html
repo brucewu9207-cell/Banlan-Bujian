@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-12 (2026-06-16) — 修复独体字"下一个字"按钮不跳转:checkPinyin 独体字分支补 sessionIndex++ -->
+<!-- 斑斓部件 · 部件联动-14 (2026-06-16) — confirmLeave 调用 Worker /leave 端点,让老师端看到学生真实"已离开"状态 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-12">
+<meta name="version" content="部件联动-14">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -2435,6 +2435,7 @@ function loadCharacter(char){
 function renderPinyinOptions(char,data){
   const container=document.getElementById('pinyin-options');
   container.innerHTML='';
+  container.style.display='';   // ★ 联动-13: 重置上一字 checkPinyin 选对时手机端设的 display:none
   const allPy=[...new Set(Object.values(CHAR_DB).map(d=>d.py))].filter(p=>p!==data.py);
   const distractors=allPy.sort(()=>Math.random()-0.5).slice(0,3);
   const options=[...distractors,data.py].sort(()=>Math.random()-0.5);
@@ -2471,6 +2472,19 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
+    // ★ 联动-13: 手机端 wizard 模式释义被挡修复
+    // char-panel overflow:hidden + 高度锁死,新增的拼音按钮 + char-info 超出一屏
+    // 解法: 选对后隐藏 pinyin-options 容器,让出空间给 char-info; 同时 scrollIntoView
+    if(_isMobile){
+      setTimeout(function(){
+        const pinContainer = document.getElementById('pinyin-options');
+        if(pinContainer) pinContainer.style.display = 'none';
+        if(info && typeof info.scrollIntoView === 'function'){
+          info.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }, 80);
+    }
+
     // ★ 联动-12: 独体字 vs 合体字分流 (v12 修复:独体字补 sessionIndex++)
     const _isWhole = !!(data && (data.structure === 'whole' || data.structure === 'ov'));
     if(_isWhole){
@@ -5171,7 +5185,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-12';
+  const VERSION = '部件联动-14';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5796,7 +5810,31 @@ showHome();
   function confirmLeave(){
     const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后将清除本设备的学生信息。\n\nLeave class ' + state.classCode + '? Your info on this device will be cleared.');
     if(!ok) return;
-    console.log('[BLS] 离开班级 (仅本地清空,Worker 无 leave 端点)');
+    console.log('[BLS] 离开班级 · 先通知后端清理');
+
+    // ★ 联动-14: 异步通知 Worker 删除学生记录 (不阻塞本地清理)
+    const oldClassCode = state.classCode;
+    const oldStudentCode = state.studentCode;
+    if(oldClassCode && oldStudentCode){
+      fetch(BLS_API_BASE + '/student/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ classCode: oldClassCode, studentCode: oldStudentCode })
+      })
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+      .then(function(res){
+        if(res.status === 200 && res.body && res.body.success){
+          console.log('[BLS] ✅ 后端已清除学生记录 · ' + oldClassCode + '/' + oldStudentCode);
+        } else {
+          console.warn('[BLS] ⚠️ 后端清除失败 (本地已清,不影响使用)', res);
+        }
+      })
+      .catch(function(err){
+        console.warn('[BLS] ⚠️ 后端清除网络错误 (本地已清)', err);
+      });
+    }
+
+    // 本地清理 (不等后端响应)
     clearSession();
     closeDialog();
     updateCardSubtitle();

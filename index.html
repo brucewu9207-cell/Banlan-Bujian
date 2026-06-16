@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-4 (2026-06-16) — Hotfix:班级码大小写智能容错(前端按 原样→大写→小写 顺序自动尝试) -->
+<!-- 斑斓部件 · 部件联动-5 (2026-06-16) — 关键修复:API 路径加 /api 前缀 + 弹窗配色重做(白底深墨绿,参考老师端) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-4">
+<meta name="version" content="部件联动-5">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5157,10 +5157,10 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-4';
+  const VERSION = '部件联动-5';
 
   // ─── 配置 ──────────────────────────────────────────────────
-  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev';
+  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ v5: 加 /api 前缀,跟老师端 /api/classes 路径规律一致
 
   const LS_KEYS = {
     TOKEN:           'banlan_student_token',
@@ -5220,78 +5220,79 @@ showHome();
     state.completedTasks = [];
   }
 
-  // ─── 注入 BLS 专用 CSS (v3: 深墨绿主体 + 竹色按钮 + 米黄标题) ─
+  // ─── 注入 BLS 专用 CSS (v5: 白底 + 深墨绿,参考老师端 v2D.7) ─
   function injectStyles(){
     if(document.getElementById('bls-styles')) return;
     const style = document.createElement('style');
     style.id = 'bls-styles';
     style.textContent = `
-      /* 遮罩层 - 深色加深,水墨晕染感 */
-      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,28,22,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .2s ease}
+      /* 遮罩层 - 浅墨绿半透明 (跟老师端 .bl-overlay 一致) */
+      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(228,238,233,0.85);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .18s ease}
       .bls-overlay.bls-show{display:flex}
       @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
 
-      /* 弹窗主体 - 深墨绿渐变,跟主页卡片一脉相承 */
-      .bls-modal{background:linear-gradient(180deg,rgba(48,68,58,0.97) 0%,rgba(35,52,44,0.97) 100%);border-radius:14px;border:1.5px solid rgba(181,118,58,0.32);box-shadow:0 24px 70px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;color:#fff;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      /* 弹窗主体 - 白底,跟老师端 .bl-modal 一脉相承 */
+      .bls-modal{background:#fff;border-radius:10px;border:1px solid rgba(55,74,66,0.1);box-shadow:0 24px 60px rgba(55,74,66,0.2);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
       @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
-      /* 顶部装饰条 - 竹色 */
-      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#b5763a;border-radius:0 0 4px 4px;opacity:.95}
+      /* 顶部装饰条 - 深墨绿 */
+      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#374a42;border-radius:0 0 4px 4px;opacity:.85}
 
-      /* 头部 - 米黄标题 */
-      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid rgba(255,255,255,0.1);position:relative;text-align:center}
-      .bls-modal-header h3{margin:0;font-size:17px;color:#f5edd8;letter-spacing:1.4px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
-      .bls-modal-header .bls-subtitle{font-size:11px;color:rgba(245,237,216,0.55);letter-spacing:.6px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
-      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.55);font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
-      .bls-close:hover{background:rgba(255,255,255,0.12);color:#fff}
+      /* 头部 */
+      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid #eef1ef;position:relative;text-align:center}
+      .bls-modal-header h3{margin:0;font-size:17px;color:#374a42;letter-spacing:1.5px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
+      .bls-modal-header .bls-subtitle{font-size:11px;color:#5c7569;letter-spacing:.6px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
+      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:#52635b;font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
+      .bls-close:hover{background:rgba(0,0,0,.06);color:#2c2416}
 
-      /* 表单区 */
+      /* 表单 */
       .bls-modal-body{padding:18px 22px;overflow-y:auto}
       .bls-field{margin-bottom:14px}
-      .bls-label{display:block;font-size:13px;color:rgba(255,255,255,0.92);font-weight:600;margin-bottom:6px;letter-spacing:.3px}
-      .bls-label .bls-required{color:#d4975a;margin-left:2px}
+      .bls-label{display:block;font-size:13px;color:#374a42;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+      .bls-label .bls-required{color:#b33939;margin-left:2px}
 
-      /* 输入框 - 浅米色背景,便于阅读 */
-      .bls-input{width:100%;padding:10px 12px;border:1.5px solid rgba(255,255,255,0.18);border-radius:8px;font-size:15px;font-family:inherit;color:#2c2416;background:rgba(255,253,246,0.96);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
-      .bls-input:focus{border-color:#d4975a;box-shadow:0 0 0 3px rgba(212,151,90,0.28)}
-      .bls-input:disabled{background:rgba(255,253,246,0.55);color:#8a7a65;cursor:not-allowed}
-      .bls-hint{font-size:11.5px;color:rgba(255,255,255,0.55);margin-top:5px;line-height:1.5;letter-spacing:.2px}
+      /* 输入框 - 白底浅边框 */
+      .bls-input{width:100%;padding:10px 12px;border:1px solid #c8d0cb;border-radius:4px;font-size:15px;font-family:inherit;color:#374a42;background:#fafbfa;outline:none;transition:all .2s;box-sizing:border-box}
+      .bls-input:focus{background:#fff;border-color:#374a42;box-shadow:0 0 0 3px rgba(55,74,66,0.1)}
+      .bls-input:disabled{background:#f0f3f1;color:#8a9590;cursor:not-allowed}
+      .bls-hint{font-size:11.5px;color:#5c7569;margin-top:5px;line-height:1.5;letter-spacing:.2px}
 
       /* 错误提示 - 朱砂红 */
-      .bls-error{font-size:12.5px;color:#f4c8bd;margin-top:8px;padding:8px 10px;background:rgba(200,75,47,0.18);border-left:3px solid #e07555;border-radius:4px;line-height:1.5;display:none}
+      .bls-error{font-size:13px;color:#b33939;margin-top:8px;padding:8px 12px;background:rgba(179,57,57,0.06);border-left:3px solid #b33939;border-radius:4px;line-height:1.5;display:none}
       .bls-error.bls-show{display:block;animation:bls-fade-in .18s ease}
 
       /* 底部按钮区 */
-      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.18)}
-      .bls-btn{padding:9px 18px;border-radius:8px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;transition:all .18s;border:1.5px solid transparent;letter-spacing:.3px}
-      .bls-btn:disabled{opacity:.5;cursor:not-allowed}
+      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef1ef;background:#fafbfa}
+      .bls-btn{padding:9px 18px;border-radius:4px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;border:1px solid transparent;letter-spacing:.5px;transition:all .2s;box-shadow:0 3px 8px rgba(55,74,66,0.12)}
+      .bls-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 12px rgba(55,74,66,0.22);filter:brightness(1.08)}
+      .bls-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
 
-      /* 主按钮 - 竹色,跟 "演示 →" 按钮一脉相承 */
-      .bls-btn-primary{background:#b5763a;color:#fff;border-color:#b5763a;box-shadow:0 2px 6px rgba(0,0,0,0.2)}
-      .bls-btn-primary:hover:not(:disabled){background:#d4975a;border-color:#d4975a;transform:translateY(-1px);box-shadow:0 6px 14px rgba(181,118,58,0.35)}
+      /* 主按钮 - 深墨绿 (老师端主按钮一致) */
+      .bls-btn-primary{background:#374a42;color:#fff;border-color:#374a42}
 
-      /* 次按钮 - 透明白边 */
-      .bls-btn-secondary{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.88);border-color:rgba(255,255,255,0.28)}
-      .bls-btn-secondary:hover:not(:disabled){background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.45);color:#fff}
+      /* 次按钮 - 白底深墨绿字 */
+      .bls-btn-secondary{background:#fff;color:#374a42;border-color:#c8d0cb;box-shadow:none}
+      .bls-btn-secondary:hover:not(:disabled){background:#f0f7f3;border-color:#374a42;box-shadow:0 3px 8px rgba(55,74,66,0.12)}
 
-      /* 危险按钮 - 朱砂红,默认空心 */
-      .bls-btn-danger{background:transparent;color:#f4a89a;border-color:rgba(224,117,85,0.6)}
-      .bls-btn-danger:hover:not(:disabled){background:#c84b2f;color:#fff;border-color:#c84b2f;box-shadow:0 4px 12px rgba(200,75,47,0.4)}
+      /* 危险按钮 - 朱砂红 */
+      .bls-btn-danger{background:#b33939;color:#fff;border-color:#8f2727}
+      .bls-btn-danger:hover:not(:disabled){background:#8f2727;border-color:#8f2727}
 
-      /* 身份面板 - 信息行 */
-      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed rgba(255,255,255,0.16)}
+      /* 身份面板信息行 */
+      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed #e0e6e2}
       .bls-info-row:last-of-type{border-bottom:none}
-      .bls-info-label{font-size:13px;color:rgba(255,255,255,0.62);letter-spacing:.3px}
-      .bls-info-value{font-size:15px;color:#fff;font-weight:600}
-      .bls-info-value.bls-code{font-family:'SF Mono','Consolas','Monaco',monospace;background:rgba(245,237,216,0.92);color:#2c2416;padding:3px 10px;border-radius:6px;letter-spacing:1px}
+      .bls-info-label{font-size:13px;color:#5c7569;letter-spacing:.3px}
+      .bls-info-value{font-size:15px;color:#374a42;font-weight:600}
+      /* 班级码 badge - 深墨绿底白字,跟老师端 .bl-class-code badge 一致 */
+      .bls-info-value.bls-code{font-family:'SF Mono','Consolas','Monaco',monospace;background:#374a42;color:#fff;padding:3px 10px;border-radius:3px;letter-spacing:1px;font-weight:700;font-size:13px}
 
-      /* 任务列表占位 - 薄荷绿提示 */
-      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(143,196,173,0.12);border:1px dashed rgba(143,196,173,0.42);border-radius:8px;text-align:center;color:#b8e4cd;font-size:13px;letter-spacing:.3px}
-      .bls-coming-soon-en{font-size:11px;font-style:italic;color:rgba(255,255,255,0.5);margin-top:3px}
+      /* 任务列表占位 - 浅薄荷绿 */
+      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(106,170,142,0.08);border:1px dashed rgba(106,170,142,0.4);border-radius:6px;text-align:center;color:#3a7a5a;font-size:13px;letter-spacing:.3px}
+      .bls-coming-soon-en{font-size:11px;font-style:italic;color:#5c7569;margin-top:3px}
 
       /* 手机端适配 */
       @media (max-width: 480px){
         .bls-overlay{padding:12px}
-        .bls-modal{max-width:100%;max-height:88vh;border-radius:12px}
+        .bls-modal{max-width:100%;max-height:88vh;border-radius:8px}
         .bls-modal-header{padding:14px 16px 10px}
         .bls-modal-header h3{font-size:15px}
         .bls-modal-body{padding:14px 16px}

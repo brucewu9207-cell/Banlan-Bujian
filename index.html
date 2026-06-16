@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-6 (2026-06-16) — 重大对齐:全部 API 路径/请求/响应/认证字段跟 Worker 真实 schema 一致 (path 改单数 /api/student/*, 字段 name, 无 token, 离开仅本地清) -->
+<!-- 斑斓部件 · 部件联动-7 (2026-06-16) — 视觉:首页三卡片放宽 + 功能:自动拉任务列表(副标题显示新任务数) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-6">
+<meta name="version" content="部件联动-7">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -47,9 +47,9 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* 级别选择 */
 /* ══ 首页：二选一入口 ══ */
-.home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
+.home-screen{text-align:center;padding:28px 14px;max-width:1100px;margin:0 auto}  /* ★ 联动-7: 860→1100 容纳三张卡片 */
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;max-width:960px;margin:0 auto;position:relative;z-index:1}  /* ★ 联动-1: 2列→3列, max-width 760→960 容纳第三张卡片 */
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;max-width:1080px;margin:0 auto;position:relative;z-index:1}  /* ★ 联动-7: 960→1080,每张卡片更宽,避免图标贴边 */
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 /* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
@@ -5156,7 +5156,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-6';
+  const VERSION = '部件联动-7';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5490,6 +5490,7 @@ showHome();
         closeDialog();
         updateCardSubtitle();
         showToast('已加入班级 ' + finalCC + ' 🎉');
+        fetchTasksAndUpdate();  // ★ v7: 加入后立刻拉任务,副标题显示新任务数
         return;
       }
 
@@ -5597,6 +5598,32 @@ showHome();
     }
   }
 
+  // ─── 拉任务列表 (静默更新,不打扰用户) ─────────────────────
+  function fetchTasksAndUpdate(){
+    if(!state.classCode){
+      console.log('[BLS] fetchTasks 跳过 (无 classCode)');
+      return;
+    }
+    console.log('[BLS] 拉取任务列表 · classCode=' + state.classCode);
+    fetch(BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) + '/tasks')
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+      .then(function(res){
+        console.log('[BLS] 任务列表响应', res);
+        if(res.status === 200 && res.body && Array.isArray(res.body.tasks)){
+          state.tasks = res.body.tasks;
+          console.log('[BLS] 拉取任务成功 · 共 ' + state.tasks.length + ' 个');
+          updateCardSubtitle();
+        } else {
+          // 班级不存在等错误,不报警 (用户可能已被老师踢出班级或班级被删)
+          console.warn('[BLS] 拉取任务失败', res.status, res.body);
+        }
+      })
+      .catch(function(err){
+        console.warn('[BLS] 拉取任务网络错误', err);
+        // 不打扰用户,保持当前 state.tasks 不变
+      });
+  }
+
   // ─── 卡片副标题更新 ────────────────────────────────────────
   function updateCardSubtitle(){
     const el = document.getElementById('bls-entry-desc');
@@ -5635,7 +5662,7 @@ showHome();
 
     if(state.studentCode){
       console.log('[BLS] 已加入 · 班级=' + state.classCode + ' · 姓名=' + state.name + ' · 学号=' + state.studentCode);
-      // TODO 下版本: 静默拉任务列表
+      fetchTasksAndUpdate();  // ★ v7: 自动拉任务列表
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
     }
@@ -5649,6 +5676,7 @@ showHome();
     openJoinDialog: openJoinDialog,
     openIdentityPanel: openIdentityPanel,
     leaveClass: confirmLeave,
+    refreshTasks: fetchTasksAndUpdate,  // ★ v7: 手动刷新任务 (console 调试用)
     _state: state,
     _LS_KEYS: LS_KEYS,
     _API_BASE: BLS_API_BASE

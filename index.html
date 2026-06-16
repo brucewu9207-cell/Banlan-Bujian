@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-11 (2026-06-16) — 独体字完整四步流程(全局生效):选拼音→书写→例词,中栏永久 lock,去掉"下一个字"按钮 -->
+<!-- 斑斓部件 · 部件联动-12 (2026-06-16) — 修复独体字"下一个字"按钮不跳转:checkPinyin 独体字分支补 sessionIndex++ -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-11">
+<meta name="version" content="部件联动-12">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -2471,13 +2471,14 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
-    // ★ 联动-11: 独体字 vs 合体字分流
+    // ★ 联动-12: 独体字 vs 合体字分流 (v12 修复:独体字补 sessionIndex++)
     const _isWhole = !!(data && (data.structure === 'whole' || data.structure === 'ov'));
     if(_isWhole){
       // 独体字: 跳过 step ②,直接解锁 step ③ 书写
       setTimeout(function(){
         state.pinyinDone = true;
         _fitFrozen = false;
+        state.sessionIndex++;   // ★ 联动-12: 模拟 mergeCharacter 的 sessionIndex++,让"下一个字"按钮能跳转
         unlockWriting();    // 解锁右栏书写
         wizUnlock(3);       // wizard: 跳过 step ②,max = 3
       }, 600);
@@ -5170,7 +5171,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-11';
+  const VERSION = '部件联动-12';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

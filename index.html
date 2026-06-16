@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-10 (2026-06-16) — 修正:班级任务模式下隐藏 skip 按钮(学生必须做完每个字) + 完成时机改为做完才标记(监听 toast) -->
+<!-- 斑斓部件 · 部件联动-11 (2026-06-16) — 独体字完整四步流程(全局生效):选拼音→书写→例词,中栏永久 lock,去掉"下一个字"按钮 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-10">
+<meta name="version" content="部件联动-11">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -2306,47 +2306,50 @@ function updateHskBadge(ch){
   else { b.style.display='none'; }
 }
 
-// 仅笔顺演示模式（HanziWriter 支持任意汉字）
+// ★ 联动-11: 独体字完整四步流程(选拼音→[跳过 ②]→书写→例词)
 function loadStrokeOnlyChar(char){
   state.currentChar=char;
-  state.pinyinDone=true;
+  state.pinyinDone=false;   // ★ 联动-11: 拼音待选(原为 true 默认通过)
   state.droppedComponents={};
   state.currentCharFailed=false;
 
   document.getElementById('main-char').textContent=char;
   updateHskBadge(char);
   renderStrokes(char);
-  unlockWriting();
+  // ★ 联动-11 删除: unlockWriting() - 等选对拼音再解锁
 
-  // 左栏：若字库有拼音/释义则显示，否则留空
+  // 左栏: 渲染拼音选项让学生主动选 (不再直接显示答案)
   const data=CHAR_DB[char];
-  const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
-  _fitFrozen=false;   /* ★ v38 ①：换字时解锁缩放，新字的 step① 正常自适应 */
+  _fitFrozen=false;
   const info=document.getElementById('char-info');
-  if(data){
-    info.style.display='block';
-    info.innerHTML=`<div style="font-size:1.5rem;letter-spacing:0.04em">${data.py||''}</div>${data.en?`<div style="margin-top:4px;font-size:0.92rem">${data.en}</div>`:''}`;
-  }else{ info.style.display='none'; }
+  if(info){info.style.display='none';info.innerHTML='';}   // 释义先隐藏,选对才显示
+  if(data && data.py){
+    renderPinyinOptions(char, data);   // ★ 联动-11: 复用合体字的拼音选项渲染
+  } else {
+    // 完全无 data 的字(CHAR_DB 之外): 退化为原行为
+    const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
+    state.pinyinDone=true;
+    unlockWriting();
+  }
   const sb=document.getElementById('skip-btn');if(sb)sb.style.display='none';
 
-  // 中栏：仅笔顺提示
+  // 中栏: 永久 lock — "独体字无需拆部件"
   const wh=document.getElementById('word-hint');wh.classList.remove('show');wh.style.display='none';wh.innerHTML='';
   const wl=document.getElementById('word-locked');
-  if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">此字仅作笔顺演示<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Stroke order only</span></p>';}
+  if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">独体字无需拆部件<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">No components to drag</span></p>';}
 
-  // 右栏：提示 + 下一个字按钮
+  // 右栏 step ② lock 提示 (★ 联动-11: 去掉"下一个字"按钮)
   const lo=document.getElementById('locked-overlay');
   lo.style.display='flex';
   lo.innerHTML=`<div style="font-size:2.2rem;margin-bottom:10px">🎨</div>
-    <p style="font-size:0.95rem;margin-bottom:18px;line-height:1.6">此字不在可拆部件字库中<br><span style="font-family:Georgia;font-style:italic;font-size:0.8rem">Stroke order only — no component drill</span></p>
-    <button class="next-btn" onclick="teacherNext()">下一个字 · Next →</button>`;
+    <p style="font-size:0.95rem;line-height:1.6">独体字无需拆部件<br><span style="font-family:Georgia;font-style:italic;font-size:0.8rem">No components — continue to write below</span></p>`;
   document.getElementById('drag-content').style.display='none';
   const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
   const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
-  // ★ v62：清空 step② 标题左侧 hint（仅笔顺模式 step② 是 lock 的，hint 显示前字残留无意义）
   const _hint=document.getElementById('drag-hint-char');
   if(_hint){ _hint.dataset.glyph=''; _hint.textContent=''; }
   requestAnimationFrame(fitPracticeUI);
+  wizReset();   // ★ 联动-11: 跟 loadCharacter 末尾一样,重置 wizard 到 step ①
   setTimeout(fitPracticeUI, 200);
 }
 
@@ -2468,11 +2471,22 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
-    // ★ v37 ②：选对的"瞬间"就在后台把 step2 的拖拽区 + 部件卡渲染好（此刻 drag-content 仍被 locked-overlay 盖住/隐藏，
-    //          但 DOM 与笔画 SVG 已就绪）。等下面 1.8s 停留结束 unlockDragSection 揭开时，部件已经画好直接显示，不再现场加载。
-    renderDragZones(char,data);
-    renderCompPool(char,data);
-    setTimeout(()=>unlockDragSection(char,data),600);   // ★ v42②：1800→600ms，选对拼音后更快翻到 step2
+    // ★ 联动-11: 独体字 vs 合体字分流
+    const _isWhole = !!(data && (data.structure === 'whole' || data.structure === 'ov'));
+    if(_isWhole){
+      // 独体字: 跳过 step ②,直接解锁 step ③ 书写
+      setTimeout(function(){
+        state.pinyinDone = true;
+        _fitFrozen = false;
+        unlockWriting();    // 解锁右栏书写
+        wizUnlock(3);       // wizard: 跳过 step ②,max = 3
+      }, 600);
+    } else {
+      // 合体字: 原行为(预渲染 step ② 部件,翻到拖拽页)
+      renderDragZones(char,data);
+      renderCompPool(char,data);
+      setTimeout(()=>unlockDragSection(char,data),600);
+    }
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
     btn.classList.add('wrong');
@@ -5156,7 +5170,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-10';
+  const VERSION = '部件联动-11';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

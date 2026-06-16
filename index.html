@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-8 (2026-06-16) — 完整任务列表 UI:卡片显示+类型徽章+刷新按钮+点击注入挥毫四步流程 -->
+<!-- 斑斓部件 · 部件联动-10 (2026-06-16) — 修正:班级任务模式下隐藏 skip 按钮(学生必须做完每个字) + 完成时机改为做完才标记(监听 toast) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-8">
+<meta name="version" content="部件联动-10">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5156,7 +5156,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-8';
+  const VERSION = '部件联动-10';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5174,11 +5174,14 @@ showHome();
 
   // ─── 内部状态 ──────────────────────────────────────────────
   const state = {
-    studentCode: null,    // Worker 用的身份标识 (本前端固定 = name)
-    classCode: null,      // 班级码
-    name: null,           // 学生姓名 (跟 Worker 的 name 字段一致)
-    tasks: [],            // 当前班级活跃任务
-    completedTasks: []    // 已完成任务 id 数组
+    studentCode: null,       // Worker 用的身份标识 (本前端固定 = name)
+    classCode: null,         // 班级码
+    name: null,              // 学生姓名 (跟 Worker 的 name 字段一致)
+    tasks: [],               // 当前班级活跃任务
+    completedTasks: [],      // 已完成任务 id 数组
+    inTaskMode: false,       // ★ v10: 当前是否在班级任务模式 (true 时 skip 按钮被 CSS 隐藏)
+    _currentTaskId: null,    // ★ v10: 当前正在做的任务 id
+    _toastObserver: null     // ★ v10: 监听"全部完成"toast 的 MutationObserver
   };
 
   // ─── LocalStorage 读写 ─────────────────────────────────────
@@ -5316,6 +5319,9 @@ showHome();
       .bls-task-empty{text-align:center;padding:28px 16px;color:#5c7569;font-size:13px;background:rgba(106,170,142,0.06);border:1px dashed rgba(106,170,142,0.3);border-radius:6px}
       .bls-task-empty-icon{font-size:34px;margin-bottom:8px;opacity:.55}
       .bls-task-empty-en{font-size:11px;font-style:italic;margin-top:3px;color:rgba(74,63,47,.55)}
+
+      /* ★ v10: 班级任务模式下隐藏主 skip 按钮 (学生必须做完每个字,不能跳过) */
+      body.bls-in-task-mode #skip-btn { display: none !important; }
 
       /* 手机端适配 */
       @media (max-width: 480px){
@@ -5649,7 +5655,7 @@ showHome();
     return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  // ─── 打开任务 → 注入挥毫四步流程 ───────────────────────────
+  // ─── 打开任务 → 进入任务模式 + 注入挥毫流程 (v10) ─────────
   function openTask(taskId){
     const task = (state.tasks || []).find(function(t){ return t.taskId === taskId; });
     if(!task){
@@ -5662,25 +5668,74 @@ showHome();
     // 关闭弹窗
     closeDialog();
 
-    // 把任务内容注入挥毫流程: #teacher-input + startTeacherSession()
     const input = document.getElementById('teacher-input');
     if(!input || typeof global.startTeacherSession !== 'function'){
       console.error('[BLS] 主页面挥毫入口不可用');
       showToast('启动练习失败 / Failed to start');
       return;
     }
+
+    // ★ v10: 进入任务模式 (CSS 隐藏 skip 按钮 + 启动完成监听)
+    state._currentTaskId = task.taskId;
+    state.inTaskMode = true;
+    document.body.classList.add('bls-in-task-mode');
+    setupTaskCompletionObserver();
+
     input.value = task.content || '';
     global.startTeacherSession();
-    console.log('[BLS] 已注入任务内容到挥毫流程 · content="' + (task.content || '') + '"');
-
-    // 本地标记完成 (前端先记,后续 v9 上报 Worker)
-    markTaskCompletedLocally(task.taskId);
+    console.log('[BLS] 已进入任务模式 · taskId=' + task.taskId + ' · content="' + (task.content || '') + '"');
+    // ★ v10: 不再立刻 markTaskCompletedLocally — 改为做完所有字时由 observer 触发
   }
 
-  // ─── 本地标记任务完成 ─────────────────────────────────────
+  // ─── 监听"🎉 全部完成"toast → 标记任务完成 (v10) ──────────
+  function setupTaskCompletionObserver(){
+    // 清理旧的 observer 防重复
+    if(state._toastObserver){
+      try { state._toastObserver.disconnect(); } catch(e){}
+      state._toastObserver = null;
+    }
+
+    const toast = document.getElementById('toast');
+    if(!toast){
+      console.warn('[BLS] toast 元素不存在,无法监听任务完成');
+      return;
+    }
+
+    const observer = new MutationObserver(function(){
+      const text = toast.textContent || '';
+      if(state.inTaskMode && state._currentTaskId && /全部完成|Session complete/i.test(text)){
+        console.log('[BLS] ✅ 检测到任务全部完成 · toast="' + text + '"');
+        const finishedTaskId = state._currentTaskId;
+        // 清理任务模式状态
+        exitTaskMode();
+        // 标记完成 + 上报后端 (markTaskCompletedLocally 内部会调 reportTaskCompletedToServer)
+        markTaskCompletedLocally(finishedTaskId);
+      }
+    });
+    observer.observe(toast, { childList: true, characterData: true, subtree: true });
+    state._toastObserver = observer;
+    console.log('[BLS] 已启动任务完成监听器');
+  }
+
+  // ─── 退出任务模式 (清理状态,不标记完成) ───────────────────
+  function exitTaskMode(){
+    state._currentTaskId = null;
+    state.inTaskMode = false;
+    document.body.classList.remove('bls-in-task-mode');
+    if(state._toastObserver){
+      try { state._toastObserver.disconnect(); } catch(e){}
+      state._toastObserver = null;
+    }
+  }
+
+  // ─── 本地标记任务完成 (v9: 同时异步上报后端) ──────────────
   function markTaskCompletedLocally(taskId){
     if(!taskId) return;
-    if(state.completedTasks.indexOf(taskId) >= 0) return;
+    if(state.completedTasks.indexOf(taskId) >= 0){
+      // 已记录过,但仍然上报一次后端 (防止之前网络失败导致后端缺少记录)
+      reportTaskCompletedToServer(taskId);
+      return;
+    }
     state.completedTasks.push(taskId);
     try {
       localStorage.setItem(LS_KEYS.COMPLETED_TASKS, JSON.stringify(state.completedTasks));
@@ -5689,7 +5744,37 @@ showHome();
     }
     updateCardSubtitle();
     console.log('[BLS] 任务本地标记完成 · ' + taskId + ' · 总已完成: ' + state.completedTasks.length);
-    // TODO v9: POST /api/student/{classCode}/tasks/{taskId}/complete 上报
+    // ★ v9: 异步上报后端 (本地标记后立刻调,不阻塞用户)
+    reportTaskCompletedToServer(taskId);
+  }
+
+  // ─── 上报任务完成到后端 (v9 新增) ──────────────────────────
+  function reportTaskCompletedToServer(taskId){
+    if(!taskId || !state.classCode || !state.studentCode){
+      console.warn('[BLS] 上报跳过 · 缺少参数', { taskId: taskId, classCode: state.classCode, studentCode: state.studentCode });
+      return;
+    }
+    const url = BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) +
+                '/tasks/' + encodeURIComponent(taskId) + '/complete';
+    console.log('[BLS] 上报任务完成 · ' + taskId + ' → ' + url);
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentCode: state.studentCode })
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] 上报响应 [' + taskId + ']', res);
+      if(res.status === 200 && res.body && res.body.success){
+        console.log('[BLS] ✅ 上报成功 · taskId=' + taskId);
+      } else {
+        console.warn('[BLS] ⚠️ 上报失败 (本地已记,不影响使用)', res.status, res.body);
+      }
+    })
+    .catch(function(err){
+      console.warn('[BLS] ⚠️ 上报网络错误 (本地已记,不影响使用)', err);
+    });
   }
 
   // ─── 离开班级 (Worker 无该端点,只清本地) ──────────────────
@@ -5786,16 +5871,38 @@ showHome();
     }
   }
 
+  // ─── patch navBack (v10: 学生中途点"返回"时清理任务模式) ──
+  function patchNavBack(){
+    if(typeof global.navBack !== 'function'){
+      console.warn('[BLS] navBack 不存在,跳过 patch');
+      return;
+    }
+    if(global.navBack._blsPatched){
+      return;
+    }
+    const orig = global.navBack;
+    global.navBack = function(){
+      if(state.inTaskMode){
+        console.log('[BLS] 学生主动 navBack · 清理任务模式 (任务未完成,不标记)');
+        exitTaskMode();
+      }
+      return orig.apply(this, arguments);
+    };
+    global.navBack._blsPatched = true;
+    console.log('[BLS] ✅ 已 patch navBack');
+  }
+
   // ─── 启动入口 ──────────────────────────────────────────────
   function init(){
     console.log('[BLS] init 开始 · ' + VERSION);
     injectStyles();
     loadFromStorage();
     updateCardSubtitle();
+    patchNavBack();  // ★ v10: 拦截学生主动返回,清理任务模式状态
 
     if(state.studentCode){
       console.log('[BLS] 已加入 · 班级=' + state.classCode + ' · 姓名=' + state.name + ' · 学号=' + state.studentCode);
-      fetchTasksAndUpdate();  // ★ v7: 自动拉任务列表
+      fetchTasksAndUpdate();
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
     }

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-1 (2026-06-16) — Phase 3 启动:主控制台加第三张"班级任务"卡片 + BLS 启动框架(尚未接 API) -->
+<!-- 斑斓部件 · 部件联动-2 (2026-06-16) — Phase 3 阶段2:加入班级弹窗 + API 调用 + LocalStorage 持久化 + 身份面板 + 离开班级 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-1">
+<meta name="version" content="部件联动-2">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5145,17 +5145,19 @@ showHome();
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
-     斑斓联动学生端模块 (BLS = BanLan Student)
-     · 部件联动-1: 启动框架(尚未接 API,仅本地状态管理)
-     · 命名空间: window.BLS
-     · LocalStorage key 前缀: banlan_student_*
-     · DOM id 前缀: bls-*
+     斑斓联动学生端模块 (BLS = BanLan Student) · 部件联动-2
+     · 加入班级弹窗 (自定义水墨风格 modal)
+     · POST /students/join API 调用
+     · LocalStorage 持久化 (banlan_student_*)
+     · 启动时自动恢复登录态
+     · 已登录身份面板 (显示班级码 + 学生名 + 离开班级)
+     · POST /students/leave API 调用
      ═══════════════════════════════════════════════════════════ -->
 <script id="bls-module">
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-1';
+  const VERSION = '部件联动-2';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev';
@@ -5167,6 +5169,10 @@ showHome();
     COMPLETED_TASKS: 'banlan_student_completedTasks'
   };
 
+  // 班级码格式: 2-20 位字母数字横线下划线 (与老师端一致)
+  const CLASS_CODE_REGEX = /^[A-Za-z0-9_-]{2,20}$/;
+  const DISPLAY_NAME_MAX = 20;
+
   // ─── 内部状态 ──────────────────────────────────────────────
   const state = {
     token: null,
@@ -5176,7 +5182,7 @@ showHome();
     completedTasks: []
   };
 
-  // ─── LocalStorage 读 ───────────────────────────────────────
+  // ─── LocalStorage 读写 ─────────────────────────────────────
   function loadFromStorage(){
     try {
       state.token        = localStorage.getItem(LS_KEYS.TOKEN);
@@ -5188,8 +5194,363 @@ showHome();
       console.warn('[BLS] localStorage 读取失败', e);
     }
   }
+  function saveSession(token, classCode, displayName){
+    try {
+      localStorage.setItem(LS_KEYS.TOKEN, token);
+      localStorage.setItem(LS_KEYS.CLASS_CODE, classCode);
+      localStorage.setItem(LS_KEYS.DISPLAY_NAME, displayName);
+      state.token = token;
+      state.classCode = classCode;
+      state.displayName = displayName;
+    } catch(e) {
+      console.warn('[BLS] localStorage 写入失败', e);
+    }
+  }
+  function clearSession(){
+    try {
+      localStorage.removeItem(LS_KEYS.TOKEN);
+      localStorage.removeItem(LS_KEYS.CLASS_CODE);
+      localStorage.removeItem(LS_KEYS.DISPLAY_NAME);
+      localStorage.removeItem(LS_KEYS.COMPLETED_TASKS);
+    } catch(e) {}
+    state.token = null;
+    state.classCode = null;
+    state.displayName = null;
+    state.tasks = [];
+    state.completedTasks = [];
+  }
 
-  // ─── 更新卡片副标题(根据登录态/任务数) ─────────────────────
+  // ─── 注入 BLS 专用 CSS ─────────────────────────────────────
+  function injectStyles(){
+    if(document.getElementById('bls-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'bls-styles';
+    style.textContent = `
+      /* 遮罩层 */
+      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(35,50,42,0.62);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .18s ease}
+      .bls-overlay.bls-show{display:flex}
+      @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
+
+      /* 弹窗主体 */
+      .bls-modal{background:#fffef9;border-radius:14px;border:1px solid rgba(55,74,66,0.18);box-shadow:0 24px 60px rgba(35,50,42,0.32);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#374a42;border-radius:0 0 4px 4px;opacity:.85}
+
+      /* 头部 */
+      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid #eef1ef;position:relative;text-align:center}
+      .bls-modal-header h3{margin:0;font-size:17px;color:#374a42;letter-spacing:1.2px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
+      .bls-modal-header .bls-subtitle{font-size:11px;color:rgba(74,63,47,.55);letter-spacing:.5px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
+      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:#8a7a65;font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
+      .bls-close:hover{background:rgba(0,0,0,.06);color:#2c2416}
+
+      /* 表单 */
+      .bls-modal-body{padding:18px 22px;overflow-y:auto}
+      .bls-field{margin-bottom:14px}
+      .bls-label{display:block;font-size:13px;color:#374a42;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+      .bls-label .bls-required{color:#c84b2f;margin-left:2px}
+      .bls-input{width:100%;padding:10px 12px;border:1.5px solid #d4ccba;border-radius:8px;font-size:15px;font-family:inherit;color:#2c2416;background:#fffdf6;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
+      .bls-input:focus{border-color:#b5763a;box-shadow:0 0 0 3px rgba(181,118,58,.15)}
+      .bls-input:disabled{background:#f0ede5;color:#8a7a65;cursor:not-allowed}
+      .bls-hint{font-size:11.5px;color:#8a7a65;margin-top:5px;line-height:1.5;letter-spacing:.2px}
+      .bls-error{font-size:12.5px;color:#c84b2f;margin-top:8px;padding:8px 10px;background:rgba(200,75,47,.08);border-left:3px solid #c84b2f;border-radius:4px;line-height:1.5;display:none}
+      .bls-error.bls-show{display:block;animation:bls-fade-in .18s ease}
+
+      /* 底部按钮区 */
+      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef1ef;background:rgba(245,237,216,.32)}
+      .bls-btn{padding:9px 18px;border-radius:8px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;transition:all .18s;border:1.5px solid transparent;letter-spacing:.3px}
+      .bls-btn:disabled{opacity:.55;cursor:not-allowed}
+      .bls-btn-primary{background:#374a42;color:#fff;border-color:#374a42}
+      .bls-btn-primary:hover:not(:disabled){background:#2a3a33;transform:translateY(-1px);box-shadow:0 4px 12px rgba(55,74,66,.25)}
+      .bls-btn-secondary{background:#fff;color:#4a3f2f;border-color:#d4ccba}
+      .bls-btn-secondary:hover:not(:disabled){background:#f5edd8;border-color:#b5763a}
+      .bls-btn-danger{background:#fff;color:#c84b2f;border-color:#c84b2f}
+      .bls-btn-danger:hover:not(:disabled){background:#c84b2f;color:#fff}
+
+      /* 身份面板 */
+      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #e0d8c3}
+      .bls-info-row:last-child{border-bottom:none}
+      .bls-info-label{font-size:13px;color:#8a7a65;letter-spacing:.3px}
+      .bls-info-value{font-size:15px;color:#2c2416;font-weight:600}
+      .bls-info-value.bls-code{font-family:'SF Mono','Consolas',monospace;background:#f5edd8;padding:3px 10px;border-radius:6px;letter-spacing:1px}
+      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(106,170,142,.08);border:1px dashed rgba(106,170,142,.4);border-radius:8px;text-align:center;color:#3a7a5a;font-size:13px;letter-spacing:.3px}
+      .bls-coming-soon-en{font-size:11px;font-style:italic;color:rgba(74,63,47,.6);margin-top:3px}
+
+      /* 手机端适配 */
+      @media (max-width: 480px){
+        .bls-modal{max-width:100%;max-height:88vh;border-radius:12px}
+        .bls-modal-header{padding:14px 16px 10px}
+        .bls-modal-header h3{font-size:15px}
+        .bls-modal-body{padding:14px 16px}
+        .bls-modal-footer{padding:10px 16px 14px}
+        .bls-btn{padding:8px 14px;font-size:13px}
+        .bls-input{font-size:14px;padding:9px 11px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // ─── 通用: 创建/移除遮罩 ───────────────────────────────────
+  function createOverlay(modalHTML){
+    closeDialog(); // 先关掉旧的
+    const ov = document.createElement('div');
+    ov.className = 'bls-overlay bls-show';
+    ov.id = 'bls-active-overlay';
+    ov.innerHTML = modalHTML;
+    // 点遮罩空白处关闭
+    ov.addEventListener('click', function(e){
+      if(e.target === ov) closeDialog();
+    });
+    document.body.appendChild(ov);
+    return ov;
+  }
+  function closeDialog(){
+    const old = document.getElementById('bls-active-overlay');
+    if(old) old.remove();
+  }
+
+  // ─── 加入班级弹窗 ──────────────────────────────────────────
+  function openJoinDialog(){
+    console.log('[BLS] 打开加入班级弹窗');
+    const html = `
+      <div class="bls-modal" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>加入班级</h3>
+          <div class="bls-subtitle">Join a Class</div>
+          <button class="bls-close" id="bls-join-close" aria-label="关闭">×</button>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-field">
+            <label class="bls-label" for="bls-join-code">
+              班级码 / Class Code <span class="bls-required">*</span>
+            </label>
+            <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div class="bls-hint">2-20 位字母、数字、横线、下划线 (区分大小写) / 2-20 chars (A-Z, a-z, 0-9, -, _)</div>
+          </div>
+          <div class="bls-field">
+            <label class="bls-label" for="bls-join-name">
+              我的名字 / My Name <span class="bls-required">*</span>
+            </label>
+            <input type="text" id="bls-join-name" class="bls-input" placeholder="如:张三、Tommy、小雨" maxlength="20" autocomplete="off">
+            <div class="bls-hint">让老师认得你 / Let your teacher recognize you (1-20 字)</div>
+          </div>
+          <div class="bls-error" id="bls-join-error"></div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消 / Cancel</button>
+          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入 / Join</button>
+        </div>
+      </div>
+    `;
+    createOverlay(html);
+
+    // 绑定事件
+    document.getElementById('bls-join-close').onclick = closeDialog;
+    document.getElementById('bls-join-cancel').onclick = closeDialog;
+    document.getElementById('bls-join-submit').onclick = submitJoin;
+
+    // 回车提交
+    const codeInput = document.getElementById('bls-join-code');
+    const nameInput = document.getElementById('bls-join-name');
+    [codeInput, nameInput].forEach(function(inp){
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Enter') submitJoin();
+      });
+    });
+
+    // 自动聚焦
+    setTimeout(function(){ codeInput.focus(); }, 60);
+  }
+
+  // ─── 显示错误 ──────────────────────────────────────────────
+  function showJoinError(msg){
+    const el = document.getElementById('bls-join-error');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.add('bls-show');
+  }
+  function hideJoinError(){
+    const el = document.getElementById('bls-join-error');
+    if(el) el.classList.remove('bls-show');
+  }
+
+  // ─── 提交加入班级 ──────────────────────────────────────────
+  function submitJoin(){
+    hideJoinError();
+    const codeInput = document.getElementById('bls-join-code');
+    const nameInput = document.getElementById('bls-join-name');
+    const submitBtn = document.getElementById('bls-join-submit');
+    if(!codeInput || !nameInput || !submitBtn) return;
+
+    const classCode = codeInput.value.trim();
+    const displayName = nameInput.value.trim();
+
+    // 前端校验
+    if(!classCode){
+      showJoinError('请输入班级码 / Please enter class code');
+      codeInput.focus();
+      return;
+    }
+    if(!CLASS_CODE_REGEX.test(classCode)){
+      showJoinError('班级码格式不对：需 2-20 位字母/数字/横线/下划线 / Invalid format');
+      codeInput.focus();
+      return;
+    }
+    if(!displayName){
+      showJoinError('请输入你的名字 / Please enter your name');
+      nameInput.focus();
+      return;
+    }
+    if(displayName.length > DISPLAY_NAME_MAX){
+      showJoinError('名字过长 (最多 ' + DISPLAY_NAME_MAX + ' 字) / Name too long');
+      nameInput.focus();
+      return;
+    }
+
+    // 提交中状态
+    submitBtn.disabled = true;
+    submitBtn.textContent = '加入中... / Joining...';
+    codeInput.disabled = true;
+    nameInput.disabled = true;
+
+    // 调 API
+    console.log('[BLS] 提交加入: classCode=' + classCode + ', displayName=' + displayName);
+    fetch(BLS_API_BASE + '/students/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode: classCode, displayName: displayName })
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] API 响应', res);
+      if(res.body && res.body.ok && res.body.data){
+        const d = res.body.data;
+        // 兼容多种返回字段名
+        const token = d.token || d.studentToken || d.accessToken;
+        const cc    = d.classCode || classCode;
+        const dn    = d.displayName || displayName;
+        if(!token){
+          throw new Error('服务端未返回 token');
+        }
+        saveSession(token, cc, dn);
+        console.log('[BLS] 加入成功,已保存到 LocalStorage');
+        closeDialog();
+        updateCardSubtitle();
+        // 友好成功提示
+        showToast('已加入班级 ' + cc + ' 🎉');
+      } else {
+        const msg = (res.body && res.body.error) ? res.body.error : ('加入失败 (' + res.status + ')');
+        showJoinError(msg);
+        submitBtn.disabled = false;
+        submitBtn.textContent = '加入 / Join';
+        codeInput.disabled = false;
+        nameInput.disabled = false;
+      }
+    })
+    .catch(function(err){
+      console.error('[BLS] 加入失败', err);
+      showJoinError('网络似乎有点问题,请稍后重试 / Network error');
+      submitBtn.disabled = false;
+      submitBtn.textContent = '加入 / Join';
+      codeInput.disabled = false;
+      nameInput.disabled = false;
+    });
+  }
+
+  // ─── 身份面板 (已登录) ─────────────────────────────────────
+  function openIdentityPanel(){
+    console.log('[BLS] 打开身份面板');
+    const html = `
+      <div class="bls-modal" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>我的班级</h3>
+          <div class="bls-subtitle">My Class</div>
+          <button class="bls-close" id="bls-info-close" aria-label="关闭">×</button>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-info-row">
+            <span class="bls-info-label">班级 / Class</span>
+            <span class="bls-info-value bls-code">${escapeHtml(state.classCode)}</span>
+          </div>
+          <div class="bls-info-row">
+            <span class="bls-info-label">我的名字 / My Name</span>
+            <span class="bls-info-value">${escapeHtml(state.displayName)}</span>
+          </div>
+          <div class="bls-coming-soon">
+            📚 任务列表即将上线
+            <div class="bls-coming-soon-en">Task list coming soon</div>
+          </div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-danger" id="bls-leave-btn">离开班级 / Leave Class</button>
+          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好 / OK</button>
+        </div>
+      </div>
+    `;
+    createOverlay(html);
+    document.getElementById('bls-info-close').onclick = closeDialog;
+    document.getElementById('bls-info-ok').onclick = closeDialog;
+    document.getElementById('bls-leave-btn').onclick = confirmLeave;
+  }
+
+  // ─── 离开班级确认 + 提交 ───────────────────────────────────
+  function confirmLeave(){
+    const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后将清除本设备的学生信息。\n\nLeave class ' + state.classCode + '? Your info on this device will be cleared.');
+    if(!ok) return;
+    console.log('[BLS] 提交离开班级');
+
+    const leaveBtn = document.getElementById('bls-leave-btn');
+    if(leaveBtn){
+      leaveBtn.disabled = true;
+      leaveBtn.textContent = '离开中... / Leaving...';
+    }
+
+    // 调 API 但不强依赖响应,本地清就行
+    fetch(BLS_API_BASE + '/students/leave', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + (state.token || '')
+      },
+      body: JSON.stringify({})
+    })
+    .catch(function(err){ console.warn('[BLS] 离开 API 失败 (忽略,本地仍清理)', err); })
+    .finally(function(){
+      clearSession();
+      closeDialog();
+      updateCardSubtitle();
+      showToast('已离开班级 / Left class');
+      console.log('[BLS] 本地状态已清空');
+    });
+  }
+
+  // ─── HTML 转义 (防止显示名 XSS) ────────────────────────────
+  function escapeHtml(s){
+    if(s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ─── 轻量 Toast (复用现有 #toast 元素,若有) ────────────────
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    if(t){
+      t.textContent = msg;
+      t.className = 'toast show';
+      clearTimeout(global._toastTimer);
+      global._toastTimer = setTimeout(function(){
+        t.className = 'toast';
+      }, 2400);
+    } else {
+      // 主页面没 toast 元素就降级 alert
+      console.log('[BLS toast] ' + msg);
+    }
+  }
+
+  // ─── 更新卡片副标题 ────────────────────────────────────────
   function updateCardSubtitle(){
     const el = document.getElementById('bls-entry-desc');
     if(!el) return;
@@ -5198,38 +5559,36 @@ showHome();
       el.innerHTML = '点此加入班级 / Join a class';
       return;
     }
-    // 已加入班级
     const newCount = state.tasks.filter(function(t){
       return !state.completedTasks.includes(t.taskId);
     }).length;
 
     if(newCount > 0){
-      el.innerHTML = state.classCode + ' · 🔴 ' + newCount + ' 个新任务';
+      el.innerHTML = escapeHtml(state.classCode) + ' · 🔴 ' + newCount + ' 个新任务';
     } else {
-      el.innerHTML = state.classCode + ' · 暂无任务 / No tasks';
+      el.innerHTML = escapeHtml(state.classCode) + ' · 暂无任务 / No tasks';
     }
   }
 
-  // ─── 卡片点击 (本版本: 仅占位,下版本接入加入班级 / 任务列表) ─
+  // ─── 卡片点击 (分发: 未登录 → 加入对话框 / 已登录 → 身份面板) ─
   function onCardClick(){
     if(!state.token){
-      console.log('[BLS] 卡片点击 → 应弹"加入班级"对话框(下版本实现)');
-      alert('「加入班级」功能开发中，下个版本就来 🍵');
+      openJoinDialog();
     } else {
-      console.log('[BLS] 卡片点击 → 应弹"任务列表"对话框(下版本实现)');
-      alert('「任务列表」功能开发中，下个版本就来 🍵');
+      openIdentityPanel();
     }
   }
 
   // ─── 启动入口 ──────────────────────────────────────────────
   function init(){
     console.log('[BLS] init 开始 · ' + VERSION);
+    injectStyles();
     loadFromStorage();
     updateCardSubtitle();
 
     if(state.token){
       console.log('[BLS] 已登录 · 班级=' + state.classCode + ' · 学生=' + state.displayName);
-      // TODO 下版本: 静默调 GET /students/tasks 拉任务列表
+      // TODO 下版本: 静默拉任务列表
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
     }
@@ -5240,7 +5599,10 @@ showHome();
     version: VERSION,
     init: init,
     onCardClick: onCardClick,
-    // 调试用(console 里可访问)
+    openJoinDialog: openJoinDialog,
+    openIdentityPanel: openIdentityPanel,
+    leaveClass: confirmLeave,
+    // 调试用
     _state: state,
     _LS_KEYS: LS_KEYS,
     _API_BASE: BLS_API_BASE
@@ -5248,7 +5610,6 @@ showHome();
 
   console.log('[BLS] ' + VERSION + ' 已加载');
 
-  // DOM 就绪后自动 init
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init);
   } else {

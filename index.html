@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v100 (2026-06-15) — "BASED ON HSK 3.0":电脑端保持 v99 的 0.82rem(1.3 倍),手机端还原为 v97 的 0.63rem 原字号 -->
+<!-- 斑斓部件 · 部件联动-1 (2026-06-16) — Phase 3 启动:主控制台加第三张"班级任务"卡片 + BLS 启动框架(尚未接 API) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v100">
+<meta name="version" content="部件联动-1">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -49,7 +49,7 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ══ 首页：二选一入口 ══ */
 .home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto;position:relative;z-index:1}
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;max-width:960px;margin:0 auto;position:relative;z-index:1}  /* ★ 联动-1: 2列→3列, max-width 760→960 容纳第三张卡片 */
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 /* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
@@ -1039,6 +1039,15 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
             <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
           </div>
         </div>
+        <!-- ★ 联动-1: 入口 C 班级任务(BLS 模块) -->
+        <button class="home-entry" id="bls-entry-card" onclick="BLS.onCardClick()">
+          <div class="home-entry-header">
+            <span class="home-entry-icon">📚</span>
+            <span class="home-entry-zh">班级任务</span>
+          </div>
+          <div class="home-entry-en">Class Tasks</div>
+          <div class="home-entry-desc" id="bls-entry-desc">点此加入班级 / Join a class</div>
+        </button>
       </div>
     </div>
 
@@ -5134,5 +5143,119 @@ showHome();
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     斑斓联动学生端模块 (BLS = BanLan Student)
+     · 部件联动-1: 启动框架(尚未接 API,仅本地状态管理)
+     · 命名空间: window.BLS
+     · LocalStorage key 前缀: banlan_student_*
+     · DOM id 前缀: bls-*
+     ═══════════════════════════════════════════════════════════ -->
+<script id="bls-module">
+(function(global){
+  'use strict';
+
+  const VERSION = '部件联动-1';
+
+  // ─── 配置 ──────────────────────────────────────────────────
+  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev';
+
+  const LS_KEYS = {
+    TOKEN:           'banlan_student_token',
+    CLASS_CODE:      'banlan_student_classCode',
+    DISPLAY_NAME:    'banlan_student_displayName',
+    COMPLETED_TASKS: 'banlan_student_completedTasks'
+  };
+
+  // ─── 内部状态 ──────────────────────────────────────────────
+  const state = {
+    token: null,
+    classCode: null,
+    displayName: null,
+    tasks: [],
+    completedTasks: []
+  };
+
+  // ─── LocalStorage 读 ───────────────────────────────────────
+  function loadFromStorage(){
+    try {
+      state.token        = localStorage.getItem(LS_KEYS.TOKEN);
+      state.classCode    = localStorage.getItem(LS_KEYS.CLASS_CODE);
+      state.displayName  = localStorage.getItem(LS_KEYS.DISPLAY_NAME);
+      const completed    = localStorage.getItem(LS_KEYS.COMPLETED_TASKS);
+      state.completedTasks = completed ? JSON.parse(completed) : [];
+    } catch(e) {
+      console.warn('[BLS] localStorage 读取失败', e);
+    }
+  }
+
+  // ─── 更新卡片副标题(根据登录态/任务数) ─────────────────────
+  function updateCardSubtitle(){
+    const el = document.getElementById('bls-entry-desc');
+    if(!el) return;
+
+    if(!state.token){
+      el.innerHTML = '点此加入班级 / Join a class';
+      return;
+    }
+    // 已加入班级
+    const newCount = state.tasks.filter(function(t){
+      return !state.completedTasks.includes(t.taskId);
+    }).length;
+
+    if(newCount > 0){
+      el.innerHTML = state.classCode + ' · 🔴 ' + newCount + ' 个新任务';
+    } else {
+      el.innerHTML = state.classCode + ' · 暂无任务 / No tasks';
+    }
+  }
+
+  // ─── 卡片点击 (本版本: 仅占位,下版本接入加入班级 / 任务列表) ─
+  function onCardClick(){
+    if(!state.token){
+      console.log('[BLS] 卡片点击 → 应弹"加入班级"对话框(下版本实现)');
+      alert('「加入班级」功能开发中，下个版本就来 🍵');
+    } else {
+      console.log('[BLS] 卡片点击 → 应弹"任务列表"对话框(下版本实现)');
+      alert('「任务列表」功能开发中，下个版本就来 🍵');
+    }
+  }
+
+  // ─── 启动入口 ──────────────────────────────────────────────
+  function init(){
+    console.log('[BLS] init 开始 · ' + VERSION);
+    loadFromStorage();
+    updateCardSubtitle();
+
+    if(state.token){
+      console.log('[BLS] 已登录 · 班级=' + state.classCode + ' · 学生=' + state.displayName);
+      // TODO 下版本: 静默调 GET /students/tasks 拉任务列表
+    } else {
+      console.log('[BLS] 未登录,等用户点卡片加入班级');
+    }
+  }
+
+  // ─── 暴露 API ──────────────────────────────────────────────
+  global.BLS = {
+    version: VERSION,
+    init: init,
+    onCardClick: onCardClick,
+    // 调试用(console 里可访问)
+    _state: state,
+    _LS_KEYS: LS_KEYS,
+    _API_BASE: BLS_API_BASE
+  };
+
+  console.log('[BLS] ' + VERSION + ' 已加载');
+
+  // DOM 就绪后自动 init
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})(window);
+</script>
 </body>
 </html>

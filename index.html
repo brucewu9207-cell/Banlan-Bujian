@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-2 (2026-06-16) — Phase 3 阶段2:加入班级弹窗 + API 调用 + LocalStorage 持久化 + 身份面板 + 离开班级 -->
+<!-- 斑斓部件 · 部件联动-4 (2026-06-16) — Hotfix:班级码大小写智能容错(前端按 原样→大写→小写 顺序自动尝试) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-2">
+<meta name="version" content="部件联动-4">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5157,7 +5157,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-2';
+  const VERSION = '部件联动-4';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev';
@@ -5220,69 +5220,83 @@ showHome();
     state.completedTasks = [];
   }
 
-  // ─── 注入 BLS 专用 CSS ─────────────────────────────────────
+  // ─── 注入 BLS 专用 CSS (v3: 深墨绿主体 + 竹色按钮 + 米黄标题) ─
   function injectStyles(){
     if(document.getElementById('bls-styles')) return;
     const style = document.createElement('style');
     style.id = 'bls-styles';
     style.textContent = `
-      /* 遮罩层 */
-      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(35,50,42,0.62);backdrop-filter:blur(4px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .18s ease}
+      /* 遮罩层 - 深色加深,水墨晕染感 */
+      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(15,28,22,0.72);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .2s ease}
       .bls-overlay.bls-show{display:flex}
       @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
 
-      /* 弹窗主体 */
-      .bls-modal{background:#fffef9;border-radius:14px;border:1px solid rgba(55,74,66,0.18);box-shadow:0 24px 60px rgba(35,50,42,0.32);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      /* 弹窗主体 - 深墨绿渐变,跟主页卡片一脉相承 */
+      .bls-modal{background:linear-gradient(180deg,rgba(48,68,58,0.97) 0%,rgba(35,52,44,0.97) 100%);border-radius:14px;border:1.5px solid rgba(181,118,58,0.32);box-shadow:0 24px 70px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;color:#fff;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
       @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
-      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#374a42;border-radius:0 0 4px 4px;opacity:.85}
+      /* 顶部装饰条 - 竹色 */
+      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#b5763a;border-radius:0 0 4px 4px;opacity:.95}
 
-      /* 头部 */
-      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid #eef1ef;position:relative;text-align:center}
-      .bls-modal-header h3{margin:0;font-size:17px;color:#374a42;letter-spacing:1.2px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
-      .bls-modal-header .bls-subtitle{font-size:11px;color:rgba(74,63,47,.55);letter-spacing:.5px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
-      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:#8a7a65;font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
-      .bls-close:hover{background:rgba(0,0,0,.06);color:#2c2416}
+      /* 头部 - 米黄标题 */
+      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid rgba(255,255,255,0.1);position:relative;text-align:center}
+      .bls-modal-header h3{margin:0;font-size:17px;color:#f5edd8;letter-spacing:1.4px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
+      .bls-modal-header .bls-subtitle{font-size:11px;color:rgba(245,237,216,0.55);letter-spacing:.6px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
+      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:rgba(255,255,255,0.55);font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
+      .bls-close:hover{background:rgba(255,255,255,0.12);color:#fff}
 
-      /* 表单 */
+      /* 表单区 */
       .bls-modal-body{padding:18px 22px;overflow-y:auto}
       .bls-field{margin-bottom:14px}
-      .bls-label{display:block;font-size:13px;color:#374a42;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
-      .bls-label .bls-required{color:#c84b2f;margin-left:2px}
-      .bls-input{width:100%;padding:10px 12px;border:1.5px solid #d4ccba;border-radius:8px;font-size:15px;font-family:inherit;color:#2c2416;background:#fffdf6;outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
-      .bls-input:focus{border-color:#b5763a;box-shadow:0 0 0 3px rgba(181,118,58,.15)}
-      .bls-input:disabled{background:#f0ede5;color:#8a7a65;cursor:not-allowed}
-      .bls-hint{font-size:11.5px;color:#8a7a65;margin-top:5px;line-height:1.5;letter-spacing:.2px}
-      .bls-error{font-size:12.5px;color:#c84b2f;margin-top:8px;padding:8px 10px;background:rgba(200,75,47,.08);border-left:3px solid #c84b2f;border-radius:4px;line-height:1.5;display:none}
+      .bls-label{display:block;font-size:13px;color:rgba(255,255,255,0.92);font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+      .bls-label .bls-required{color:#d4975a;margin-left:2px}
+
+      /* 输入框 - 浅米色背景,便于阅读 */
+      .bls-input{width:100%;padding:10px 12px;border:1.5px solid rgba(255,255,255,0.18);border-radius:8px;font-size:15px;font-family:inherit;color:#2c2416;background:rgba(255,253,246,0.96);outline:none;transition:border-color .15s,box-shadow .15s;box-sizing:border-box}
+      .bls-input:focus{border-color:#d4975a;box-shadow:0 0 0 3px rgba(212,151,90,0.28)}
+      .bls-input:disabled{background:rgba(255,253,246,0.55);color:#8a7a65;cursor:not-allowed}
+      .bls-hint{font-size:11.5px;color:rgba(255,255,255,0.55);margin-top:5px;line-height:1.5;letter-spacing:.2px}
+
+      /* 错误提示 - 朱砂红 */
+      .bls-error{font-size:12.5px;color:#f4c8bd;margin-top:8px;padding:8px 10px;background:rgba(200,75,47,0.18);border-left:3px solid #e07555;border-radius:4px;line-height:1.5;display:none}
       .bls-error.bls-show{display:block;animation:bls-fade-in .18s ease}
 
       /* 底部按钮区 */
-      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef1ef;background:rgba(245,237,216,.32)}
+      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.18)}
       .bls-btn{padding:9px 18px;border-radius:8px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;transition:all .18s;border:1.5px solid transparent;letter-spacing:.3px}
-      .bls-btn:disabled{opacity:.55;cursor:not-allowed}
-      .bls-btn-primary{background:#374a42;color:#fff;border-color:#374a42}
-      .bls-btn-primary:hover:not(:disabled){background:#2a3a33;transform:translateY(-1px);box-shadow:0 4px 12px rgba(55,74,66,.25)}
-      .bls-btn-secondary{background:#fff;color:#4a3f2f;border-color:#d4ccba}
-      .bls-btn-secondary:hover:not(:disabled){background:#f5edd8;border-color:#b5763a}
-      .bls-btn-danger{background:#fff;color:#c84b2f;border-color:#c84b2f}
-      .bls-btn-danger:hover:not(:disabled){background:#c84b2f;color:#fff}
+      .bls-btn:disabled{opacity:.5;cursor:not-allowed}
 
-      /* 身份面板 */
-      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #e0d8c3}
-      .bls-info-row:last-child{border-bottom:none}
-      .bls-info-label{font-size:13px;color:#8a7a65;letter-spacing:.3px}
-      .bls-info-value{font-size:15px;color:#2c2416;font-weight:600}
-      .bls-info-value.bls-code{font-family:'SF Mono','Consolas',monospace;background:#f5edd8;padding:3px 10px;border-radius:6px;letter-spacing:1px}
-      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(106,170,142,.08);border:1px dashed rgba(106,170,142,.4);border-radius:8px;text-align:center;color:#3a7a5a;font-size:13px;letter-spacing:.3px}
-      .bls-coming-soon-en{font-size:11px;font-style:italic;color:rgba(74,63,47,.6);margin-top:3px}
+      /* 主按钮 - 竹色,跟 "演示 →" 按钮一脉相承 */
+      .bls-btn-primary{background:#b5763a;color:#fff;border-color:#b5763a;box-shadow:0 2px 6px rgba(0,0,0,0.2)}
+      .bls-btn-primary:hover:not(:disabled){background:#d4975a;border-color:#d4975a;transform:translateY(-1px);box-shadow:0 6px 14px rgba(181,118,58,0.35)}
+
+      /* 次按钮 - 透明白边 */
+      .bls-btn-secondary{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.88);border-color:rgba(255,255,255,0.28)}
+      .bls-btn-secondary:hover:not(:disabled){background:rgba(255,255,255,0.16);border-color:rgba(255,255,255,0.45);color:#fff}
+
+      /* 危险按钮 - 朱砂红,默认空心 */
+      .bls-btn-danger{background:transparent;color:#f4a89a;border-color:rgba(224,117,85,0.6)}
+      .bls-btn-danger:hover:not(:disabled){background:#c84b2f;color:#fff;border-color:#c84b2f;box-shadow:0 4px 12px rgba(200,75,47,0.4)}
+
+      /* 身份面板 - 信息行 */
+      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed rgba(255,255,255,0.16)}
+      .bls-info-row:last-of-type{border-bottom:none}
+      .bls-info-label{font-size:13px;color:rgba(255,255,255,0.62);letter-spacing:.3px}
+      .bls-info-value{font-size:15px;color:#fff;font-weight:600}
+      .bls-info-value.bls-code{font-family:'SF Mono','Consolas','Monaco',monospace;background:rgba(245,237,216,0.92);color:#2c2416;padding:3px 10px;border-radius:6px;letter-spacing:1px}
+
+      /* 任务列表占位 - 薄荷绿提示 */
+      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(143,196,173,0.12);border:1px dashed rgba(143,196,173,0.42);border-radius:8px;text-align:center;color:#b8e4cd;font-size:13px;letter-spacing:.3px}
+      .bls-coming-soon-en{font-size:11px;font-style:italic;color:rgba(255,255,255,0.5);margin-top:3px}
 
       /* 手机端适配 */
       @media (max-width: 480px){
+        .bls-overlay{padding:12px}
         .bls-modal{max-width:100%;max-height:88vh;border-radius:12px}
         .bls-modal-header{padding:14px 16px 10px}
         .bls-modal-header h3{font-size:15px}
         .bls-modal-body{padding:14px 16px}
-        .bls-modal-footer{padding:10px 16px 14px}
-        .bls-btn{padding:8px 14px;font-size:13px}
+        .bls-modal-footer{padding:10px 16px 14px;flex-wrap:wrap}
+        .bls-btn{padding:8px 14px;font-size:13px;flex:1;min-width:0}
         .bls-input{font-size:14px;padding:9px 11px}
       }
     `;
@@ -5324,7 +5338,7 @@ showHome();
               班级码 / Class Code <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint">2-20 位字母、数字、横线、下划线 (区分大小写) / 2-20 chars (A-Z, a-z, 0-9, -, _)</div>
+            <div class="bls-hint">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</div>
           </div>
           <div class="bls-field">
             <label class="bls-label" for="bls-join-name">
@@ -5373,7 +5387,7 @@ showHome();
     if(el) el.classList.remove('bls-show');
   }
 
-  // ─── 提交加入班级 ──────────────────────────────────────────
+  // ─── 提交加入班级 (v4: 大小写智能容错) ─────────────────────
   function submitJoin(){
     hideJoinError();
     const codeInput = document.getElementById('bls-join-code');
@@ -5406,54 +5420,95 @@ showHome();
       return;
     }
 
+    // 构建大小写变体队列: 原样 → 大写 → 小写 (去重)
+    const variants = [classCode];
+    const upper = classCode.toUpperCase();
+    const lower = classCode.toLowerCase();
+    if(variants.indexOf(upper) < 0) variants.push(upper);
+    if(variants.indexOf(lower) < 0) variants.push(lower);
+
     // 提交中状态
     submitBtn.disabled = true;
     submitBtn.textContent = '加入中... / Joining...';
     codeInput.disabled = true;
     nameInput.disabled = true;
 
-    // 调 API
-    console.log('[BLS] 提交加入: classCode=' + classCode + ', displayName=' + displayName);
+    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', displayName=' + displayName);
+    attemptJoinSequence(variants, 0, displayName, submitBtn, codeInput, nameInput);
+  }
+
+  // ─── 按变体顺序尝试加入 (递归式 promise 链) ────────────────
+  function attemptJoinSequence(variants, idx, displayName, submitBtn, codeInput, nameInput){
+    if(idx >= variants.length){
+      // 全部变体都失败 (理论上 attemptJoinSingle 内部会处理,这里兜底)
+      showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
+      resetJoinForm(submitBtn, codeInput, nameInput);
+      return;
+    }
+    const cc = variants[idx];
+    console.log('[BLS] 尝试加入 [' + (idx+1) + '/' + variants.length + ']: classCode=' + cc);
+
     fetch(BLS_API_BASE + '/students/join', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classCode: classCode, displayName: displayName })
+      body: JSON.stringify({ classCode: cc, displayName: displayName })
     })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){
-      console.log('[BLS] API 响应', res);
+      console.log('[BLS] API 响应 [' + cc + ']', res);
+
+      // 成功路径
       if(res.body && res.body.ok && res.body.data){
         const d = res.body.data;
-        // 兼容多种返回字段名
         const token = d.token || d.studentToken || d.accessToken;
-        const cc    = d.classCode || classCode;
-        const dn    = d.displayName || displayName;
+        const finalCC = d.classCode || cc;
+        const finalDN = d.displayName || displayName;
         if(!token){
-          throw new Error('服务端未返回 token');
+          showJoinError('服务端未返回 token / Server response missing token');
+          resetJoinForm(submitBtn, codeInput, nameInput);
+          return;
         }
-        saveSession(token, cc, dn);
-        console.log('[BLS] 加入成功,已保存到 LocalStorage');
+        saveSession(token, finalCC, finalDN);
+        console.log('[BLS] 加入成功 · 班级=' + finalCC + ' · 学生=' + finalDN);
         closeDialog();
         updateCardSubtitle();
-        // 友好成功提示
-        showToast('已加入班级 ' + cc + ' 🎉');
+        showToast('已加入班级 ' + finalCC + ' 🎉');
+        return;
+      }
+
+      // 失败路径:判断是否要继续尝试下一个变体
+      const rawErr = (res.body && res.body.error) ? res.body.error : null;
+      const isNotFound = res.status === 404 ||
+                         (rawErr && /not\s*found/i.test(String(rawErr)));
+
+      if(isNotFound && idx + 1 < variants.length){
+        // 继续尝试下一个变体
+        console.log('[BLS] 班级码 [' + cc + '] not found, 尝试下一变体');
+        attemptJoinSequence(variants, idx + 1, displayName, submitBtn, codeInput, nameInput);
       } else {
-        const msg = (res.body && res.body.error) ? res.body.error : ('加入失败 (' + res.status + ')');
+        // 不是 not found 错误 (如 already joined / unauthorized 等) → 直接报错
+        // 或者已经试完所有变体 → 报错
+        const msg = friendlyError(rawErr, res.status);
         showJoinError(msg);
-        submitBtn.disabled = false;
-        submitBtn.textContent = '加入 / Join';
-        codeInput.disabled = false;
-        nameInput.disabled = false;
+        resetJoinForm(submitBtn, codeInput, nameInput);
       }
     })
     .catch(function(err){
-      console.error('[BLS] 加入失败', err);
-      showJoinError('网络似乎有点问题,请稍后重试 / Network error');
+      console.error('[BLS] 加入失败 (网络) [' + cc + ']', err);
+      // 网络错误不重试其他变体,直接报错
+      showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
+      resetJoinForm(submitBtn, codeInput, nameInput);
+    });
+  }
+
+  // ─── 重置加入表单 (失败后允许用户重试) ─────────────────────
+  function resetJoinForm(submitBtn, codeInput, nameInput){
+    if(submitBtn){
       submitBtn.disabled = false;
       submitBtn.textContent = '加入 / Join';
-      codeInput.disabled = false;
-      nameInput.disabled = false;
-    });
+    }
+    if(codeInput) codeInput.disabled = false;
+    if(nameInput) nameInput.disabled = false;
   }
 
   // ─── 身份面板 (已登录) ─────────────────────────────────────
@@ -5521,6 +5576,42 @@ showHome();
       showToast('已离开班级 / Left class');
       console.log('[BLS] 本地状态已清空');
     });
+  }
+
+  // ─── 错误信息中英文友好化 ─────────────────────────────────
+  function friendlyError(rawError, status){
+    // 后端可能返回英文短码,如 'Not found'、'Already joined' 等
+    if(!rawError){
+      if(status === 404) return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+      if(status === 401 || status === 403) return '权限不足 / Unauthorized';
+      if(status === 429) return '请求过于频繁，稍后再试 / Too many requests';
+      if(status >= 500) return '服务器暂时不可用 / Server error, please try later';
+      return '加入失败 (' + status + ') / Join failed';
+    }
+    const e = String(rawError).trim().toLowerCase();
+    if(e === 'not found' || e.indexOf('not found') >= 0 || e.indexOf('class not found') >= 0){
+      return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+    }
+    if(e.indexOf('already') >= 0 && (e.indexOf('join') >= 0 || e.indexOf('member') >= 0)){
+      return '你已经在这个班级了 / You\'re already in this class';
+    }
+    if(e.indexOf('unauthorized') >= 0 || e.indexOf('forbidden') >= 0){
+      return '权限不足 / Unauthorized';
+    }
+    if(e.indexOf('rate limit') >= 0 || e.indexOf('too many') >= 0){
+      return '请求过于频繁，稍后再试 / Too many requests';
+    }
+    if(e.indexOf('invalid') >= 0 || e.indexOf('format') >= 0){
+      return '格式不正确 / Invalid format: ' + rawError;
+    }
+    if(e.indexOf('display') >= 0 && e.indexOf('name') >= 0){
+      return '名字格式不对 / Invalid name: ' + rawError;
+    }
+    if(e.indexOf('class') >= 0 && e.indexOf('code') >= 0){
+      return '班级码无效 / Invalid class code: ' + rawError;
+    }
+    // 默认: 透传原始错误,前缀提示
+    return '加入失败 / Failed: ' + rawError;
   }
 
   // ─── HTML 转义 (防止显示名 XSS) ────────────────────────────

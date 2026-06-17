@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-14 (2026-06-16) — confirmLeave 调用 Worker /leave 端点,让老师端看到学生真实"已离开"状态 -->
+<!-- 斑斓部件 · 部件联动-15 (2026-06-17) — Phase 4-2 阶段①: 采集每字拼音/部件答对率(first-try), 完成时随回执上报后端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-14">
+<meta name="version" content="部件联动-15">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -2309,6 +2309,8 @@ function updateHskBadge(ch){
 // ★ 联动-11: 独体字完整四步流程(选拼音→[跳过 ②]→书写→例词)
 function loadStrokeOnlyChar(char){
   state.currentChar=char;
+  // ★ Phase 4-2: 初始化本字答对率标记(独体字: 拼音待判, 不统计部件)
+  window._blsCurPy = null; window._blsCurComp = null;
   state.pinyinDone=false;   // ★ 联动-11: 拼音待选(原为 true 默认通过)
   state.droppedComponents={};
   state.currentCharFailed=false;
@@ -2379,6 +2381,8 @@ function backToLevelSelect(){
 function loadCharacter(char){
   const data=CHAR_DB[char];
   if(!data)return;
+  // ★ Phase 4-2: 初始化本字答对率标记(合体字: 拼音待判, 部件默认全对)
+  window._blsCurPy = null; window._blsCurComp = true;
   // ★ 跳过独体字（whole/ov），自动加载下一个
   if(data.structure==='whole'||data.structure==='ov'){
     state.sessionIndex++;
@@ -2448,6 +2452,8 @@ function renderPinyinOptions(char,data){
 }
 
 function checkPinyin(btn,chosen,correct,data,char){
+  // ★ Phase 4-2: 只记第一次点击的对错(first-try), 重试不覆盖
+  if(window._blsCurPy === null){ window._blsCurPy = (chosen === correct); }
   document.querySelectorAll('.pinyin-btn').forEach(b=>b.disabled=true);
   if(chosen===correct){
     btn.classList.add('correct');
@@ -3243,6 +3249,7 @@ function showWrongDrop(zoneEl,msg){
   showZoneFeedback(zoneEl, '✗', '#8b2c2c');
   playWrongSound();
   state.currentCharFailed=true; // 标记本字失败
+  window._blsCurComp = false; // ★ Phase 4-2: 部件拖错过 → 本字部件不算第一次对
 }
 
 // 在指定 zone 上短暂浮现一个符号（✓ 或 ✗），700ms 后自动消失
@@ -3937,6 +3944,11 @@ function startWritingQuiz(){
     _writeWriter.quiz({
       // 全部写完 → 角落打勾 + 🎉 撒花庆祝
       onComplete: ()=>{
+        // ★ Phase 4-2: 字学完, 任务模式下记录本字成绩(拼音+部件)
+        if(state.teacherMode && state.currentChar){
+          window._blsResults = window._blsResults || {};
+          window._blsResults[state.currentChar] = { py: window._blsCurPy, comp: window._blsCurComp };
+        }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -5185,7 +5197,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-14';
+  const VERSION = '部件联动-15';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5704,6 +5716,8 @@ showHome();
       return;
     }
 
+    // ★ Phase 4-2: 清空上一个任务残留的成绩
+    window._blsResults = {};
     // ★ v10: 进入任务模式 (CSS 隐藏 skip 按钮 + 启动完成监听)
     state._currentTaskId = task.taskId;
     state.inTaskMode = true;
@@ -5790,7 +5804,7 @@ showHome();
     fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ studentCode: state.studentCode })
+      body: JSON.stringify({ studentCode: state.studentCode, results: window._blsResults || {} }) // ★ Phase 4-2: 带每字成绩
     })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){

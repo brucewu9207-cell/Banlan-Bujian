@@ -5197,7 +5197,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-15';
+  const VERSION = '部件联动-16';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5211,6 +5211,7 @@ showHome();
 
   // 班级码格式: 2-20 位字母数字横线下划线 (与老师端一致)
   const CLASS_CODE_REGEX = /^[A-Za-z0-9_-]{2,20}$/;
+  const STUDENT_ID_REGEX = /^[A-Za-z0-9_-]{1,20}$/;  // ★ 16: 学号(字母/数字/-/_),班内唯一,杜绝同名碰撞
   const NAME_MAX_LEN = 20;
 
   // ─── 内部状态 ──────────────────────────────────────────────
@@ -5422,6 +5423,13 @@ showHome();
             <input type="text" id="bls-join-name" class="bls-input" placeholder="如：张三、Tommy、小雨" maxlength="20" autocomplete="off">
             <div class="bls-hint">让老师认得你 / Let your teacher recognize you (1-20 字)</div>
           </div>
+          <div class="bls-field">
+            <label class="bls-label" for="bls-join-sid">
+              学号 / Student ID <span class="bls-required">*</span>
+            </label>
+            <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div class="bls-hint">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</div>
+          </div>
           <div class="bls-error" id="bls-join-error"></div>
         </div>
         <div class="bls-modal-footer">
@@ -5437,7 +5445,9 @@ showHome();
 
     const codeInput = document.getElementById('bls-join-code');
     const nameInput = document.getElementById('bls-join-name');
-    [codeInput, nameInput].forEach(function(inp){
+    const sidInput = document.getElementById('bls-join-sid');
+    [codeInput, nameInput, sidInput].forEach(function(inp){
+      if(!inp) return;
       inp.addEventListener('keydown', function(e){
         if(e.key === 'Enter') submitJoin();
       });
@@ -5473,6 +5483,9 @@ showHome();
     if(/请填写/.test(e) && (/班级/.test(e) || /姓名/.test(e))){
       return '请完整填写班级码和姓名 / Please fill in class code and name';
     }
+    if(/请填写/.test(e) && /学号/.test(e)){
+      return '请填写学号 / Please enter your student ID';
+    }
     if(/数据异常/.test(e)){
       return '班级数据异常，请联系老师 / Class data issue, please contact teacher';
     }
@@ -5489,11 +5502,13 @@ showHome();
     hideJoinError();
     const codeInput = document.getElementById('bls-join-code');
     const nameInput = document.getElementById('bls-join-name');
+    const sidInput = document.getElementById('bls-join-sid');
     const submitBtn = document.getElementById('bls-join-submit');
-    if(!codeInput || !nameInput || !submitBtn) return;
+    if(!codeInput || !nameInput || !sidInput || !submitBtn) return;
 
     const classCode = codeInput.value.trim();
     const studentName = nameInput.value.trim();
+    const studentId = sidInput.value.trim();
 
     if(!classCode){
       showJoinError('请输入班级码 / Please enter class code');
@@ -5515,6 +5530,17 @@ showHome();
       nameInput.focus();
       return;
     }
+    // ★ 16: 学号必填校验
+    if(!studentId){
+      showJoinError('请输入学号 / Please enter your student ID');
+      sidInput.focus();
+      return;
+    }
+    if(!STUDENT_ID_REGEX.test(studentId)){
+      showJoinError('学号格式不对：需 1-20 位字母/数字/横线/下划线 / Invalid ID format');
+      sidInput.focus();
+      return;
+    }
 
     // 大小写变体队列
     const variants = [classCode];
@@ -5527,13 +5553,14 @@ showHome();
     submitBtn.textContent = '加入中... / Joining...';
     codeInput.disabled = true;
     nameInput.disabled = true;
+    sidInput.disabled = true;
 
-    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', name=' + studentName);
-    attemptJoinSequence(variants, 0, studentName, submitBtn, codeInput, nameInput);
+    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', name=' + studentName + ', sid=' + studentId);
+    attemptJoinSequence(variants, 0, studentName, studentId, submitBtn, codeInput, nameInput);
   }
 
   // ─── 按变体顺序尝试加入 ────────────────────────────────────
-  function attemptJoinSequence(variants, idx, name, submitBtn, codeInput, nameInput){
+  function attemptJoinSequence(variants, idx, name, sid, submitBtn, codeInput, nameInput){
     if(idx >= variants.length){
       showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
       resetJoinForm(submitBtn, codeInput, nameInput);
@@ -5545,7 +5572,7 @@ showHome();
     fetch(BLS_API_BASE + '/student/join', {  // ★ Worker 真实路径: /api/student/join (单数!)
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classCode: cc, name: name })  // ★ 字段名 name (不是 displayName)
+      body: JSON.stringify({ classCode: cc, name: name, studentCode: sid })  // ★ 16: 带学号(studentCode)
     })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){
@@ -5556,7 +5583,7 @@ showHome();
         const cInfo = res.body.classInfo;
         const student = res.body.student;
         const finalCC = cInfo.classCode || cc;
-        const finalSC = student.studentCode || name;
+        const finalSC = student.studentCode || sid;
         const finalName = student.name || name;
 
         saveJoinResult(finalCC, finalSC, finalName);
@@ -5576,7 +5603,7 @@ showHome();
 
       if(isNotFound && idx + 1 < variants.length){
         console.log('[BLS] 班级码 [' + cc + '] not found, 尝试下一变体');
-        attemptJoinSequence(variants, idx + 1, name, submitBtn, codeInput, nameInput);
+        attemptJoinSequence(variants, idx + 1, name, sid, submitBtn, codeInput, nameInput);
       } else {
         const msg = friendlyError(rawErr, res.status);
         showJoinError(msg);
@@ -5597,6 +5624,8 @@ showHome();
     }
     if(codeInput) codeInput.disabled = false;
     if(nameInput) nameInput.disabled = false;
+    var sidInput = document.getElementById('bls-join-sid');  // ★ 16: 重新启用学号框
+    if(sidInput) sidInput.disabled = false;
   }
 
   // ─── 身份面板 (已加入 · v8 含完整任务列表) ─────────────────
@@ -5618,6 +5647,10 @@ showHome();
           <div class="bls-info-row">
             <span class="bls-info-label">我的名字 / My Name</span>
             <span class="bls-info-value">${escapeHtml(state.name)}</span>
+          </div>
+          <div class="bls-info-row">
+            <span class="bls-info-label">学号 / Student ID</span>
+            <span class="bls-info-value bls-code">${escapeHtml(state.studentCode || '—')}</span>
           </div>
           <div class="bls-tasks-section">
             <div class="bls-tasks-header">
@@ -5822,7 +5855,7 @@ showHome();
 
   // ─── 离开班级 (Worker 无该端点,只清本地) ──────────────────
   function confirmLeave(){
-    const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后将清除本设备的学生信息。\n\nLeave class ' + state.classCode + '? Your info on this device will be cleared.');
+    const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后你将看不到本班任务（你的学习记录会保留，老师仍可查看）。\n\nLeave class ' + state.classCode + '?\nYou will no longer see this class. Your learning records are kept (teacher can still view them).');
     if(!ok) return;
     console.log('[BLS] 离开班级 · 先通知后端清理');
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · v72 (2026-06-14) — 合体卡：字+拼音同框、楷体、智能避让 -->
+<!-- 斑斓部件 · 部件联动-24 (2026-06-19) — 修复：书写画布禁用右键菜单(防右键/双指菜单截走抬笔信号导致连笔)·承接-23 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="v72">
+<meta name="version" content="部件联动-24">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -47,13 +47,15 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* 级别选择 */
 /* ══ 首页：二选一入口 ══ */
-.home-screen{text-align:center;padding:28px 14px;max-width:860px;margin:0 auto}
+.home-screen{text-align:center;padding:28px 14px;max-width:1280px;margin:0 auto}  /* ★ 19: 1100→1280 容纳四张卡片并排 */
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:760px;margin:0 auto;position:relative;z-index:1}
-.home-entry{display:flex;flex-direction:column;align-items:center;padding:34px 26px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:268px;text-align:center}
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;max-width:1260px;margin:0 auto;position:relative;z-index:1}  /* ★ 19: 四张卡并排一行,3列→4列, 1080→1260 */
+.home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
-.home-entry-icon{font-size:2.6rem;margin-bottom:14px}
-.home-entry-zh{font-size:1.7rem;font-weight:700;letter-spacing:0.08em;margin-bottom:4px}
+/* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
+.home-entry-header{position:relative;display:inline-block;margin-bottom:4px}
+.home-entry-icon{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);font-size:2rem;line-height:1}
+.home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em;display:inline-block}
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
 .home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}
 .home-entry-input{cursor:default}
@@ -75,6 +77,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.28)) brightness(1.08)}
 .deco-piece-inner{
   width:100%;height:100%;
+  position:relative;           /* v75：容纳叠加的 solo + aligned SVG */
   display:flex;align-items:center;justify-content:center;
   will-change:transform;
 }
@@ -95,29 +98,36 @@ body::before{content:'';position:fixed;inset:0;background:
    ④ 动效更轻：纯淡入,无弹跳
 */
 .deco-merge-display{
-  position:fixed;pointer-events:none;z-index:6;
-  width:72px;height:92px;
+  position:fixed;pointer-events:none;z-index:10;   /* v81：高于结构表(9),避免被遮挡 */
+  width:101px;height:140px;       /* v80：尺寸 ×1.3 */
   background:rgba(255,255,255,0.96);
-  border-radius:12px;
-  box-shadow:0 6px 20px rgba(20,40,30,0.22);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:4px 4px 3px;box-sizing:border-box;
+  border-radius:14px;
+  box-shadow:0 8px 24px rgba(20,40,30,0.24);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:7px 5px 8px;box-sizing:border-box;
   opacity:0;transform:translate(-50%,-50%) scale(0.96);
   transition:opacity .15s ease, transform .15s ease;
 }
 .deco-merge-display.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.deco-merge-level{
+  font-family:Georgia,serif;font-weight:700;font-size:12px;line-height:1;
+  letter-spacing:0.06em;
+  color:#fff;background:#5a8a6a;
+  padding:3px 8px;border-radius:5px;
+  margin-bottom:3px;
+}
 .deco-merge-char{
   flex:1 1 auto;
   display:flex;align-items:center;justify-content:center;
   font-family:'Kaiti SC','STKaiti','Songti SC',serif;
-  font-size:48px;line-height:1;
+  font-size:57px;line-height:1;
   color:#2a3a30;
 }
 .deco-merge-pinyin{
   font-family:Georgia,serif;font-style:italic;
-  font-size:12px;line-height:1.2;
-  color:#7a8a80;
-  margin-top:1px;
+  font-size:21px;line-height:1;
+  color:#1a2a20;
+  margin-top:-3px;
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -130,11 +140,21 @@ body::before{content:'';position:fixed;inset:0;background:
 .level-select-screen h2{font-size:1.5rem;color:#ffffff;margin-bottom:14px;letter-spacing:0.1em}
 .level-select-screen .subtitle{color:#ffffff;font-size:0.88rem;margin-bottom:14px;font-style:italic;font-family:Georgia,serif}
 .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:680px;margin:0 auto}
-.level-btn{padding:18px 14px;border:2px solid rgba(255,255,255,0.25);border-radius:var(--radius);background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s}
+.level-btn{
+  padding:18px 14px;border:2px solid rgba(255,255,255,0.25);border-radius:var(--radius);
+  background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s;
+  /* ★ v95:flex column + min-height 让 9 个方框等高,锁头/无锁头都一致 */
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:108px;
+}
 .level-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--bamboo-light)}
 .level-btn .level-num{font-size:1.6rem;font-weight:bold;color:#ffffff;display:block;line-height:1}
 .level-btn .level-label{font-size:0.72rem;color:#ffffff;margin-top:4px;display:block}
 .level-btn .level-count{font-size:0.68rem;color:rgba(255,255,255,0.7);margin-top:2px;display:block}
+/* ★ v94:未解锁等级 — 用 🔒 锁头表示;卡片整体略淡以示区分 */
+.level-btn .level-lock{font-size:1.5rem;line-height:1;display:block;margin-top:10px}
+.level-btn.level-locked{opacity:0.6}
+.level-btn.level-locked:hover{opacity:0.75;transform:translateY(-1px)}
 
 /* 练习布局 — 左右等高 */
 
@@ -369,20 +389,39 @@ body::before{content:'';position:fixed;inset:0;background:
   .query-result-grid{grid-template-columns:1fr}
   /* ★ 首页两卡：居中 + 压缩尺寸，整个首页一屏装下不滑动 */
   .home-screen{padding:10px 12px}
-  .home-grid{grid-template-columns:1fr;justify-items:center;gap:14px;width:100%}
+  /* ★ v86:撤销 zoom:0.7(iOS Safari 表现不稳),改用直接缩小内部所有数值 → 0.7 倍,layout 真实变化 */
+  .home-grid{grid-template-columns:1fr;justify-items:center;gap:10px;width:100%}   /* gap 14→10 */
   .home-grid .home-entry{
-    width:100%;max-width:440px;margin:0 auto;
-    min-height:0;                 /* 解除 268px 死高度（一屏装不下的元凶） */
-    padding:20px 18px;
+    width:100%;max-width:308px;       /* ★ v86:440→308 (×0.7),卡片真实变小 */
+    margin:0 auto;
+    min-height:0;                     /* 解除 268px 死高度（一屏装不下的元凶） */
+    padding:14px 13px;                /* ★ v86:20 18→14 13 (×0.7) */
   }
-  .home-entry-icon{font-size:2rem;margin-bottom:8px}
-  .home-entry-zh{font-size:1.35rem}
-  .home-entry-en{font-size:0.85rem;margin-bottom:10px}
-  .home-input-row{margin:4px 0 8px;max-width:280px}
-  .teacher-input{padding:9px 12px;font-size:1.05rem}
-  .teacher-go{padding:9px 12px;font-size:0.9rem}
+  .home-entry-icon{font-size:1.2rem}                  /* ★ v86:1.7→1.2 (×0.7) */
+  .home-entry-zh{font-size:0.9rem}                    /* ★ v86:1.25→0.9 (×0.7) */
+  .home-entry-en{font-size:0.6rem;margin-bottom:7px}  /* ★ v86:0.85, 10→0.6, 7 (×0.7) */
+  .home-input-row{margin:3px 0 6px;max-width:196px}   /* ★ v86:280→196 (×0.7) */
+  .teacher-input{padding:7px 9px;font-size:0.75rem}   /* ★ v86:9 12, 1.05→7 9, 0.75 (×0.7) */
+  .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
   .top-nav{padding:11px 16px}
   .mode-tab{padding:6px 12px;font-size:0.78rem}
+  /* ★ v100:手机端 "BASED ON HSK 3.0" 字号还原为 v97 之前的 0.63rem(电脑端保持 v99 的 0.82rem 大字号) */
+  .based-on-hsk{font-size:0.63rem !important}
+  /* ★ v97:9 个 HSK 方框组居中于下面空白处 — 用 JS 实测的 --fit-vh 替代 100vh(iOS Safari 更准);
+        只减顶栏高度和少量底部 padding,让 .level-select-screen 占满剩余空间后 flex 居中 */
+  .level-select-screen{
+    min-height:calc(var(--fit-vh, 100vh) - var(--struct-h, 200px) - 28px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  /* ★ v93:手机端缩小等级方框内"HSK 1"字号,让 HSK 和数字保持同一行(不再换行) */
+  .level-btn .level-num{font-size:1.15rem;white-space:nowrap}
+  .level-btn{padding:14px 8px;min-height:78px}    /* ★ v95:手机端等高 78px(适配缩小后的字号) */
+  .level-btn .level-label{font-size:0.66rem}
+  .level-btn .level-count{font-size:0.62rem}
+  /* ★ v94:手机端锁头跟随大字号 */
+  .level-btn .level-lock{font-size:1.2rem;margin-top:8px}
 }
 
 /* ══ 结构参考栏 ══ */
@@ -432,7 +471,7 @@ body::before{content:'';position:fixed;inset:0;background:
   display:flex;flex-direction:column;align-items:center;
   padding:6px 4px;
   border-right:1px solid rgba(255,255,255,0.07);
-  cursor:default;
+  cursor:pointer;                              /* ★ v96:配合"点击任意位置折叠",鼠标变手型提示 */
   transition:background .2s;
 }
 .struct-card:hover{background:rgba(255,255,255,0.08);border-radius:6px}
@@ -451,9 +490,19 @@ body::before{content:'';position:fixed;inset:0;background:
   .struct-bar-body.open{max-height:320px}
 }
 @media(max-width:500px){
-  .struct-grid{grid-template-columns:repeat(4,1fr)}
+  .struct-grid{
+    grid-template-columns:repeat(4,1fr);
+    padding:4px 0 5px;                         /* ★ v88:6 0 8 → 4 0 5 (×0.6) */
+  }
   .struct-bar-body.open{max-height:900px}
   .struct-bar-header{padding:10px 16px}
+  /* ★ v88:手机端 13 种汉字结构卡片整体缩到 0.6 倍 — padding / 字号 / SVG 尺寸 全部 ×0.6 */
+  .struct-card{padding:3px 2px}                                  /* 6 4 → 3 2 */
+  .struct-card-num{font-size:0.84rem;margin-bottom:0}            /* 1.4rem → 0.84rem */
+  .struct-card-svg{width:40px;height:40px;margin-bottom:2px}     /* 66 → 40 (×0.6) */
+  .struct-card-name{font-size:0.45rem;margin-bottom:0;line-height:1.15}   /* 0.72rem → 0.43→0.45rem (微调可读) */
+  .struct-card-en{font-size:0.48rem;margin-bottom:1px;line-height:1.15}   /* 0.8rem → 0.48rem */
+  .struct-card-ex{font-size:0.47rem;line-height:1.2}             /* 0.78rem → 0.47rem */
 }
 
 .step-title{
@@ -574,22 +623,83 @@ body::after{
   /* 顶部操作按钮在窄屏不至于挤压换行难看 */
   .struct-action-btn{padding:8px 14px;font-size:1rem}
   /* ★ 顶部四按钮已被 JS 搬到 #header-actions-bar（浅色页面区）；标题栏只留标题 */
-  .struct-bar-header{padding:8px 10px 9px}
+  .struct-bar-header{
+    padding:8px 10px 9px;
+    cursor:pointer;                         /* ★ v83 ① 明确告知整条可点 */
+    transition:background .15s ease;
+  }
+  .struct-bar-header:active{
+    background:rgba(255,255,255,0.10);      /* ★ v83 ① 触摸瞬间的"按下"反馈,让用户确信点击命中 */
+  }
   #header-actions-bar{
-    display:flex;justify-content:center;align-items:center;
-    gap:4px;flex-wrap:nowrap;       /* ★ 4个按钮强制挤在一行，不换行 */
-    padding:8px 8px 2px;          /* 落在浅墨绿页面区，背景透明 */
+    display:flex;
+    flex-direction:column;          /* ★ v93:改为两行布局 */
+    align-items:center;             /* ★ v94:整组水平居中 */
+    gap:6px;
+    padding:8px 14px 4px;           /* ★ v95:左右 padding 14 与 .level-select-screen 一致 → 与 HSK 网格对齐 */
   }
   #header-actions-bar > div{
     position:static !important;     /* 覆盖内联的 position:absolute */
     transform:none !important;      /* 覆盖内联的 translateY(-50%) */
     right:auto !important;left:auto !important;top:auto !important;
-    display:flex;justify-content:center;align-items:center;
-    gap:4px !important;flex:0 0 auto;flex-wrap:nowrap;
+    /* ★ v94:每行用 grid 平均分两栏,两个按钮等宽 */
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+    /* ★ v95:去掉 max-width 限制,让顶部按钮组占满与 HSK 网格相同的内宽 */
+    width:100%;
+    flex-wrap:nowrap;
   }
-  /* 按钮整体缩小一号 */
-  .struct-action-btn{padding:3px 5px !important;font-size:0.5rem !important;border-radius:5px;white-space:nowrap}
-  .struct-action-btn svg{width:9px;height:9px}
+  /* ★ v94:按钮占满 grid 单元 → 4 个完全等宽;text-align 居中保持文字视觉平衡 */
+  .struct-action-btn{
+    padding:7px 8px !important;
+    font-size:0.65rem !important;
+    border-radius:6px;
+    white-space:nowrap;
+    box-sizing:border-box;
+    width:100%;
+    text-align:center;
+    justify-content:center;         /* 内部 icon+text 容器也居中 */
+    font-family:inherit !important; /* ★ v95:跟随 body 字体(Noto Serif SC),与 HSK 方框一致 */
+  }
+  .struct-action-btn svg{width:11px;height:11px;flex-shrink:0}
+  /* ★ v95:qr-btn 外层 span 也占满 grid cell,保证 qr-btn 与其他按钮等宽 */
+  #header-actions-bar > div > span{
+    width:100% !important;
+    display:inline-flex !important;
+  }
+  /* ★ v95:手机端 QR popover 改为 fixed 居中,不再从父按钮位置左下展开 → 永远不会被挤出屏幕 */
+  .qr-popover{
+    position:fixed !important;
+    left:50% !important;
+    top:50% !important;
+    right:auto !important;
+    margin:0 !important;
+    transform:translate(-50%,-50%) scaleY(0.85) !important;
+    transform-origin:center center !important;
+    max-width:calc(100vw - 32px);
+    max-height:calc(100vh - 64px);
+    z-index:9999 !important;
+    overflow:auto;
+  }
+  .qr-popover.open{
+    transform:translate(-50%,-50%) !important;
+  }
+  /* ★ v97 反馈弹窗:① 铺满整个手机屏幕 ② iframe 容器 overflow:hidden + iframe 高度多 64px → 裁掉底部 Microsoft 365 水印 */
+  #feedback-modal{
+    padding:0 !important;
+  }
+  #feedback-modal > div{
+    width:100vw !important;
+    height:var(--fit-vh, 100vh) !important;
+    max-width:none !important;
+    max-height:none !important;
+    border-radius:0 !important;
+  }
+  /* iframe 比容器多 64px,被父容器(#feedback-iframe-wrap)的 overflow:hidden 裁掉 → 底部 Microsoft 365 logo 消失 */
+  #feedback-modal #feedback-iframe{
+    height:calc(100% + 64px) !important;
+  }
 }
 
 /* 触控笔/手指等"粗指针"设备：放大可点区域，悬停态不残留 */
@@ -713,6 +823,47 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .next-btn{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
   .next-btn:hover{background:var(--bamboo-light) !important}
 }
+
+/* ══ 错题本 (部件联动-18) ══ */
+.wb-home-card .home-entry-icon{color:var(--vermillion)}
+.wb-screen{max-width:680px;margin:0 auto;padding:18px 14px;color:#fff}
+.wb-head{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;width:fit-content;max-width:100%;margin:0 auto 16px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 22px}
+.wb-title-wrap{display:flex;align-items:center;gap:12px}
+.wb-title-icon{font-size:2rem;line-height:1}
+.wb-title-zh{font-size:1.5rem;font-weight:700;letter-spacing:0.06em}
+.wb-title-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.8)}
+.wb-count-wrap{font-size:0.95rem;color:#fff;white-space:nowrap}
+.wb-count-wrap b{color:var(--gold);font-size:1.2rem}
+.wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
+.wb-review-row{display:flex;gap:12px;margin-bottom:12px}
+.wb-review-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wb-review-btn:hover{background:var(--bamboo-light);transform:translateY(-2px)}
+.wb-due-badge{position:absolute;top:-7px;left:-6px;background:var(--bamboo);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:2}
+.wb-chip-due{border-color:var(--bamboo-light);background:rgba(181,118,58,0.22)}
+.wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.85rem;color:#fff;margin-bottom:12px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px}
+.wb-legend{display:inline-flex;align-items:center;gap:5px}
+.wb-manage-btn{padding:5px 13px;border:1px solid rgba(255,255,255,0.42);border-radius:8px;background:rgba(255,255,255,0.13);color:#fff;font-family:inherit;font-size:0.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.wb-manage-btn:hover{background:rgba(255,255,255,0.24);border-color:var(--bamboo-light)}
+.wb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}
+.wb-chip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 4px 12px;border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .18s}
+.wb-chip:hover{transform:translateY(-3px);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
+.wb-char{font-size:2rem;line-height:1.05}
+.wb-py{font-size:0.85rem;color:rgba(255,255,255,0.8);margin-top:3px;letter-spacing:0.03em}
+.wb-dots{position:absolute;top:6px;left:0;right:0;display:flex;justify-content:center;gap:4px}
+.wb-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.wb-dot-py{background:#F5A623}
+.wb-dot-comp{background:#4FC3F7}
+.wb-times{position:absolute;bottom:4px;right:6px;font-size:0.68rem;color:rgba(255,255,255,0.55)}
+.wb-del{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--vermillion);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:2}
+.wb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center}
+.wb-empty-icon{font-size:3rem;margin-bottom:14px}
+.wb-empty-zh{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.wb-empty-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.75)}
+
+.wb-tip{font-size:1.2rem;color:rgba(255,255,255,0.85);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.16);border-radius:10px;padding:12px 18px;margin-bottom:16px;text-align:center;line-height:1.5}
+.home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
+@media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
 </style>
 </head>
 <body>
@@ -752,7 +903,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 <!-- ══ 13种汉字结构参考栏 ══ -->
 <div class="struct-bar" id="struct-bar">
-  <div class="struct-bar-header" onclick="toggleStructBar()">
+  <div class="struct-bar-header" onclick="onHeaderClick(event)">
     <div class="struct-bar-title" style="text-align:center">
       <div onclick="event.stopPropagation();showHome();" title="回到主页面 / Back to Home" style="display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
@@ -761,18 +912,18 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
       </div>
       <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:9px">
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: Mozhou</span>
-        <span style="color:#8b2c2c;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
+        <span class="based-on-hsk" style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
     <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       反馈 / Feedback
     </button>
-    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">折叠 / Collapse</button></div>
-    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="display:none;background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span></div>
+    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">13种结构 / 13 Structures</button></div>
+    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
-  <div class="struct-bar-body open" id="struct-body">
+  <div class="struct-bar-body open" id="struct-body" onclick="toggleStructBar()">
     <div class="struct-grid">
       <div class="struct-card">
         <div class="struct-card-num">1</div>
@@ -904,40 +1055,93 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
       <!-- v67：漂浮部件装饰层（position:fixed，父级 display:none 时自动隐藏） -->
       <div class="deco-layer" id="deco-layer" aria-hidden="true"></div>
       <div class="deco-merge-display" id="deco-merge-display" aria-hidden="true">
+        <div class="deco-merge-level" id="deco-merge-level"></div>
         <div class="deco-merge-char" id="deco-merge-char"></div>
         <div class="deco-merge-pinyin" id="deco-merge-pinyin"></div>
       </div>
       <div class="home-grid">
         <!-- 入口 A：HSK 分级挑战 -->
         <button class="home-entry" onclick="showLevelSelect()">
-          <div class="home-entry-icon">🎯</div>
-          <div class="home-entry-zh">HSK分级挑战</div>
+          <div class="home-entry-header">
+            <span class="home-entry-icon">🎯</span>
+            <span class="home-entry-zh">挑战模式</span>
+          </div>
           <div class="home-entry-en">HSK Level Challenge</div>
         </button>
         <!-- 入口 B：请输入字/词 -->
         <div class="home-entry home-entry-input">
-          <div class="home-entry-icon">✏️</div>
-          <div class="home-entry-zh">请输入内容</div>
-          <div class="home-entry-en">Enter Content</div>
+          <div class="home-entry-header">
+            <span class="home-entry-icon">🔍</span>
+            <span class="home-entry-zh">搜索模式</span>
+          </div>
+          <div class="home-entry-en">Search Mode</div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
             <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
           </div>
         </div>
+        <!-- ★ 联动-1: 入口 C 班级任务(BLS 模块) -->
+        <button class="home-entry" id="bls-entry-card" onclick="BLS.onCardClick()">
+          <div class="home-entry-header">
+            <span class="home-entry-icon">📚</span>
+            <span class="home-entry-zh">班级任务</span>
+          </div>
+          <div class="home-entry-en">Class Tasks</div>
+          <div class="home-entry-desc" id="bls-entry-desc">点此加入班级 / Join a class</div>
+        </button>
+        <!-- ★ 部件联动-18: 入口 D 错题本 -->
+        <button class="home-entry wb-home-card" id="wb-entry-card" onclick="showWrongBook()">
+          <div class="home-entry-header">
+            <span class="home-entry-icon">📕</span>
+            <span class="home-entry-zh">错题本</span>
+          </div>
+          <div class="home-entry-en">Mistake Book</div>
+          <div class="home-entry-desc" id="wb-home-desc">暂无错题 / All clear</div>
+        </button>
       </div>
     </div>
 
     <div id="level-select" class="card level-select-screen" style="display:none">
       <div class="level-grid">
-        <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-label">入门 · Beginner</span><span class="level-count">Available ✓</span></button>
-        <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-label">基础 · Elementary</span><span class="level-count">Available ✓</span></button>
-        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span><span class="level-label">初级 · Pre-intermediate</span><span class="level-count">Available ✓</span></button>
-        <button class="level-btn" onclick="startLevel(4)"><span class="level-num">HSK 4</span><span class="level-label">中级 · Intermediate</span><span class="level-count">Coming soon</span></button>
-        <button class="level-btn" onclick="startLevel(5)"><span class="level-num">HSK 5</span><span class="level-label">中高级 · Upper-inter</span><span class="level-count">Coming soon</span></button>
-        <button class="level-btn" onclick="startLevel(6)"><span class="level-num">HSK 6</span><span class="level-label">高级 · Advanced</span><span class="level-count">Coming soon</span></button>
-        <button class="level-btn" onclick="startLevel(7)"><span class="level-num">HSK 7</span><span class="level-label">专业 · Professional</span><span class="level-count">Coming soon</span></button>
-        <button class="level-btn" onclick="startLevel(8)"><span class="level-num">HSK 8</span><span class="level-label">精通 · Mastery</span><span class="level-count">Coming soon</span></button>
-        <button class="level-btn" onclick="startLevel(9)"><span class="level-num">HSK 9</span><span class="level-label">卓越 · Excellence</span><span class="level-count">Coming soon</span></button>
+        <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span></button>
+        <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span></button>
+        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(4)"><span class="level-num">HSK 4</span><span class="level-lock">🔒</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(5)"><span class="level-num">HSK 5</span><span class="level-lock">🔒</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(6)"><span class="level-num">HSK 6</span><span class="level-lock">🔒</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(7)"><span class="level-num">HSK 7</span><span class="level-lock">🔒</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(8)"><span class="level-num">HSK 8</span><span class="level-lock">🔒</span></button>
+        <button class="level-btn level-locked" onclick="startLevel(9)"><span class="level-num">HSK 9</span><span class="level-lock">🔒</span></button>
+      </div>
+    </div>
+
+    <div id="wrongbook-screen" class="wb-screen" style="display:none">
+      <div class="wb-head">
+        <div class="wb-title-wrap">
+          <span class="wb-title-icon">📕</span>
+          <div>
+            <div class="wb-title-zh">错题本</div>
+            <div class="wb-title-en">Mistake Book</div>
+          </div>
+        </div>
+      </div>
+      <div id="wb-review-row" class="wb-review-row" style="display:none">
+        <button id="wb-review-today" class="wb-review-btn" onclick="wbReviewToday()" style="display:none">
+          <span>🔥 今天复习</span><span class="wb-ra-num" id="wb-today-num">(0)</span>
+        </button>
+        <button id="wb-review-all" class="wb-review-btn" onclick="wbReviewAll()"><span>复习全部</span><span class="wb-ra-num">(0)</span></button>
+      </div>
+      <div id="wb-tools" class="wb-tools" style="display:none">
+        <span class="wb-sort">↓ 错最多优先</span>
+        <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错 <span class="wb-dot wb-dot-comp"></span>部件错</span>
+        <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()">管理 / Manage</button>
+      </div>
+      <div id="wb-tip" class="wb-tip">💡 间隔复习：答对一次，下次间隔拉长（1→3→7→16天）；熬过 16 天那级自动移出 · 答错退回起点</div>
+      <div id="wb-grid" class="wb-grid"></div>
+      <div id="wb-empty" class="wb-empty" style="display:none">
+        <div class="wb-empty-icon">🎉</div>
+        <div class="wb-empty-zh">暂无错题，继续加油 💪</div>
+        <div class="wb-empty-en">No mistakes yet — keep practicing!</div>
       </div>
     </div>
 
@@ -983,7 +1187,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span></p>
             </div>
-            <div class="write-stage" id="write-stage" style="display:none">
+            <div class="write-stage" id="write-stage" style="display:none" oncontextmenu="return false">
               <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                 <line x1="0" y1="512" x2="1024" y2="512" class="grid-line"/>
                 <line x1="512" y1="0" x2="512" y2="1024" class="grid-line"/>
@@ -991,7 +1195,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
                 <line x1="1024" y1="0" x2="0" y2="1024" class="grid-line"/>
                 <rect x="0" y="0" width="1024" height="1024" class="grid-line"/>
               </svg>
-              <div id="write-target"></div>
+              <div id="write-target" oncontextmenu="return false"></div>
               <div id="write-check" class="write-check">✓</div>
             </div>
             <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写 / Redo</button>
@@ -1045,6 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
+console.log('%c斑斓部件 · 部件联动-24 ✦ 书写区禁右键菜单','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -1950,16 +2155,31 @@ document.addEventListener("click",function(e){
     pop.classList.remove("open"); btn.classList.remove("open");
   }
 });
+// ★ v83 ① 顶部标题栏(.struct-bar-header)统一点击入口:
+//   手机端 → 整条点击回主页(showHome)— 包括 logo、"斑斓部件"四字、英文、Mozhou 副标题、空白
+//             ★ v84:若此时「13 种结构」处于展开状态,同步折叠它(避免回到主页后下次进来仍是展开态)
+//   电脑端 → 维持原行为(切换 13 种结构表的展开/收起)
+//   子按钮(返回/二维码/反馈/展开/logo 子 div)它们的 onclick 都已 event.stopPropagation,不受影响
+function onHeaderClick(event){
+  if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    // 若 13 种结构展开 → 先折叠(toggleStructBar 会同步按钮文字、chevron、高度)
+    const body=document.getElementById('struct-body');
+    if(body && body.classList.contains('open')){
+      toggleStructBar();
+    }
+    showHome();
+  } else {
+    toggleStructBar();
+  }
+}
+
 function toggleStructBar(){
   const body=document.getElementById('struct-body');
   const chevron=document.getElementById('struct-chevron');
   body.classList.toggle('open');
   chevron.classList.toggle('open');
-  // 同步切换按钮文字
-  const btn=document.getElementById('toggle-struct-btn');
-  if(btn){
-    btn.textContent = body.classList.contains('open') ? '折叠 / Collapse' : '展开 / Expand';
-  }
+  // ★ v87:按钮文字固定为"13种结构 / 13 Structures",不再切换 — 展开/折叠状态通过 body.open class 即可
+  // (保留 btn 引用以便未来需要时用,但不动 textContent)
   setTimeout(updateStructHeight, 420);
 }
 
@@ -1969,11 +2189,10 @@ function applyMobileStructDefault(){
   if(window.matchMedia && window.matchMedia('(max-width:768px)').matches){
     const body=document.getElementById('struct-body');
     const chevron=document.getElementById('struct-chevron');
-    const btn=document.getElementById('toggle-struct-btn');
     if(body && body.classList.contains('open')){
       body.classList.remove('open');
       if(chevron) chevron.classList.remove('open');
-      if(btn) btn.textContent='展开 / Expand';
+      // ★ v87:按钮文字固定为"13种结构 / 13 Structures",不再覆盖
     }
   }
   updateStructHeight();
@@ -2095,10 +2314,13 @@ function switchMode(mode){
 // ══ 首页导航：二选一入口 ══
 function showHome(){
   state.teacherMode=false;
+  state.reviewMode=false;
   document.getElementById('home-screen').style.display='block';
   document.getElementById('level-select').style.display='none';
   document.getElementById('practice-screen').style.display='none';
-  const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='none';
+  var _wb=document.getElementById('wrongbook-screen'); if(_wb) _wb.style.display='none';
+  if(typeof updateWrongBookBadge==='function') updateWrongBookBadge();
+  // ★ v94:返回按钮默认始终显示(首页时点击 navBack 走 no-op),不再特意在 showHome 中隐藏
 }
 function showLevelSelect(){
   document.getElementById('home-screen').style.display='none';
@@ -2109,6 +2331,14 @@ function showLevelSelect(){
 }
 // 统一的顶栏返回：根据当前页面智能判断回到哪一层
 function navBack(){
+  // ★ v94:在首页时返回按钮无动作 — 首页已是顶层,无处可返(按钮虽显示但不响应)
+  const home = document.getElementById('home-screen');
+  if(home && home.style.display !== 'none'){ return; }
+  // ★ 错题本列表页 → 回首页
+  const _wbScr=document.getElementById('wrongbook-screen');
+  if(_wbScr && _wbScr.style.display==='block'){ showHome(); return; }
+  // ★ 错题本复习中(练习页) → 回错题本
+  if(state.reviewMode){ showWrongBook(); return; }
   // 在「等级选择」页 → 回首页
   if(document.getElementById('level-select').style.display==='block'){ showHome(); return; }
   // 在「练习」页：老师模式→首页，HSK模式→等级选择
@@ -2129,6 +2359,7 @@ function startTeacherSession(){
   const chars=(raw.match(/[\u4e00-\u9fa5]/g))||[];
   if(chars.length===0){showToast('请输入至少一个汉字 / Enter a character','error');return;}
   state.teacherMode=true;
+  state.reviewMode=false;
   state.currentLevel=null;
   state.sessionChars=chars;     // ★ 不打乱，按输入顺序逐字演示
   state.sessionIndex=0;
@@ -2165,52 +2396,59 @@ function updateHskBadge(ch){
   else { b.style.display='none'; }
 }
 
-// 仅笔顺演示模式（HanziWriter 支持任意汉字）
+// ★ 联动-11: 独体字完整四步流程(选拼音→[跳过 ②]→书写→例词)
 function loadStrokeOnlyChar(char){
   state.currentChar=char;
-  state.pinyinDone=true;
+  // ★ Phase 4-2: 初始化本字答对率标记(独体字: 拼音待判, 不统计部件)
+  window._blsCurPy = null; window._blsCurComp = null;
+  state.pinyinDone=false;   // ★ 联动-11: 拼音待选(原为 true 默认通过)
   state.droppedComponents={};
   state.currentCharFailed=false;
 
   document.getElementById('main-char').textContent=char;
   updateHskBadge(char);
   renderStrokes(char);
-  unlockWriting();
+  lockWriting();   // ★ -23 修复：独体字切换时也要锁/重置书写区,清掉上一字残留(loadStrokeOnlyChar 原先漏了)
+  // ★ 联动-11 删除: unlockWriting() - 等选对拼音再解锁
 
-  // 左栏：若字库有拼音/释义则显示，否则留空
+  // 左栏: 渲染拼音选项让学生主动选 (不再直接显示答案)
   const data=CHAR_DB[char];
-  const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
-  _fitFrozen=false;   /* ★ v38 ①：换字时解锁缩放，新字的 step① 正常自适应 */
+  _fitFrozen=false;
   const info=document.getElementById('char-info');
-  if(data){
-    info.style.display='block';
-    info.innerHTML=`<div style="font-size:1.5rem;letter-spacing:0.04em">${data.py||''}</div>${data.en?`<div style="margin-top:4px;font-size:0.92rem">${data.en}</div>`:''}`;
-  }else{ info.style.display='none'; }
+  if(info){info.style.display='none';info.innerHTML='';}   // 释义先隐藏,选对才显示
+  if(data && data.py){
+    renderPinyinOptions(char, data);   // ★ 联动-11: 复用合体字的拼音选项渲染
+  } else {
+    // 完全无 data 的字(CHAR_DB 之外): 退化为原行为
+    const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
+    state.pinyinDone=true;
+    unlockWriting();
+  }
   const sb=document.getElementById('skip-btn');if(sb)sb.style.display='none';
 
-  // 中栏：仅笔顺提示
+  // 中栏: 永久 lock — "独体字无需拆部件"
   const wh=document.getElementById('word-hint');wh.classList.remove('show');wh.style.display='none';wh.innerHTML='';
   const wl=document.getElementById('word-locked');
-  if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">此字仅作笔顺演示<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">Stroke order only</span></p>';}
+  if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">独体字无需拆部件<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">No components to drag</span></p>';}
 
-  // 右栏：提示 + 下一个字按钮
+  // 右栏 step ② lock 提示 (★ 联动-11: 去掉"下一个字"按钮)
   const lo=document.getElementById('locked-overlay');
   lo.style.display='flex';
   lo.innerHTML=`<div style="font-size:2.2rem;margin-bottom:10px">🎨</div>
-    <p style="font-size:0.95rem;margin-bottom:18px;line-height:1.6">此字不在可拆部件字库中<br><span style="font-family:Georgia;font-style:italic;font-size:0.8rem">Stroke order only — no component drill</span></p>
-    <button class="next-btn" onclick="teacherNext()">下一个字 · Next →</button>`;
+    <p style="font-size:0.95rem;line-height:1.6">独体字无需拆部件<br><span style="font-family:Georgia;font-style:italic;font-size:0.8rem">No components — continue to write below</span></p>`;
   document.getElementById('drag-content').style.display='none';
   const nbw=document.getElementById('next-btn-wrap');if(nbw)nbw.style.display='none';
   const rs=document.getElementById('result-side');if(rs){rs.style.opacity='0';rs.style.pointerEvents='none';}
-  // ★ v62：清空 step② 标题左侧 hint（仅笔顺模式 step② 是 lock 的，hint 显示前字残留无意义）
   const _hint=document.getElementById('drag-hint-char');
   if(_hint){ _hint.dataset.glyph=''; _hint.textContent=''; }
   requestAnimationFrame(fitPracticeUI);
+  wizReset();   // ★ 联动-11: 跟 loadCharacter 末尾一样,重置 wizard 到 step ①
   setTimeout(fitPracticeUI, 200);
 }
 
 function startLevel(level){
   state.teacherMode=false;
+  state.reviewMode=false;
   // 是否解锁完全由数据决定：本级别没有可练字（如 HSK4+ 尚未导入）时，下方统一提示"扩展中"
   // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
   const levelChars = HSK_LEVEL_CHARS[level] || [];
@@ -2235,6 +2473,8 @@ function backToLevelSelect(){
 function loadCharacter(char){
   const data=CHAR_DB[char];
   if(!data)return;
+  // ★ Phase 4-2: 初始化本字答对率标记(合体字: 拼音待判, 部件默认全对)
+  window._blsCurPy = null; window._blsCurComp = true;
   // ★ 跳过独体字（whole/ov），自动加载下一个
   if(data.structure==='whole'||data.structure==='ov'){
     state.sessionIndex++;
@@ -2291,6 +2531,7 @@ function loadCharacter(char){
 function renderPinyinOptions(char,data){
   const container=document.getElementById('pinyin-options');
   container.innerHTML='';
+  container.style.display='';   // ★ 联动-13: 重置上一字 checkPinyin 选对时手机端设的 display:none
   const allPy=[...new Set(Object.values(CHAR_DB).map(d=>d.py))].filter(p=>p!==data.py);
   const distractors=allPy.sort(()=>Math.random()-0.5).slice(0,3);
   const options=[...distractors,data.py].sort(()=>Math.random()-0.5);
@@ -2303,6 +2544,8 @@ function renderPinyinOptions(char,data){
 }
 
 function checkPinyin(btn,chosen,correct,data,char){
+  // ★ Phase 4-2: 只记第一次点击的对错(first-try), 重试不覆盖
+  if(window._blsCurPy === null){ window._blsCurPy = (chosen === correct); }
   document.querySelectorAll('.pinyin-btn').forEach(b=>b.disabled=true);
   if(chosen===correct){
     btn.classList.add('correct');
@@ -2327,11 +2570,36 @@ function checkPinyin(btn,chosen,correct,data,char){
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
-    // ★ v37 ②：选对的"瞬间"就在后台把 step2 的拖拽区 + 部件卡渲染好（此刻 drag-content 仍被 locked-overlay 盖住/隐藏，
-    //          但 DOM 与笔画 SVG 已就绪）。等下面 1.8s 停留结束 unlockDragSection 揭开时，部件已经画好直接显示，不再现场加载。
-    renderDragZones(char,data);
-    renderCompPool(char,data);
-    setTimeout(()=>unlockDragSection(char,data),600);   // ★ v42②：1800→600ms，选对拼音后更快翻到 step2
+    // ★ 联动-13: 手机端 wizard 模式释义被挡修复
+    // char-panel overflow:hidden + 高度锁死,新增的拼音按钮 + char-info 超出一屏
+    // 解法: 选对后隐藏 pinyin-options 容器,让出空间给 char-info; 同时 scrollIntoView
+    if(_isMobile){
+      setTimeout(function(){
+        const pinContainer = document.getElementById('pinyin-options');
+        if(pinContainer) pinContainer.style.display = 'none';
+        if(info && typeof info.scrollIntoView === 'function'){
+          info.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+      }, 80);
+    }
+
+    // ★ 联动-12: 独体字 vs 合体字分流 (v12 修复:独体字补 sessionIndex++)
+    const _isWhole = !!(data && (data.structure === 'whole' || data.structure === 'ov'));
+    if(_isWhole){
+      // 独体字: 跳过 step ②,直接解锁 step ③ 书写
+      setTimeout(function(){
+        state.pinyinDone = true;
+        _fitFrozen = false;
+        state.sessionIndex++;   // ★ 联动-12: 模拟 mergeCharacter 的 sessionIndex++,让"下一个字"按钮能跳转
+        unlockWriting();    // 解锁右栏书写
+        wizUnlock(3);       // wizard: 跳过 step ②,max = 3
+      }, 600);
+    } else {
+      // 合体字: 原行为(预渲染 step ② 部件,翻到拖拽页)
+      renderDragZones(char,data);
+      renderCompPool(char,data);
+      setTimeout(()=>unlockDragSection(char,data),600);
+    }
   } else {
     // 错误按钮变红 + 内部追加 ✗（持久），其他按钮恢复可点击让用户重试
     btn.classList.add('wrong');
@@ -2745,7 +3013,14 @@ async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
   }
   document.body.removeChild(svg);
   if(bb && bb.width && bb.height){
-    if(sharedScale && full && full.width && full.height){
+    if(sharedScale === 'whole' && full && full.width && full.height){
+      // v75：以**整字中心**为原点（而非部件中心）,部件按原字坐标显示
+      //      用于合体时两片完全叠加 → 视觉上拼成完整字
+      const S=Math.max(full.width, full.height)*1.16;
+      const wcx=full.x+full.width/2, wcy=full.y+full.height/2;
+      const fx=wcx-S/2, fy=(900-wcy)-S/2;
+      svg.setAttribute('viewBox',`${fx} ${fy} ${S} ${S}`);
+    } else if(sharedScale && full && full.width && full.height){
       // 统一缩放：视窗边长 = 整字最大边*1.16，以部件中心定位 → 部件真实大小、粗细与整字一致
       const S=Math.max(full.width, full.height)*1.16;
       const pcx=bb.x+bb.width/2, pcy=bb.y+bb.height/2;
@@ -3066,6 +3341,7 @@ function showWrongDrop(zoneEl,msg){
   showZoneFeedback(zoneEl, '✗', '#8b2c2c');
   playWrongSound();
   state.currentCharFailed=true; // 标记本字失败
+  window._blsCurComp = false; // ★ Phase 4-2: 部件拖错过 → 本字部件不算第一次对
 }
 
 // 在指定 zone 上短暂浮现一个符号（✓ 或 ✗），700ms 后自动消失
@@ -3299,7 +3575,7 @@ function _loadHskBundle(){
   _hskBundlePromise = fetch('hsk.json')
     .then(r => r.ok ? r.json() : {})
     .then(j => { _hskBundleData = j; return j; })   // ★ 标记整包就绪
-    .catch(() => ({}));
+    .catch(() => { _hskBundleData = {}; return {}; });   // ★ v90:失败时也设 _hskBundleData={},确保 await 解除
   return _hskBundlePromise;
 }
 // ★ v37 ②A：开屏即预载 hsk.json 整包（7.9MB），不等到 step2 才下载 → 部件随取随有
@@ -3346,11 +3622,34 @@ async function loadStrokeData(char){
 async function renderGlyphInto(el, char){
   if(!el) return;
   el.dataset.glyph = char;          // 标记当前应显示的字（防异步过期覆盖）
+  el.textContent = '';              // ★ v89:清空,避免显示残留旧字
   try{
-    const data = await loadStrokeData(char);
-    if(el.dataset.glyph !== char) return;   // 期间已换字 → 丢弃过期结果
+    // ★ v91:用户明确要求"全部所有毫无例外"用笔画 SVG 渲染 → **完全移除印刷字 fallback**
+    //        重试策略:立即 → 等 hsk.json 整包 → 等 2s → 等 5s → 等 10s
+    //        若最终仍拿不到(网络极差极小概率) → 保持空白,绝不显示印刷字
+    let data = null;
+    try{ data = await loadStrokeData(char); }catch(e){}
+
+    // ① 等 hsk.json 整包加载完成后再试
+    if((!data || !data.strokes || !data.strokes.length) && typeof _hskBundlePromise !== 'undefined' && _hskBundlePromise){
+      if(el.dataset.glyph !== char) return;
+      try{ await _hskBundlePromise; }catch(e){}
+      if(el.dataset.glyph !== char) return;
+      try{ data = await loadStrokeData(char); }catch(e){}
+    }
+
+    // ② 继续延时重试:2s / 5s / 10s — 给 CDN 偶发丢包足够多的机会
+    const delays = [2000, 5000, 10000];
+    for(const d of delays){
+      if(data && data.strokes && data.strokes.length) break;
+      await new Promise(r => setTimeout(r, d));
+      if(el.dataset.glyph !== char) return;
+      try{ data = await loadStrokeData(char); }catch(e){}
+    }
+
+    if(el.dataset.glyph !== char) return;
     if(!data || !data.strokes || !data.strokes.length){
-      el.textContent = char;        // 无数据 → 回退文字（宿主自带楷体字体栈）
+      // ★ v91:全部失败 → **保持空白**,绝不 fallback 到印刷字(用户明确要求)
       return;
     }
     const NS = 'http://www.w3.org/2000/svg';
@@ -3369,7 +3668,7 @@ async function renderGlyphInto(el, char){
     el.textContent = '';
     el.appendChild(svg);
   }catch(e){
-    if(el.dataset.glyph === char) el.textContent = char;          // 出错也保底显示文字
+    // ★ v91:即使出错也不显示文字 — 保持空白
   }
 }
 
@@ -3656,6 +3955,7 @@ function lockWriting(){
   if(rb) rb.style.display='none';
   // 取消可能残留的旧测验实例并隐藏打勾
   if(_writeWriter){ try{ _writeWriter.cancelQuiz && _writeWriter.cancelQuiz(); }catch(e){} _writeWriter=null; }
+  const _wt=document.getElementById('write-target'); if(_wt) _wt.innerHTML='';
   const c=document.getElementById('write-check'); if(c) c.classList.remove('show');
 }
 function unlockWriting(){
@@ -3737,6 +4037,16 @@ function startWritingQuiz(){
     _writeWriter.quiz({
       // 全部写完 → 角落打勾 + 🎉 撒花庆祝
       onComplete: ()=>{
+        // ★ Phase 4-2: 字学完, 任务模式下记录本字成绩(拼音+部件)
+        if(state.teacherMode && state.currentChar){
+          window._blsResults = window._blsResults || {};
+          window._blsResults[state.currentChar] = { py: window._blsCurPy, comp: window._blsCurComp };
+        }
+        // ★ 错题本(部件联动-18): 任何模式下都更新错题本(进/出/连对计数)
+        if(state.currentChar){
+          var _wbSrc = state.reviewMode ? 'review' : (state.teacherMode ? 'task' : 'free');
+          try{ WrongBook.record(state.currentChar, window._blsCurPy, window._blsCurComp, _wbSrc); }catch(_e){ console.warn('[错题本] record 失败', _e); }
+        }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -3922,6 +4232,16 @@ function skipCharacter(){
 }
 
 function nextCharacter(){
+  // ★ 错题本复习模式：按列表顺序逐字，到末尾回错题本
+  if(state.reviewMode){
+    if(state.sessionIndex>=state.sessionChars.length){
+      showToast('🎉 错题复习完成！Review complete!','success');
+      setTimeout(showWrongBook,1400);
+      return;
+    }
+    loadTeacherChar(state.sessionChars[state.sessionIndex]);
+    return;
+  }
   // ★ 老师输入模式：按输入顺序逐字翻页，到末尾即结束
   if(state.teacherMode){
     if(state.sessionIndex>=state.sessionChars.length){
@@ -3953,6 +4273,174 @@ function nextCharacter(){
   }
   loadCharacter(state.sessionChars[state.sessionIndex]);
 }
+
+// ============================================================
+// ★ 错题本 (部件联动-18) — 纯学生端 localStorage, 按字去重, 记来源(task/free/review)
+//   进: 第一次就错(拼音或部件); 出: 重练连对2次"第一次就对"; 又错: 连对清零+错次+1; 另留手动删
+// ============================================================
+// ★ SRS 间隔重复(部件联动-22): 固定阶梯 [1,3,7,16,35] 天。答对(且到期)→ 升一级、间隔拉长;
+//   答错 → 退回 L0;熬过 SRS_GRAD_LEVEL(L3=16天那级)再答对一次 → 毕业移出(删除)。
+//   到期判定:本地日期整天,今天 ≥ due 即"今天该复习"。安全网:毕业后任何模式再写错 → 自动重新入册。
+var SRS_LADDER = [1, 3, 7, 16, 35];   // 各级间隔(天),index=level(L0..L4)
+var SRS_GRAD_LEVEL = 3;               // 爬过这一级即毕业(L3=16天);改成 4 = 爬完 35 天那级
+function _wbToday(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function _wbAddDays(n){ var d=new Date(); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+const WrongBook = {
+  KEY: 'BLS_WRONGBOOK_v1',
+  _load: function(){ try{ return JSON.parse(localStorage.getItem(this.KEY)) || {}; }catch(e){ return {}; } },
+  _save: function(o){ try{ localStorage.setItem(this.KEY, JSON.stringify(o)); }catch(e){ console.warn('[错题本] 保存失败', e); } },
+  // 旧存档兼容:缺 level/due 的老字 → 当 L0、due=今天
+  _ensureSrs: function(e){ if(typeof e.level !== 'number') e.level = 0; if(!e.due) e.due = _wbToday(); return e; },
+  record: function(char, pyOK, compOK, source){
+    if(!char) return;
+    var wrong = (pyOK === false) || (compOK === false);
+    var firstTryOK = (pyOK !== false) && (compOK !== false);
+    var book = this._load();
+    var e = book[char];
+    var today = _wbToday();
+    if(wrong){
+      var d = (typeof CHAR_DB !== 'undefined' && CHAR_DB[char]) ? CHAR_DB[char] : {};
+      if(e){
+        // 已在册又错=遗忘 → 退回 L0,明天再复习
+        this._ensureSrs(e);
+        e.wrongCount = (e.wrongCount||0) + 1;
+        e.streak = 0;
+        e.level = 0;
+        e.due = _wbAddDays(1);
+        if(pyOK === false) e.pyWrong = true;
+        if(compOK === false) e.compWrong = true;
+        if(!e.src) e.src = {task:0, free:0, review:0};
+        e.src[source] = (e.src[source]||0) + 1;
+        e.lastTs = Date.now();
+      } else {
+        // 新错入册:L0,今天就到期(进"今天该复习")
+        var src0 = {task:0, free:0, review:0}; src0[source] = 1;
+        book[char] = { pinyin:(d.py||''), hsk:(typeof charHskLevel==='function'?charHskLevel(char):null),
+          pyWrong:(pyOK===false), compWrong:(compOK===false), wrongCount:1, streak:0, src:src0,
+          level:0, due:today, firstTs:Date.now(), lastTs:Date.now() };
+      }
+      this._save(book);
+    } else if(firstTryOK && e){
+      // 答对:仅"到期"才算一次有效复习(防同一天反复刷过快升级/毕业)
+      this._ensureSrs(e);
+      e.streak = (e.streak||0) + 1;   // 旧字段仅作统计,不再触发毕业
+      if(e.due <= today){
+        if(e.level >= SRS_GRAD_LEVEL){
+          delete book[char];          // 毕业 → 移出(删除)
+        } else {
+          e.level = e.level + 1;
+          e.due = _wbAddDays(SRS_LADDER[e.level]);
+          e.lastTs = Date.now();
+        }
+      } else {
+        e.lastTs = Date.now();        // 未到期答对:不升级、不改 due
+      }
+      this._save(book);
+    }
+  },
+  remove: function(char){ var b=this._load(); if(b[char]){ delete b[char]; this._save(b); } },
+  list: function(){ var b=this._load(); var t=_wbToday(); return Object.keys(b).map(function(c){ var o=b[c]; o.char=c;
+            if(typeof o.level!=='number') o.level=0; if(!o.due) o.due=t; o.dueToday=(o.due<=t); return o; })
+            .sort(function(a,b2){ return (b2.wrongCount-a.wrongCount) || (b2.lastTs-a.lastTs); }); },
+  count: function(){ return Object.keys(this._load()).length; },
+  // 今天该复习(到期)的字
+  dueList: function(){ var t=_wbToday(); return this.list().filter(function(o){ return o.due <= t; })
+            .sort(function(a,b2){ return (a.due<b2.due?-1:a.due>b2.due?1:0) || (b2.wrongCount-a.wrongCount); }); },
+  dueCount: function(){ var t=_wbToday(); var b=this._load(); var n=0;
+            for(var k in b){ var o=b[k]; var due=(o&&o.due)?o.due:t; if(due<=t) n++; } return n; }
+};
+
+let _wbManage = false;
+function toggleWrongBookManage(){ _wbManage = !_wbManage; renderWrongBook(); }
+
+function showWrongBook(){
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='none';
+  document.getElementById('practice-screen').style.display='none';
+  var wb=document.getElementById('wrongbook-screen'); if(wb) wb.style.display='block';
+  var nb=document.getElementById('nav-back-btn'); if(nb) nb.style.display='block';
+  _wbManage = false;
+  renderWrongBook();
+}
+
+function updateWrongBookBadge(){
+  var m = WrongBook.count();
+  var n = WrongBook.dueCount();
+  var d = document.getElementById('wb-home-desc');
+  if(!d) return;
+  if(m === 0){ d.textContent = '暂无错题 / All clear'; }
+  else if(n > 0){ d.textContent = '今天该复习 ' + n + ' 个 / ' + n + ' due today'; }
+  else { d.textContent = '今日已清 · 共 ' + m + ' 个 / All done today'; }
+}
+
+function renderWrongBook(){
+  var list = WrongBook.list();
+  var cnt = list.length;
+  var dueN = WrongBook.dueCount();
+  var cEl = document.getElementById('wb-count'); if(cEl) cEl.textContent = cnt;
+  var cdEl = document.getElementById('wb-count-due'); if(cdEl) cdEl.textContent = dueN;
+  var mEl = document.getElementById('wb-manage-btn');
+  if(mEl){ mEl.textContent = _wbManage ? '完成 / Done' : '管理 / Manage'; mEl.style.display = cnt ? 'inline-block' : 'none'; }
+  var rRow = document.getElementById('wb-review-row');
+  if(rRow) rRow.style.display = cnt ? 'flex' : 'none';
+  var rToday = document.getElementById('wb-review-today');
+  if(rToday){ rToday.style.display = dueN ? 'flex' : 'none'; var tn = document.getElementById('wb-today-num'); if(tn) tn.textContent='('+dueN+')'; }
+  var rAll = document.getElementById('wb-review-all');
+  if(rAll){ rAll.style.display = cnt ? 'flex' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
+  var tools = document.getElementById('wb-tools'); if(tools) tools.style.display = cnt ? 'flex' : 'none';
+  var tip = document.getElementById('wb-tip'); if(tip) tip.style.display = cnt ? 'block' : 'none';
+  var grid = document.getElementById('wb-grid');
+  var empty = document.getElementById('wb-empty');
+  if(cnt===0){ if(grid) grid.innerHTML=''; if(empty) empty.style.display='flex'; return; }
+  if(empty) empty.style.display='none';
+  if(!grid) return;
+  grid.innerHTML = list.map(function(it){
+    var dots = (it.pyWrong ? '<span class="wb-dot wb-dot-py" title="拼音错"></span>' : '')
+             + (it.compWrong ? '<span class="wb-dot wb-dot-comp" title="部件错"></span>' : '');
+    var del = _wbManage ? '<span class="wb-del" data-del="'+it.char+'">×</span>' : '';
+    var times = (it.wrongCount>1) ? '<span class="wb-times">×'+it.wrongCount+'</span>' : '';
+    var dueBadge = it.dueToday ? '<span class="wb-due-badge">今日</span>' : '';
+    var chipCls = 'wb-chip' + (it.dueToday ? ' wb-chip-due' : '');
+    return '<button class="'+chipCls+'" data-char="'+it.char+'">'+del+dueBadge
+      +'<span class="wb-dots">'+dots+'</span>'
+      +'<span class="wb-char">'+it.char+'</span>'
+      +'<span class="wb-py">'+(it.pinyin||'')+'</span>'+times+'</button>';
+  }).join('');
+  if(!grid._wbBound){
+    grid._wbBound = true;
+    grid.addEventListener('click', function(ev){
+      var delEl = ev.target.closest ? ev.target.closest('.wb-del') : null;
+      if(delEl){ ev.stopPropagation(); wbDelete(delEl.getAttribute('data-del')); return; }
+      if(_wbManage) return;
+      var chip = ev.target.closest ? ev.target.closest('.wb-chip') : null;
+      if(chip){ wbPracticeOne(chip.getAttribute('data-char')); }
+    });
+  }
+}
+
+function wbDelete(char){ WrongBook.remove(char); renderWrongBook(); updateWrongBookBadge(); }
+function wbPracticeOne(char){ startWrongBookReview([char]); }
+function wbReviewAll(){ startWrongBookReview(WrongBook.list().map(function(x){ return x.char; })); }
+function wbReviewToday(){ var due = WrongBook.dueList().map(function(x){ return x.char; }); if(!due.length){ showToast('今天没有要复习的字 / Nothing due today','success'); return; } startWrongBookReview(due); }
+
+function startWrongBookReview(charList){
+  if(!charList || !charList.length){ showToast('错题本是空的 / Mistake book is empty', 'error'); return; }
+  state.teacherMode = false;
+  state.reviewMode = true;
+  state.currentLevel = null;
+  state.sessionChars = charList.slice();
+  state.sessionIndex = 0;
+  state.failedQueue = [];
+  state.currentCharFailed = false;
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='none';
+  var wb=document.getElementById('wrongbook-screen'); if(wb) wb.style.display='none';
+  document.getElementById('practice-screen').style.display='block';
+  var nb=document.getElementById('nav-back-btn'); if(nb) nb.style.display='block';
+  loadTeacherChar(state.sessionChars[0]);
+}
+
+try{ updateWrongBookBadge(); }catch(e){}
 
 document.addEventListener('dragstart',e=>{
   if(e.target.dataset&&e.target.dataset.comp){
@@ -4061,18 +4549,23 @@ function showToast(msg,type=''){
 //      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
-  pairCount:   30,    // 桌面端：配对数（→ 最多 60 个部件 piece；含间距约束,实际放置数会略少）
-  pairCountMb: 14,    // 手机端：配对数
-  loneStroke:  18,    // 桌面端：单笔画装饰数
-  loneStrokeMb: 9,    // 手机端：单笔画装饰数
+  pairCount:   34,    // v74：从 30 增到 34,补偿去掉笔画装饰后的密度
+  pairCountMb: 10,    // ★ v85:从 16 降到 10 — 手机端可用区小,过多必失败,降数提高成功率
+  loneStroke:   0,    // v74：去掉单笔画装饰（不参与合体,纯装饰太被动）
+  loneStrokeMb: 0,    // 同上
   baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
   safeMargin:  36,    // 离卡片的安全距离 px（密度高了,留多点呼吸感）
   sideEdge:    10,    // 离视口边缘的最小距离 px
   pieceSpacing: 14,   // v70：部件与部件之间的最小间距 px（避免重叠）
+  pieceSpacingMb: 8,  // ★ v85:手机端间距收紧
   pairProxMin:  90,   // v70②：同对两片中心距离的最小值（小于此值会重叠）
   pairProxMax: 220,   // v70②：同对两片中心距离的最大值（太远合体时穿屏不雅）
-  minSize:     48,    // 部件最小尺寸 px（v71：从 38→48,收窄差距）
-  maxSize:     62,    // 部件最大尺寸 px（v71：从 68→62,统一感更强）
+  pairProxMinMb: 50,  // ★ v85:手机端配对距离区间显著收窄,适配狭窄可用区
+  pairProxMaxMb:130,
+  minSize:     50,    // v73：尺寸跨度从 14px 收到 4px,消除视觉大小差异
+  maxSize:     54,    // v73：原来 62,现在 54,统一容器尺寸
+  minSizeMb:   30,    // ★ v85:手机端部件缩到 30~34,可叠卡片背后做"纹理"也不会压住卡片内容
+  maxSizeMb:   34,
   driftMin:     9,    // 浮动动画最短时长 s
   driftMax:    16,    // 浮动动画最长时长 s
   mergeDelay: 720,    // 合体后展示完整字的等待 ms
@@ -4094,15 +4587,19 @@ const _decoLoneStrokes = [
 
 let _decoState = {
   inited: false,
-  pieces: [],           // [{el, pairId, role, baseLeft, baseTop, size, fullChar, py, structure, ranges, ...}]
-  activePair: null,     // 当前合体的 pairId
+  pieces: [],
+  cardActivePair: null,
+  mergedPairs: new Set(),
   leaveTimer: null,
   isMobile: false,
-  mergeCenter: null,    // v70②：当前合体中心 {x,y},供 document mousemove 计算距离
-  mouseHandler: null,   // v70②：合体期间 document 级 mousemove 监听器引用
-  lastMouseX: 0,        // v70②：最近一次已知的光标屏幕位置（用于 mouseleave 时复核）
+  mergeCenter: null,
+  mouseHandler: null,
+  lastMouseX: 0,
   lastMouseY: 0,
-  trackRadius: 0,       // v70②：当前合体的悬停宽容半径
+  trackRadius: 0,
+  dispHideTimer: null,
+  topMargin: 80,           // v78：合体时也要避开顶部结构表
+  sideEdge: 10,            // v78：合体时也要避开侧边
 };
 
 // 从 CHAR_DB 抽取适合配对的字：左右(lr) / 上下(tb) 二件结构
@@ -4146,8 +4643,11 @@ function _sampleN(arr, n){
 // v70：placed 参数 → 部件之间不重叠
 // v70②：anchor 可选 {x,y,w,h,minDist,maxDist} → 把候选位置约束在某锚点附近
 //        anchor 严格执行（不放宽）：拿不到合格位置宁愿跳过这对,也不让配对横跨整屏
-function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
-  const m = DECO_CFG.safeMargin;
+function _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, initialGap, anchor){
+  // ★ v86:撤销 v85 方案A(部件不再沉到卡片背后,因为半透明卡片叠加后部件几乎隐形)
+  //         手机端用更小 safeMargin=4,部件可紧贴卡片边但不重叠,密度更高
+  // ★ v88:safeRects 由"整个 grid"改为"每张卡片各自" → 遍历每张卡片检测,允许部件落到卡片之间和旁边
+  const m = _decoState.isMobile ? 4 : DECO_CFG.safeMargin;
   const maxX = viewport.w - 2*sideEdge - size;
   const maxY = viewport.h - topMargin - sideEdge - size;
   if(maxX <= 0 || maxY <= 0) return null;
@@ -4157,11 +4657,16 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
     for(let i = 0; i < 80; i++){
       const x = sideEdge + Math.random() * maxX;
       const y = topMargin + Math.random() * maxY;
-      // ① 卡片安全区检测
-      const cardClear = (x + size < safeRect.x - m ||
-                         x > safeRect.x + safeRect.w + m ||
-                         y + size < safeRect.y - m ||
-                         y > safeRect.y + safeRect.h + m);
+      // ① 卡片安全区检测(手机端 m=4 紧贴卡边;桌面端 m=36 留呼吸)— 遍历每张卡片
+      let cardClear = true;
+      for(let k = 0; k < safeRects.length; k++){
+        const sr = safeRects[k];
+        const clearOfThis = (x + size < sr.x - m ||
+                             x > sr.x + sr.w + m ||
+                             y + size < sr.y - m ||
+                             y > sr.y + sr.h + m);
+        if(!clearOfThis){ cardClear = false; break; }
+      }
       if(!cardClear) continue;
       // ② 锚点距离检测（始终严格,放不下就跳过这对,不允许跨屏配对）
       if(anchor){
@@ -4188,20 +4693,67 @@ function _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, i
 }
 
 // 异步把 SVG 笔画图形画进 piece 的 inner 容器
-async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText){
+// ★ v88:去掉"先显示文字 fallback,再替换成 SVG"的过渡过程 —— 用户不希望看到从文字到笔画的渐变
+//        改造为:piece 初始 opacity:0,SVG 加载完成才加 visible class(平滑淡入)
+//        兜底:5 秒后 SVG 仍未来 → 显示 fallback 文字 + visible,避免永远空白
+async function _renderDecoPieceSVG(innerEl, srcChar, strokeIdx, color, fallbackText, pieceEl){
+  // ★ v89:兜底时间 5 秒 → 2.5 秒,部件更快显示;失败时显示 fallback 文字 + visible,避免长时间空白
+  const fallbackTimer = setTimeout(()=>{
+    if(pieceEl && !pieceEl.classList.contains('visible')){
+      if(fallbackText && innerEl && !innerEl.querySelector('svg')){
+        innerEl.innerHTML = `<span class="deco-fallback-text" style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
+      }
+      pieceEl.classList.add('visible');
+    }
+  }, 2500);
+
   try{
-    const svg = await renderComponentStrokes(srcChar, strokeIdx, color, false);
-    if(svg){
-      svg.style.cssText = 'width:100%;height:100%;display:block';
-      innerEl.appendChild(svg);
+    const svgSolo = await renderComponentStrokes(srcChar, strokeIdx, color, true);
+    const svgAligned = await renderComponentStrokes(srcChar, strokeIdx, color, 'whole');
+    if(svgSolo || svgAligned){
+      // 清空容器(防止 5s 兜底已经塞了 fallback)
+      innerEl.innerHTML = '';
+      if(svgSolo){
+        svgSolo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
+        svgSolo.dataset.mode = 'solo';
+        innerEl.appendChild(svgSolo);
+      }
+      if(svgAligned){
+        svgAligned.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:none';
+        svgAligned.dataset.mode = 'aligned';
+        innerEl.appendChild(svgAligned);
+      }
+      clearTimeout(fallbackTimer);
+      // SVG 就绪 → 让 piece 显示(transition 触发 0.6s 淡入)
+      if(pieceEl) pieceEl.classList.add('visible');
       return true;
     }
   }catch(e){}
-  // 兜底：用字体字形
-  if(fallbackText){
-    innerEl.innerHTML = `<span style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
+  // SVG 拿不到 → 立即 fallback + visible(不等 5s 兜底)
+  clearTimeout(fallbackTimer);
+  if(fallbackText && innerEl){
+    innerEl.innerHTML = `<span class="deco-fallback-text" style="font-size:1.6em;color:${color};font-family:'Kaiti SC','STKaiti',serif;line-height:1">${fallbackText}</span>`;
   }
+  if(pieceEl) pieceEl.classList.add('visible');
   return false;
+}
+
+// v74：配对两片用**同一个 size**,按这对的总笔画数算（避免对内大小差异）
+// 笔画总数越多 → 容器越小（避免视觉过重）；越少 → 越大（避免显得稀薄）
+function _sizeForPair(totalStrokes){
+  // ★ v85 方案B:手机端整体缩小到 30~34px,与卡片背后并存不显突兀
+  if(_decoState.isMobile){
+    if(totalStrokes <= 4)   return 34;
+    if(totalStrokes <= 8)   return 33;
+    if(totalStrokes <= 12)  return 32;
+    if(totalStrokes <= 16)  return 31;
+    return 30;
+  }
+  if(totalStrokes <= 4)   return 60;
+  if(totalStrokes <= 8)   return 56;
+  if(totalStrokes <= 12)  return 52;
+  if(totalStrokes <= 16)  return 48;
+  return 46;
 }
 
 // 初始化整个装饰层
@@ -4216,8 +4768,11 @@ function initDeco(){
   // 清理旧的
   layer.innerHTML = '';
   _decoState.pieces = [];
-  _decoState.activePair = null;
+  _decoState.cardActivePair = null;
+  _decoState.mergedPairs = new Set();          // v77：清空所有合体记录
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
   if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); _decoState.mouseHandler = null; }
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
 
@@ -4230,15 +4785,41 @@ function initDeco(){
   const pool = _buildDecoPairPool();
   const pairs = _sampleN(pool, Math.min(targetPairs, pool.length));
 
+  // ★ v87:进 initDeco 之前先强制刷新 --struct-h,避免顶栏高度滞后导致 topMargin 错位
+  if(typeof updateStructHeight === 'function') updateStructHeight();
+
   // 计算安全区（卡片网格 bounding rect，相对视口）
   const gridRect = grid.getBoundingClientRect();
-  const safeRect = {x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height};
-  const viewport = {w: window.innerWidth, h: window.innerHeight};
+  // ★ v88:safeRect 从"整个 grid 的大矩形"改为"每张卡片各自的 rect"数组
+  //        意义:grid 100% 宽,但卡片实际只占 308 宽(手机端) — 旧逻辑禁止部件落到卡片左右两侧的留白和卡片之间的 gap
+  //        新逻辑只规避每张卡片本身,允许部件落到卡片"周围"和"之间"
+  const entries = home.querySelectorAll('.home-grid .home-entry');
+  const safeRects = [...entries].map(el => {
+    const r = el.getBoundingClientRect();
+    return {x: r.left, y: r.top, w: r.width, h: r.height};
+  });
+  // 兜底:取不到 entry rect 时,退回到 gridRect
+  if(!safeRects.length){
+    safeRects.push({x: gridRect.left, y: gridRect.top, w: gridRect.width, h: gridRect.height});
+  }
+  // ★ v87:viewport 优先用 visualViewport(iOS Safari 上更准确,会扣掉 URL 栏/工具栏的占位)
+  const vpW = (window.visualViewport && window.visualViewport.width)  || window.innerWidth  || document.documentElement.clientWidth;
+  const vpH = (window.visualViewport && window.visualViewport.height) || window.innerHeight || document.documentElement.clientHeight;
+  const viewport = {w: vpW, h: vpH};
+
+  // ★ v87:gridRect 异常(布局未完成,height < 50)时,跳过本次,留给外层重试机制
+  if(gridRect.height < 50){
+    if(window._DECO_DEBUG) console.warn('[deco] gridRect.height too small:', gridRect.height, '→ skip & retry later');
+    return;
+  }
 
   // 顶部留白：让出顶栏（struct-bar）高度
   const structH = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--struct-h')) || 80;
   const topMargin = structH + 14;
   const sideEdge = DECO_CFG.sideEdge;
+  // v78：记到 state,供合体时的避让计算用
+  _decoState.topMargin = topMargin;
+  _decoState.sideEdge = sideEdge;
 
   // v71：部件保持静止,不再添加 f-a/f-b/f-c/f-d 浮动 class
   // const floatVars = ['f-a','f-b','f-c','f-d'];  // 已废弃
@@ -4254,10 +4835,10 @@ function initDeco(){
     const colorIdx = pairIdx % COMP_COLORS.length;
     const color = COMP_COLORS[colorIdx].text;
 
-    // 预先为这一对生成两片的尺寸（v71：不再要 dur/vari,部件静止）
-    const pieceSpecs = pair.comps.map(()=>({
-      size: DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize),
-    }));
+    // v74：一对的两片**完全同尺寸**,按这对总笔画数算
+    const totalStrokes = pair.ranges.reduce((s, r) => s + r.length, 0);
+    const pairSize = _sizeForPair(totalStrokes);
+    const pieceSpecs = pair.comps.map(()=>({ size: pairSize }));
 
     // 尝试给两片各找一个不重叠的位置（用 snapshot 防止部分回滚）
     // v70②：第二片用 anchor 约束,确保和第一片中心距离在 [pairProxMin, pairProxMax]
@@ -4268,10 +4849,12 @@ function initDeco(){
       const anchor = (r === 0) ? null : {
         x: positions[0].x, y: positions[0].y,
         w: pieceSpecs[0].size, h: pieceSpecs[0].size,
-        minDist: DECO_CFG.pairProxMin,
-        maxDist: DECO_CFG.pairProxMax,
+        // ★ v85 方案B:手机端配对距离收紧到 50~130,匹配窄可用区
+        minDist: _decoState.isMobile ? DECO_CFG.pairProxMinMb : DECO_CFG.pairProxMin,
+        maxDist: _decoState.isMobile ? DECO_CFG.pairProxMaxMb : DECO_CFG.pairProxMax,
       };
-      const pos = _randomDecoPos(safeRect, viewport, spec.size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing, anchor);
+      const spacing = _decoState.isMobile ? DECO_CFG.pieceSpacingMb : DECO_CFG.pieceSpacing;
+      const pos = _randomDecoPos(safeRects, viewport, spec.size, sideEdge, topMargin, placed, spacing, anchor);
       if(!pos){
         // 放置失败,回滚已加入的本对部件
         placed.length = placedSnapshot;
@@ -4302,13 +4885,14 @@ function initDeco(){
       inner.className = 'deco-piece-inner';
       el.appendChild(inner);
 
-      _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, cleanLabel);
+      _renderDecoPieceSVG(inner, pair.char, pair.ranges[roleIdx], color, cleanLabel, el);   // ★ v88:传 el 用于 SVG 就绪后再 visible
 
       if(_decoState.isMobile){
         el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _toggleMergePair(pairIdx, roleIdx); });
       } else {
         el.addEventListener('mouseenter', (e)=> _activateMergePair(pairIdx, roleIdx, e));
-        el.addEventListener('mouseleave', ()=> _maybeScheduleDeactivate(pairIdx));
+        // v75：mouseleave 不再触发解散——合体后保持原状,只有 hover 新对才切换
+        // el.addEventListener('mouseleave', ()=> _maybeScheduleDeactivate(pairIdx));
       }
 
       layer.appendChild(el);
@@ -4324,10 +4908,11 @@ function initDeco(){
   // —— 渲染单笔画装饰（不参与合体；逐个放置,放不下就跳过） ——
   let placedStrokeCount = 0;
   for(let i = 0; i < targetLone; i++){
+    // v74：笔画装饰已停用（loneStroke=0,该 for 循环不会进入）;
+    //      留这段代码以便未来若想恢复笔画装饰再开启。下面用固定 size 兜底,避免引用已删的函数。
     const stroke = _decoLoneStrokes[i % _decoLoneStrokes.length];
-    // 笔画稍小（更点缀）
-    const size = (DECO_CFG.minSize + Math.random() * (DECO_CFG.maxSize - DECO_CFG.minSize)) * 0.85;  // v71：从 0.78 提到 0.85,笔画也不太小
-    const pos = _randomDecoPos(safeRect, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
+    const size = 56;
+    const pos = _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, DECO_CFG.pieceSpacing);
     if(!pos) continue;
     placed.push({x:pos.x, y:pos.y, w:size, h:size});
     placedStrokeCount++;
@@ -4343,7 +4928,7 @@ function initDeco(){
     inner.className = 'deco-piece-inner';
     el.appendChild(inner);
 
-    _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '');
+    _renderDecoPieceSVG(inner, stroke.src, stroke.sIdx, color, '', el);   // ★ v88
     layer.appendChild(el);
     _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
   }
@@ -4353,12 +4938,60 @@ function initDeco(){
     console.log(`[deco] placed ${placedPairCount}/${pairs.length} pairs, ${placedStrokeCount}/${targetLone} strokes; total pieces: ${_decoState.pieces.length}`);
   }
 
-  // 全部就位后淡入
-  requestAnimationFrame(()=>{
+  // ★ v88:不再统一加 visible —— 改为每个 piece 在自己的 SVG 就绪后单独 visible(_renderDecoPieceSVG 内部处理)
+  //        这样消除了"先文字、后笔画"的过渡过程,用户只会看到最终笔画 SVG 平滑淡入。
+
+  // ★ v89:并行预拉取所有装饰对应字的笔画数据 — 让合体卡片显示时数据已就绪,避免"印刷字 → SVG"过渡
+  //        loadStrokeData 内部有 _strokeInflight 去重 + _strokeCache 缓存,这里只是触发拉取
+  if(typeof loadStrokeData === 'function'){
+    pairs.forEach(p => { if(p && p.char){ try{ loadStrokeData(p.char); }catch(e){} } });
+  }
+
+  // ★ v92:进入网页时自动演示 3 对部件拼合 — 手机和电脑端统一 3 对
+  //        每对依次触发,间隔 3.5 秒(合体 0.7s + 卡片显示 2s + 隐藏过渡 + 留白)
+  //        只在本会话首次跑(autoDemoDone 标记)
+  if(!_decoState.autoDemoDone){
+    _decoState.autoDemoDone = true;
+    const demoCount = 3;
     setTimeout(()=>{
-      _decoState.pieces.forEach(p => p.el.classList.add('visible'));
-    }, 80);
-  });
+      // ① 优先挑"两片都已 visible"(SVG 已就绪)的对
+      const pairIds = [...new Set(_decoState.pieces.filter(p => p.role === 'pair').map(p => p.pairId))];
+      const readyPairs = [];
+      for(const pid of pairIds){
+        const pieces = _decoState.pieces.filter(p => p.pairId === pid);
+        if(pieces.length === 2 && pieces.every(p => p.el.classList.contains('visible'))){
+          readyPairs.push(pid);
+          if(readyPairs.length >= demoCount) break;
+        }
+      }
+      // ② 如果就绪的不足,补未就绪的对(部件 DOM 已创建,SVG 可能仍在加载)
+      if(readyPairs.length < demoCount){
+        for(const pid of pairIds){
+          if(readyPairs.indexOf(pid) === -1){
+            readyPairs.push(pid);
+            if(readyPairs.length >= demoCount) break;
+          }
+        }
+      }
+      // ③ 依次触发,间隔 3.5 秒
+      readyPairs.forEach((pid, i)=>{
+        setTimeout(()=>{ try{ _activateMergePair(pid, 0); }catch(e){} }, i * 3500);
+      });
+    }, 2000);
+  }
+
+  // ★ v87:URL 加 ?dbg=1 时,在屏幕底部显示一个微型诊断条(给手机端排错用)
+  //   显示:viewport / struct-h / gridRect / 放下的对数 — 你给我截这一行就够诊断
+  if(typeof URLSearchParams !== 'undefined' && new URLSearchParams(location.search).get('dbg') === '1'){
+    let bar = document.getElementById('deco-debug-bar');
+    if(!bar){
+      bar = document.createElement('div');
+      bar.id = 'deco-debug-bar';
+      bar.style.cssText = 'position:fixed;left:4px;right:4px;bottom:4px;z-index:9999;background:rgba(0,0,0,0.85);color:#0f0;font:11px/1.4 monospace;padding:6px 8px;border-radius:6px;pointer-events:none;text-align:left;word-break:break-all';
+      document.body.appendChild(bar);
+    }
+    bar.innerHTML = `vp:${vpW}×${vpH} | struct-h:${structH} | grid:(${gridRect.left.toFixed(0)},${gridRect.top.toFixed(0)},${gridRect.width.toFixed(0)}×${gridRect.height.toFixed(0)}) | placed:${placedPairCount}/${pairs.length} pairs · pieces:${_decoState.pieces.length} | mb:${_decoState.isMobile}`;
+  }
 
   _decoState.inited = true;
 }
@@ -4367,108 +5000,100 @@ function initDeco(){
 // v70②：恢复"双方共同移动到中点"的对称合体（用户反馈：拼合要两片一起走）
 //        + document 级 mousemove 兜底 + 真实光标位置追踪,避免元素移动触发的误 mouseleave
 async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
-  // 取消任何 pending 的 deactivate
-  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
-  if(_decoState.activePair === pairIdx) return;
-  // 若已有别的对激活,先解散
-  if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
-
-  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
-  if(pieces.length !== 2) return;
-
   // 初始化光标位置（从触发事件取,若无则用上一次记录）
   if(evt && typeof evt.clientX === 'number'){
     _decoState.lastMouseX = evt.clientX;
     _decoState.lastMouseY = evt.clientY;
   }
 
+  // v77：先把当前显示的合体卡藏掉（如果是不同对的话）—— 仅藏卡,不复位部件
+  if(_decoState.cardActivePair !== null && _decoState.cardActivePair !== pairIdx){
+    _hideMergeCardOnly();
+  }
+
+  // v77：如果该对已经合体（且仍在合体位置）—— 只重新显示卡片,不再触发合体动画
+  if(_decoState.mergedPairs.has(pairIdx)){
+    _showMergeCard(pairIdx);
+    return;
+  }
+
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  if(pieces.length !== 2) return;
+
   // 按 roleIdx 排序：a = roleIdx 0（左/上）, b = roleIdx 1（右/下）
   pieces.sort((p1, p2) => p1.roleIdx - p2.roleIdx);
   const [a, b] = pieces;
 
   // 合体中心：两片当前中心的中点
-  const cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
-  const cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
+  let cx = (a.baseLeft + a.size/2 + b.baseLeft + b.size/2) / 2;
+  let cy = (a.baseTop  + a.size/2 + b.baseTop  + b.size/2) / 2;
 
-  // 合体后两片紧贴
-  // v71：renderComponentStrokes 在 sharedScale=false 时给 SVG 加了 14% padding,
-  //      所以容器边对齐时,视觉上还是有 ~28% 空隙。用负 gap 把这个 padding 抵消掉。
-  const avgSize = (a.size + b.size) / 2;
-  const gap = -avgSize * 0.30;  // 容器重叠 30%,刚好抵消两侧 padding,视觉无缝
+  // v78：避让 —— 找一个不与已合体对/中央卡片/顶部结构表冲突的位置
+  //      （a 和 b 同 size,直接传 a.size）
+  const cleared = _findClearMergeCenter(cx, cy, a.size, pairIdx);
+  cx = cleared.x; cy = cleared.y;
 
-  let aX, aY, bX, bY;
-  if(a.structure === 'lr'){
-    // 左右结构：a 在左、b 在右
-    aX = cx - gap/2 - a.size;     aY = cy - a.size/2;
-    bX = cx + gap/2;              bY = cy - b.size/2;
-  } else {
-    // 上下结构：a 在上、b 在下
-    aX = cx - a.size/2;  aY = cy - gap/2 - a.size;
-    bX = cx - b.size/2;  bY = cy + gap/2;
-  }
+  // v75：两片完全叠加在同一位置（aligned SVG 按整字坐标绘制）
+  const aX = cx - a.size/2,  aY = cy - a.size/2;
+  const bX = cx - b.size/2,  bY = cy - b.size/2;
 
-  // 边界保护：合体点不能跑出视口
+  // 边界保护：合体点不能跑出视口（v78：顶部用 state.topMargin 避开结构表）
   const vw = window.innerWidth, vh = window.innerHeight;
+  const topM = _decoState.topMargin || 100;
   const clampX = (x, s) => Math.max(6, Math.min(vw - s - 6, x));
-  const clampY = (y, s) => Math.max(60, Math.min(vh - s - 6, y));
-  aX = clampX(aX, a.size); aY = clampY(aY, a.size);
-  bX = clampX(bX, b.size); bY = clampY(bY, b.size);
+  const clampY = (y, s) => Math.max(topM, Math.min(vh - s - 6, y));
+  const aXc = clampX(aX, a.size), aYc = clampY(aY, a.size);
+  const bXc = clampX(bX, b.size), bYc = clampY(bY, b.size);
 
-  pieces.forEach(p => p.el.classList.add('merging'));
-  a.el.style.left = aX + 'px'; a.el.style.top = aY + 'px';
-  b.el.style.left = bX + 'px'; b.el.style.top = bY + 'px';
+  // 切换到 aligned 模式（隐藏 solo,显示 aligned）
+  pieces.forEach(p => {
+    p.el.classList.add('merging');
+    const solo = p.inner.querySelector('[data-mode="solo"]');
+    const aligned = p.inner.querySelector('[data-mode="aligned"]');
+    if(solo) solo.style.display = 'none';
+    if(aligned) aligned.style.display = 'block';
+  });
+  a.el.style.left = aXc + 'px'; a.el.style.top = aYc + 'px';
+  b.el.style.left = bXc + 'px'; b.el.style.top = bYc + 'px';
 
-  _decoState.activePair = pairIdx;
-  // v70②：合体中心(目标位置) + 悬停宽容半径
-  _decoState.mergeCenter = {
-    x: (aX + a.size/2 + bX + b.size/2) / 2,
-    y: (aY + a.size/2 + bY + b.size/2) / 2,
-  };
-  _decoState.trackRadius = Math.max(a.size, b.size) * 2.4 + 20;  // 略宽于两片对角线长
+  // 记录合体后的实际位置（用于后续避让计算）+ 标记为已合体
+  a._mergedX = aXc; a._mergedY = aYc;
+  b._mergedX = bXc; b._mergedY = bYc;
+  _decoState.mergedPairs.add(pairIdx);
+  _decoState.cardActivePair = pairIdx;
 
-  // v70②：document 级 mousemove —— 同时更新 lastMousePos 并做半径检查
-  if(_decoState.mouseHandler){ document.removeEventListener('mousemove', _decoState.mouseHandler); }
-  _decoState.mouseHandler = (e)=>{
-    _decoState.lastMouseX = e.clientX;
-    _decoState.lastMouseY = e.clientY;
-    if(_decoState.activePair !== pairIdx) return;
-    const mc = _decoState.mergeCenter;
-    if(!mc) return;
-    const dist = Math.hypot(e.clientX - mc.x, e.clientY - mc.y);
-    if(dist <= _decoState.trackRadius){
-      // 仍在悬停区：取消任何 pending 解散
-      if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
-    } else {
-      // 离开悬停区：触发解散（带宽限）
-      if(!_decoState.leaveTimer) _scheduleDeactivate(pairIdx);
-    }
-  };
-  document.addEventListener('mousemove', _decoState.mouseHandler);
-
-  // 等到滑入到位后显示完整字 + 拼音（同框,楷体,智能定位）
+  // 等到滑入到位后显示完整字 + 拼音
   setTimeout(async ()=>{
-    if(_decoState.activePair !== pairIdx) return;  // 用户已离开
+    if(_decoState.cardActivePair !== pairIdx) return;  // 用户已 hover 其他对
     const disp = document.getElementById('deco-merge-display');
+    const lvBox = document.getElementById('deco-merge-level');
     const charBox = document.getElementById('deco-merge-char');
     const pyBox = document.getElementById('deco-merge-pinyin');
     if(!disp || !charBox || !pyBox) return;
 
-    // v72：字 + 拼音都直接用楷体文本(不再渲染 SVG,不再单独胶囊)
-    charBox.textContent = a.fullChar;
+    // v79：HSK 等级标签
+    const lv = (typeof charHskLevel === 'function') ? charHskLevel(a.fullChar) : null;
+    if(lvBox){
+      if(lv){ lvBox.textContent = 'HSK ' + lv; lvBox.style.display = 'block'; }
+      else { lvBox.style.display = 'none'; }
+    }
+    charBox.textContent = '';   // ★ v86:清掉旧文字,准备用 SVG 笔画渲染
+    // ★ v92:renderGlyphInto 保证全程笔画 SVG;不再保留任何"显示原字符"的防御 fallback —
+    //        renderGlyphInto 是同文件函数,必然存在;若极端情况未定义则保持空白(不显示印刷字)
+    if(typeof renderGlyphInto === 'function'){
+      renderGlyphInto(charBox, a.fullChar);
+    }
     pyBox.textContent = a.py;
 
-    // v72：智能避让 —— 在合体两片周围 8 个候选方向中找一个不遮挡其他部件、不出视口、不压卡片的位置
-    const dispW = 72, dispH = 92;
+    // v77：避让用**当前所有部件的实际位置**（包括已合体的对都在合体位置）
+    const dispW = 101, dispH = 140;
     const mergeBox = {
-      x: Math.min(aX, bX),
-      y: Math.min(aY, bY),
-      w: Math.max(aX + a.size, bX + b.size) - Math.min(aX, bX),
-      h: Math.max(aY + a.size, bY + b.size) - Math.min(aY, bY),
+      x: Math.min(aXc, bXc),
+      y: Math.min(aYc, bYc),
+      w: Math.max(aXc + a.size, bXc + b.size) - Math.min(aXc, bXc),
+      h: Math.max(aYc + a.size, bYc + b.size) - Math.min(aYc, bYc),
     };
-    // 已放置的其他部件（剔除当前合体的 a / b）
-    const others = _decoState.pieces
-      .filter(p => p !== a && p !== b)
-      .map(p => ({x: p.baseLeft, y: p.baseTop, w: p.size, h: p.size}));
+    const others = _collectOtherPiecesRects(pairIdx);
     const gridEl = document.querySelector('.home-grid');
     const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
     const bestPos = _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh);
@@ -4476,7 +5101,160 @@ async function _activateMergePair(pairIdx, hoveredRoleIdx, evt){
     disp.style.left = bestPos.x + 'px';
     disp.style.top  = bestPos.y + 'px';
     disp.classList.add('show');
+
+    // 2 秒后自动隐藏卡片（但部件保留在合体位置）
+    if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); }
+    _decoState.dispHideTimer = setTimeout(()=>{
+      const d = document.getElementById('deco-merge-display');
+      if(d) d.classList.remove('show');
+      _decoState.dispHideTimer = null;
+      _decoState.cardActivePair = null;
+    }, 2000);
   }, DECO_CFG.mergeDelay);
+}
+
+// v77：仅藏卡片,不复位部件
+function _hideMergeCardOnly(){
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
+  const disp = document.getElementById('deco-merge-display');
+  if(disp) disp.classList.remove('show');
+  _decoState.cardActivePair = null;
+}
+
+// v77：收集**除某对外**所有部件的当前实际位置（含已合体对的合体位置）
+function _collectOtherPiecesRects(excludePairId){
+  const result = [];
+  _decoState.pieces.forEach(p => {
+    if(p.pairId === excludePairId) return;
+    // 已合体的部件：用合体后位置；其他用 baseLeft/baseTop
+    const x = (p._mergedX != null) ? p._mergedX : p.baseLeft;
+    const y = (p._mergedY != null) ? p._mergedY : p.baseTop;
+    result.push({x, y, w: p.size, h: p.size});
+  });
+  return result;
+}
+
+// v78：找一个不与已合体对/卡片/顶部结构表/视口冲突的合体中心位置
+//   - 先试两片中点（pcx, pcy）,如果合法直接用
+//   - 否则螺旋向外搜索（步长 8px,最多 ~300px 半径）
+//   - 都找不到时返回最少重叠的位置（兜底）
+//   入参 size: 合体部件单边长度（两片同 size,所以是 a.size）
+function _findClearMergeCenter(pcx, pcy, size, excludePairId){
+  const others = _collectOtherPiecesRects(excludePairId);
+  const grid = document.querySelector('.home-grid');
+  const cardRect = grid ? grid.getBoundingClientRect() : null;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const topM = _decoState.topMargin || 100;
+  const sideE = _decoState.sideEdge || 10;
+  const gap = 14;  // 合体字之间的最小间距 px
+
+  // 检查 (tx, ty) 中心位置是否合法（不重叠 + 在边界内）
+  // 返回 0 = 干净,正数 = 重叠面积总和（用于评分）;-1 = 违反硬约束（视口/卡片）
+  function score(tx, ty){
+    const tl = tx - size/2 - gap, tt = ty - size/2 - gap;
+    const tr = tx + size/2 + gap, tb = ty + size/2 + gap;
+    // 硬约束①：在视口内（含顶部结构表避让）
+    if(tl < sideE || tr > vw - sideE || tt < topM || tb > vh - sideE) return -1;
+    // 硬约束②：不压中央卡片
+    if(cardRect){
+      const cL = cardRect.left - 6, cR = cardRect.right + 6;
+      const cT = cardRect.top  - 6, cB = cardRect.bottom + 6;
+      if(!(tr < cL || tl > cR || tb < cT || tt > cB)) return -1;
+    }
+    // 软约束：累计与其他部件的重叠面积
+    let area = 0;
+    for(const p of others){
+      const ow = Math.max(0, Math.min(tr, p.x + p.w) - Math.max(tl, p.x));
+      const oh = Math.max(0, Math.min(tb, p.y + p.h) - Math.max(tt, p.y));
+      area += ow * oh;
+    }
+    return area;
+  }
+
+  // 试原始位置
+  let s = score(pcx, pcy);
+  if(s === 0) return {x: pcx, y: pcy};
+
+  // 螺旋搜索：从近到远扫描周围空位
+  const stepR = 10, stepA = 30;  // 半径步长 10px,角度步长 30°
+  let best = (s >= 0) ? {x: pcx, y: pcy, score: s} : null;
+  for(let r = stepR; r <= 320; r += stepR){
+    for(let a = 0; a < 360; a += stepA){
+      const rad = a * Math.PI / 180;
+      const tx = pcx + r * Math.cos(rad);
+      const ty = pcy + r * Math.sin(rad);
+      const sc = score(tx, ty);
+      if(sc === 0) return {x: tx, y: ty};
+      if(sc > 0 && (!best || sc < best.score)){
+        best = {x: tx, y: ty, score: sc};
+      }
+    }
+  }
+
+  // 实在找不到完全干净的位置 → 用最少重叠的近似
+  if(best) return {x: best.x, y: best.y};
+  // 最最兜底：clamp 到视口内
+  return {
+    x: Math.max(sideE + size/2, Math.min(vw - sideE - size/2, pcx)),
+    y: Math.max(topM + size/2, Math.min(vh - sideE - size/2, pcy)),
+  };
+}
+
+// v76：同一对再次 hover 时仅重新显示合体卡（无需重新动画）
+function _showMergeCard(pairIdx){
+  const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
+  if(pieces.length !== 2) return;
+  const a = pieces.sort((p1,p2)=>p1.roleIdx - p2.roleIdx)[0];
+  const disp = document.getElementById('deco-merge-display');
+  const lvBox = document.getElementById('deco-merge-level');
+  const charBox = document.getElementById('deco-merge-char');
+  const pyBox = document.getElementById('deco-merge-pinyin');
+  if(!disp || !charBox || !pyBox) return;
+
+  _decoState.cardActivePair = pairIdx;
+  // v79：HSK 等级标签
+  const lv = (typeof charHskLevel === 'function') ? charHskLevel(a.fullChar) : null;
+  if(lvBox){
+    if(lv){ lvBox.textContent = 'HSK ' + lv; lvBox.style.display = 'block'; }
+    else { lvBox.style.display = 'none'; }
+  }
+  // ★ v92:再次点击合体后的字 — 之前直接用 textContent → 印刷字
+  //        改为与首次合体一致:走 renderGlyphInto(笔画 SVG),保证全部场景都用笔画渲染
+  //        不保留印刷字 fallback,renderGlyphInto 永不 fallback(v91 设计)
+  charBox.textContent = '';
+  if(typeof renderGlyphInto === 'function'){
+    renderGlyphInto(charBox, a.fullChar);
+  }
+  pyBox.textContent = a.py;
+
+  // 根据当前两片实际位置算 mergeBox + 智能避让定位
+  const aR = pieces[0].el.getBoundingClientRect();
+  const bR = pieces[1].el.getBoundingClientRect();
+  const mergeBox = {
+    x: Math.min(aR.left, bR.left),
+    y: Math.min(aR.top, bR.top),
+    w: Math.max(aR.right, bR.right) - Math.min(aR.left, bR.left),
+    h: Math.max(aR.bottom, bR.bottom) - Math.min(aR.top, bR.top),
+  };
+  // v77：用 _collectOtherPiecesRects,考虑所有已合体对的当前位置
+  const others = _collectOtherPiecesRects(pairIdx);
+  const gridEl = document.querySelector('.home-grid');
+  const cardRect = gridEl ? gridEl.getBoundingClientRect() : null;
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const bestPos = _findBestDispPosition(mergeBox, 101, 140, others, cardRect, vw, vh);
+
+  disp.style.left = bestPos.x + 'px';
+  disp.style.top  = bestPos.y + 'px';
+  disp.classList.add('show');
+
+  // 重置 2 秒自动隐藏 timer
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); }
+  _decoState.dispHideTimer = setTimeout(()=>{
+    const d = document.getElementById('deco-merge-display');
+    if(d) d.classList.remove('show');
+    _decoState.dispHideTimer = null;
+    _decoState.cardActivePair = null;
+  }, 2000);
 }
 
 // v72：智能避让算法
@@ -4502,7 +5280,9 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
     }
   }
 
-  const safeMargin = 8, topMargin = 70, cardMargin = 6;
+  const safeMargin = 8;
+  const topMargin = _decoState.topMargin || 280;   // v81：用 state 真实值,避免压到结构表
+  const cardMargin = 6;
   let bestScore = Infinity;
   let bestPos = null;
 
@@ -4538,18 +5318,28 @@ function _findBestDispPosition(mergeBox, dispW, dispH, others, cardRect, vw, vh)
   return {x: vw - dispW/2 - safeMargin, y: vh - dispH/2 - safeMargin, name: 'corner'};
 }
 
-// 关掉合体状态：两片回归原位
+// 关掉合体状态：两片回归原位 + 切回 solo SVG（v77 中很少调用,只在 init/离开页面时用）
 function _deactivateMergePair(pairIdx, immediate){
+  // 清理 2 秒自动隐藏 timer
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
+
   const pieces = _decoState.pieces.filter(p => p.pairId === pairIdx);
   pieces.forEach(p => {
     p.el.style.left = p.baseLeft + 'px';
     p.el.style.top  = p.baseTop  + 'px';
     p.el.classList.remove('merging');
+    // 清掉合体后的位置标记
+    delete p._mergedX; delete p._mergedY;
+    // 切回 solo SVG 显示
+    const solo = p.inner && p.inner.querySelector('[data-mode="solo"]');
+    const aligned = p.inner && p.inner.querySelector('[data-mode="aligned"]');
+    if(solo) solo.style.display = 'block';
+    if(aligned) aligned.style.display = 'none';
   });
   const disp = document.getElementById('deco-merge-display');
   if(disp) disp.classList.remove('show');
-  if(_decoState.activePair === pairIdx) _decoState.activePair = null;
-  // v70②：清理 document 级 mousemove 监听
+  if(_decoState.cardActivePair === pairIdx) _decoState.cardActivePair = null;
+  _decoState.mergedPairs.delete(pairIdx);   // v77：从合体记录中移除
   if(_decoState.mouseHandler){
     document.removeEventListener('mousemove', _decoState.mouseHandler);
     _decoState.mouseHandler = null;
@@ -4557,44 +5347,23 @@ function _deactivateMergePair(pairIdx, immediate){
   _decoState.mergeCenter = null;
 }
 
-// mouseleave 宽限：避免 pair 内部跳动闪烁
-function _scheduleDeactivate(pairIdx){
-  if(_decoState.leaveTimer) clearTimeout(_decoState.leaveTimer);
-  _decoState.leaveTimer = setTimeout(()=>{
-    _deactivateMergePair(pairIdx, false);
-    _decoState.leaveTimer = null;
-  }, DECO_CFG.leaveGrace);
-}
+// v77：_scheduleDeactivate / _maybeScheduleDeactivate 在 v75 之后不再使用,已删除。
+//      合体的解散现在只发生在 init/_decoOnHide,且通过遍历 mergedPairs 完成。
 
-// v70②：mouseleave 触发时,先用真实光标位置复核 —— 元素只是移动到了别处,
-//         若光标其实还在合体半径内,就不该解散
-function _maybeScheduleDeactivate(pairIdx){
-  if(_decoState.activePair !== pairIdx) return;
-  const mc = _decoState.mergeCenter;
-  if(!mc){ _scheduleDeactivate(pairIdx); return; }
-  const dist = Math.hypot(_decoState.lastMouseX - mc.x, _decoState.lastMouseY - mc.y);
-  if(dist > _decoState.trackRadius){
-    _scheduleDeactivate(pairIdx);
-  }
-  // 否则光标其实还在范围内,忽略这次 mouseleave（多半是元素动了,不是光标走了）
-}
-
-// 移动端：点击切换合体/分散
+// 移动端：点击合体（v77：跟桌面一致,合体后保留,不会被点击解散）
 function _toggleMergePair(pairIdx, roleIdx){
-  if(_decoState.activePair === pairIdx){
-    _deactivateMergePair(pairIdx, false);
-  } else {
-    if(_decoState.activePair !== null) _deactivateMergePair(_decoState.activePair, true);
-    _activateMergePair(pairIdx, roleIdx);
-  }
+  // 点击始终走 activate（已合体的会自动跳过动画,仅重显示卡片）
+  _activateMergePair(pairIdx, roleIdx);
 }
 
-// 离开首页时：清理合体态（防止回来时残留）
+// 离开首页时：清理所有合体态（防止回来时残留）
 function _decoOnHide(){
-  if(_decoState.activePair !== null){
-    _deactivateMergePair(_decoState.activePair, true);
-  }
-  if(_decoState.leaveTimer){ clearTimeout(_decoState.leaveTimer); _decoState.leaveTimer = null; }
+  // v77：把所有已合体的对都复位
+  const toClear = Array.from(_decoState.mergedPairs);
+  toClear.forEach(pid => _deactivateMergePair(pid, true));
+  _decoState.mergedPairs.clear();
+  _decoState.cardActivePair = null;
+  if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
 }
 
 // resize / 进入首页时：重新布局（避免位置错位）
@@ -4631,12 +5400,23 @@ window.addEventListener('resize', _onDecoResize);
 })();
 
 // 页面首次加载：稍等 CHAR_DB 与 HanziWriter 就绪后初始化
+// ★ v87:增加重试机制 —— 手机端 iOS Safari 上,载入后布局/视口测量可能滞后,
+//        首次跑没放下任何部件时,自动延后再试,直到放下或重试次数耗尽。
 window.addEventListener('load', ()=>{
-  setTimeout(()=>{
-    if(document.getElementById('home-screen').style.display !== 'none'){
-      initDeco();
+  let attempts = 0;
+  function tryInit(){
+    attempts++;
+    const home = document.getElementById('home-screen');
+    if(!home || home.style.display === 'none') return;
+    initDeco();
+    // 验证:如果一对都没放下,延后再来 — 重试间隔逐步拉长
+    if(_decoState.pieces.length === 0 && attempts < 5){
+      const nextDelay = [600, 1200, 2000, 3000][attempts - 1] || 3000;
+      if(window._DECO_DEBUG) console.warn(`[deco] attempt ${attempts} placed 0 pieces; retry in ${nextDelay}ms`);
+      setTimeout(tryInit, nextDelay);
     }
-  }, 350);
+  }
+  setTimeout(tryInit, 350);
 });
 // ══ end v67 漂浮部件装饰层 ══
 
@@ -4650,19 +5430,21 @@ showHome();
 <!-- 反馈弹窗（嵌入 Microsoft Forms） -->
 <div id="feedback-modal" style="display:none;position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px" onclick="closeFeedback(event)">
   <div style="background:var(--paper);border-radius:16px;padding:0;max-width:760px;width:100%;height:90vh;max-height:780px;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;display:flex;flex-direction:column;overflow:hidden" onclick="event.stopPropagation()">
-    <!-- 顶部条 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0">
-      <div style="display:flex;align-items:center;gap:10px">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3a7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        <span style="font-size:1.15rem;color:var(--ink-dark);font-weight:700">用户反馈 · Feedback</span>
+    <!-- 顶部条 — v96:改为 2 行布局,第 1 行:邮件图标+用户反馈·Feedback+×;第 2 行:在新窗口打开按钮 -->
+    <div style="display:flex;flex-direction:column;gap:10px;padding:14px 22px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0">
+      <!-- 第 1 行:标题 + 关闭 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3a7a5a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span style="font-size:1.15rem;color:var(--ink-dark);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">用户反馈 · Feedback</span>
+        </div>
+        <button onclick="closeFeedback()" style="width:32px;height:32px;border:none;background:transparent;font-size:1.6rem;cursor:pointer;color:var(--ink-light);border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s;flex-shrink:0" onmouseover="this.style.background='rgba(0,0,0,0.06)'" onmouseout="this.style.background='transparent'">×</button>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
-        <a id="feedback-newtab-link" href="https://forms.office.com/Pages/ResponsePage.aspx?id=GDmBaUijT0KBaEskboYkXP-XIYLvRYFDp-c9F9Ke3EJUQlNDOUtESE4wVVJKQ1VXTFcyRkpEVENFRy4u" target="_blank" rel="noopener" style="font-size:0.88rem;color:#ffffff;background:rgba(20,40,30,0.55);text-decoration:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-family:inherit;letter-spacing:0.04em;transition:all .2s" onmouseover="this.style.background='rgba(20,40,30,0.85)'" onmouseout="this.style.background='rgba(20,40,30,0.55)'">在新窗口打开 / Open in new tab ↗</a>
-        <button onclick="closeFeedback()" style="width:32px;height:32px;border:none;background:transparent;font-size:1.6rem;cursor:pointer;color:var(--ink-light);border-radius:50%;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,0.06)'" onmouseout="this.style.background='transparent'">×</button>
-      </div>
+      <!-- 第 2 行:在新窗口打开 -->
+      <a id="feedback-newtab-link" href="https://forms.office.com/Pages/ResponsePage.aspx?id=GDmBaUijT0KBaEskboYkXP-XIYLvRYFDp-c9F9Ke3EJUQlNDOUtESE4wVVJKQ1VXTFcyRkpEVENFRy4u" target="_blank" rel="noopener" style="font-size:0.88rem;color:#ffffff;background:rgba(20,40,30,0.55);text-decoration:none;padding:8px 12px;border:1px solid rgba(255,255,255,0.3);border-radius:6px;font-family:inherit;letter-spacing:0.04em;transition:all .2s;text-align:center;display:block" onmouseover="this.style.background='rgba(20,40,30,0.85)'" onmouseout="this.style.background='rgba(20,40,30,0.55)'">在新窗口打开 / Open in new tab ↗</a>
     </div>
     <!-- 容器：iframe + 加载提示/备用 -->
-    <div style="position:relative;flex:1;background:#fff">
+    <div id="feedback-iframe-wrap" style="position:relative;flex:1;background:#fff;overflow:hidden">
       <!-- 加载提示 -->
       <div id="feedback-loading" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;background:#fff;z-index:1">
         <div style="font-size:0.95rem;color:var(--ink-light);margin-bottom:8px">正在加载反馈表单...</div>
@@ -4678,5 +5460,895 @@ showHome();
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     斑斓联动学生端模块 (BLS = BanLan Student) · 部件联动-6
+     · 全部 API 路径/字段对齐 Worker 真实定义
+     · POST /api/student/join (单数!) · 字段 {classCode, name}
+     · 成功响应 {classInfo, student} (无 ok / 无 token)
+     · 认证: studentCode 作身份标识 (不是 Bearer Token)
+     · 离开班级: Worker 无该端点,仅本地清 localStorage
+     ═══════════════════════════════════════════════════════════ -->
+<script id="bls-module">
+(function(global){
+  'use strict';
+
+  const VERSION = '部件联动-17';
+
+  // ─── 配置 ──────────────────────────────────────────────────
+  const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
+
+  const LS_KEYS = {
+    STUDENT_CODE:    'banlan_student_studentCode',   // 学生身份标识 (Worker 用它认人)
+    CLASS_CODE:      'banlan_student_classCode',     // 班级码
+    NAME:            'banlan_student_name',          // 学生姓名 (= 加入时 name 字段)
+    COMPLETED_TASKS: 'banlan_student_completedTasks' // 已完成任务 id 数组
+  };
+
+  // 班级码格式: 2-20 位字母数字横线下划线 (与老师端一致)
+  const CLASS_CODE_REGEX = /^[A-Za-z0-9_-]{2,20}$/;
+  const STUDENT_ID_REGEX = /^[A-Za-z0-9_-]{1,20}$/;  // ★ 16: 学号(字母/数字/-/_),班内唯一,杜绝同名碰撞
+  const NAME_MAX_LEN = 20;
+
+  // ─── 内部状态 ──────────────────────────────────────────────
+  const state = {
+    studentCode: null,       // Worker 用的身份标识 (本前端固定 = name)
+    classCode: null,         // 班级码
+    name: null,              // 学生姓名 (跟 Worker 的 name 字段一致)
+    tasks: [],               // 当前班级活跃任务
+    completedTasks: [],      // 已完成任务 id 数组
+    inTaskMode: false,       // ★ v10: 当前是否在班级任务模式 (true 时 skip 按钮被 CSS 隐藏)
+    _currentTaskId: null,    // ★ v10: 当前正在做的任务 id
+    _toastObserver: null     // ★ v10: 监听"全部完成"toast 的 MutationObserver
+  };
+
+  // ─── LocalStorage 读写 ─────────────────────────────────────
+  function loadFromStorage(){
+    try {
+      state.studentCode = localStorage.getItem(LS_KEYS.STUDENT_CODE);
+      state.classCode   = localStorage.getItem(LS_KEYS.CLASS_CODE);
+      state.name        = localStorage.getItem(LS_KEYS.NAME);
+      const completed   = localStorage.getItem(LS_KEYS.COMPLETED_TASKS);
+      state.completedTasks = completed ? JSON.parse(completed) : [];
+    } catch(e) {
+      console.warn('[BLS] localStorage 读取失败', e);
+    }
+  }
+
+  function saveJoinResult(classCode, studentCode, name){
+    try {
+      localStorage.setItem(LS_KEYS.CLASS_CODE, classCode);
+      localStorage.setItem(LS_KEYS.STUDENT_CODE, studentCode);
+      localStorage.setItem(LS_KEYS.NAME, name);
+      state.classCode = classCode;
+      state.studentCode = studentCode;
+      state.name = name;
+    } catch(e) {
+      console.warn('[BLS] localStorage 写入失败', e);
+    }
+  }
+
+  function clearSession(){
+    try {
+      localStorage.removeItem(LS_KEYS.STUDENT_CODE);
+      localStorage.removeItem(LS_KEYS.CLASS_CODE);
+      localStorage.removeItem(LS_KEYS.NAME);
+      localStorage.removeItem(LS_KEYS.COMPLETED_TASKS);
+    } catch(e) {}
+    state.studentCode = null;
+    state.classCode = null;
+    state.name = null;
+    state.tasks = [];
+    state.completedTasks = [];
+  }
+
+  // ─── 注入 BLS 专用 CSS (v5: 白底 + 深墨绿,参考老师端 v2D.7) ─
+  function injectStyles(){
+    if(document.getElementById('bls-styles')) return;
+    const style = document.createElement('style');
+    style.id = 'bls-styles';
+    style.textContent = `
+      /* 遮罩层 - 浅墨绿半透明 (跟老师端 .bl-overlay 一致) */
+      .bls-overlay{position:fixed;inset:0;z-index:9999;background:rgba(228,238,233,0.85);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);display:none;justify-content:center;align-items:center;padding:16px;animation:bls-fade-in .18s ease}
+      .bls-overlay.bls-show{display:flex}
+      @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
+
+      /* 弹窗主体 - 白底,跟老师端 .bl-modal 一脉相承 */
+      .bls-modal{background:#fff;border-radius:10px;border:1px solid rgba(55,74,66,0.1);box-shadow:0 24px 60px rgba(55,74,66,0.2);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
+      /* 顶部装饰条 - 深墨绿 */
+      .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:#374a42;border-radius:0 0 4px 4px;opacity:.85}
+
+      /* 头部 */
+      .bls-modal-header{padding:18px 22px 12px;border-bottom:1px solid #eef1ef;position:relative;text-align:center}
+      .bls-modal-header h3{margin:0;font-size:17px;color:#374a42;letter-spacing:1.5px;font-weight:700;font-family:'Noto Serif SC','STSong',serif}
+      .bls-modal-header .bls-subtitle{font-size:11px;color:#5c7569;letter-spacing:.6px;margin-top:4px;font-family:Georgia,serif;font-style:italic}
+      .bls-close{position:absolute;right:10px;top:10px;background:none;border:none;cursor:pointer;color:#52635b;font-size:22px;padding:4px 10px;border-radius:6px;line-height:1;transition:all .15s}
+      .bls-close:hover{background:rgba(0,0,0,.06);color:#2c2416}
+
+      /* 表单 */
+      .bls-modal-body{padding:18px 22px;overflow-y:auto}
+      .bls-field{margin-bottom:14px}
+      .bls-label{display:block;font-size:13px;color:#374a42;font-weight:600;margin-bottom:6px;letter-spacing:.3px}
+      .bls-label .bls-required{color:#b33939;margin-left:2px}
+
+      /* 输入框 - 白底浅边框 */
+      .bls-input{width:100%;padding:10px 12px;border:1px solid #c8d0cb;border-radius:4px;font-size:15px;font-family:inherit;color:#374a42;background:#fafbfa;outline:none;transition:all .2s;box-sizing:border-box}
+      .bls-input:focus{background:#fff;border-color:#374a42;box-shadow:0 0 0 3px rgba(55,74,66,0.1)}
+      .bls-input:disabled{background:#f0f3f1;color:#8a9590;cursor:not-allowed}
+      .bls-hint{font-size:11.5px;color:#5c7569;margin-top:5px;line-height:1.5;letter-spacing:.2px}
+
+      /* 错误提示 - 朱砂红 */
+      .bls-error{font-size:13px;color:#b33939;margin-top:8px;padding:8px 12px;background:rgba(179,57,57,0.06);border-left:3px solid #b33939;border-radius:4px;line-height:1.5;display:none}
+      .bls-error.bls-show{display:block;animation:bls-fade-in .18s ease}
+
+      /* 底部按钮区 */
+      .bls-modal-footer{padding:12px 22px 18px;display:flex;gap:10px;justify-content:flex-end;border-top:1px solid #eef1ef;background:#fafbfa}
+      .bls-btn{padding:9px 18px;border-radius:4px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;border:1px solid transparent;letter-spacing:.5px;transition:all .2s;box-shadow:0 3px 8px rgba(55,74,66,0.12)}
+      .bls-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 12px rgba(55,74,66,0.22);filter:brightness(1.08)}
+      .bls-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+
+      /* 主按钮 - 深墨绿 (老师端主按钮一致) */
+      .bls-btn-primary{background:#374a42;color:#fff;border-color:#374a42}
+
+      /* 次按钮 - 白底深墨绿字 */
+      .bls-btn-secondary{background:#fff;color:#374a42;border-color:#c8d0cb;box-shadow:none}
+      .bls-btn-secondary:hover:not(:disabled){background:#f0f7f3;border-color:#374a42;box-shadow:0 3px 8px rgba(55,74,66,0.12)}
+
+      /* 危险按钮 - 朱砂红 */
+      .bls-btn-danger{background:#b33939;color:#fff;border-color:#8f2727}
+      .bls-btn-danger:hover:not(:disabled){background:#8f2727;border-color:#8f2727}
+
+      /* 身份面板信息行 */
+      .bls-info-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:1px dashed #e0e6e2}
+      .bls-info-row:last-of-type{border-bottom:none}
+      .bls-info-label{font-size:13px;color:#5c7569;letter-spacing:.3px}
+      .bls-info-value{font-size:15px;color:#374a42;font-weight:600}
+      /* 班级码 badge - 深墨绿底白字,跟老师端 .bl-class-code badge 一致 */
+      .bls-info-value.bls-code{font-family:'SF Mono','Consolas','Monaco',monospace;background:#374a42;color:#fff;padding:3px 10px;border-radius:3px;letter-spacing:1px;font-weight:700;font-size:13px}
+
+      /* 任务列表占位 - 浅薄荷绿 (保留,空状态可用) */
+      .bls-coming-soon{margin:14px 0 6px;padding:14px;background:rgba(106,170,142,0.08);border:1px dashed rgba(106,170,142,0.4);border-radius:6px;text-align:center;color:#3a7a5a;font-size:13px;letter-spacing:.3px}
+      .bls-coming-soon-en{font-size:11px;font-style:italic;color:#5c7569;margin-top:3px}
+
+      /* ★ v8: 任务列表区域 */
+      .bls-tasks-section{margin-top:14px}
+      .bls-tasks-header{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#374a42;font-weight:700;padding:0 4px 8px;letter-spacing:.4px}
+      .bls-refresh-btn{background:#fff;border:1px solid #c8d0cb;color:#374a42;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .25s;padding:0}
+      .bls-refresh-btn:hover:not(:disabled){background:#374a42;color:#fff;border-color:#374a42;transform:rotate(180deg)}
+      .bls-refresh-btn:disabled{opacity:.55;cursor:not-allowed}
+
+      .bls-task-list{display:flex;flex-direction:column;gap:6px;max-height:300px;overflow-y:auto;margin:0;padding:2px 0}
+      .bls-task-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #d0d7d3;border-left:3px solid #374a42;border-radius:4px;background:#fafbfa;cursor:pointer;transition:all .2s;text-align:left;font-family:inherit;width:100%;box-shadow:none}
+      .bls-task-card:hover{background:#e8f0eb;border-left-color:#b33939;transform:translateX(2px);box-shadow:0 2px 6px rgba(55,74,66,0.08)}
+      .bls-task-card.bls-completed{opacity:.6;border-left-color:#6aaa8e}
+      .bls-task-card.bls-completed:hover{transform:none;background:#fafbfa;border-left-color:#6aaa8e}
+
+      /* 类型徽章 (跟老师端配色一致) */
+      .bls-task-badge{padding:3px 9px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:1.5px;flex-shrink:0;font-family:'Noto Serif SC','STSong',serif}
+      .bls-task-badge-char{background:rgba(143,39,39,0.12);color:#8f2727}
+      .bls-task-badge-word{background:rgba(202,138,4,0.15);color:#976806}
+      .bls-task-badge-sentence{background:rgba(74,139,111,0.15);color:#2f6b53}
+
+      .bls-task-title{flex:1;font-size:14px;font-weight:600;color:#374a42;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:.3px}
+      .bls-task-check{font-size:14px;color:#3a7a5a;flex-shrink:0;font-weight:bold}
+
+      /* 任务列表空状态 */
+      .bls-task-empty{text-align:center;padding:28px 16px;color:#5c7569;font-size:13px;background:rgba(106,170,142,0.06);border:1px dashed rgba(106,170,142,0.3);border-radius:6px}
+      .bls-task-empty-icon{font-size:34px;margin-bottom:8px;opacity:.55}
+      .bls-task-empty-en{font-size:11px;font-style:italic;margin-top:3px;color:rgba(74,63,47,.55)}
+
+      /* ★ v10: 班级任务模式下隐藏主 skip 按钮 (学生必须做完每个字,不能跳过) */
+      body.bls-in-task-mode #skip-btn { display: none !important; }
+
+      /* 手机端适配 */
+      @media (max-width: 480px){
+        .bls-overlay{padding:12px}
+        .bls-modal{max-width:100%;max-height:88vh;border-radius:8px}
+        .bls-modal-header{padding:14px 16px 10px}
+        .bls-modal-header h3{font-size:15px}
+        .bls-modal-body{padding:14px 16px}
+        .bls-modal-footer{padding:10px 16px 14px;flex-wrap:wrap}
+        .bls-btn{padding:8px 14px;font-size:13px;flex:1;min-width:0}
+        .bls-input{font-size:14px;padding:9px 11px}
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  // ─── 通用: 创建/移除遮罩 ───────────────────────────────────
+  function createOverlay(modalHTML){
+    closeDialog();
+    const ov = document.createElement('div');
+    ov.className = 'bls-overlay bls-show';
+    ov.id = 'bls-active-overlay';
+    ov.innerHTML = modalHTML;
+    ov.addEventListener('click', function(e){
+      if(e.target === ov) closeDialog();
+    });
+    document.body.appendChild(ov);
+    return ov;
+  }
+  function closeDialog(){
+    const old = document.getElementById('bls-active-overlay');
+    if(old) old.remove();
+  }
+
+  // ─── 加入班级弹窗 ──────────────────────────────────────────
+  function openJoinDialog(){
+    console.log('[BLS] 打开加入班级弹窗');
+    const html = `
+      <div class="bls-modal" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>加入班级</h3>
+          <div class="bls-subtitle">Join a Class</div>
+          <button class="bls-close" id="bls-join-close" aria-label="关闭">×</button>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-field">
+            <label class="bls-label" for="bls-join-code">
+              班级码 / Class Code <span class="bls-required">*</span>
+            </label>
+            <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div class="bls-hint">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</div>
+          </div>
+          <!-- ★ 17: 名字由名单回显,不再让学生自填 -->
+          <div class="bls-field">
+            <label class="bls-label" for="bls-join-sid">
+              学号 / Student ID <span class="bls-required">*</span>
+            </label>
+            <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <div class="bls-hint">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</div>
+          </div>
+          <div class="bls-error" id="bls-join-error"></div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消 / Cancel</button>
+          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入 / Join</button>
+        </div>
+      </div>
+    `;
+    createOverlay(html);
+    document.getElementById('bls-join-close').onclick = closeDialog;
+    document.getElementById('bls-join-cancel').onclick = closeDialog;
+    document.getElementById('bls-join-submit').onclick = submitJoin;
+
+    const codeInput = document.getElementById('bls-join-code');
+    const nameInput = document.getElementById('bls-join-name');
+    const sidInput = document.getElementById('bls-join-sid');
+    [codeInput, nameInput, sidInput].forEach(function(inp){
+      if(!inp) return;
+      inp.addEventListener('keydown', function(e){
+        if(e.key === 'Enter') submitJoin();
+      });
+    });
+    setTimeout(function(){ codeInput.focus(); }, 60);
+  }
+
+  function showJoinError(msg){
+    const el = document.getElementById('bls-join-error');
+    if(!el) return;
+    el.textContent = msg;
+    el.classList.add('bls-show');
+  }
+  function hideJoinError(){
+    const el = document.getElementById('bls-join-error');
+    if(el) el.classList.remove('bls-show');
+  }
+
+  // ─── 错误信息中英文友好化 (兼容 Worker 的中文错误) ──────────
+  function friendlyError(rawError, status){
+    if(!rawError){
+      if(status === 404) return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+      if(status === 401 || status === 403) return '权限不足 / Unauthorized';
+      if(status === 429) return '请求过于频繁，稍后再试 / Too many requests';
+      if(status >= 500) return '服务器暂时不可用 / Server error, please try later';
+      return '加入失败 (' + status + ') / Join failed';
+    }
+    const e = String(rawError).trim();
+    // Worker 的中文错误信息直接识别
+    if(/不存在/.test(e) && /班级/.test(e)){
+      return '班级码不存在，请向老师确认 / Class not found, please check with your teacher';
+    }
+    if(/请填写/.test(e) && (/班级/.test(e) || /姓名/.test(e))){
+      return '请完整填写班级码和姓名 / Please fill in class code and name';
+    }
+    if(/请填写/.test(e) && /学号/.test(e)){
+      return '请填写学号 / Please enter your student ID';
+    }
+    if(/数据异常/.test(e)){
+      return '班级数据异常，请联系老师 / Class data issue, please contact teacher';
+    }
+    // 英文 fallback
+    const el = e.toLowerCase();
+    if(/not\s*found/.test(el)) return '班级码不存在，请向老师确认 / Class not found';
+    if(/unauthorized|forbidden/.test(el)) return '权限不足 / Unauthorized';
+    if(/rate\s*limit|too\s*many/.test(el)) return '请求过于频繁 / Too many requests';
+    return '加入失败 / Failed: ' + e;
+  }
+
+  // ─── ★ 17: 提交加入 = 先按学号查名单回显姓名 → 确认本人 → 加入 ─────
+  function submitJoin(){
+    hideJoinError();
+    const codeInput = document.getElementById('bls-join-code');
+    const sidInput = document.getElementById('bls-join-sid');
+    const submitBtn = document.getElementById('bls-join-submit');
+    if(!codeInput || !sidInput || !submitBtn) return;
+
+    const classCode = codeInput.value.trim();
+    const studentId = sidInput.value.trim();
+
+    if(!classCode){
+      showJoinError('请输入班级码 / Please enter class code');
+      codeInput.focus(); return;
+    }
+    if(!CLASS_CODE_REGEX.test(classCode)){
+      showJoinError('班级码格式不对：需 2-20 位字母/数字/横线/下划线 / Invalid format');
+      codeInput.focus(); return;
+    }
+    if(!studentId){
+      showJoinError('请输入学号 / Please enter your student ID');
+      sidInput.focus(); return;
+    }
+    if(!STUDENT_ID_REGEX.test(studentId)){
+      showJoinError('学号格式不对：需 1-20 位字母/数字/横线/下划线 / Invalid ID format');
+      sidInput.focus(); return;
+    }
+
+    // 班级码大小写变体队列(智能容错)
+    const variants = [classCode];
+    const upper = classCode.toUpperCase();
+    const lower = classCode.toLowerCase();
+    if(variants.indexOf(upper) < 0) variants.push(upper);
+    if(variants.indexOf(lower) < 0) variants.push(lower);
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = '查询中... / Checking...';
+    codeInput.disabled = true;
+    sidInput.disabled = true;
+
+    console.log('[BLS] ★17 提交查名单: variants=' + JSON.stringify(variants) + ', sid=' + studentId);
+    attemptLookupSequence(variants, 0, studentId, submitBtn, codeInput);
+  }
+
+  // ─── ★ 17: 按变体顺序查名单(lookup),回显姓名 ──────────────
+  function attemptLookupSequence(variants, idx, sid, submitBtn, codeInput){
+    if(idx >= variants.length){
+      showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
+      resetJoinForm(submitBtn, codeInput);
+      return;
+    }
+    const cc = variants[idx];
+    console.log('[BLS] ★17 查名单 [' + (idx+1) + '/' + variants.length + ']: classCode=' + cc + ', sid=' + sid);
+
+    fetch(BLS_API_BASE + '/student/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode: cc, studentCode: sid })
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] ★17 lookup 响应 [' + cc + ']', res);
+      const b = res.body || {};
+
+      // 找到本人 → 弹确认
+      if(res.status === 200 && b.found === true && b.name){
+        const finalCC = (b.classInfo && b.classInfo.classCode) ? b.classInfo.classCode : cc;
+        confirmIdentityAndJoin(finalCC, sid, b.name, submitBtn, codeInput);
+        return;
+      }
+
+      // 班级不存在 → 试下一变体
+      if(b.reason === 'no_class' || res.status === 404){
+        if(idx + 1 < variants.length){
+          attemptLookupSequence(variants, idx + 1, sid, submitBtn, codeInput);
+        } else {
+          showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
+          resetJoinForm(submitBtn, codeInput);
+        }
+        return;
+      }
+
+      // 班级在,但学号不在名单 / 老师没填名字 → 友好提示(不再试变体)
+      if(b.reason === 'not_in_roster'){
+        showJoinError('学号不在班级名单里，请联系老师把你加进名单 / Your ID is not on the class list — please ask your teacher to add you');
+      } else if(b.reason === 'no_name'){
+        showJoinError('老师还没给你的学号填姓名，请联系老师 / Your teacher has not set your name yet — please contact them');
+      } else {
+        showJoinError(b.error ? ('加入失败 / Failed: ' + b.error) : ('加入失败 (' + res.status + ') / Join failed'));
+      }
+      resetJoinForm(submitBtn, codeInput);
+    })
+    .catch(function(err){
+      console.error('[BLS] ★17 lookup 网络错误 [' + cc + ']', err);
+      showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
+      resetJoinForm(submitBtn, codeInput);
+    });
+  }
+
+  // ─── ★ 17: 确认是本人 → 正式加入(join,不传名字) ───────────
+  function confirmIdentityAndJoin(classCode, sid, name, submitBtn, codeInput){
+    const ok = confirm('确认是你本人吗？\n姓名：' + name + '\n学号：' + sid + '\n\nIs this you?\nName: ' + name + '\nID: ' + sid);
+    if(!ok){
+      resetJoinForm(submitBtn, codeInput);   // 取消 → 恢复表单,可改学号
+      return;
+    }
+    if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '加入中... / Joining...'; }
+
+    fetch(BLS_API_BASE + '/student/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode: classCode, studentCode: sid })   // ★17: 不传 name,名字以名单为准
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] ★17 join 响应', res);
+      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){
+        const cInfo = res.body.classInfo;
+        const student = res.body.student;
+        const finalCC = cInfo.classCode || classCode;
+        const finalSC = student.studentCode || sid;
+        const finalName = student.name || name;
+        saveJoinResult(finalCC, finalSC, finalName);
+        console.log('[BLS] ★17 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
+        closeDialog();
+        updateCardSubtitle();
+        showToast('已加入班级 ' + finalCC + ' 🎉');
+        fetchTasksAndUpdate();
+        return;
+      }
+      const b = res.body || {};
+      if(b.status === 'not_in_roster'){
+        showJoinError('学号不在班级名单里，请联系老师 / Your ID is not on the class list');
+      } else if(b.status === 'no_name'){
+        showJoinError('老师还没给你的学号填姓名，请联系老师 / Your name is not set yet');
+      } else {
+        showJoinError(b.error ? ('加入失败 / Failed: ' + b.error) : ('加入失败 (' + res.status + ') / Join failed'));
+      }
+      resetJoinForm(submitBtn, codeInput);
+    })
+    .catch(function(err){
+      console.error('[BLS] ★17 join 网络错误', err);
+      showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
+      resetJoinForm(submitBtn, codeInput);
+    });
+  }
+
+  // ─── 重置加入表单 (★17: 去掉 name) ─────────────────────────
+  function resetJoinForm(submitBtn, codeInput){
+    if(submitBtn){
+      submitBtn.disabled = false;
+      submitBtn.textContent = '加入 / Join';
+    }
+    if(codeInput) codeInput.disabled = false;
+    var sidInput = document.getElementById('bls-join-sid');
+    if(sidInput) sidInput.disabled = false;
+  }
+
+  // ─── 身份面板 (已加入 · v8 含完整任务列表) ─────────────────
+  function openIdentityPanel(){
+    console.log('[BLS] 打开身份面板 · 当前 tasks 数: ' + (state.tasks ? state.tasks.length : 0));
+    const tasksHTML = renderTasksList();
+    const html = `
+      <div class="bls-modal" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>我的班级</h3>
+          <div class="bls-subtitle">My Class</div>
+          <button class="bls-close" id="bls-info-close" aria-label="关闭">×</button>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-info-row">
+            <span class="bls-info-label">班级 / Class</span>
+            <span class="bls-info-value bls-code">${escapeHtml(state.classCode)}</span>
+          </div>
+          <div class="bls-info-row">
+            <span class="bls-info-label">我的名字 / My Name</span>
+            <span class="bls-info-value">${escapeHtml(state.name)}</span>
+          </div>
+          <div class="bls-info-row">
+            <span class="bls-info-label">学号 / Student ID</span>
+            <span class="bls-info-value bls-code">${escapeHtml(state.studentCode || '—')}</span>
+          </div>
+          <div class="bls-tasks-section">
+            <div class="bls-tasks-header">
+              <span>📚 任务 / Tasks (${state.tasks ? state.tasks.length : 0})</span>
+              <button class="bls-refresh-btn" id="bls-refresh-tasks" title="刷新 / Refresh">↻</button>
+            </div>
+            ${tasksHTML}
+          </div>
+        </div>
+        <div class="bls-modal-footer">
+          <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
+          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好 / OK</button>
+        </div>
+      </div>
+    `;
+    createOverlay(html);
+    document.getElementById('bls-info-close').onclick = closeDialog;
+    document.getElementById('bls-info-ok').onclick = closeDialog;
+    // ★ 17: 离开按钮已移除
+
+    // 刷新按钮
+    const refreshBtn = document.getElementById('bls-refresh-tasks');
+    if(refreshBtn){
+      refreshBtn.onclick = function(){
+        refreshBtn.disabled = true;
+        refreshBtn.textContent = '...';
+        fetchTasksAndUpdate(function(ok){
+          // fetch 完成后重新渲染整个面板 (createOverlay 内部会先 closeDialog)
+          openIdentityPanel();
+          showToast(ok ? '任务已刷新 / Tasks refreshed' : '刷新失败 / Failed to refresh');
+        });
+      };
+    }
+  }
+
+  // ─── 渲染任务列表 HTML ─────────────────────────────────────
+  function renderTasksList(){
+    if(!state.tasks || state.tasks.length === 0){
+      return `
+        <div class="bls-task-empty">
+          <div class="bls-task-empty-icon">📭</div>
+          <div>暂无任务</div>
+          <div class="bls-task-empty-en">No tasks yet · waiting for teacher</div>
+        </div>
+      `;
+    }
+
+    // 排序: 未完成的在前,已完成的在后;同组内按创建时间倒序
+    const sorted = state.tasks.slice().sort(function(a, b){
+      const aDone = state.completedTasks.indexOf(a.taskId) >= 0;
+      const bDone = state.completedTasks.indexOf(b.taskId) >= 0;
+      if(aDone !== bDone) return aDone ? 1 : -1;
+      return (b.createdAt || '').localeCompare(a.createdAt || '');
+    });
+
+    return '<div class="bls-task-list">' + sorted.map(function(task){
+      const isDone = state.completedTasks.indexOf(task.taskId) >= 0;
+      const t = task.type || 'char';
+      const badgeClass = (t === 'word') ? 'bls-task-badge-word' :
+                         (t === 'sentence') ? 'bls-task-badge-sentence' : 'bls-task-badge-char';
+      const badgeText = (t === 'word') ? '词' :
+                        (t === 'sentence') ? '句' : '字';
+      const title = task.title || '(未命名 / Untitled)';
+      return '<button class="bls-task-card' + (isDone ? ' bls-completed' : '') +
+             '" onclick="BLS.openTask(\'' + escapeAttr(task.taskId) + '\')">' +
+             '<span class="bls-task-badge ' + badgeClass + '">' + badgeText + '</span>' +
+             '<span class="bls-task-title">' + escapeHtml(title) + '</span>' +
+             (isDone ? '<span class="bls-task-check" title="已完成">✓</span>' : '') +
+             '</button>';
+    }).join('') + '</div>';
+  }
+
+  // ─── HTML attribute 转义 (防止 taskId 含特殊字符) ──────────
+  function escapeAttr(s){
+    if(s == null) return '';
+    return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  // ─── 打开任务 → 进入任务模式 + 注入挥毫流程 (v10) ─────────
+  function openTask(taskId){
+    const task = (state.tasks || []).find(function(t){ return t.taskId === taskId; });
+    if(!task){
+      console.warn('[BLS] 任务不存在: ' + taskId);
+      showToast('任务不存在 / Task not found');
+      return;
+    }
+    console.log('[BLS] 打开任务', task);
+
+    // 关闭弹窗
+    closeDialog();
+
+    const input = document.getElementById('teacher-input');
+    if(!input || typeof global.startTeacherSession !== 'function'){
+      console.error('[BLS] 主页面挥毫入口不可用');
+      showToast('启动练习失败 / Failed to start');
+      return;
+    }
+
+    // ★ Phase 4-2: 清空上一个任务残留的成绩
+    window._blsResults = {};
+    // ★ v10: 进入任务模式 (CSS 隐藏 skip 按钮 + 启动完成监听)
+    state._currentTaskId = task.taskId;
+    state.inTaskMode = true;
+    document.body.classList.add('bls-in-task-mode');
+    setupTaskCompletionObserver();
+
+    input.value = task.content || '';
+    global.startTeacherSession();
+    console.log('[BLS] 已进入任务模式 · taskId=' + task.taskId + ' · content="' + (task.content || '') + '"');
+    // ★ v10: 不再立刻 markTaskCompletedLocally — 改为做完所有字时由 observer 触发
+  }
+
+  // ─── 监听"🎉 全部完成"toast → 标记任务完成 (v10) ──────────
+  function setupTaskCompletionObserver(){
+    // 清理旧的 observer 防重复
+    if(state._toastObserver){
+      try { state._toastObserver.disconnect(); } catch(e){}
+      state._toastObserver = null;
+    }
+
+    const toast = document.getElementById('toast');
+    if(!toast){
+      console.warn('[BLS] toast 元素不存在,无法监听任务完成');
+      return;
+    }
+
+    const observer = new MutationObserver(function(){
+      const text = toast.textContent || '';
+      if(state.inTaskMode && state._currentTaskId && /全部完成|Session complete/i.test(text)){
+        console.log('[BLS] ✅ 检测到任务全部完成 · toast="' + text + '"');
+        const finishedTaskId = state._currentTaskId;
+        // 清理任务模式状态
+        exitTaskMode();
+        // 标记完成 + 上报后端 (markTaskCompletedLocally 内部会调 reportTaskCompletedToServer)
+        markTaskCompletedLocally(finishedTaskId);
+      }
+    });
+    observer.observe(toast, { childList: true, characterData: true, subtree: true });
+    state._toastObserver = observer;
+    console.log('[BLS] 已启动任务完成监听器');
+  }
+
+  // ─── 退出任务模式 (清理状态,不标记完成) ───────────────────
+  function exitTaskMode(){
+    state._currentTaskId = null;
+    state.inTaskMode = false;
+    document.body.classList.remove('bls-in-task-mode');
+    if(state._toastObserver){
+      try { state._toastObserver.disconnect(); } catch(e){}
+      state._toastObserver = null;
+    }
+  }
+
+  // ─── 本地标记任务完成 (v9: 同时异步上报后端) ──────────────
+  function markTaskCompletedLocally(taskId){
+    if(!taskId) return;
+    if(state.completedTasks.indexOf(taskId) >= 0){
+      // 已记录过,但仍然上报一次后端 (防止之前网络失败导致后端缺少记录)
+      reportTaskCompletedToServer(taskId);
+      return;
+    }
+    state.completedTasks.push(taskId);
+    try {
+      localStorage.setItem(LS_KEYS.COMPLETED_TASKS, JSON.stringify(state.completedTasks));
+    } catch(e) {
+      console.warn('[BLS] 完成状态持久化失败', e);
+    }
+    updateCardSubtitle();
+    console.log('[BLS] 任务本地标记完成 · ' + taskId + ' · 总已完成: ' + state.completedTasks.length);
+    // ★ v9: 异步上报后端 (本地标记后立刻调,不阻塞用户)
+    reportTaskCompletedToServer(taskId);
+  }
+
+  // ─── 上报任务完成到后端 (v9 新增) ──────────────────────────
+  function reportTaskCompletedToServer(taskId){
+    if(!taskId || !state.classCode || !state.studentCode){
+      console.warn('[BLS] 上报跳过 · 缺少参数', { taskId: taskId, classCode: state.classCode, studentCode: state.studentCode });
+      return;
+    }
+    const url = BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) +
+                '/tasks/' + encodeURIComponent(taskId) + '/complete';
+    console.log('[BLS] 上报任务完成 · ' + taskId + ' → ' + url);
+
+    fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ studentCode: state.studentCode, results: window._blsResults || {} }) // ★ Phase 4-2: 带每字成绩
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] 上报响应 [' + taskId + ']', res);
+      if(res.body && res.body.status === 'removed'){ handleStudentRemoved(res.body.message); return; }
+      if(res.status === 200 && res.body && res.body.success){
+        console.log('[BLS] ✅ 上报成功 · taskId=' + taskId);
+      } else {
+        console.warn('[BLS] ⚠️ 上报失败 (本地已记,不影响使用)', res.status, res.body);
+      }
+    })
+    .catch(function(err){
+      console.warn('[BLS] ⚠️ 上报网络错误 (本地已记,不影响使用)', err);
+    });
+  }
+
+  // ─── 离开班级 (Worker 无该端点,只清本地) ──────────────────
+  function confirmLeave(){
+    const ok = confirm('确定离开班级 ' + state.classCode + ' 吗?\n离开后你将看不到本班任务（你的学习记录会保留，老师仍可查看）。\n\nLeave class ' + state.classCode + '?\nYou will no longer see this class. Your learning records are kept (teacher can still view them).');
+    if(!ok) return;
+    console.log('[BLS] 离开班级 · 先通知后端清理');
+
+    // ★ 联动-14: 异步通知 Worker 删除学生记录 (不阻塞本地清理)
+    const oldClassCode = state.classCode;
+    const oldStudentCode = state.studentCode;
+    if(oldClassCode && oldStudentCode){
+      fetch(BLS_API_BASE + '/student/leave', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ classCode: oldClassCode, studentCode: oldStudentCode })
+      })
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+      .then(function(res){
+        if(res.status === 200 && res.body && res.body.success){
+          console.log('[BLS] ✅ 后端已清除学生记录 · ' + oldClassCode + '/' + oldStudentCode);
+        } else {
+          console.warn('[BLS] ⚠️ 后端清除失败 (本地已清,不影响使用)', res);
+        }
+      })
+      .catch(function(err){
+        console.warn('[BLS] ⚠️ 后端清除网络错误 (本地已清)', err);
+      });
+    }
+
+    // 本地清理 (不等后端响应)
+    clearSession();
+    closeDialog();
+    updateCardSubtitle();
+    showToast('已离开班级 / Left class');
+  }
+
+  // ─── HTML 转义 ─────────────────────────────────────────────
+  function escapeHtml(s){
+    if(s == null) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  // ─── Toast (复用主页面 #toast 元素) ────────────────────────
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    if(t){
+      t.textContent = msg;
+      t.className = 'toast show';
+      clearTimeout(global._toastTimer);
+      global._toastTimer = setTimeout(function(){
+        t.className = 'toast';
+      }, 2400);
+    } else {
+      console.log('[BLS toast] ' + msg);
+    }
+  }
+
+  // ─── 拉任务列表 (v8: 支持回调) ─────────────────────────────
+  // ─── ★ 17: 身份复验失败(被移出) → 清本地登录态 + 退回加入页 ──
+  function handleStudentRemoved(message){
+    console.warn('[BLS] ★17 身份复验:已不在该班级 → 清本地登录态');
+    clearSession();
+    try { closeDialog(); } catch(e){}
+    if(state.inTaskMode){ try { exitTaskMode(); } catch(e){} }
+    updateCardSubtitle();
+    showToast(message || '你已不在该班级，请重新加入 / You are no longer in this class');
+  }
+
+  // ─── 拉任务列表 (★17: 带 studentCode 复验身份) ─────────────
+  function fetchTasksAndUpdate(onDone){
+    if(!state.classCode){
+      console.log('[BLS] fetchTasks 跳过 (无 classCode)');
+      if(onDone) onDone(false);
+      return;
+    }
+    var url = BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) + '/tasks';
+    if(state.studentCode) url += '?studentCode=' + encodeURIComponent(state.studentCode);   // ★17: 后端据此复验
+    console.log('[BLS] 拉取任务列表 · classCode=' + state.classCode);
+    fetch(url)
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+      .then(function(res){
+        console.log('[BLS] 任务列表响应', res);
+        // ★17: 后端说已被移出 → 自动登出退回加入页
+        if(res.body && res.body.status === 'removed'){
+          handleStudentRemoved(res.body.message);
+          if(onDone) onDone(false);
+          return;
+        }
+        if(res.status === 200 && res.body && Array.isArray(res.body.tasks)){
+          state.tasks = res.body.tasks;
+          console.log('[BLS] 拉取任务成功 · 共 ' + state.tasks.length + ' 个');
+          updateCardSubtitle();
+          if(onDone) onDone(true);
+        } else {
+          console.warn('[BLS] 拉取任务失败', res.status, res.body);
+          if(onDone) onDone(false);
+        }
+      })
+      .catch(function(err){
+        console.warn('[BLS] 拉取任务网络错误', err);
+        if(onDone) onDone(false);
+      });
+  }
+
+  // ─── 卡片副标题更新 ────────────────────────────────────────
+  function updateCardSubtitle(){
+    const el = document.getElementById('bls-entry-desc');
+    if(!el) return;
+
+    if(!state.studentCode){
+      el.innerHTML = '点此加入班级 / Join a class';
+      return;
+    }
+    const newCount = state.tasks.filter(function(t){
+      return !state.completedTasks.includes(t.taskId);
+    }).length;
+
+    if(newCount > 0){
+      el.innerHTML = escapeHtml(state.classCode) + ' · 🔴 ' + newCount + ' 个新任务';
+    } else {
+      el.innerHTML = escapeHtml(state.classCode) + ' · 暂无任务 / No tasks';
+    }
+  }
+
+  // ─── 卡片点击分发 ──────────────────────────────────────────
+  function onCardClick(){
+    if(!state.studentCode){
+      openJoinDialog();
+    } else {
+      openIdentityPanel();
+    }
+  }
+
+  // ─── patch navBack (v10: 学生中途点"返回"时清理任务模式) ──
+  function patchNavBack(){
+    if(typeof global.navBack !== 'function'){
+      console.warn('[BLS] navBack 不存在,跳过 patch');
+      return;
+    }
+    if(global.navBack._blsPatched){
+      return;
+    }
+    const orig = global.navBack;
+    global.navBack = function(){
+      if(state.inTaskMode){
+        console.log('[BLS] 学生主动 navBack · 清理任务模式 (任务未完成,不标记)');
+        exitTaskMode();
+      }
+      return orig.apply(this, arguments);
+    };
+    global.navBack._blsPatched = true;
+    console.log('[BLS] ✅ 已 patch navBack');
+  }
+
+  // ─── 启动入口 ──────────────────────────────────────────────
+  function init(){
+    console.log('[BLS] init 开始 · ' + VERSION);
+    injectStyles();
+    loadFromStorage();
+    updateCardSubtitle();
+    patchNavBack();  // ★ v10: 拦截学生主动返回,清理任务模式状态
+
+    if(state.studentCode){
+      console.log('[BLS] 已加入 · 班级=' + state.classCode + ' · 姓名=' + state.name + ' · 学号=' + state.studentCode);
+      fetchTasksAndUpdate();
+    } else {
+      console.log('[BLS] 未登录,等用户点卡片加入班级');
+    }
+  }
+
+  // ─── 暴露 API ──────────────────────────────────────────────
+  global.BLS = {
+    version: VERSION,
+    init: init,
+    onCardClick: onCardClick,
+    openJoinDialog: openJoinDialog,
+    openIdentityPanel: openIdentityPanel,
+    // ★ 17: leaveClass 已移除
+    refreshTasks: fetchTasksAndUpdate,
+    openTask: openTask,                  // ★ v8: 任务点击 (HTML onclick 调用)
+    _state: state,
+    _LS_KEYS: LS_KEYS,
+    _API_BASE: BLS_API_BASE
+  };
+
+  console.log('[BLS] ' + VERSION + ' 已加载');
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})(window);
+</script>
 </body>
 </html>

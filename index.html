@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-24 (2026-06-19) — 修复：书写画布禁用右键菜单(防右键/双指菜单截走抬笔信号导致连笔)·承接-23 -->
+<!-- 斑斓部件 · 部件联动-25 (2026-06-19) — 修复：无CHAR_DB数据的独体字(如"鼠")跳过拼音→sessionIndex不前进→"下一个字"重载同字/到不了完成·含-23~24全部修复 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-24">
+<meta name="version" content="部件联动-25">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-24 ✦ 书写区禁右键菜单','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-25 ✦ 独体字推进修复','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2422,6 +2422,7 @@ function loadStrokeOnlyChar(char){
     // 完全无 data 的字(CHAR_DB 之外): 退化为原行为
     const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
     state.pinyinDone=true;
+    state.sessionIndex++;   // ★ -25 修复：无 CHAR_DB 数据的独体字(如"鼠")跳过拼音→checkPinyin 不触发→sessionIndex 不前进→"下一个字"重载同字;在此补上推进,与有数据独体字(checkPinyin 的 sessionIndex++)对齐
     unlockWriting();
   }
   const sb=document.getElementById('skip-btn');if(sb)sb.style.display='none';

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-18 (2026-06-19) — Phase 4-2: 错题本(本地localStorage,任务+自由采集,合并展示,连对2次移出) + 阶段①每字答对率上报 -->
+<!-- 斑斓部件 · 部件联动-19 (2026-06-19) — UI: 错点配色(暖橙#F5A623/天青#4FC3F7)、错题本连对2次提示、首页4卡并排一行、前两卡改名(挑战/搜索模式) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -47,9 +47,9 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* 级别选择 */
 /* ══ 首页：二选一入口 ══ */
-.home-screen{text-align:center;padding:28px 14px;max-width:1100px;margin:0 auto}  /* ★ 联动-7: 860→1100 容纳三张卡片 */
+.home-screen{text-align:center;padding:28px 14px;max-width:1280px;margin:0 auto}  /* ★ 19: 1100→1280 容纳四张卡片并排 */
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:22px;max-width:1080px;margin:0 auto;position:relative;z-index:1}  /* ★ 联动-7: 960→1080,每张卡片更宽,避免图标贴边 */
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;max-width:1260px;margin:0 auto;position:relative;z-index:1}  /* ★ 19: 四张卡并排一行,3列→4列, 1080→1260 */
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 /* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
@@ -847,15 +847,18 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-py{font-size:0.85rem;color:rgba(255,255,255,0.8);margin-top:3px;letter-spacing:0.03em}
 .wb-dots{position:absolute;top:6px;left:0;right:0;display:flex;justify-content:center;gap:4px}
 .wb-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
-.wb-dot-py{background:var(--vermillion)}
-.wb-dot-comp{background:var(--porcelain)}
+.wb-dot-py{background:#F5A623}
+.wb-dot-comp{background:#4FC3F7}
 .wb-times{position:absolute;bottom:4px;right:6px;font-size:0.68rem;color:rgba(255,255,255,0.55)}
 .wb-del{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--vermillion);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:2}
 .wb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center}
 .wb-empty-icon{font-size:3rem;margin-bottom:14px}
 .wb-empty-zh{font-size:1.15rem;font-weight:700;margin-bottom:6px}
 .wb-empty-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.75)}
-@media(min-width:769px){ .home-grid .wb-home-card{grid-column:2 / 3} }
+
+.wb-tip{font-size:0.8rem;color:rgba(255,255,255,0.72);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 12px;margin-bottom:12px;text-align:center;line-height:1.5}
+.home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
+@media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
 </style>
 </head>
 <body>
@@ -1056,17 +1059,16 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         <button class="home-entry" onclick="showLevelSelect()">
           <div class="home-entry-header">
             <span class="home-entry-icon">🎯</span>
-            <span class="home-entry-zh">HSK分级挑战</span>
+            <span class="home-entry-zh">挑战模式</span>
           </div>
-          <div class="home-entry-en">HSK Level Challenge</div>
+          <div class="home-entry-sub-zh">HSK 分级挑战</div>
         </button>
         <!-- 入口 B：请输入字/词 -->
         <div class="home-entry home-entry-input">
           <div class="home-entry-header">
-            <span class="home-entry-icon">✏️</span>
-            <span class="home-entry-zh">请输入内容</span>
+            <span class="home-entry-icon">🔍</span>
+            <span class="home-entry-zh">搜索模式</span>
           </div>
-          <div class="home-entry-en">Enter Content</div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
             <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
@@ -1126,6 +1128,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错 <span class="wb-dot wb-dot-comp"></span>部件错</span>
         <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()">管理 / Manage</button>
       </div>
+      <div id="wb-tip" class="wb-tip">💡 同一个字连续做对 2 次,才会自动移出 · Master twice to remove</div>
       <div id="wb-grid" class="wb-grid"></div>
       <div id="wb-empty" class="wb-empty" style="display:none">
         <div class="wb-empty-icon">🎉</div>
@@ -1238,7 +1241,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-18 ✦ 错题本','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-19 ✦ 错题本/配色/布局','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4332,6 +4335,7 @@ function renderWrongBook(){
   var rAll = document.getElementById('wb-review-all');
   if(rAll){ rAll.style.display = cnt ? 'flex' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
   var tools = document.getElementById('wb-tools'); if(tools) tools.style.display = cnt ? 'flex' : 'none';
+  var tip = document.getElementById('wb-tip'); if(tip) tip.style.display = cnt ? 'block' : 'none';
   var grid = document.getElementById('wb-grid');
   var empty = document.getElementById('wb-empty');
   if(cnt===0){ if(grid) grid.innerHTML=''; if(empty) empty.style.display='flex'; return; }

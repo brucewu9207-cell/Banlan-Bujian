@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-22 (2026-06-19) — SRS 间隔重复：错题本接入固定阶梯(1/3/7/16/35天)·今天该复习N/全部M·SRS接管毕业(熬过L3=16天那级自动移出) -->
+<!-- 斑斓部件 · 部件联动-24 (2026-06-19) — 修复：书写画布禁用右键菜单(防右键/双指菜单截走抬笔信号导致连笔)·承接-23 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-22">
+<meta name="version" content="部件联动-24">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -836,8 +836,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-count-wrap b{color:var(--gold);font-size:1.2rem}
 .wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
 .wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
-.wb-review-rest{display:block;width:fit-content;margin:0 auto 14px;display:flex;align-items:center;gap:6px;justify-content:center;padding:8px 18px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(20,40,30,0.5);color:rgba(255,255,255,0.85);font-family:inherit;font-size:0.92rem;cursor:pointer;transition:all .2s}
-.wb-review-rest:hover{background:rgba(20,40,30,0.7);border-color:var(--bamboo-light)}
+.wb-review-row{display:flex;gap:12px;margin-bottom:12px}
+.wb-review-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wb-review-btn:hover{background:var(--bamboo-light);transform:translateY(-2px)}
 .wb-due-badge{position:absolute;top:-7px;left:-6px;background:var(--bamboo);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:2}
 .wb-chip-due{border-color:var(--bamboo-light);background:rgba(181,118,58,0.22)}
 .wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.85rem;color:#fff;margin-bottom:12px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px}
@@ -1123,12 +1124,13 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
             <div class="wb-title-en">Mistake Book</div>
           </div>
         </div>
-        <div class="wb-count-wrap">今天 <b id="wb-count-due">0</b> · 全部 <b id="wb-count">0</b></div>
       </div>
-      <button id="wb-review-today" class="wb-review-all" onclick="wbReviewToday()" style="display:none">
-        <span>🔥 今天复习</span><span class="wb-ra-num" id="wb-today-num">(0)</span>
-      </button>
-      <button id="wb-review-all" class="wb-review-rest" onclick="wbReviewAll()" style="display:none">复习全部 <span class="wb-ra-num">(0)</span></button>
+      <div id="wb-review-row" class="wb-review-row" style="display:none">
+        <button id="wb-review-today" class="wb-review-btn" onclick="wbReviewToday()" style="display:none">
+          <span>🔥 今天复习</span><span class="wb-ra-num" id="wb-today-num">(0)</span>
+        </button>
+        <button id="wb-review-all" class="wb-review-btn" onclick="wbReviewAll()"><span>复习全部</span><span class="wb-ra-num">(0)</span></button>
+      </div>
       <div id="wb-tools" class="wb-tools" style="display:none">
         <span class="wb-sort">↓ 错最多优先</span>
         <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错 <span class="wb-dot wb-dot-comp"></span>部件错</span>
@@ -1185,7 +1187,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span></p>
             </div>
-            <div class="write-stage" id="write-stage" style="display:none">
+            <div class="write-stage" id="write-stage" style="display:none" oncontextmenu="return false">
               <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
                 <line x1="0" y1="512" x2="1024" y2="512" class="grid-line"/>
                 <line x1="512" y1="0" x2="512" y2="1024" class="grid-line"/>
@@ -1193,7 +1195,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
                 <line x1="1024" y1="0" x2="0" y2="1024" class="grid-line"/>
                 <rect x="0" y="0" width="1024" height="1024" class="grid-line"/>
               </svg>
-              <div id="write-target"></div>
+              <div id="write-target" oncontextmenu="return false"></div>
               <div id="write-check" class="write-check">✓</div>
             </div>
             <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写 / Redo</button>
@@ -1247,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-22 ✦ SRS间隔重复','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-24 ✦ 书写区禁右键菜单','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2406,6 +2408,7 @@ function loadStrokeOnlyChar(char){
   document.getElementById('main-char').textContent=char;
   updateHskBadge(char);
   renderStrokes(char);
+  lockWriting();   // ★ -23 修复：独体字切换时也要锁/重置书写区,清掉上一字残留(loadStrokeOnlyChar 原先漏了)
   // ★ 联动-11 删除: unlockWriting() - 等选对拼音再解锁
 
   // 左栏: 渲染拼音选项让学生主动选 (不再直接显示答案)
@@ -3952,6 +3955,7 @@ function lockWriting(){
   if(rb) rb.style.display='none';
   // 取消可能残留的旧测验实例并隐藏打勾
   if(_writeWriter){ try{ _writeWriter.cancelQuiz && _writeWriter.cancelQuiz(); }catch(e){} _writeWriter=null; }
+  const _wt=document.getElementById('write-target'); if(_wt) _wt.innerHTML='';
   const c=document.getElementById('write-check'); if(c) c.classList.remove('show');
 }
 function unlockWriting(){
@@ -4377,10 +4381,12 @@ function renderWrongBook(){
   var cdEl = document.getElementById('wb-count-due'); if(cdEl) cdEl.textContent = dueN;
   var mEl = document.getElementById('wb-manage-btn');
   if(mEl){ mEl.textContent = _wbManage ? '完成 / Done' : '管理 / Manage'; mEl.style.display = cnt ? 'inline-block' : 'none'; }
+  var rRow = document.getElementById('wb-review-row');
+  if(rRow) rRow.style.display = cnt ? 'flex' : 'none';
   var rToday = document.getElementById('wb-review-today');
   if(rToday){ rToday.style.display = dueN ? 'flex' : 'none'; var tn = document.getElementById('wb-today-num'); if(tn) tn.textContent='('+dueN+')'; }
   var rAll = document.getElementById('wb-review-all');
-  if(rAll){ rAll.style.display = cnt ? 'block' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
+  if(rAll){ rAll.style.display = cnt ? 'flex' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
   var tools = document.getElementById('wb-tools'); if(tools) tools.style.display = cnt ? 'flex' : 'none';
   var tip = document.getElementById('wb-tip'); if(tip) tip.style.display = cnt ? 'block' : 'none';
   var grid = document.getElementById('wb-grid');

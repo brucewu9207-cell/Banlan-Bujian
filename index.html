@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-17 (2026-06-19) — Phase 4-2 阶段①: 采集每字拼音/部件答对率(first-try), 完成时随回执上报后端 -->
+<!-- 斑斓部件 · 部件联动-18 (2026-06-19) — Phase 4-2: 错题本(本地localStorage,任务+自由采集,合并展示,连对2次移出) + 阶段①每字答对率上报 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -823,6 +823,39 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .next-btn{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
   .next-btn:hover{background:var(--bamboo-light) !important}
 }
+
+/* ══ 错题本 (部件联动-18) ══ */
+.wb-home-card .home-entry-icon{color:var(--vermillion)}
+.wb-screen{max-width:680px;margin:0 auto;padding:18px 14px;color:#fff}
+.wb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.wb-title-wrap{display:flex;align-items:center;gap:12px}
+.wb-title-icon{font-size:2rem;line-height:1}
+.wb-title-zh{font-size:1.5rem;font-weight:700;letter-spacing:0.06em}
+.wb-title-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.8)}
+.wb-count-wrap{font-size:0.95rem;color:rgba(255,255,255,0.85)}
+.wb-count-wrap b{color:var(--gold);font-size:1.2rem}
+.wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
+.wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
+.wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:0.8rem;color:rgba(255,255,255,0.75);margin-bottom:12px}
+.wb-legend{display:inline-flex;align-items:center;gap:5px}
+.wb-manage-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.8rem;cursor:pointer;transition:all .2s}
+.wb-manage-btn:hover{border-color:var(--bamboo-light)}
+.wb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}
+.wb-chip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 4px 12px;border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .18s}
+.wb-chip:hover{transform:translateY(-3px);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
+.wb-char{font-size:2rem;line-height:1.05}
+.wb-py{font-size:0.85rem;color:rgba(255,255,255,0.8);margin-top:3px;letter-spacing:0.03em}
+.wb-dots{position:absolute;top:6px;left:0;right:0;display:flex;justify-content:center;gap:4px}
+.wb-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.wb-dot-py{background:var(--vermillion)}
+.wb-dot-comp{background:var(--porcelain)}
+.wb-times{position:absolute;bottom:4px;right:6px;font-size:0.68rem;color:rgba(255,255,255,0.55)}
+.wb-del{position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:var(--vermillion);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:2}
+.wb-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 20px;text-align:center}
+.wb-empty-icon{font-size:3rem;margin-bottom:14px}
+.wb-empty-zh{font-size:1.15rem;font-weight:700;margin-bottom:6px}
+.wb-empty-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.75)}
+@media(min-width:769px){ .home-grid .wb-home-card{grid-column:2 / 3} }
 </style>
 </head>
 <body>
@@ -1048,6 +1081,15 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
           <div class="home-entry-en">Class Tasks</div>
           <div class="home-entry-desc" id="bls-entry-desc">点此加入班级 / Join a class</div>
         </button>
+        <!-- ★ 部件联动-18: 入口 D 错题本 -->
+        <button class="home-entry wb-home-card" id="wb-entry-card" onclick="showWrongBook()">
+          <div class="home-entry-header">
+            <span class="home-entry-icon">📕</span>
+            <span class="home-entry-zh">错题本</span>
+          </div>
+          <div class="home-entry-en">Mistake Book</div>
+          <div class="home-entry-desc" id="wb-home-desc">暂无错题 / All clear</div>
+        </button>
       </div>
     </div>
 
@@ -1062,6 +1104,33 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         <button class="level-btn level-locked" onclick="startLevel(7)"><span class="level-num">HSK 7</span><span class="level-lock">🔒</span></button>
         <button class="level-btn level-locked" onclick="startLevel(8)"><span class="level-num">HSK 8</span><span class="level-lock">🔒</span></button>
         <button class="level-btn level-locked" onclick="startLevel(9)"><span class="level-num">HSK 9</span><span class="level-lock">🔒</span></button>
+      </div>
+    </div>
+
+    <div id="wrongbook-screen" class="wb-screen" style="display:none">
+      <div class="wb-head">
+        <div class="wb-title-wrap">
+          <span class="wb-title-icon">📕</span>
+          <div>
+            <div class="wb-title-zh">错题本</div>
+            <div class="wb-title-en">Mistake Book</div>
+          </div>
+        </div>
+        <div class="wb-count-wrap"><b id="wb-count">0</b> 个待复习</div>
+      </div>
+      <button id="wb-review-all" class="wb-review-all" onclick="wbReviewAll()" style="display:none">
+        <span>↻ 复习全部</span><span class="wb-ra-num">(0)</span>
+      </button>
+      <div id="wb-tools" class="wb-tools" style="display:none">
+        <span class="wb-sort">↓ 错最多优先</span>
+        <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错 <span class="wb-dot wb-dot-comp"></span>部件错</span>
+        <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()">管理 / Manage</button>
+      </div>
+      <div id="wb-grid" class="wb-grid"></div>
+      <div id="wb-empty" class="wb-empty" style="display:none">
+        <div class="wb-empty-icon">🎉</div>
+        <div class="wb-empty-zh">暂无错题，继续加油 💪</div>
+        <div class="wb-empty-en">No mistakes yet — keep practicing!</div>
       </div>
     </div>
 
@@ -1169,6 +1238,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
+console.log('%c斑斓部件 · 部件联动-18 ✦ 错题本','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2233,9 +2303,12 @@ function switchMode(mode){
 // ══ 首页导航：二选一入口 ══
 function showHome(){
   state.teacherMode=false;
+  state.reviewMode=false;
   document.getElementById('home-screen').style.display='block';
   document.getElementById('level-select').style.display='none';
   document.getElementById('practice-screen').style.display='none';
+  var _wb=document.getElementById('wrongbook-screen'); if(_wb) _wb.style.display='none';
+  if(typeof updateWrongBookBadge==='function') updateWrongBookBadge();
   // ★ v94:返回按钮默认始终显示(首页时点击 navBack 走 no-op),不再特意在 showHome 中隐藏
 }
 function showLevelSelect(){
@@ -2250,6 +2323,11 @@ function navBack(){
   // ★ v94:在首页时返回按钮无动作 — 首页已是顶层,无处可返(按钮虽显示但不响应)
   const home = document.getElementById('home-screen');
   if(home && home.style.display !== 'none'){ return; }
+  // ★ 错题本列表页 → 回首页
+  const _wbScr=document.getElementById('wrongbook-screen');
+  if(_wbScr && _wbScr.style.display==='block'){ showHome(); return; }
+  // ★ 错题本复习中(练习页) → 回错题本
+  if(state.reviewMode){ showWrongBook(); return; }
   // 在「等级选择」页 → 回首页
   if(document.getElementById('level-select').style.display==='block'){ showHome(); return; }
   // 在「练习」页：老师模式→首页，HSK模式→等级选择
@@ -2270,6 +2348,7 @@ function startTeacherSession(){
   const chars=(raw.match(/[\u4e00-\u9fa5]/g))||[];
   if(chars.length===0){showToast('请输入至少一个汉字 / Enter a character','error');return;}
   state.teacherMode=true;
+  state.reviewMode=false;
   state.currentLevel=null;
   state.sessionChars=chars;     // ★ 不打乱，按输入顺序逐字演示
   state.sessionIndex=0;
@@ -2357,6 +2436,7 @@ function loadStrokeOnlyChar(char){
 
 function startLevel(level){
   state.teacherMode=false;
+  state.reviewMode=false;
   // 是否解锁完全由数据决定：本级别没有可练字（如 HSK4+ 尚未导入）时，下方统一提示"扩展中"
   // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
   const levelChars = HSK_LEVEL_CHARS[level] || [];
@@ -3949,6 +4029,11 @@ function startWritingQuiz(){
           window._blsResults = window._blsResults || {};
           window._blsResults[state.currentChar] = { py: window._blsCurPy, comp: window._blsCurComp };
         }
+        // ★ 错题本(部件联动-18): 任何模式下都更新错题本(进/出/连对计数)
+        if(state.currentChar){
+          var _wbSrc = state.reviewMode ? 'review' : (state.teacherMode ? 'task' : 'free');
+          try{ WrongBook.record(state.currentChar, window._blsCurPy, window._blsCurComp, _wbSrc); }catch(_e){ console.warn('[错题本] record 失败', _e); }
+        }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -4134,6 +4219,16 @@ function skipCharacter(){
 }
 
 function nextCharacter(){
+  // ★ 错题本复习模式：按列表顺序逐字，到末尾回错题本
+  if(state.reviewMode){
+    if(state.sessionIndex>=state.sessionChars.length){
+      showToast('🎉 错题复习完成！Review complete!','success');
+      setTimeout(showWrongBook,1400);
+      return;
+    }
+    loadTeacherChar(state.sessionChars[state.sessionIndex]);
+    return;
+  }
   // ★ 老师输入模式：按输入顺序逐字翻页，到末尾即结束
   if(state.teacherMode){
     if(state.sessionIndex>=state.sessionChars.length){
@@ -4165,6 +4260,127 @@ function nextCharacter(){
   }
   loadCharacter(state.sessionChars[state.sessionIndex]);
 }
+
+// ============================================================
+// ★ 错题本 (部件联动-18) — 纯学生端 localStorage, 按字去重, 记来源(task/free/review)
+//   进: 第一次就错(拼音或部件); 出: 重练连对2次"第一次就对"; 又错: 连对清零+错次+1; 另留手动删
+// ============================================================
+const WrongBook = {
+  KEY: 'BLS_WRONGBOOK_v1',
+  _load: function(){ try{ return JSON.parse(localStorage.getItem(this.KEY)) || {}; }catch(e){ return {}; } },
+  _save: function(o){ try{ localStorage.setItem(this.KEY, JSON.stringify(o)); }catch(e){ console.warn('[错题本] 保存失败', e); } },
+  record: function(char, pyOK, compOK, source){
+    if(!char) return;
+    var wrong = (pyOK === false) || (compOK === false);
+    var firstTryOK = (pyOK !== false) && (compOK !== false);
+    var book = this._load();
+    var e = book[char];
+    if(wrong){
+      var d = (typeof CHAR_DB !== 'undefined' && CHAR_DB[char]) ? CHAR_DB[char] : {};
+      if(e){
+        e.wrongCount = (e.wrongCount||0) + 1;
+        e.streak = 0;
+        if(pyOK === false) e.pyWrong = true;
+        if(compOK === false) e.compWrong = true;
+        if(!e.src) e.src = {task:0, free:0, review:0};
+        e.src[source] = (e.src[source]||0) + 1;
+        e.lastTs = Date.now();
+      } else {
+        var src0 = {task:0, free:0, review:0}; src0[source] = 1;
+        book[char] = { pinyin:(d.py||''), hsk:(typeof charHskLevel==='function'?charHskLevel(char):null),
+          pyWrong:(pyOK===false), compWrong:(compOK===false), wrongCount:1, streak:0, src:src0,
+          firstTs:Date.now(), lastTs:Date.now() };
+      }
+      this._save(book);
+    } else if(firstTryOK && e){
+      e.streak = (e.streak||0) + 1;
+      if(e.streak >= 2){ delete book[char]; }
+      this._save(book);
+    }
+  },
+  remove: function(char){ var b=this._load(); if(b[char]){ delete b[char]; this._save(b); } },
+  list: function(){ var b=this._load(); return Object.keys(b).map(function(c){ var o=b[c]; o.char=c; return o; })
+            .sort(function(a,b2){ return (b2.wrongCount-a.wrongCount) || (b2.lastTs-a.lastTs); }); },
+  count: function(){ return Object.keys(this._load()).length; }
+};
+
+let _wbManage = false;
+function toggleWrongBookManage(){ _wbManage = !_wbManage; renderWrongBook(); }
+
+function showWrongBook(){
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='none';
+  document.getElementById('practice-screen').style.display='none';
+  var wb=document.getElementById('wrongbook-screen'); if(wb) wb.style.display='block';
+  var nb=document.getElementById('nav-back-btn'); if(nb) nb.style.display='block';
+  _wbManage = false;
+  renderWrongBook();
+}
+
+function updateWrongBookBadge(){
+  var n = WrongBook.count();
+  var d = document.getElementById('wb-home-desc');
+  if(d) d.textContent = n>0 ? (n + ' 个待复习 / to review') : '暂无错题 / All clear';
+}
+
+function renderWrongBook(){
+  var list = WrongBook.list();
+  var cnt = list.length;
+  var cEl = document.getElementById('wb-count'); if(cEl) cEl.textContent = cnt;
+  var mEl = document.getElementById('wb-manage-btn');
+  if(mEl){ mEl.textContent = _wbManage ? '完成 / Done' : '管理 / Manage'; mEl.style.display = cnt ? 'inline-block' : 'none'; }
+  var rAll = document.getElementById('wb-review-all');
+  if(rAll){ rAll.style.display = cnt ? 'flex' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
+  var tools = document.getElementById('wb-tools'); if(tools) tools.style.display = cnt ? 'flex' : 'none';
+  var grid = document.getElementById('wb-grid');
+  var empty = document.getElementById('wb-empty');
+  if(cnt===0){ if(grid) grid.innerHTML=''; if(empty) empty.style.display='flex'; return; }
+  if(empty) empty.style.display='none';
+  if(!grid) return;
+  grid.innerHTML = list.map(function(it){
+    var dots = (it.pyWrong ? '<span class="wb-dot wb-dot-py" title="拼音错"></span>' : '')
+             + (it.compWrong ? '<span class="wb-dot wb-dot-comp" title="部件错"></span>' : '');
+    var del = _wbManage ? '<span class="wb-del" data-del="'+it.char+'">×</span>' : '';
+    var times = (it.wrongCount>1) ? '<span class="wb-times">×'+it.wrongCount+'</span>' : '';
+    return '<button class="wb-chip" data-char="'+it.char+'">'+del
+      +'<span class="wb-dots">'+dots+'</span>'
+      +'<span class="wb-char">'+it.char+'</span>'
+      +'<span class="wb-py">'+(it.pinyin||'')+'</span>'+times+'</button>';
+  }).join('');
+  if(!grid._wbBound){
+    grid._wbBound = true;
+    grid.addEventListener('click', function(ev){
+      var delEl = ev.target.closest ? ev.target.closest('.wb-del') : null;
+      if(delEl){ ev.stopPropagation(); wbDelete(delEl.getAttribute('data-del')); return; }
+      if(_wbManage) return;
+      var chip = ev.target.closest ? ev.target.closest('.wb-chip') : null;
+      if(chip){ wbPracticeOne(chip.getAttribute('data-char')); }
+    });
+  }
+}
+
+function wbDelete(char){ WrongBook.remove(char); renderWrongBook(); updateWrongBookBadge(); }
+function wbPracticeOne(char){ startWrongBookReview([char]); }
+function wbReviewAll(){ startWrongBookReview(WrongBook.list().map(function(x){ return x.char; })); }
+
+function startWrongBookReview(charList){
+  if(!charList || !charList.length){ showToast('错题本是空的 / Mistake book is empty', 'error'); return; }
+  state.teacherMode = false;
+  state.reviewMode = true;
+  state.currentLevel = null;
+  state.sessionChars = charList.slice();
+  state.sessionIndex = 0;
+  state.failedQueue = [];
+  state.currentCharFailed = false;
+  document.getElementById('home-screen').style.display='none';
+  document.getElementById('level-select').style.display='none';
+  var wb=document.getElementById('wrongbook-screen'); if(wb) wb.style.display='none';
+  document.getElementById('practice-screen').style.display='block';
+  var nb=document.getElementById('nav-back-btn'); if(nb) nb.style.display='block';
+  loadTeacherChar(state.sessionChars[0]);
+}
+
+try{ updateWrongBookBadge(); }catch(e){}
 
 document.addEventListener('dragstart',e=>{
   if(e.target.dataset&&e.target.dataset.comp){

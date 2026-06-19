@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-19 (2026-06-19) — UI: 错点配色(暖橙#F5A623/天青#4FC3F7)、错题本连对2次提示、首页4卡并排一行、前两卡改名(挑战/搜索模式) -->
+<!-- 斑斓部件 · 部件联动-20 (2026-06-19) — UI: 4卡统一(图标+中文+英文斜体)、错题本工具栏+计数改深色bar(仅管理可点)、提示框×1.5 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -832,14 +832,14 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-title-icon{font-size:2rem;line-height:1}
 .wb-title-zh{font-size:1.5rem;font-weight:700;letter-spacing:0.06em}
 .wb-title-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.8)}
-.wb-count-wrap{font-size:0.95rem;color:rgba(255,255,255,0.85)}
+.wb-count-wrap{font-size:0.9rem;color:#fff;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:6px 14px;white-space:nowrap}
 .wb-count-wrap b{color:var(--gold);font-size:1.2rem}
 .wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
 .wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
-.wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:0.8rem;color:rgba(255,255,255,0.75);margin-bottom:12px}
+.wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.85rem;color:#fff;margin-bottom:12px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px}
 .wb-legend{display:inline-flex;align-items:center;gap:5px}
-.wb-manage-btn{padding:6px 14px;border:1px solid rgba(255,255,255,0.3);border-radius:8px;background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.8rem;cursor:pointer;transition:all .2s}
-.wb-manage-btn:hover{border-color:var(--bamboo-light)}
+.wb-manage-btn{padding:5px 13px;border:1px solid rgba(255,255,255,0.42);border-radius:8px;background:rgba(255,255,255,0.13);color:#fff;font-family:inherit;font-size:0.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.wb-manage-btn:hover{background:rgba(255,255,255,0.24);border-color:var(--bamboo-light)}
 .wb-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:10px}
 .wb-chip{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 4px 12px;border:1.5px solid rgba(255,255,255,0.22);border-radius:12px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .18s}
 .wb-chip:hover{transform:translateY(-3px);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
@@ -856,7 +856,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-empty-zh{font-size:1.15rem;font-weight:700;margin-bottom:6px}
 .wb-empty-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.75)}
 
-.wb-tip{font-size:0.8rem;color:rgba(255,255,255,0.72);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 12px;margin-bottom:12px;text-align:center;line-height:1.5}
+.wb-tip{font-size:1.2rem;color:rgba(255,255,255,0.85);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.16);border-radius:10px;padding:12px 18px;margin-bottom:16px;text-align:center;line-height:1.5}
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
 @media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
 </style>
@@ -1061,7 +1061,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
             <span class="home-entry-icon">🎯</span>
             <span class="home-entry-zh">挑战模式</span>
           </div>
-          <div class="home-entry-sub-zh">HSK 分级挑战</div>
+          <div class="home-entry-en">HSK Level Challenge</div>
         </button>
         <!-- 入口 B：请输入字/词 -->
         <div class="home-entry home-entry-input">
@@ -1069,6 +1069,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
             <span class="home-entry-icon">🔍</span>
             <span class="home-entry-zh">搜索模式</span>
           </div>
+          <div class="home-entry-en">Search Mode</div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
             <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
@@ -1241,7 +1242,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-19 ✦ 错题本/配色/布局','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-20 ✦ 卡片统一/工具栏bar','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================

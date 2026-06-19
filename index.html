@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-21 (2026-06-19) — UI: 错题本标题栏(标题+计数)合并为一个居中深色框 -->
+<!-- 斑斓部件 · 部件联动-22 (2026-06-19) — SRS 间隔重复：错题本接入固定阶梯(1/3/7/16/35天)·今天该复习N/全部M·SRS接管毕业(熬过L3=16天那级自动移出) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-17">
+<meta name="version" content="部件联动-22">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -836,6 +836,10 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-count-wrap b{color:var(--gold);font-size:1.2rem}
 .wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
 .wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
+.wb-review-rest{display:block;width:fit-content;margin:0 auto 14px;display:flex;align-items:center;gap:6px;justify-content:center;padding:8px 18px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(20,40,30,0.5);color:rgba(255,255,255,0.85);font-family:inherit;font-size:0.92rem;cursor:pointer;transition:all .2s}
+.wb-review-rest:hover{background:rgba(20,40,30,0.7);border-color:var(--bamboo-light)}
+.wb-due-badge{position:absolute;top:-7px;left:-6px;background:var(--bamboo);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:2}
+.wb-chip-due{border-color:var(--bamboo-light);background:rgba(181,118,58,0.22)}
 .wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.85rem;color:#fff;margin-bottom:12px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px}
 .wb-legend{display:inline-flex;align-items:center;gap:5px}
 .wb-manage-btn{padding:5px 13px;border:1px solid rgba(255,255,255,0.42);border-radius:8px;background:rgba(255,255,255,0.13);color:#fff;font-family:inherit;font-size:0.82rem;cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -1119,17 +1123,18 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
             <div class="wb-title-en">Mistake Book</div>
           </div>
         </div>
-        <div class="wb-count-wrap"><b id="wb-count">0</b> 个待复习</div>
+        <div class="wb-count-wrap">今天 <b id="wb-count-due">0</b> · 全部 <b id="wb-count">0</b></div>
       </div>
-      <button id="wb-review-all" class="wb-review-all" onclick="wbReviewAll()" style="display:none">
-        <span>↻ 复习全部</span><span class="wb-ra-num">(0)</span>
+      <button id="wb-review-today" class="wb-review-all" onclick="wbReviewToday()" style="display:none">
+        <span>🔥 今天复习</span><span class="wb-ra-num" id="wb-today-num">(0)</span>
       </button>
+      <button id="wb-review-all" class="wb-review-rest" onclick="wbReviewAll()" style="display:none">复习全部 <span class="wb-ra-num">(0)</span></button>
       <div id="wb-tools" class="wb-tools" style="display:none">
         <span class="wb-sort">↓ 错最多优先</span>
         <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错 <span class="wb-dot wb-dot-comp"></span>部件错</span>
         <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()">管理 / Manage</button>
       </div>
-      <div id="wb-tip" class="wb-tip">💡 同一个字连续做对 2 次,才会自动移出 · Master twice to remove</div>
+      <div id="wb-tip" class="wb-tip">💡 间隔复习：答对一次，下次间隔拉长（1→3→7→16天）；熬过 16 天那级自动移出 · 答错退回起点</div>
       <div id="wb-grid" class="wb-grid"></div>
       <div id="wb-empty" class="wb-empty" style="display:none">
         <div class="wb-empty-icon">🎉</div>
@@ -1242,7 +1247,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-21 ✦ 标题栏合并居中','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-22 ✦ SRS间隔重复','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4269,43 +4274,76 @@ function nextCharacter(){
 // ★ 错题本 (部件联动-18) — 纯学生端 localStorage, 按字去重, 记来源(task/free/review)
 //   进: 第一次就错(拼音或部件); 出: 重练连对2次"第一次就对"; 又错: 连对清零+错次+1; 另留手动删
 // ============================================================
+// ★ SRS 间隔重复(部件联动-22): 固定阶梯 [1,3,7,16,35] 天。答对(且到期)→ 升一级、间隔拉长;
+//   答错 → 退回 L0;熬过 SRS_GRAD_LEVEL(L3=16天那级)再答对一次 → 毕业移出(删除)。
+//   到期判定:本地日期整天,今天 ≥ due 即"今天该复习"。安全网:毕业后任何模式再写错 → 自动重新入册。
+var SRS_LADDER = [1, 3, 7, 16, 35];   // 各级间隔(天),index=level(L0..L4)
+var SRS_GRAD_LEVEL = 3;               // 爬过这一级即毕业(L3=16天);改成 4 = 爬完 35 天那级
+function _wbToday(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function _wbAddDays(n){ var d=new Date(); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
 const WrongBook = {
   KEY: 'BLS_WRONGBOOK_v1',
   _load: function(){ try{ return JSON.parse(localStorage.getItem(this.KEY)) || {}; }catch(e){ return {}; } },
   _save: function(o){ try{ localStorage.setItem(this.KEY, JSON.stringify(o)); }catch(e){ console.warn('[错题本] 保存失败', e); } },
+  // 旧存档兼容:缺 level/due 的老字 → 当 L0、due=今天
+  _ensureSrs: function(e){ if(typeof e.level !== 'number') e.level = 0; if(!e.due) e.due = _wbToday(); return e; },
   record: function(char, pyOK, compOK, source){
     if(!char) return;
     var wrong = (pyOK === false) || (compOK === false);
     var firstTryOK = (pyOK !== false) && (compOK !== false);
     var book = this._load();
     var e = book[char];
+    var today = _wbToday();
     if(wrong){
       var d = (typeof CHAR_DB !== 'undefined' && CHAR_DB[char]) ? CHAR_DB[char] : {};
       if(e){
+        // 已在册又错=遗忘 → 退回 L0,明天再复习
+        this._ensureSrs(e);
         e.wrongCount = (e.wrongCount||0) + 1;
         e.streak = 0;
+        e.level = 0;
+        e.due = _wbAddDays(1);
         if(pyOK === false) e.pyWrong = true;
         if(compOK === false) e.compWrong = true;
         if(!e.src) e.src = {task:0, free:0, review:0};
         e.src[source] = (e.src[source]||0) + 1;
         e.lastTs = Date.now();
       } else {
+        // 新错入册:L0,今天就到期(进"今天该复习")
         var src0 = {task:0, free:0, review:0}; src0[source] = 1;
         book[char] = { pinyin:(d.py||''), hsk:(typeof charHskLevel==='function'?charHskLevel(char):null),
           pyWrong:(pyOK===false), compWrong:(compOK===false), wrongCount:1, streak:0, src:src0,
-          firstTs:Date.now(), lastTs:Date.now() };
+          level:0, due:today, firstTs:Date.now(), lastTs:Date.now() };
       }
       this._save(book);
     } else if(firstTryOK && e){
-      e.streak = (e.streak||0) + 1;
-      if(e.streak >= 2){ delete book[char]; }
+      // 答对:仅"到期"才算一次有效复习(防同一天反复刷过快升级/毕业)
+      this._ensureSrs(e);
+      e.streak = (e.streak||0) + 1;   // 旧字段仅作统计,不再触发毕业
+      if(e.due <= today){
+        if(e.level >= SRS_GRAD_LEVEL){
+          delete book[char];          // 毕业 → 移出(删除)
+        } else {
+          e.level = e.level + 1;
+          e.due = _wbAddDays(SRS_LADDER[e.level]);
+          e.lastTs = Date.now();
+        }
+      } else {
+        e.lastTs = Date.now();        // 未到期答对:不升级、不改 due
+      }
       this._save(book);
     }
   },
   remove: function(char){ var b=this._load(); if(b[char]){ delete b[char]; this._save(b); } },
-  list: function(){ var b=this._load(); return Object.keys(b).map(function(c){ var o=b[c]; o.char=c; return o; })
+  list: function(){ var b=this._load(); var t=_wbToday(); return Object.keys(b).map(function(c){ var o=b[c]; o.char=c;
+            if(typeof o.level!=='number') o.level=0; if(!o.due) o.due=t; o.dueToday=(o.due<=t); return o; })
             .sort(function(a,b2){ return (b2.wrongCount-a.wrongCount) || (b2.lastTs-a.lastTs); }); },
-  count: function(){ return Object.keys(this._load()).length; }
+  count: function(){ return Object.keys(this._load()).length; },
+  // 今天该复习(到期)的字
+  dueList: function(){ var t=_wbToday(); return this.list().filter(function(o){ return o.due <= t; })
+            .sort(function(a,b2){ return (a.due<b2.due?-1:a.due>b2.due?1:0) || (b2.wrongCount-a.wrongCount); }); },
+  dueCount: function(){ var t=_wbToday(); var b=this._load(); var n=0;
+            for(var k in b){ var o=b[k]; var due=(o&&o.due)?o.due:t; if(due<=t) n++; } return n; }
 };
 
 let _wbManage = false;
@@ -4322,19 +4360,27 @@ function showWrongBook(){
 }
 
 function updateWrongBookBadge(){
-  var n = WrongBook.count();
+  var m = WrongBook.count();
+  var n = WrongBook.dueCount();
   var d = document.getElementById('wb-home-desc');
-  if(d) d.textContent = n>0 ? (n + ' 个待复习 / to review') : '暂无错题 / All clear';
+  if(!d) return;
+  if(m === 0){ d.textContent = '暂无错题 / All clear'; }
+  else if(n > 0){ d.textContent = '今天该复习 ' + n + ' 个 / ' + n + ' due today'; }
+  else { d.textContent = '今日已清 · 共 ' + m + ' 个 / All done today'; }
 }
 
 function renderWrongBook(){
   var list = WrongBook.list();
   var cnt = list.length;
+  var dueN = WrongBook.dueCount();
   var cEl = document.getElementById('wb-count'); if(cEl) cEl.textContent = cnt;
+  var cdEl = document.getElementById('wb-count-due'); if(cdEl) cdEl.textContent = dueN;
   var mEl = document.getElementById('wb-manage-btn');
   if(mEl){ mEl.textContent = _wbManage ? '完成 / Done' : '管理 / Manage'; mEl.style.display = cnt ? 'inline-block' : 'none'; }
+  var rToday = document.getElementById('wb-review-today');
+  if(rToday){ rToday.style.display = dueN ? 'flex' : 'none'; var tn = document.getElementById('wb-today-num'); if(tn) tn.textContent='('+dueN+')'; }
   var rAll = document.getElementById('wb-review-all');
-  if(rAll){ rAll.style.display = cnt ? 'flex' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
+  if(rAll){ rAll.style.display = cnt ? 'block' : 'none'; var rn=rAll.querySelector('.wb-ra-num'); if(rn) rn.textContent='('+cnt+')'; }
   var tools = document.getElementById('wb-tools'); if(tools) tools.style.display = cnt ? 'flex' : 'none';
   var tip = document.getElementById('wb-tip'); if(tip) tip.style.display = cnt ? 'block' : 'none';
   var grid = document.getElementById('wb-grid');
@@ -4347,7 +4393,9 @@ function renderWrongBook(){
              + (it.compWrong ? '<span class="wb-dot wb-dot-comp" title="部件错"></span>' : '');
     var del = _wbManage ? '<span class="wb-del" data-del="'+it.char+'">×</span>' : '';
     var times = (it.wrongCount>1) ? '<span class="wb-times">×'+it.wrongCount+'</span>' : '';
-    return '<button class="wb-chip" data-char="'+it.char+'">'+del
+    var dueBadge = it.dueToday ? '<span class="wb-due-badge">今日</span>' : '';
+    var chipCls = 'wb-chip' + (it.dueToday ? ' wb-chip-due' : '');
+    return '<button class="'+chipCls+'" data-char="'+it.char+'">'+del+dueBadge
       +'<span class="wb-dots">'+dots+'</span>'
       +'<span class="wb-char">'+it.char+'</span>'
       +'<span class="wb-py">'+(it.pinyin||'')+'</span>'+times+'</button>';
@@ -4367,6 +4415,7 @@ function renderWrongBook(){
 function wbDelete(char){ WrongBook.remove(char); renderWrongBook(); updateWrongBookBadge(); }
 function wbPracticeOne(char){ startWrongBookReview([char]); }
 function wbReviewAll(){ startWrongBookReview(WrongBook.list().map(function(x){ return x.char; })); }
+function wbReviewToday(){ var due = WrongBook.dueList().map(function(x){ return x.char; }); if(!due.length){ showToast('今天没有要复习的字 / Nothing due today','success'); return; } startWrongBookReview(due); }
 
 function startWrongBookReview(charList){
   if(!charList || !charList.length){ showToast('错题本是空的 / Mistake book is empty', 'error'); return; }

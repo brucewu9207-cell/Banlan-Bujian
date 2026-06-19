@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-25 (2026-06-19) — 修复：无CHAR_DB数据的独体字(如"鼠")跳过拼音→sessionIndex不前进→"下一个字"重载同字/到不了完成·含-23~24全部修复 -->
+<!-- 斑斓部件 · 部件联动-26 (2026-06-19) — 游戏化第一步：积分(拼音+1/部件+1/写字+3,各区域弹)+连击计数器+撒花+奖分+每日打卡+9徽章+解锁toast+顶栏总分·连续天数读数。纯前端localStorage(BLS_GAME_v1),后端零改动。主页"成就"拼合动画留作-27 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-25">
+<meta name="version" content="部件联动-26">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-25 ✦ 独体字推进修复','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-26 ✦ 游戏化第一步:积分/连击/打卡/徽章','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2553,6 +2553,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     // 在拼音按钮文字后追加 ☑️ 勾标
     btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
     playCorrectSound();
+    try{ Game.scorePinyin(); }catch(_gmE){}
     // ★ v38 ①：选对的瞬间锁死整步自适应缩放 → 之后不再重算 --ui-scale，
     //          拼音框不会变大、释义框不会缩小，全部原地不动（翻页时由 unlockDragSection 解锁）。
     _fitFrozen = true;
@@ -3536,6 +3537,7 @@ function mergeCharacter(){
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
   state.sessionIndex++;
+  try{ Game.scoreComp(); }catch(_gmE){}
   wizUnlock(3);   // ★ v52④：只解锁③,不自动翻页;用户点「下一步」才翻
 }
 
@@ -4048,6 +4050,7 @@ function startWritingQuiz(){
           var _wbSrc = state.reviewMode ? 'review' : (state.teacherMode ? 'task' : 'free');
           try{ WrongBook.record(state.currentChar, window._blsCurPy, window._blsCurComp, _wbSrc); }catch(_e){ console.warn('[错题本] record 失败', _e); }
         }
+        try{ var _gmAll=(window._blsCurPy!==false)&&(window._blsCurComp!==false); Game.scoreWrite(_gmAll); }catch(_gmE){ console.warn('[Game] scoreWrite 失败', _gmE); }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -5474,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-17';
+  const VERSION = '部件联动-26';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6350,6 +6353,155 @@ showHome();
   }
 
 })(window);
+</script>
+<style>
+/* ══ 游戏化(部件联动-26)：积分/连击/打卡/徽章 ══ */
+.gm-plus{position:fixed;z-index:9998;transform:translate(-50%,0);font-family:Georgia,serif;font-weight:700;font-size:22px;color:#c84b2f;text-shadow:0 1px 4px rgba(255,255,255,.85),0 0 2px rgba(255,255,255,.9);pointer-events:none;animation:gmPlus 1.15s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes gmPlus{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}18%{opacity:1;transform:translate(-50%,-4px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-48px) scale(1)}}
+.gm-combo{position:fixed;right:14px;top:92px;z-index:60;background:rgba(55,74,66,.92);color:#fff;font-family:Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.04em;padding:6px 14px;border-radius:20px;box-shadow:0 4px 14px rgba(20,40,30,.32);opacity:0;transform:scale(.8);transition:opacity .2s ease,transform .2s ease;pointer-events:none}
+.gm-combo.show{opacity:1;transform:scale(1)}
+.gm-stat-top{display:inline-flex;align-items:center;gap:4px;font-family:Georgia,serif;font-size:.78rem;font-weight:600;color:#f5edd8;background:rgba(20,40,30,.45);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;letter-spacing:.02em;line-height:1.1}
+.gm-stat-top:hover{background:rgba(20,40,30,.62)}
+.gm-stat-top .gm-stat-pts{color:#ffd9a0;font-weight:700}
+#gm-toast-box{position:fixed;left:0;right:0;top:16px;z-index:10000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.gm-toast{background:#374a42;color:#fff;font-size:14px;font-weight:500;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(20,40,30,.38);opacity:0;transform:translateY(-10px);transition:opacity .3s ease,transform .3s ease;max-width:90vw;text-align:center}
+.gm-toast.show{opacity:1;transform:none}
+.gm-wall{position:fixed;inset:0;z-index:10001;background:rgba(20,40,30,.5);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease;padding:20px;box-sizing:border-box}
+.gm-wall.show{opacity:1;visibility:visible}
+.gm-wall-card{background:#f5edd8;border-radius:18px;box-shadow:0 18px 50px rgba(20,40,30,.42);padding:18px 18px 20px;width:100%;max-width:380px;box-sizing:border-box;transform:scale(.94);transition:transform .22s ease}
+.gm-wall.show .gm-wall-card{transform:scale(1)}
+.gm-wall-head{display:flex;align-items:center;justify-content:space-between;font-family:Georgia,serif;font-weight:700;font-size:1.02rem;color:#374a42;letter-spacing:.05em}
+.gm-wall-x{cursor:pointer;color:#8a7a65;font-size:1.15rem;line-height:1;padding:0 4px}
+.gm-wall-x:hover{color:#c84b2f}
+.gm-wall-sub{font-family:Georgia,serif;font-size:.8rem;color:#b5763a;margin:5px 0 14px}
+.gm-wall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gm-badge{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:rgba(55,74,66,.06);opacity:.42;filter:grayscale(1)}
+.gm-badge.got{opacity:1;filter:none;background:rgba(181,118,58,.13)}
+.gm-badge-ic{font-size:26px;line-height:1}
+.gm-badge-nm{font-size:11px;color:#374a42;text-align:center;line-height:1.2}
+</style>
+<script>
+/* ══════════════════════════════════════════════════════════
+   ★ 游戏化(部件联动-26)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
+   挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · onComplete(写字+3 +连击/打卡/徽章)
+   ══════════════════════════════════════════════════════════ */
+const Game=(function(){
+  const KEY='BLS_GAME_v1';
+  function _def(){return{points:0,combo:0,bestCombo:0,totalChars:0,lastPlay:'',streak:0,bestStreak:0,badges:{}};}
+  let S=_def();
+  function _load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(_def(),JSON.parse(r));}catch(e){console.warn('[Game] load 失败',e);}}
+  function _save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){console.warn('[Game] save 失败',e);}}
+  function _ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function _today(){return _ymd(new Date());}
+  function _yesterday(){const d=new Date();d.setDate(d.getDate()-1);return _ymd(d);}
+  const BADGES=[
+    {id:'first',name:'初次落笔',icon:'🖌️',cond:s=>s.totalChars>=1},
+    {id:'c10',name:'小有所成',icon:'✍️',cond:s=>s.totalChars>=10},
+    {id:'c50',name:'勤学不辍',icon:'📖',cond:s=>s.totalChars>=50},
+    {id:'c100',name:'百字成林',icon:'🏯',cond:s=>s.totalChars>=100},
+    {id:'combo5',name:'五连击',icon:'🔥',cond:s=>s.bestCombo>=5},
+    {id:'combo10',name:'十连击',icon:'⚡',cond:s=>s.bestCombo>=10},
+    {id:'d3',name:'三日不断',icon:'📅',cond:s=>s.bestStreak>=3},
+    {id:'d7',name:'七日不断',icon:'🗓️',cond:s=>s.bestStreak>=7},
+    {id:'hsk',name:'HSK 通关',icon:'🎯',cond:s=>false}
+  ];
+  function _burst(){try{if(typeof confetti==='function')confetti({particleCount:90,spread:72,origin:{y:0.7}});}catch(e){}}
+  function popPlus(n,target){
+    try{
+      if(!target)return;
+      const r=target.getBoundingClientRect();
+      if(!r||(r.width===0&&r.height===0))return;
+      const el=document.createElement('div');
+      el.className='gm-plus';el.textContent='+'+n;
+      el.style.left=(r.left+r.width/2)+'px';
+      el.style.top=(r.top+Math.min(r.height/2,40))+'px';
+      document.body.appendChild(el);
+      setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},1180);
+    }catch(e){}
+  }
+  function toast(text){
+    let box=document.getElementById('gm-toast-box');
+    if(!box){box=document.createElement('div');box.id='gm-toast-box';document.body.appendChild(box);}
+    const t=document.createElement('div');t.className='gm-toast';t.textContent=text;box.appendChild(t);
+    requestAnimationFrame(function(){t.classList.add('show');});
+    setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},350);},2600);
+  }
+  function _checkin(){
+    const t=_today();
+    if(S.lastPlay===t)return;
+    if(S.lastPlay===_yesterday())S.streak++;else S.streak=1;
+    S.lastPlay=t;
+    if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+  }
+  function _checkBadges(){
+    BADGES.forEach(function(b){if(!S.badges[b.id]&&b.cond(S)){S.badges[b.id]=_today();toast(b.icon+' 解锁徽章：'+b.name);}});
+  }
+  function _renderTop(){
+    let el=document.getElementById('gm-stat-top');
+    if(!el){_injectTop();el=document.getElementById('gm-stat-top');}
+    if(el)el.innerHTML='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天';
+  }
+  function _onPractice(){const pl=document.querySelector('.practice-layout');return !!(pl&&pl.offsetParent!==null);}
+  function _renderCombo(){
+    const el=document.getElementById('gm-combo');if(!el)return;
+    if(S.combo>=2&&_onPractice()){el.textContent='连击 ×'+S.combo;el.classList.add('show');}
+    else el.classList.remove('show');
+  }
+  function scorePinyin(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('pinyin-options'));_renderTop();}
+  function scoreComp(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('structure-panel'));_renderTop();}
+  function scoreWrite(allCorrect){
+    _checkin();
+    S.points+=3;S.totalChars+=1;
+    popPlus(3,document.getElementById('write-stage')||document.getElementById('write-target'));
+    if(allCorrect){
+      S.combo+=1;if(S.combo>S.bestCombo)S.bestCombo=S.combo;
+      if(S.combo>0&&S.combo%5===0){S.points+=5;_burst();toast('🔥 '+S.combo+' 连击！+5');}
+    }else{S.combo=0;}
+    _checkBadges();_save();_renderCombo();_renderTop();
+  }
+  function _injectTop(){
+    const qr=document.getElementById('qr-btn');if(!qr)return;
+    if(document.getElementById('gm-stat-top'))return;
+    const qrSpan=qr.closest('span');
+    const el=document.createElement('span');
+    el.id='gm-stat-top';el.className='gm-stat-top';el.title='点开看成就 / Achievements';
+    el.addEventListener('click',function(ev){ev.stopPropagation();openWall();});
+    if(qrSpan&&qrSpan.parentElement){qrSpan.insertAdjacentElement('afterend',el);}
+    else if(qr.parentElement){qr.parentElement.appendChild(el);}
+  }
+  function _injectCombo(){
+    if(document.getElementById('gm-combo'))return;
+    const el=document.createElement('div');el.id='gm-combo';el.className='gm-combo';
+    document.body.appendChild(el);
+  }
+  function openWall(){if(!document.getElementById('gm-wall'))_buildWall();_renderWall();const ov=document.getElementById('gm-wall');if(ov)ov.classList.add('show');}
+  function closeWall(){const ov=document.getElementById('gm-wall');if(ov)ov.classList.remove('show');}
+  function _buildWall(){
+    const ov=document.createElement('div');ov.id='gm-wall';ov.className='gm-wall';
+    ov.addEventListener('click',function(e){if(e.target===ov)closeWall();});
+    const card=document.createElement('div');card.className='gm-wall-card';
+    card.innerHTML='<div class="gm-wall-head"><span>成就 / Achievements</span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
+    ov.appendChild(card);document.body.appendChild(ov);
+    const x=document.getElementById('gm-wall-x');if(x)x.addEventListener('click',closeWall);
+  }
+  function _renderWall(){
+    const sub=document.getElementById('gm-wall-sub');if(sub)sub.textContent='总分 '+S.points+' · 连续 '+S.streak+' 天 · 最长 '+S.bestStreak+' 天';
+    const grid=document.getElementById('gm-wall-grid');if(!grid)return;
+    grid.innerHTML='';
+    BADGES.forEach(function(b){
+      const got=!!S.badges[b.id];
+      const d=document.createElement('div');d.className='gm-badge'+(got?' got':'');
+      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'</div>';
+      grid.appendChild(d);
+    });
+  }
+  function init(){
+    _load();_injectTop();_injectCombo();_renderTop();_renderCombo();
+    setInterval(_renderCombo,800);
+  }
+  return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
+})();
+window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
 </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-15 (2026-06-17) — Phase 4-2 阶段①: 采集每字拼音/部件答对率(first-try), 完成时随回执上报后端 -->
+<!-- 斑斓部件 · 部件联动-17 (2026-06-19) — Phase 4-2 阶段①: 采集每字拼音/部件答对率(first-try), 完成时随回执上报后端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-15">
+<meta name="version" content="部件联动-17">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -5197,7 +5197,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-16';
+  const VERSION = '部件联动-17';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5416,13 +5416,7 @@ showHome();
             <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
             <div class="bls-hint">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</div>
           </div>
-          <div class="bls-field">
-            <label class="bls-label" for="bls-join-name">
-              我的名字 / My Name <span class="bls-required">*</span>
-            </label>
-            <input type="text" id="bls-join-name" class="bls-input" placeholder="如：张三、Tommy、小雨" maxlength="20" autocomplete="off">
-            <div class="bls-hint">让老师认得你 / Let your teacher recognize you (1-20 字)</div>
-          </div>
+          <!-- ★ 17: 名字由名单回显,不再让学生自填 -->
           <div class="bls-field">
             <label class="bls-label" for="bls-join-sid">
               学号 / Student ID <span class="bls-required">*</span>
@@ -5497,52 +5491,35 @@ showHome();
     return '加入失败 / Failed: ' + e;
   }
 
-  // ─── 提交加入班级 (大小写智能容错 + Worker 真实 schema) ─────
+  // ─── ★ 17: 提交加入 = 先按学号查名单回显姓名 → 确认本人 → 加入 ─────
   function submitJoin(){
     hideJoinError();
     const codeInput = document.getElementById('bls-join-code');
-    const nameInput = document.getElementById('bls-join-name');
     const sidInput = document.getElementById('bls-join-sid');
     const submitBtn = document.getElementById('bls-join-submit');
-    if(!codeInput || !nameInput || !sidInput || !submitBtn) return;
+    if(!codeInput || !sidInput || !submitBtn) return;
 
     const classCode = codeInput.value.trim();
-    const studentName = nameInput.value.trim();
     const studentId = sidInput.value.trim();
 
     if(!classCode){
       showJoinError('请输入班级码 / Please enter class code');
-      codeInput.focus();
-      return;
+      codeInput.focus(); return;
     }
     if(!CLASS_CODE_REGEX.test(classCode)){
       showJoinError('班级码格式不对：需 2-20 位字母/数字/横线/下划线 / Invalid format');
-      codeInput.focus();
-      return;
+      codeInput.focus(); return;
     }
-    if(!studentName){
-      showJoinError('请输入你的名字 / Please enter your name');
-      nameInput.focus();
-      return;
-    }
-    if(studentName.length > NAME_MAX_LEN){
-      showJoinError('名字过长 (最多 ' + NAME_MAX_LEN + ' 字) / Name too long');
-      nameInput.focus();
-      return;
-    }
-    // ★ 16: 学号必填校验
     if(!studentId){
       showJoinError('请输入学号 / Please enter your student ID');
-      sidInput.focus();
-      return;
+      sidInput.focus(); return;
     }
     if(!STUDENT_ID_REGEX.test(studentId)){
       showJoinError('学号格式不对：需 1-20 位字母/数字/横线/下划线 / Invalid ID format');
-      sidInput.focus();
-      return;
+      sidInput.focus(); return;
     }
 
-    // 大小写变体队列
+    // 班级码大小写变体队列(智能容错)
     const variants = [classCode];
     const upper = classCode.toUpperCase();
     const lower = classCode.toLowerCase();
@@ -5550,81 +5527,125 @@ showHome();
     if(variants.indexOf(lower) < 0) variants.push(lower);
 
     submitBtn.disabled = true;
-    submitBtn.textContent = '加入中... / Joining...';
+    submitBtn.textContent = '查询中... / Checking...';
     codeInput.disabled = true;
-    nameInput.disabled = true;
     sidInput.disabled = true;
 
-    console.log('[BLS] 提交加入: variants=' + JSON.stringify(variants) + ', name=' + studentName + ', sid=' + studentId);
-    attemptJoinSequence(variants, 0, studentName, studentId, submitBtn, codeInput, nameInput);
+    console.log('[BLS] ★17 提交查名单: variants=' + JSON.stringify(variants) + ', sid=' + studentId);
+    attemptLookupSequence(variants, 0, studentId, submitBtn, codeInput);
   }
 
-  // ─── 按变体顺序尝试加入 ────────────────────────────────────
-  function attemptJoinSequence(variants, idx, name, sid, submitBtn, codeInput, nameInput){
+  // ─── ★ 17: 按变体顺序查名单(lookup),回显姓名 ──────────────
+  function attemptLookupSequence(variants, idx, sid, submitBtn, codeInput){
     if(idx >= variants.length){
       showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
-      resetJoinForm(submitBtn, codeInput, nameInput);
+      resetJoinForm(submitBtn, codeInput);
       return;
     }
     const cc = variants[idx];
-    console.log('[BLS] 尝试加入 [' + (idx+1) + '/' + variants.length + ']: classCode=' + cc);
+    console.log('[BLS] ★17 查名单 [' + (idx+1) + '/' + variants.length + ']: classCode=' + cc + ', sid=' + sid);
 
-    fetch(BLS_API_BASE + '/student/join', {  // ★ Worker 真实路径: /api/student/join (单数!)
+    fetch(BLS_API_BASE + '/student/lookup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classCode: cc, name: name, studentCode: sid })  // ★ 16: 带学号(studentCode)
+      body: JSON.stringify({ classCode: cc, studentCode: sid })
     })
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){
-      console.log('[BLS] API 响应 [' + cc + ']', res);
+      console.log('[BLS] ★17 lookup 响应 [' + cc + ']', res);
+      const b = res.body || {};
 
-      // ★ 成功判定: Worker 返回 {classInfo, student} 且 status 200
-      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){
-        const cInfo = res.body.classInfo;
-        const student = res.body.student;
-        const finalCC = cInfo.classCode || cc;
-        const finalSC = student.studentCode || sid;
-        const finalName = student.name || name;
-
-        saveJoinResult(finalCC, finalSC, finalName);
-        console.log('[BLS] 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
-        closeDialog();
-        updateCardSubtitle();
-        showToast('已加入班级 ' + finalCC + ' 🎉');
-        fetchTasksAndUpdate();  // ★ v7: 加入后立刻拉任务,副标题显示新任务数
+      // 找到本人 → 弹确认
+      if(res.status === 200 && b.found === true && b.name){
+        const finalCC = (b.classInfo && b.classInfo.classCode) ? b.classInfo.classCode : cc;
+        confirmIdentityAndJoin(finalCC, sid, b.name, submitBtn, codeInput);
         return;
       }
 
-      // 失败:用 Worker 返回的 error 字段
-      const rawErr = (res.body && res.body.error) ? res.body.error : null;
-      // Worker 班级不存在: status=404 + error='班级码不存在'
-      const isNotFound = res.status === 404 ||
-                         (rawErr && /不存在|not\s*found/i.test(String(rawErr)));
-
-      if(isNotFound && idx + 1 < variants.length){
-        console.log('[BLS] 班级码 [' + cc + '] not found, 尝试下一变体');
-        attemptJoinSequence(variants, idx + 1, name, sid, submitBtn, codeInput, nameInput);
-      } else {
-        const msg = friendlyError(rawErr, res.status);
-        showJoinError(msg);
-        resetJoinForm(submitBtn, codeInput, nameInput);
+      // 班级不存在 → 试下一变体
+      if(b.reason === 'no_class' || res.status === 404){
+        if(idx + 1 < variants.length){
+          attemptLookupSequence(variants, idx + 1, sid, submitBtn, codeInput);
+        } else {
+          showJoinError('班级码不存在，请向老师确认 / Class not found, please check with your teacher');
+          resetJoinForm(submitBtn, codeInput);
+        }
+        return;
       }
+
+      // 班级在,但学号不在名单 / 老师没填名字 → 友好提示(不再试变体)
+      if(b.reason === 'not_in_roster'){
+        showJoinError('学号不在班级名单里，请联系老师把你加进名单 / Your ID is not on the class list — please ask your teacher to add you');
+      } else if(b.reason === 'no_name'){
+        showJoinError('老师还没给你的学号填姓名，请联系老师 / Your teacher has not set your name yet — please contact them');
+      } else {
+        showJoinError(b.error ? ('加入失败 / Failed: ' + b.error) : ('加入失败 (' + res.status + ') / Join failed'));
+      }
+      resetJoinForm(submitBtn, codeInput);
     })
     .catch(function(err){
-      console.error('[BLS] 加入失败 (网络) [' + cc + ']', err);
+      console.error('[BLS] ★17 lookup 网络错误 [' + cc + ']', err);
       showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
-      resetJoinForm(submitBtn, codeInput, nameInput);
+      resetJoinForm(submitBtn, codeInput);
     });
   }
 
-  function resetJoinForm(submitBtn, codeInput, nameInput){
+  // ─── ★ 17: 确认是本人 → 正式加入(join,不传名字) ───────────
+  function confirmIdentityAndJoin(classCode, sid, name, submitBtn, codeInput){
+    const ok = confirm('确认是你本人吗？\n姓名：' + name + '\n学号：' + sid + '\n\nIs this you?\nName: ' + name + '\nID: ' + sid);
+    if(!ok){
+      resetJoinForm(submitBtn, codeInput);   // 取消 → 恢复表单,可改学号
+      return;
+    }
+    if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '加入中... / Joining...'; }
+
+    fetch(BLS_API_BASE + '/student/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode: classCode, studentCode: sid })   // ★17: 不传 name,名字以名单为准
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      console.log('[BLS] ★17 join 响应', res);
+      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){
+        const cInfo = res.body.classInfo;
+        const student = res.body.student;
+        const finalCC = cInfo.classCode || classCode;
+        const finalSC = student.studentCode || sid;
+        const finalName = student.name || name;
+        saveJoinResult(finalCC, finalSC, finalName);
+        console.log('[BLS] ★17 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
+        closeDialog();
+        updateCardSubtitle();
+        showToast('已加入班级 ' + finalCC + ' 🎉');
+        fetchTasksAndUpdate();
+        return;
+      }
+      const b = res.body || {};
+      if(b.status === 'not_in_roster'){
+        showJoinError('学号不在班级名单里，请联系老师 / Your ID is not on the class list');
+      } else if(b.status === 'no_name'){
+        showJoinError('老师还没给你的学号填姓名，请联系老师 / Your name is not set yet');
+      } else {
+        showJoinError(b.error ? ('加入失败 / Failed: ' + b.error) : ('加入失败 (' + res.status + ') / Join failed'));
+      }
+      resetJoinForm(submitBtn, codeInput);
+    })
+    .catch(function(err){
+      console.error('[BLS] ★17 join 网络错误', err);
+      showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
+      resetJoinForm(submitBtn, codeInput);
+    });
+  }
+
+  // ─── 重置加入表单 (★17: 去掉 name) ─────────────────────────
+  function resetJoinForm(submitBtn, codeInput){
     if(submitBtn){
       submitBtn.disabled = false;
       submitBtn.textContent = '加入 / Join';
     }
     if(codeInput) codeInput.disabled = false;
-    if(nameInput) nameInput.disabled = false;
-    var sidInput = document.getElementById('bls-join-sid');  // ★ 16: 重新启用学号框
+    var sidInput = document.getElementById('bls-join-sid');
     if(sidInput) sidInput.disabled = false;
   }
 
@@ -5661,7 +5682,7 @@ showHome();
           </div>
         </div>
         <div class="bls-modal-footer">
-          <button class="bls-btn bls-btn-danger" id="bls-leave-btn">离开班级 / Leave</button>
+          <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
           <button class="bls-btn bls-btn-primary" id="bls-info-ok">好 / OK</button>
         </div>
       </div>
@@ -5669,7 +5690,7 @@ showHome();
     createOverlay(html);
     document.getElementById('bls-info-close').onclick = closeDialog;
     document.getElementById('bls-info-ok').onclick = closeDialog;
-    document.getElementById('bls-leave-btn').onclick = confirmLeave;
+    // ★ 17: 离开按钮已移除
 
     // 刷新按钮
     const refreshBtn = document.getElementById('bls-refresh-tasks');
@@ -5842,6 +5863,7 @@ showHome();
     .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
     .then(function(res){
       console.log('[BLS] 上报响应 [' + taskId + ']', res);
+      if(res.body && res.body.status === 'removed'){ handleStudentRemoved(res.body.message); return; }
       if(res.status === 200 && res.body && res.body.success){
         console.log('[BLS] ✅ 上报成功 · taskId=' + taskId);
       } else {
@@ -5915,17 +5937,36 @@ showHome();
   }
 
   // ─── 拉任务列表 (v8: 支持回调) ─────────────────────────────
+  // ─── ★ 17: 身份复验失败(被移出) → 清本地登录态 + 退回加入页 ──
+  function handleStudentRemoved(message){
+    console.warn('[BLS] ★17 身份复验:已不在该班级 → 清本地登录态');
+    clearSession();
+    try { closeDialog(); } catch(e){}
+    if(state.inTaskMode){ try { exitTaskMode(); } catch(e){} }
+    updateCardSubtitle();
+    showToast(message || '你已不在该班级，请重新加入 / You are no longer in this class');
+  }
+
+  // ─── 拉任务列表 (★17: 带 studentCode 复验身份) ─────────────
   function fetchTasksAndUpdate(onDone){
     if(!state.classCode){
       console.log('[BLS] fetchTasks 跳过 (无 classCode)');
       if(onDone) onDone(false);
       return;
     }
+    var url = BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) + '/tasks';
+    if(state.studentCode) url += '?studentCode=' + encodeURIComponent(state.studentCode);   // ★17: 后端据此复验
     console.log('[BLS] 拉取任务列表 · classCode=' + state.classCode);
-    fetch(BLS_API_BASE + '/student/' + encodeURIComponent(state.classCode) + '/tasks')
+    fetch(url)
       .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
       .then(function(res){
         console.log('[BLS] 任务列表响应', res);
+        // ★17: 后端说已被移出 → 自动登出退回加入页
+        if(res.body && res.body.status === 'removed'){
+          handleStudentRemoved(res.body.message);
+          if(onDone) onDone(false);
+          return;
+        }
         if(res.status === 200 && res.body && Array.isArray(res.body.tasks)){
           state.tasks = res.body.tasks;
           console.log('[BLS] 拉取任务成功 · 共 ' + state.tasks.length + ' 个');
@@ -6015,7 +6056,7 @@ showHome();
     onCardClick: onCardClick,
     openJoinDialog: openJoinDialog,
     openIdentityPanel: openIdentityPanel,
-    leaveClass: confirmLeave,
+    // ★ 17: leaveClass 已移除
     refreshTasks: fetchTasksAndUpdate,
     openTask: openTask,                  // ★ v8: 任务点击 (HTML onclick 调用)
     _state: state,

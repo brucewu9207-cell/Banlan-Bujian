@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-27 (2026-06-19) — 游戏化UI微调：连击读数移到积分右侧、积分/连击与顶栏按钮(返回/二维码)同尺寸(复用struct-action-btn)、连击常显「连击 ×N」。承-26:积分(拼音+1/部件+1/写字+3)+撒花+奖分+每日打卡+9徽章+顶栏读数。纯前端localStorage(BLS_GAME_v1)。主页"成就"拼合动画留作-28 -->
+<!-- 斑斓部件 · 部件联动-28 (2026-06-19) — 积分/连击读数从顶栏移到首页4个大卡上方(深色药丸,与卡片同色系;积分点开看徽章墙)、顶栏按钮(返回/二维码/反馈/13种结构)内边距22px→14px改窄。承游戏化:积分(拼音+1/部件+1/写字+3)+撒花+奖分+每日打卡+9徽章。纯前端localStorage(BLS_GAME_v1)。主页"成就"拼合动画留作-29 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-27">
+<meta name="version" content="部件联动-28">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -582,7 +582,7 @@ body::after{
 }
 
 .struct-action-btn{
-  padding:8px 22px;
+  padding:8px 14px;
   border:1px solid rgba(255,255,255,0.2);
   border-radius:9px;
   background:rgba(20,40,30,0.55);
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-27 ✦ 游戏化UI微调:连击移到积分右侧/同按钮尺寸','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-28 ✦ 积分/连击移到首页4卡上方 + 顶栏按钮改窄','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5477,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-27';
+  const VERSION = '部件联动-28';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6355,13 +6355,20 @@ showHome();
 })(window);
 </script>
 <style>
-/* ══ 游戏化(部件联动-27)：积分/连击/打卡/徽章 ══ */
+/* ══ 游戏化(部件联动-28)：积分/连击/打卡/徽章 ══ */
 .gm-plus{position:fixed;z-index:9998;transform:translate(-50%,0);font-family:Georgia,serif;font-weight:700;font-size:22px;color:#c84b2f;text-shadow:0 1px 4px rgba(255,255,255,.85),0 0 2px rgba(255,255,255,.9);pointer-events:none;animation:gmPlus 1.15s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes gmPlus{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}18%{opacity:1;transform:translate(-50%,-4px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-48px) scale(1)}}
-/* 积分/连击读数：复用 .struct-action-btn 尺寸(与返回/二维码一致)，仅给数字点缀色 */
-.gm-stat-top .gm-stat-pts{color:#ffd9a0;font-weight:700}
-.gm-combo{cursor:default}
-.gm-combo .gm-combo-n{color:#ffd9a0;font-weight:700}
+/* 积分/连击读数：首页 4 卡上方的深色药丸(与卡片同色系) */
+.gm-home-bar{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:0 auto 20px;position:relative;z-index:1}
+.gm-home-bar .gm-stat-top,.gm-home-bar .gm-combo{display:inline-flex;align-items:center;font-family:Georgia,serif;font-size:1.08rem;font-weight:600;color:#fff;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:8px 18px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2}
+.gm-home-bar .gm-stat-top{cursor:pointer;transition:all .2s}
+.gm-home-bar .gm-stat-top:hover{background:rgba(20,40,30,0.72);border-color:var(--bamboo-light)}
+.gm-home-bar .gm-combo{cursor:default}
+.gm-stat-top .gm-stat-pts,.gm-combo .gm-combo-n{color:#ffd9a0;font-weight:700}
+@media(max-width:768px){
+  .gm-home-bar{gap:8px;margin-bottom:12px}
+  .gm-home-bar .gm-stat-top,.gm-home-bar .gm-combo{font-size:0.82rem;padding:6px 12px;border-radius:9px}
+}
 #gm-toast-box{position:fixed;left:0;right:0;top:16px;z-index:10000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
 .gm-toast{background:#374a42;color:#fff;font-size:14px;font-weight:500;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(20,40,30,.38);opacity:0;transform:translateY(-10px);transition:opacity .3s ease,transform .3s ease;max-width:90vw;text-align:center}
 .gm-toast.show{opacity:1;transform:none}
@@ -6381,7 +6388,7 @@ showHome();
 </style>
 <script>
 /* ══════════════════════════════════════════════════════════
-   ★ 游戏化(部件联动-27)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
+   ★ 游戏化(部件联动-28)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
    挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · onComplete(写字+3 +连击/打卡/徽章)
    ══════════════════════════════════════════════════════════ */
 const Game=(function(){
@@ -6437,7 +6444,7 @@ const Game=(function(){
   }
   function _renderTop(){
     let el=document.getElementById('gm-stat-top');
-    if(!el){_injectTop();el=document.getElementById('gm-stat-top');}
+    if(!el){_injectHome();el=document.getElementById('gm-stat-top');}
     if(el)el.innerHTML='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天';
   }
   function _renderCombo(){
@@ -6456,22 +6463,16 @@ const Game=(function(){
     }else{S.combo=0;}
     _checkBadges();_save();_renderCombo();_renderTop();
   }
-  function _injectTop(){
-    const qr=document.getElementById('qr-btn');if(!qr)return;
-    if(document.getElementById('gm-stat-top'))return;
-    const qrSpan=qr.closest('span');
-    const el=document.createElement('span');
-    el.id='gm-stat-top';el.className='struct-action-btn gm-stat-top';el.title='点开看成就 / Achievements';
-    el.addEventListener('click',function(ev){ev.stopPropagation();openWall();});
-    if(qrSpan&&qrSpan.parentElement){qrSpan.insertAdjacentElement('afterend',el);}
-    else if(qr.parentElement){qr.parentElement.appendChild(el);}
-  }
-  function _injectCombo(){
-    if(document.getElementById('gm-combo'))return;
-    const anchor=document.getElementById('gm-stat-top');
-    const el=document.createElement('div');el.id='gm-combo';el.className='struct-action-btn gm-combo';
-    if(anchor&&anchor.parentElement){anchor.insertAdjacentElement('afterend',el);}
-    else{const qr=document.getElementById('qr-btn');if(qr&&qr.parentElement)qr.parentElement.appendChild(el);else document.body.appendChild(el);}
+  function _injectHome(){
+    if(document.getElementById('gm-home-bar'))return;
+    const grid=document.querySelector('.home-grid');if(!grid||!grid.parentNode)return;
+    const bar=document.createElement('div');bar.id='gm-home-bar';bar.className='gm-home-bar';
+    const stat=document.createElement('div');
+    stat.id='gm-stat-top';stat.className='gm-stat-top';stat.title='点开看成就 / Achievements';
+    stat.addEventListener('click',function(ev){ev.stopPropagation();openWall();});
+    const combo=document.createElement('div');combo.id='gm-combo';combo.className='gm-combo';
+    bar.appendChild(stat);bar.appendChild(combo);
+    grid.parentNode.insertBefore(bar,grid);
   }
   function openWall(){if(!document.getElementById('gm-wall'))_buildWall();_renderWall();const ov=document.getElementById('gm-wall');if(ov)ov.classList.add('show');}
   function closeWall(){const ov=document.getElementById('gm-wall');if(ov)ov.classList.remove('show');}
@@ -6495,7 +6496,7 @@ const Game=(function(){
     });
   }
   function init(){
-    _load();_injectTop();_injectCombo();_renderTop();_renderCombo();
+    _load();_injectHome();_renderTop();_renderCombo();
   }
   return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
 })();

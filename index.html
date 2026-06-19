@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-20 (2026-06-19) — UI: 4卡统一(图标+中文+英文斜体)、错题本工具栏+计数改深色bar(仅管理可点)、提示框×1.5 -->
+<!-- 斑斓部件 · 部件联动-21 (2026-06-19) — UI: 错题本标题栏(标题+计数)合并为一个居中深色框 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -827,12 +827,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 /* ══ 错题本 (部件联动-18) ══ */
 .wb-home-card .home-entry-icon{color:var(--vermillion)}
 .wb-screen{max-width:680px;margin:0 auto;padding:18px 14px;color:#fff}
-.wb-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.wb-head{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;width:fit-content;max-width:100%;margin:0 auto 16px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 22px}
 .wb-title-wrap{display:flex;align-items:center;gap:12px}
 .wb-title-icon{font-size:2rem;line-height:1}
 .wb-title-zh{font-size:1.5rem;font-weight:700;letter-spacing:0.06em}
 .wb-title-en{font-size:0.85rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.8)}
-.wb-count-wrap{font-size:0.9rem;color:#fff;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:6px 14px;white-space:nowrap}
+.wb-count-wrap{font-size:0.95rem;color:#fff;white-space:nowrap}
 .wb-count-wrap b{color:var(--gold);font-size:1.2rem}
 .wb-review-all{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
 .wb-review-all:hover{background:var(--bamboo-light);transform:translateY(-2px)}
@@ -1242,7 +1242,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-20 ✦ 卡片统一/工具栏bar','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-21 ✦ 标题栏合并居中','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================

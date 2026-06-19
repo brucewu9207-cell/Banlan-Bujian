@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-29 (2026-06-19) — 【仅电脑端布局微调】把积分/连击药丸从首页移回顶栏左簇(返回/二维码 右边);6个顶栏按钮缩小字号(1.17→0.85rem)+内边距+簇间距,避免挤压中间标题。手机端布局完全不变(仍用首页药丸条+方格按钮)。承-28游戏化:积分/连击/打卡/9徽章/localStorage(BLS_GAME_v1)。主页"成就"拼合动画仍留作下一步 -->
+<!-- 斑斓部件 · 部件联动-30 (2026-06-19) — 主页新增「成就」拼合入口:随机部件之外固定加 成、就 两个完整字(朱砂红+脉冲发光),点任一→飞拢并排成「成就」→显示拼音→弹徽章墙(关墙后自动散开,可重复)。随机部件/顶栏布局/游戏化数据(localStorage BLS_GAME_v1)均不变。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-29">
+<meta name="version" content="部件联动-30">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -75,6 +75,14 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 .deco-piece.visible{opacity:var(--op,1)}
 .deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.28)) brightness(1.08)}
+/* ★ -30:成就部件(徽章墙入口) —— 朱砂红整字 + 轻微脉冲发光,区别于墨绿随机部件 */
+.deco-ach{z-index:3;animation:ach-pulse 2.4s ease-in-out infinite}
+.deco-ach.deco-ach-merging{z-index:8;animation:none;filter:drop-shadow(0 6px 16px rgba(200,75,47,0.5)) brightness(1.05)}
+@keyframes ach-pulse{0%,100%{filter:drop-shadow(0 0 3px rgba(200,75,47,0.4))}50%{filter:drop-shadow(0 0 9px rgba(200,75,47,0.65))}}
+#deco-ach-label{position:fixed;z-index:11;pointer-events:none;transform:translate(-50%,0) scale(0.96);opacity:0;transition:opacity .2s ease,transform .2s ease;background:rgba(255,255,255,0.96);border-radius:12px;box-shadow:0 8px 24px rgba(20,40,30,0.22);padding:8px 16px;text-align:center;white-space:nowrap}
+#deco-ach-label.show{opacity:1;transform:translate(-50%,0) scale(1)}
+#deco-ach-label .ach-py{font-family:Georgia,serif;font-style:italic;font-size:18px;color:var(--vermillion,#c84b2f);line-height:1.2}
+#deco-ach-label .ach-cap{font-size:12px;color:#5a6a60;letter-spacing:0.04em;margin-top:3px}
 .deco-piece-inner{
   width:100%;height:100%;
   position:relative;           /* v75：容纳叠加的 solo + aligned SVG */
@@ -1249,7 +1257,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-29 ✦ 积分/连击移回顶栏(仅电脑端) + 6按钮缩小不挡标题','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-30 ✦ 主页新增「成就」拼合入口 → 徽章墙','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4760,6 +4768,98 @@ function _sizeForPair(totalStrokes){
   return 46;
 }
 
+// ════════════════════════════════════════════════
+// ★ -30:成就部件(徽章墙入口) —— 成、就 两个完整字(朱砂红),点任一→飞拢并排成「成就」→显示拼音→弹徽章墙→关墙后散开
+// ════════════════════════════════════════════════
+const _ACH_CHARS = [ {char:'成', py:'chéng'}, {char:'就', py:'jiù'} ];
+const _ACH_COLOR = '#c84b2f';   // 朱砂红 = var(--vermillion)
+let _achBusy = false;
+
+function _placeAchievementPieces(layer, safeRects, viewport, sideEdge, topMargin, placed){
+  _decoState.achPieces = [];
+  const size = _decoState.isMobile ? 40 : 62;     // 比随机部件略大:好点、显眼
+  const spacing = _decoState.isMobile ? DECO_CFG.pieceSpacingMb : DECO_CFG.pieceSpacing;
+  _ACH_CHARS.forEach(item=>{
+    const pos = _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, spacing);
+    if(!pos) return;   // 极少放不下;放不下就跳过该字
+    placed.push({x:pos.x, y:pos.y, w:size, h:size});
+    const el = document.createElement('div');
+    el.className = 'deco-piece deco-ach';
+    el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${size}px;height:${size}px;--op:${DECO_CFG.baseOpacity}`;
+    el.dataset.role = 'ach';
+    el.title = '成就 / Achievements';
+    const inner = document.createElement('div');
+    inner.className = 'deco-piece-inner';
+    el.appendChild(inner);
+    _renderDecoPieceSVG(inner, item.char, 'all', _ACH_COLOR, item.char, el);
+    el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _assembleAchievement(); });
+    layer.appendChild(el);
+    _decoState.achPieces.push({el, char:item.char, py:item.py, homeX:pos.x, homeY:pos.y, size});
+  });
+}
+
+function _achLabel(){
+  let lab = document.getElementById('deco-ach-label');
+  if(!lab){ lab = document.createElement('div'); lab.id = 'deco-ach-label'; document.body.appendChild(lab); }
+  return lab;
+}
+
+function _assembleAchievement(){
+  const ps = _decoState.achPieces;
+  if(!ps || ps.length < 2 || _achBusy) return;
+  _achBusy = true;
+  try{ _hideMergeCardOnly(); }catch(e){}     // 收掉随机部件的合体卡,避免叠加
+  const vw = window.innerWidth, vh = window.innerHeight;
+  const topM = _decoState.topMargin || 100;
+  const size = ps[0].size;
+  const gap = 6;
+  const cx = Math.round(vw/2);
+  const cy = Math.max(topM + size, Math.min(Math.round(vh*0.46), vh - size - 80));
+  const leftX = cx - size - Math.round(gap/2);
+  const rightX = cx + Math.round(gap/2);
+  const yTop = cy - Math.round(size/2);
+  const cheng = ps.find(p=>p.char==='成') || ps[0];
+  const jiu   = ps.find(p=>p.char==='就') || ps[1];
+  [cheng, jiu].forEach(p=>p.el.classList.add('deco-ach-merging'));
+  cheng.el.style.left = leftX + 'px';  cheng.el.style.top = yTop + 'px';
+  jiu.el.style.left   = rightX + 'px'; jiu.el.style.top   = yTop + 'px';
+  // 飞拢(0.7s)到位 → 显示拼音标签
+  setTimeout(()=>{
+    if(!_achBusy) return;
+    const lab = _achLabel();
+    lab.innerHTML = '<div class="ach-py">chéng jiù</div><div class="ach-cap">成就 · Achievements</div>';
+    lab.style.left = cx + 'px';
+    lab.style.top  = (yTop + size + 12) + 'px';
+    lab.classList.add('show');
+    // 再停 ~1s → 收标签 + 弹徽章墙
+    setTimeout(()=>{
+      lab.classList.remove('show');
+      try{ if(typeof Game !== 'undefined' && Game.openWall) Game.openWall(); }catch(e){}
+      _watchWallClose();
+    }, 1000);
+  }, 720);
+}
+
+function _watchWallClose(){
+  const wall = document.getElementById('gm-wall');
+  if(!wall){ _scatterAchievement(); return; }
+  const obs = new MutationObserver(()=>{
+    if(!wall.classList.contains('show')){ obs.disconnect(); _scatterAchievement(); }
+  });
+  obs.observe(wall, {attributes:true, attributeFilter:['class']});
+}
+
+function _scatterAchievement(){
+  const lab = document.getElementById('deco-ach-label');
+  if(lab) lab.classList.remove('show');
+  (_decoState.achPieces || []).forEach(p=>{
+    p.el.classList.remove('deco-ach-merging');
+    p.el.style.left = p.homeX + 'px';
+    p.el.style.top  = p.homeY + 'px';
+  });
+  _achBusy = false;
+}
+
 // 初始化整个装饰层
 function initDeco(){
   const layer = document.getElementById('deco-layer');
@@ -4772,6 +4872,8 @@ function initDeco(){
   // 清理旧的
   layer.innerHTML = '';
   _decoState.pieces = [];
+  _decoState.achPieces = [];
+  _achBusy = false;
   _decoState.cardActivePair = null;
   _decoState.mergedPairs = new Set();          // v77：清空所有合体记录
   if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
@@ -4936,6 +5038,9 @@ function initDeco(){
     layer.appendChild(el);
     _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
   }
+
+  // ★ -30:放置成就部件(成/就 完整字,徽章墙入口) —— 在随机部件之后放,自动避开已占位置
+  _placeAchievementPieces(layer, safeRects, viewport, sideEdge, topMargin, placed);
 
   // 调试日志（可在 console 看到实际放置数；正式版可去掉）
   if(window._DECO_DEBUG){
@@ -5477,7 +5582,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-29';
+  const VERSION = '部件联动-30';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

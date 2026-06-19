@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-26 (2026-06-19) — 游戏化第一步：积分(拼音+1/部件+1/写字+3,各区域弹)+连击计数器+撒花+奖分+每日打卡+9徽章+解锁toast+顶栏总分·连续天数读数。纯前端localStorage(BLS_GAME_v1),后端零改动。主页"成就"拼合动画留作-27 -->
+<!-- 斑斓部件 · 部件联动-27 (2026-06-19) — 游戏化UI微调：连击读数移到积分右侧、积分/连击与顶栏按钮(返回/二维码)同尺寸(复用struct-action-btn)、连击常显「连击 ×N」。承-26:积分(拼音+1/部件+1/写字+3)+撒花+奖分+每日打卡+9徽章+顶栏读数。纯前端localStorage(BLS_GAME_v1)。主页"成就"拼合动画留作-28 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-26">
+<meta name="version" content="部件联动-27">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-26 ✦ 游戏化第一步:积分/连击/打卡/徽章','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-27 ✦ 游戏化UI微调:连击移到积分右侧/同按钮尺寸','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5477,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-26';
+  const VERSION = '部件联动-27';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6355,14 +6355,13 @@ showHome();
 })(window);
 </script>
 <style>
-/* ══ 游戏化(部件联动-26)：积分/连击/打卡/徽章 ══ */
+/* ══ 游戏化(部件联动-27)：积分/连击/打卡/徽章 ══ */
 .gm-plus{position:fixed;z-index:9998;transform:translate(-50%,0);font-family:Georgia,serif;font-weight:700;font-size:22px;color:#c84b2f;text-shadow:0 1px 4px rgba(255,255,255,.85),0 0 2px rgba(255,255,255,.9);pointer-events:none;animation:gmPlus 1.15s cubic-bezier(.2,.7,.3,1) forwards}
 @keyframes gmPlus{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}18%{opacity:1;transform:translate(-50%,-4px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-48px) scale(1)}}
-.gm-combo{position:fixed;right:14px;top:92px;z-index:60;background:rgba(55,74,66,.92);color:#fff;font-family:Georgia,serif;font-weight:700;font-size:15px;letter-spacing:.04em;padding:6px 14px;border-radius:20px;box-shadow:0 4px 14px rgba(20,40,30,.32);opacity:0;transform:scale(.8);transition:opacity .2s ease,transform .2s ease;pointer-events:none}
-.gm-combo.show{opacity:1;transform:scale(1)}
-.gm-stat-top{display:inline-flex;align-items:center;gap:4px;font-family:Georgia,serif;font-size:.78rem;font-weight:600;color:#f5edd8;background:rgba(20,40,30,.45);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:5px 10px;cursor:pointer;white-space:nowrap;letter-spacing:.02em;line-height:1.1}
-.gm-stat-top:hover{background:rgba(20,40,30,.62)}
+/* 积分/连击读数：复用 .struct-action-btn 尺寸(与返回/二维码一致)，仅给数字点缀色 */
 .gm-stat-top .gm-stat-pts{color:#ffd9a0;font-weight:700}
+.gm-combo{cursor:default}
+.gm-combo .gm-combo-n{color:#ffd9a0;font-weight:700}
 #gm-toast-box{position:fixed;left:0;right:0;top:16px;z-index:10000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
 .gm-toast{background:#374a42;color:#fff;font-size:14px;font-weight:500;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(20,40,30,.38);opacity:0;transform:translateY(-10px);transition:opacity .3s ease,transform .3s ease;max-width:90vw;text-align:center}
 .gm-toast.show{opacity:1;transform:none}
@@ -6382,7 +6381,7 @@ showHome();
 </style>
 <script>
 /* ══════════════════════════════════════════════════════════
-   ★ 游戏化(部件联动-26)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
+   ★ 游戏化(部件联动-27)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
    挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · onComplete(写字+3 +连击/打卡/徽章)
    ══════════════════════════════════════════════════════════ */
 const Game=(function(){
@@ -6441,11 +6440,9 @@ const Game=(function(){
     if(!el){_injectTop();el=document.getElementById('gm-stat-top');}
     if(el)el.innerHTML='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天';
   }
-  function _onPractice(){const pl=document.querySelector('.practice-layout');return !!(pl&&pl.offsetParent!==null);}
   function _renderCombo(){
     const el=document.getElementById('gm-combo');if(!el)return;
-    if(S.combo>=2&&_onPractice()){el.textContent='连击 ×'+S.combo;el.classList.add('show');}
-    else el.classList.remove('show');
+    el.innerHTML='连击 <span class="gm-combo-n">×'+S.combo+'</span>';
   }
   function scorePinyin(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('pinyin-options'));_renderTop();}
   function scoreComp(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('structure-panel'));_renderTop();}
@@ -6464,15 +6461,17 @@ const Game=(function(){
     if(document.getElementById('gm-stat-top'))return;
     const qrSpan=qr.closest('span');
     const el=document.createElement('span');
-    el.id='gm-stat-top';el.className='gm-stat-top';el.title='点开看成就 / Achievements';
+    el.id='gm-stat-top';el.className='struct-action-btn gm-stat-top';el.title='点开看成就 / Achievements';
     el.addEventListener('click',function(ev){ev.stopPropagation();openWall();});
     if(qrSpan&&qrSpan.parentElement){qrSpan.insertAdjacentElement('afterend',el);}
     else if(qr.parentElement){qr.parentElement.appendChild(el);}
   }
   function _injectCombo(){
     if(document.getElementById('gm-combo'))return;
-    const el=document.createElement('div');el.id='gm-combo';el.className='gm-combo';
-    document.body.appendChild(el);
+    const anchor=document.getElementById('gm-stat-top');
+    const el=document.createElement('div');el.id='gm-combo';el.className='struct-action-btn gm-combo';
+    if(anchor&&anchor.parentElement){anchor.insertAdjacentElement('afterend',el);}
+    else{const qr=document.getElementById('qr-btn');if(qr&&qr.parentElement)qr.parentElement.appendChild(el);else document.body.appendChild(el);}
   }
   function openWall(){if(!document.getElementById('gm-wall'))_buildWall();_renderWall();const ov=document.getElementById('gm-wall');if(ov)ov.classList.add('show');}
   function closeWall(){const ov=document.getElementById('gm-wall');if(ov)ov.classList.remove('show');}
@@ -6497,7 +6496,6 @@ const Game=(function(){
   }
   function init(){
     _load();_injectTop();_injectCombo();_renderTop();_renderCombo();
-    setInterval(_renderCombo,800);
   }
   return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
 })();

@@ -1,0 +1,16 @@
+{
+  "name": "斑斓部件 · HSK 3.0",
+  "short_name": "斑斓部件",
+  "description": "拼音识别 + 部件拼字 · 水墨汉字练习",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#b8cec4",
+  "theme_color": "#55675a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-24 (2026-06-19) — 修复：书写画布禁用右键菜单(防右键/双指菜单截走抬笔信号导致连笔)·承接-23 -->
+<!-- 斑斓部件 · 部件联动-31 (2026-06-19) — 撤掉-30的「成就拼合彩蛋」(以-29为底);徽章墙从全屏弹窗改成【下拉面板】:点积分药丸→从其下方滑出(带▾箭头,点外面或再点药丸收起),配色对齐二维码弹窗(米黄纸#f5edd8 + 砖红#8b2c2c + 白描边)。手机/电脑药丸各自下拉。游戏化数据(localStorage BLS_GAME_v1)不变。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-24">
+<meta name="version" content="部件联动-31">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -582,13 +582,13 @@ body::after{
 }
 
 .struct-action-btn{
-  padding:8px 22px;
+  padding:6px 10px;
   border:1px solid rgba(255,255,255,0.2);
   border-radius:9px;
   background:rgba(20,40,30,0.55);
   color:#ffffff;
   font-family:inherit;
-  font-size:1.17rem;
+  font-size:0.85rem;
   cursor:pointer;
   transition:all .2s;
   letter-spacing:0.04em;
@@ -915,12 +915,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
         <span class="based-on-hsk" style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
-    <div style="position:absolute;right:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
+    <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       反馈 / Feedback
     </button>
     <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">13种结构 / 13 Structures</button></div>
-    <div style="position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:10px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span></div>
+    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span><span id="gm-stat-bar" class="gm-stat-top gm-bar-pill gm-bar-stat" title="点开看成就 / Achievements"></span><span id="gm-combo-bar" class="gm-combo gm-bar-pill gm-bar-combo"></span></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
   <div class="struct-bar-body open" id="struct-body" onclick="toggleStructBar()">
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-24 ✦ 书写区禁右键菜单','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-31 ✦ 徽章墙改下拉面板(像二维码) + 砖红配色','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2422,6 +2422,7 @@ function loadStrokeOnlyChar(char){
     // 完全无 data 的字(CHAR_DB 之外): 退化为原行为
     const pin=document.getElementById('pinyin-options');if(pin){pin.innerHTML='';}
     state.pinyinDone=true;
+    state.sessionIndex++;   // ★ -25 修复：无 CHAR_DB 数据的独体字(如"鼠")跳过拼音→checkPinyin 不触发→sessionIndex 不前进→"下一个字"重载同字;在此补上推进,与有数据独体字(checkPinyin 的 sessionIndex++)对齐
     unlockWriting();
   }
   const sb=document.getElementById('skip-btn');if(sb)sb.style.display='none';
@@ -2552,6 +2553,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     // 在拼音按钮文字后追加 ☑️ 勾标
     btn.innerHTML = chosen + ' <span style="color:#ffffff;font-size:1.1em">✓</span>';
     playCorrectSound();
+    try{ Game.scorePinyin(); }catch(_gmE){}
     // ★ v38 ①：选对的瞬间锁死整步自适应缩放 → 之后不再重算 --ui-scale，
     //          拼音框不会变大、释义框不会缩小，全部原地不动（翻页时由 unlockDragSection 解锁）。
     _fitFrozen = true;
@@ -3535,6 +3537,7 @@ function mergeCharacter(){
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
   state.sessionIndex++;
+  try{ Game.scoreComp(); }catch(_gmE){}
   wizUnlock(3);   // ★ v52④：只解锁③,不自动翻页;用户点「下一步」才翻
 }
 
@@ -4047,6 +4050,7 @@ function startWritingQuiz(){
           var _wbSrc = state.reviewMode ? 'review' : (state.teacherMode ? 'task' : 'free');
           try{ WrongBook.record(state.currentChar, window._blsCurPy, window._blsCurComp, _wbSrc); }catch(_e){ console.warn('[错题本] record 失败', _e); }
         }
+        try{ var _gmAll=(window._blsCurPy!==false)&&(window._blsCurComp!==false); Game.scoreWrite(_gmAll); }catch(_gmE){ console.warn('[Game] scoreWrite 失败', _gmE); }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -5473,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-17';
+  const VERSION = '部件联动-31';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6349,6 +6353,203 @@ showHome();
   }
 
 })(window);
+</script>
+<style>
+/* ══ 游戏化(部件联动-28)：积分/连击/打卡/徽章 ══ */
+.gm-plus{position:fixed;z-index:9998;transform:translate(-50%,0);font-family:Georgia,serif;font-weight:700;font-size:22px;color:#c84b2f;text-shadow:0 1px 4px rgba(255,255,255,.85),0 0 2px rgba(255,255,255,.9);pointer-events:none;animation:gmPlus 1.15s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes gmPlus{0%{opacity:0;transform:translate(-50%,8px) scale(.7)}18%{opacity:1;transform:translate(-50%,-4px) scale(1.15)}100%{opacity:0;transform:translate(-50%,-48px) scale(1)}}
+/* 积分/连击读数：首页 4 卡上方的深色药丸(与卡片同色系) */
+.gm-home-bar{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;margin:0 auto 20px;position:relative;z-index:1}
+.gm-home-bar .gm-stat-top,.gm-home-bar .gm-combo{display:inline-flex;align-items:center;font-family:Georgia,serif;font-size:1.08rem;font-weight:600;color:#fff;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.25);border-radius:12px;padding:8px 18px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2}
+.gm-home-bar .gm-stat-top{cursor:pointer;transition:all .2s}
+.gm-home-bar .gm-stat-top:hover{background:rgba(20,40,30,0.72);border-color:var(--bamboo-light)}
+.gm-home-bar .gm-combo{cursor:default}
+.gm-stat-top .gm-stat-pts,.gm-combo .gm-combo-n{color:#ffd9a0;font-weight:700}
+/* ★ -29:电脑端把积分/连击药丸放进顶栏左簇(返回/二维码 右边);手机端仍用首页 .gm-home-bar */
+.gm-bar-pill{display:inline-flex;align-items:center;font-family:inherit;font-size:0.85rem;font-weight:600;color:#fff;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.22);border-radius:9px;padding:6px 10px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2}
+.gm-bar-stat{cursor:pointer;transition:all .2s}
+.gm-bar-stat:hover{background:rgba(20,40,30,0.75);border-color:var(--bamboo,#b5763a)}
+@media(min-width:769px){.gm-home-bar{display:none}}
+@media(max-width:768px){.gm-bar-pill{display:none}}
+@media(max-width:768px){
+  .gm-home-bar{gap:8px;margin-bottom:12px}
+  .gm-home-bar .gm-stat-top,.gm-home-bar .gm-combo{font-size:0.82rem;padding:6px 12px;border-radius:9px}
+}
+#gm-toast-box{position:fixed;left:0;right:0;top:16px;z-index:10000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.gm-toast{background:#374a42;color:#fff;font-size:14px;font-weight:500;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(20,40,30,.38);opacity:0;transform:translateY(-10px);transition:opacity .3s ease,transform .3s ease;max-width:90vw;text-align:center}
+.gm-toast.show{opacity:1;transform:none}
+.gm-wall{position:fixed;z-index:10001;background:#f5edd8;border:1px solid rgba(255,255,255,0.55);border-radius:14px;box-shadow:0 14px 40px rgba(20,40,30,0.35);padding:14px 14px 16px;width:min(340px,calc(100vw - 24px));max-height:80vh;overflow-y:auto;box-sizing:border-box;transform-origin:top left;opacity:0;visibility:hidden;transform:scaleY(0.85) translateY(-6px);transition:opacity .22s ease,transform .22s ease;text-align:left}
+.gm-wall.show{opacity:1;visibility:visible;transform:scaleY(1) translateY(0)}
+/* ★ -31:积分药丸的下拉箭头(点开徽章面板时旋转) */
+.gm-stat-chev{display:inline-block;margin-left:5px;vertical-align:-1px;transition:transform .3s ease;opacity:.7}
+.gm-stat-top.wall-open .gm-stat-chev{transform:rotate(180deg)}
+.gm-wall-head{display:flex;align-items:center;justify-content:space-between;font-family:Georgia,serif;font-weight:700;font-size:1.02rem;color:#8b2c2c;letter-spacing:.05em}
+.gm-wall-x{cursor:pointer;color:#8a7a65;font-size:1.15rem;line-height:1;padding:0 4px}
+.gm-wall-x:hover{color:#c84b2f}
+.gm-wall-sub{font-family:Georgia,serif;font-size:.8rem;color:#8b2c2c;margin:5px 0 14px}
+.gm-wall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gm-badge{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:rgba(55,74,66,.06);opacity:.42;filter:grayscale(1)}
+.gm-badge.got{opacity:1;filter:none;background:rgba(139,44,44,.10)}
+.gm-badge-ic{font-size:26px;line-height:1}
+.gm-badge-nm{font-size:11px;color:#374a42;text-align:center;line-height:1.2}
+</style>
+<script>
+/* ══════════════════════════════════════════════════════════
+   ★ 游戏化(部件联动-28)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
+   挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · onComplete(写字+3 +连击/打卡/徽章)
+   ══════════════════════════════════════════════════════════ */
+const Game=(function(){
+  const KEY='BLS_GAME_v1';
+  function _def(){return{points:0,combo:0,bestCombo:0,totalChars:0,lastPlay:'',streak:0,bestStreak:0,badges:{}};}
+  let S=_def();
+  function _load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(_def(),JSON.parse(r));}catch(e){console.warn('[Game] load 失败',e);}}
+  function _save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){console.warn('[Game] save 失败',e);}}
+  function _ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function _today(){return _ymd(new Date());}
+  function _yesterday(){const d=new Date();d.setDate(d.getDate()-1);return _ymd(d);}
+  const BADGES=[
+    {id:'first',name:'初次落笔',icon:'🖌️',cond:s=>s.totalChars>=1},
+    {id:'c10',name:'小有所成',icon:'✍️',cond:s=>s.totalChars>=10},
+    {id:'c50',name:'勤学不辍',icon:'📖',cond:s=>s.totalChars>=50},
+    {id:'c100',name:'百字成林',icon:'🏯',cond:s=>s.totalChars>=100},
+    {id:'combo5',name:'五连击',icon:'🔥',cond:s=>s.bestCombo>=5},
+    {id:'combo10',name:'十连击',icon:'⚡',cond:s=>s.bestCombo>=10},
+    {id:'d3',name:'三日不断',icon:'📅',cond:s=>s.bestStreak>=3},
+    {id:'d7',name:'七日不断',icon:'🗓️',cond:s=>s.bestStreak>=7},
+    {id:'hsk',name:'HSK 通关',icon:'🎯',cond:s=>false}
+  ];
+  function _burst(){try{if(typeof confetti==='function')confetti({particleCount:90,spread:72,origin:{y:0.7}});}catch(e){}}
+  function popPlus(n,target){
+    try{
+      if(!target)return;
+      const r=target.getBoundingClientRect();
+      if(!r||(r.width===0&&r.height===0))return;
+      const el=document.createElement('div');
+      el.className='gm-plus';el.textContent='+'+n;
+      el.style.left=(r.left+r.width/2)+'px';
+      el.style.top=(r.top+Math.min(r.height/2,40))+'px';
+      document.body.appendChild(el);
+      setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},1180);
+    }catch(e){}
+  }
+  function toast(text){
+    let box=document.getElementById('gm-toast-box');
+    if(!box){box=document.createElement('div');box.id='gm-toast-box';document.body.appendChild(box);}
+    const t=document.createElement('div');t.className='gm-toast';t.textContent=text;box.appendChild(t);
+    requestAnimationFrame(function(){t.classList.add('show');});
+    setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},350);},2600);
+  }
+  function _checkin(){
+    const t=_today();
+    if(S.lastPlay===t)return;
+    if(S.lastPlay===_yesterday())S.streak++;else S.streak=1;
+    S.lastPlay=t;
+    if(S.streak>S.bestStreak)S.bestStreak=S.streak;
+  }
+  function _checkBadges(){
+    BADGES.forEach(function(b){if(!S.badges[b.id]&&b.cond(S)){S.badges[b.id]=_today();toast(b.icon+' 解锁徽章：'+b.name);}});
+  }
+  function _renderTop(){
+    let els=document.querySelectorAll('.gm-stat-top');
+    if(!els.length){_injectHome();els=document.querySelectorAll('.gm-stat-top');}
+    const html='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天<svg class="gm-stat-chev" viewBox="0 0 16 16" width="11" height="11"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    els.forEach(function(el){el.innerHTML=html;});
+  }
+  function _renderCombo(){
+    const html='连击 <span class="gm-combo-n">×'+S.combo+'</span>';
+    document.querySelectorAll('.gm-combo').forEach(function(el){el.innerHTML=html;});
+  }
+  function scorePinyin(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('pinyin-options'));_renderTop();}
+  function scoreComp(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('structure-panel'));_renderTop();}
+  function scoreWrite(allCorrect){
+    _checkin();
+    S.points+=3;S.totalChars+=1;
+    popPlus(3,document.getElementById('write-stage')||document.getElementById('write-target'));
+    if(allCorrect){
+      S.combo+=1;if(S.combo>S.bestCombo)S.bestCombo=S.combo;
+      if(S.combo>0&&S.combo%5===0){S.points+=5;_burst();toast('🔥 '+S.combo+' 连击！+5');}
+    }else{S.combo=0;}
+    _checkBadges();_save();_renderCombo();_renderTop();
+  }
+  function _injectHome(){
+    if(document.getElementById('gm-home-bar'))return;
+    const grid=document.querySelector('.home-grid');if(!grid||!grid.parentNode)return;
+    const bar=document.createElement('div');bar.id='gm-home-bar';bar.className='gm-home-bar';
+    const stat=document.createElement('div');
+    stat.id='gm-stat-top';stat.className='gm-stat-top';stat.title='点开看成就 / Achievements';
+    stat.addEventListener('click',function(ev){ev.stopPropagation();_toggleWall(stat);});
+    const combo=document.createElement('div');combo.id='gm-combo';combo.className='gm-combo';
+    bar.appendChild(stat);bar.appendChild(combo);
+    grid.parentNode.insertBefore(bar,grid);
+  }
+  let _wallOpen=false, _wallAnchor=null;
+  function _visibleStatPill(){
+    const bar=document.getElementById('gm-stat-bar');
+    if(bar && bar.offsetParent!==null) return bar;
+    const top=document.getElementById('gm-stat-top');
+    if(top && top.offsetParent!==null) return top;
+    return bar||top;
+  }
+  function _positionWall(p, anchor){
+    anchor=anchor||_visibleStatPill();
+    const gap=10, vw=window.innerWidth;
+    let top=110, left=14;
+    if(anchor){ const r=anchor.getBoundingClientRect(); top=Math.round(r.bottom+gap); left=Math.round(r.left); }
+    const pw=p.offsetWidth||320;
+    if(left+pw>vw-10) left=Math.max(10, vw-10-pw);
+    if(left<10) left=10;
+    p.style.left=left+'px'; p.style.top=top+'px';
+  }
+  function _wallOutside(e){
+    const p=document.getElementById('gm-wall'); if(!p) return;
+    if(p.contains(e.target)) return;
+    if(e.target.closest && e.target.closest('.gm-stat-top')) return;
+    closeWall();
+  }
+  function openWall(anchor){
+    if(!document.getElementById('gm-wall'))_buildWall();
+    _renderWall();
+    const p=document.getElementById('gm-wall'); if(!p) return;
+    anchor=anchor||_visibleStatPill();
+    _positionWall(p, anchor);
+    p.classList.add('show'); _wallOpen=true; _wallAnchor=anchor;
+    document.querySelectorAll('.gm-stat-top.wall-open').forEach(function(el){el.classList.remove('wall-open');});
+    if(anchor)anchor.classList.add('wall-open');
+    setTimeout(function(){document.addEventListener('click',_wallOutside,true);},0);
+  }
+  function closeWall(){
+    const p=document.getElementById('gm-wall'); if(p)p.classList.remove('show');
+    _wallOpen=false;
+    document.querySelectorAll('.gm-stat-top.wall-open').forEach(function(el){el.classList.remove('wall-open');});
+    document.removeEventListener('click',_wallOutside,true);
+  }
+  function _toggleWall(anchor){ if(_wallOpen) closeWall(); else openWall(anchor); }
+  function _buildWall(){
+    const p=document.createElement('div');p.id='gm-wall';p.className='gm-wall';
+    p.innerHTML='<div class="gm-wall-head"><span>成就 / Achievements</span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
+    document.body.appendChild(p);
+    const x=document.getElementById('gm-wall-x');if(x)x.addEventListener('click',function(e){e.stopPropagation();closeWall();});
+  }
+  function _renderWall(){
+    const sub=document.getElementById('gm-wall-sub');if(sub)sub.textContent='总分 '+S.points+' · 连续 '+S.streak+' 天 · 最长 '+S.bestStreak+' 天';
+    const grid=document.getElementById('gm-wall-grid');if(!grid)return;
+    grid.innerHTML='';
+    BADGES.forEach(function(b){
+      const got=!!S.badges[b.id];
+      const d=document.createElement('div');d.className='gm-badge'+(got?' got':'');
+      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'</div>';
+      grid.appendChild(d);
+    });
+  }
+  function init(){
+    _load();_injectHome();
+    var sb=document.getElementById('gm-stat-bar');
+    if(sb&&!sb._wired){sb._wired=1;sb.addEventListener('click',function(ev){ev.stopPropagation();_toggleWall(sb);});}
+    _renderTop();_renderCombo();
+  }
+  return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
+})();
+window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
 </script>
 </body>
 </html>

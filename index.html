@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-35 (2026-06-20) — 承-34：游戏化新增「HSK 分级通关」徽章(🥉HSK1 246字 / 🥈HSK2 125字 / 🥇HSK3 284字)，全对才记入「已完成清单」(去重；任何模式含错题本复习；同一个字任意一次全对即算)，徽章墙显示进度 N/总数，集齐自动点亮 + 弹通关 toast(存档键 doneChars，从 -35 起记，旧档不追认)。手机端练习页新增浮动连击药丸(0 连击淡出)，桌面端顶栏连击不变。内嵌 80 字笔顺 / 根治 403 沿用 -34。 -->
+<!-- 斑斓部件 · 部件联动-36 (2026-06-20) — ③ PWA:可「添加到主屏」当 App + 离线缓存(扫码后 安卓一键装 / 苹果引导装) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-35">
+<meta name="version" content="部件联动-36">
 <title>斑斓部件 · HSK 3.0</title>
+<meta name="theme-color" content="#55675a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="斑斓部件">
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
@@ -1251,7 +1258,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-35 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-36 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5487,7 +5494,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-35';
+  const VERSION = '部件联动-36';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6583,6 +6590,59 @@ const Game=(function(){
   return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
 })();
 window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
+</script>
+<script>
+/* ③ PWA:注册离线缓存引擎 + 扫码后「装到主屏」提示(安卓一键 / 苹果引导) */
+(function(){
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
+  }
+  var LS_KEY = 'bls_install_dismiss';
+  function dismissedRecently(){ try{ var t=+localStorage.getItem(LS_KEY)||0; return (Date.now()-t)<7*24*3600*1000; }catch(e){ return false; } }
+  function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
+  function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
+  var deferredPrompt = null;
+  function dismiss(el){ try{ localStorage.setItem(LS_KEY, Date.now()); }catch(e){} if(el&&el.remove) el.remove(); }
+
+  window.addEventListener('beforeinstallprompt', function(e){
+    e.preventDefault(); deferredPrompt = e;
+    if (!isStandalone() && !dismissedRecently()) showBanner('android');
+  });
+  window.addEventListener('load', function(){
+    if (isIOS() && !isStandalone() && !dismissedRecently()) setTimeout(function(){ showBanner('ios'); }, 1500);
+  });
+
+  function showBanner(kind){
+    if (document.getElementById('bls-install-banner')) return;
+    var wrap = document.createElement('div');
+    wrap.id = 'bls-install-banner';
+    wrap.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;background:#3c4f45;color:#f3ead2;border-radius:14px;padding:13px 15px;box-shadow:0 6px 24px rgba(0,0,0,0.28);display:flex;align-items:center;gap:10px;max-width:560px;margin:0 auto;';
+    var txt = document.createElement('div');
+    txt.style.cssText = 'flex:1;font-size:14px;line-height:1.55;';
+    var btns = document.createElement('div');
+    btns.style.cssText = 'display:flex;gap:8px;align-items:center;flex-shrink:0;';
+    var close = document.createElement('button');
+    close.textContent = '×'; close.setAttribute('aria-label','关闭');
+    close.style.cssText = 'background:transparent;border:none;color:#cdd6cd;font-size:22px;line-height:1;cursor:pointer;padding:0 4px;';
+    close.onclick = function(){ dismiss(wrap); };
+    if (kind === 'android') {
+      txt.innerHTML = '把<b>斑斓部件</b>装到主屏,像 App 一样用,断网也能打开。';
+      var install = document.createElement('button');
+      install.textContent = '安装';
+      install.style.cssText = 'background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 18px;font-size:14px;cursor:pointer;white-space:nowrap;';
+      install.onclick = function(){
+        if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; dismiss(wrap); }); }
+        else { dismiss(wrap); }
+      };
+      btns.appendChild(install); btns.appendChild(close);
+    } else {
+      txt.innerHTML = '把<b>斑斓部件</b>装到主屏:点屏幕底部 <b>分享</b> 按钮 <span style="display:inline-block;border:1.5px solid #f3ead2;border-radius:4px;padding:0 5px;line-height:1.3;">⤴</span> → 选 <b>「添加到主屏幕」</b>。';
+      btns.appendChild(close);
+    }
+    wrap.appendChild(txt); wrap.appendChild(btns);
+    (document.body || document.documentElement).appendChild(wrap);
+  }
+})();
 </script>
 </body>
 </html>

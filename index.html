@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-30 (2026-06-19) — 主页新增「成就」拼合入口:随机部件之外固定加 成、就 两个完整字(朱砂红+脉冲发光),点任一→飞拢并排成「成就」→显示拼音→弹徽章墙(关墙后自动散开,可重复)。随机部件/顶栏布局/游戏化数据(localStorage BLS_GAME_v1)均不变。 -->
+<!-- 斑斓部件 · 部件联动-31 (2026-06-19) — 撤掉-30的「成就拼合彩蛋」(以-29为底);徽章墙从全屏弹窗改成【下拉面板】:点积分药丸→从其下方滑出(带▾箭头,点外面或再点药丸收起),配色对齐二维码弹窗(米黄纸#f5edd8 + 砖红#8b2c2c + 白描边)。手机/电脑药丸各自下拉。游戏化数据(localStorage BLS_GAME_v1)不变。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-30">
+<meta name="version" content="部件联动-31">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -75,14 +75,6 @@ body::before{content:'';position:fixed;inset:0;background:
 }
 .deco-piece.visible{opacity:var(--op,1)}
 .deco-piece.merging{opacity:1 !important;z-index:5;filter:drop-shadow(0 6px 16px rgba(0,0,0,0.28)) brightness(1.08)}
-/* ★ -30:成就部件(徽章墙入口) —— 朱砂红整字 + 轻微脉冲发光,区别于墨绿随机部件 */
-.deco-ach{z-index:3;animation:ach-pulse 2.4s ease-in-out infinite}
-.deco-ach.deco-ach-merging{z-index:8;animation:none;filter:drop-shadow(0 6px 16px rgba(200,75,47,0.5)) brightness(1.05)}
-@keyframes ach-pulse{0%,100%{filter:drop-shadow(0 0 3px rgba(200,75,47,0.4))}50%{filter:drop-shadow(0 0 9px rgba(200,75,47,0.65))}}
-#deco-ach-label{position:fixed;z-index:11;pointer-events:none;transform:translate(-50%,0) scale(0.96);opacity:0;transition:opacity .2s ease,transform .2s ease;background:rgba(255,255,255,0.96);border-radius:12px;box-shadow:0 8px 24px rgba(20,40,30,0.22);padding:8px 16px;text-align:center;white-space:nowrap}
-#deco-ach-label.show{opacity:1;transform:translate(-50%,0) scale(1)}
-#deco-ach-label .ach-py{font-family:Georgia,serif;font-style:italic;font-size:18px;color:var(--vermillion,#c84b2f);line-height:1.2}
-#deco-ach-label .ach-cap{font-size:12px;color:#5a6a60;letter-spacing:0.04em;margin-top:3px}
 .deco-piece-inner{
   width:100%;height:100%;
   position:relative;           /* v75：容纳叠加的 solo + aligned SVG */
@@ -1257,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-30 ✦ 主页新增「成就」拼合入口 → 徽章墙','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-31 ✦ 徽章墙改下拉面板(像二维码) + 砖红配色','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4768,98 +4760,6 @@ function _sizeForPair(totalStrokes){
   return 46;
 }
 
-// ════════════════════════════════════════════════
-// ★ -30:成就部件(徽章墙入口) —— 成、就 两个完整字(朱砂红),点任一→飞拢并排成「成就」→显示拼音→弹徽章墙→关墙后散开
-// ════════════════════════════════════════════════
-const _ACH_CHARS = [ {char:'成', py:'chéng'}, {char:'就', py:'jiù'} ];
-const _ACH_COLOR = '#c84b2f';   // 朱砂红 = var(--vermillion)
-let _achBusy = false;
-
-function _placeAchievementPieces(layer, safeRects, viewport, sideEdge, topMargin, placed){
-  _decoState.achPieces = [];
-  const size = _decoState.isMobile ? 40 : 62;     // 比随机部件略大:好点、显眼
-  const spacing = _decoState.isMobile ? DECO_CFG.pieceSpacingMb : DECO_CFG.pieceSpacing;
-  _ACH_CHARS.forEach(item=>{
-    const pos = _randomDecoPos(safeRects, viewport, size, sideEdge, topMargin, placed, spacing);
-    if(!pos) return;   // 极少放不下;放不下就跳过该字
-    placed.push({x:pos.x, y:pos.y, w:size, h:size});
-    const el = document.createElement('div');
-    el.className = 'deco-piece deco-ach';
-    el.style.cssText = `left:${pos.x.toFixed(0)}px;top:${pos.y.toFixed(0)}px;width:${size}px;height:${size}px;--op:${DECO_CFG.baseOpacity}`;
-    el.dataset.role = 'ach';
-    el.title = '成就 / Achievements';
-    const inner = document.createElement('div');
-    inner.className = 'deco-piece-inner';
-    el.appendChild(inner);
-    _renderDecoPieceSVG(inner, item.char, 'all', _ACH_COLOR, item.char, el);
-    el.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); _assembleAchievement(); });
-    layer.appendChild(el);
-    _decoState.achPieces.push({el, char:item.char, py:item.py, homeX:pos.x, homeY:pos.y, size});
-  });
-}
-
-function _achLabel(){
-  let lab = document.getElementById('deco-ach-label');
-  if(!lab){ lab = document.createElement('div'); lab.id = 'deco-ach-label'; document.body.appendChild(lab); }
-  return lab;
-}
-
-function _assembleAchievement(){
-  const ps = _decoState.achPieces;
-  if(!ps || ps.length < 2 || _achBusy) return;
-  _achBusy = true;
-  try{ _hideMergeCardOnly(); }catch(e){}     // 收掉随机部件的合体卡,避免叠加
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const topM = _decoState.topMargin || 100;
-  const size = ps[0].size;
-  const gap = 6;
-  const cx = Math.round(vw/2);
-  const cy = Math.max(topM + size, Math.min(Math.round(vh*0.46), vh - size - 80));
-  const leftX = cx - size - Math.round(gap/2);
-  const rightX = cx + Math.round(gap/2);
-  const yTop = cy - Math.round(size/2);
-  const cheng = ps.find(p=>p.char==='成') || ps[0];
-  const jiu   = ps.find(p=>p.char==='就') || ps[1];
-  [cheng, jiu].forEach(p=>p.el.classList.add('deco-ach-merging'));
-  cheng.el.style.left = leftX + 'px';  cheng.el.style.top = yTop + 'px';
-  jiu.el.style.left   = rightX + 'px'; jiu.el.style.top   = yTop + 'px';
-  // 飞拢(0.7s)到位 → 显示拼音标签
-  setTimeout(()=>{
-    if(!_achBusy) return;
-    const lab = _achLabel();
-    lab.innerHTML = '<div class="ach-py">chéng jiù</div><div class="ach-cap">成就 · Achievements</div>';
-    lab.style.left = cx + 'px';
-    lab.style.top  = (yTop + size + 12) + 'px';
-    lab.classList.add('show');
-    // 再停 ~1s → 收标签 + 弹徽章墙
-    setTimeout(()=>{
-      lab.classList.remove('show');
-      try{ if(typeof Game !== 'undefined' && Game.openWall) Game.openWall(); }catch(e){}
-      _watchWallClose();
-    }, 1000);
-  }, 720);
-}
-
-function _watchWallClose(){
-  const wall = document.getElementById('gm-wall');
-  if(!wall){ _scatterAchievement(); return; }
-  const obs = new MutationObserver(()=>{
-    if(!wall.classList.contains('show')){ obs.disconnect(); _scatterAchievement(); }
-  });
-  obs.observe(wall, {attributes:true, attributeFilter:['class']});
-}
-
-function _scatterAchievement(){
-  const lab = document.getElementById('deco-ach-label');
-  if(lab) lab.classList.remove('show');
-  (_decoState.achPieces || []).forEach(p=>{
-    p.el.classList.remove('deco-ach-merging');
-    p.el.style.left = p.homeX + 'px';
-    p.el.style.top  = p.homeY + 'px';
-  });
-  _achBusy = false;
-}
-
 // 初始化整个装饰层
 function initDeco(){
   const layer = document.getElementById('deco-layer');
@@ -4872,8 +4772,6 @@ function initDeco(){
   // 清理旧的
   layer.innerHTML = '';
   _decoState.pieces = [];
-  _decoState.achPieces = [];
-  _achBusy = false;
   _decoState.cardActivePair = null;
   _decoState.mergedPairs = new Set();          // v77：清空所有合体记录
   if(_decoState.dispHideTimer){ clearTimeout(_decoState.dispHideTimer); _decoState.dispHideTimer = null; }
@@ -5038,9 +4936,6 @@ function initDeco(){
     layer.appendChild(el);
     _decoState.pieces.push({el, inner, role: 'stroke', baseLeft: pos.x, baseTop: pos.y, size});
   }
-
-  // ★ -30:放置成就部件(成/就 完整字,徽章墙入口) —— 在随机部件之后放,自动避开已占位置
-  _placeAchievementPieces(layer, safeRects, viewport, sideEdge, topMargin, placed);
 
   // 调试日志（可在 console 看到实际放置数；正式版可去掉）
   if(window._DECO_DEBUG){
@@ -5582,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-30';
+  const VERSION = '部件联动-31';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6483,17 +6378,18 @@ showHome();
 #gm-toast-box{position:fixed;left:0;right:0;top:16px;z-index:10000;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
 .gm-toast{background:#374a42;color:#fff;font-size:14px;font-weight:500;padding:10px 18px;border-radius:24px;box-shadow:0 6px 20px rgba(20,40,30,.38);opacity:0;transform:translateY(-10px);transition:opacity .3s ease,transform .3s ease;max-width:90vw;text-align:center}
 .gm-toast.show{opacity:1;transform:none}
-.gm-wall{position:fixed;inset:0;z-index:10001;background:rgba(20,40,30,.5);display:flex;align-items:center;justify-content:center;opacity:0;visibility:hidden;transition:opacity .22s ease;padding:20px;box-sizing:border-box}
-.gm-wall.show{opacity:1;visibility:visible}
-.gm-wall-card{background:#f5edd8;border-radius:18px;box-shadow:0 18px 50px rgba(20,40,30,.42);padding:18px 18px 20px;width:100%;max-width:380px;box-sizing:border-box;transform:scale(.94);transition:transform .22s ease}
-.gm-wall.show .gm-wall-card{transform:scale(1)}
-.gm-wall-head{display:flex;align-items:center;justify-content:space-between;font-family:Georgia,serif;font-weight:700;font-size:1.02rem;color:#374a42;letter-spacing:.05em}
+.gm-wall{position:fixed;z-index:10001;background:#f5edd8;border:1px solid rgba(255,255,255,0.55);border-radius:14px;box-shadow:0 14px 40px rgba(20,40,30,0.35);padding:14px 14px 16px;width:min(340px,calc(100vw - 24px));max-height:80vh;overflow-y:auto;box-sizing:border-box;transform-origin:top left;opacity:0;visibility:hidden;transform:scaleY(0.85) translateY(-6px);transition:opacity .22s ease,transform .22s ease;text-align:left}
+.gm-wall.show{opacity:1;visibility:visible;transform:scaleY(1) translateY(0)}
+/* ★ -31:积分药丸的下拉箭头(点开徽章面板时旋转) */
+.gm-stat-chev{display:inline-block;margin-left:5px;vertical-align:-1px;transition:transform .3s ease;opacity:.7}
+.gm-stat-top.wall-open .gm-stat-chev{transform:rotate(180deg)}
+.gm-wall-head{display:flex;align-items:center;justify-content:space-between;font-family:Georgia,serif;font-weight:700;font-size:1.02rem;color:#8b2c2c;letter-spacing:.05em}
 .gm-wall-x{cursor:pointer;color:#8a7a65;font-size:1.15rem;line-height:1;padding:0 4px}
 .gm-wall-x:hover{color:#c84b2f}
-.gm-wall-sub{font-family:Georgia,serif;font-size:.8rem;color:#b5763a;margin:5px 0 14px}
+.gm-wall-sub{font-family:Georgia,serif;font-size:.8rem;color:#8b2c2c;margin:5px 0 14px}
 .gm-wall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
 .gm-badge{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:rgba(55,74,66,.06);opacity:.42;filter:grayscale(1)}
-.gm-badge.got{opacity:1;filter:none;background:rgba(181,118,58,.13)}
+.gm-badge.got{opacity:1;filter:none;background:rgba(139,44,44,.10)}
 .gm-badge-ic{font-size:26px;line-height:1}
 .gm-badge-nm{font-size:11px;color:#374a42;text-align:center;line-height:1.2}
 </style>
@@ -6556,7 +6452,7 @@ const Game=(function(){
   function _renderTop(){
     let els=document.querySelectorAll('.gm-stat-top');
     if(!els.length){_injectHome();els=document.querySelectorAll('.gm-stat-top');}
-    const html='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天';
+    const html='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天<svg class="gm-stat-chev" viewBox="0 0 16 16" width="11" height="11"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     els.forEach(function(el){el.innerHTML=html;});
   }
   function _renderCombo(){
@@ -6581,20 +6477,58 @@ const Game=(function(){
     const bar=document.createElement('div');bar.id='gm-home-bar';bar.className='gm-home-bar';
     const stat=document.createElement('div');
     stat.id='gm-stat-top';stat.className='gm-stat-top';stat.title='点开看成就 / Achievements';
-    stat.addEventListener('click',function(ev){ev.stopPropagation();openWall();});
+    stat.addEventListener('click',function(ev){ev.stopPropagation();_toggleWall(stat);});
     const combo=document.createElement('div');combo.id='gm-combo';combo.className='gm-combo';
     bar.appendChild(stat);bar.appendChild(combo);
     grid.parentNode.insertBefore(bar,grid);
   }
-  function openWall(){if(!document.getElementById('gm-wall'))_buildWall();_renderWall();const ov=document.getElementById('gm-wall');if(ov)ov.classList.add('show');}
-  function closeWall(){const ov=document.getElementById('gm-wall');if(ov)ov.classList.remove('show');}
+  let _wallOpen=false, _wallAnchor=null;
+  function _visibleStatPill(){
+    const bar=document.getElementById('gm-stat-bar');
+    if(bar && bar.offsetParent!==null) return bar;
+    const top=document.getElementById('gm-stat-top');
+    if(top && top.offsetParent!==null) return top;
+    return bar||top;
+  }
+  function _positionWall(p, anchor){
+    anchor=anchor||_visibleStatPill();
+    const gap=10, vw=window.innerWidth;
+    let top=110, left=14;
+    if(anchor){ const r=anchor.getBoundingClientRect(); top=Math.round(r.bottom+gap); left=Math.round(r.left); }
+    const pw=p.offsetWidth||320;
+    if(left+pw>vw-10) left=Math.max(10, vw-10-pw);
+    if(left<10) left=10;
+    p.style.left=left+'px'; p.style.top=top+'px';
+  }
+  function _wallOutside(e){
+    const p=document.getElementById('gm-wall'); if(!p) return;
+    if(p.contains(e.target)) return;
+    if(e.target.closest && e.target.closest('.gm-stat-top')) return;
+    closeWall();
+  }
+  function openWall(anchor){
+    if(!document.getElementById('gm-wall'))_buildWall();
+    _renderWall();
+    const p=document.getElementById('gm-wall'); if(!p) return;
+    anchor=anchor||_visibleStatPill();
+    _positionWall(p, anchor);
+    p.classList.add('show'); _wallOpen=true; _wallAnchor=anchor;
+    document.querySelectorAll('.gm-stat-top.wall-open').forEach(function(el){el.classList.remove('wall-open');});
+    if(anchor)anchor.classList.add('wall-open');
+    setTimeout(function(){document.addEventListener('click',_wallOutside,true);},0);
+  }
+  function closeWall(){
+    const p=document.getElementById('gm-wall'); if(p)p.classList.remove('show');
+    _wallOpen=false;
+    document.querySelectorAll('.gm-stat-top.wall-open').forEach(function(el){el.classList.remove('wall-open');});
+    document.removeEventListener('click',_wallOutside,true);
+  }
+  function _toggleWall(anchor){ if(_wallOpen) closeWall(); else openWall(anchor); }
   function _buildWall(){
-    const ov=document.createElement('div');ov.id='gm-wall';ov.className='gm-wall';
-    ov.addEventListener('click',function(e){if(e.target===ov)closeWall();});
-    const card=document.createElement('div');card.className='gm-wall-card';
-    card.innerHTML='<div class="gm-wall-head"><span>成就 / Achievements</span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
-    ov.appendChild(card);document.body.appendChild(ov);
-    const x=document.getElementById('gm-wall-x');if(x)x.addEventListener('click',closeWall);
+    const p=document.createElement('div');p.id='gm-wall';p.className='gm-wall';
+    p.innerHTML='<div class="gm-wall-head"><span>成就 / Achievements</span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
+    document.body.appendChild(p);
+    const x=document.getElementById('gm-wall-x');if(x)x.addEventListener('click',function(e){e.stopPropagation();closeWall();});
   }
   function _renderWall(){
     const sub=document.getElementById('gm-wall-sub');if(sub)sub.textContent='总分 '+S.points+' · 连续 '+S.streak+' 天 · 最长 '+S.bestStreak+' 天';
@@ -6610,7 +6544,7 @@ const Game=(function(){
   function init(){
     _load();_injectHome();
     var sb=document.getElementById('gm-stat-bar');
-    if(sb&&!sb._wired){sb._wired=1;sb.addEventListener('click',function(ev){ev.stopPropagation();openWall();});}
+    if(sb&&!sb._wired){sb._wired=1;sb.addEventListener('click',function(ev){ev.stopPropagation();_toggleWall(sb);});}
     _renderTop();_renderCombo();
   }
   return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};

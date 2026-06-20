@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-31 (2026-06-19) — 撤掉-30的「成就拼合彩蛋」(以-29为底);徽章墙从全屏弹窗改成【下拉面板】:点积分药丸→从其下方滑出(带▾箭头,点外面或再点药丸收起),配色对齐二维码弹窗(米黄纸#f5edd8 + 砖红#8b2c2c + 白描边)。手机/电脑药丸各自下拉。游戏化数据(localStorage BLS_GAME_v1)不变。 -->
+<!-- 斑斓部件 · 部件联动-32 (2026-06-19) — 承-31:徽章墙下拉面板(像二维码弹窗,米黄+砖红+白描边)、撤成就彩蛋。本版仅微调:9个徽章格底色改成白色(已得/未得都白底,未得仍灰化淡显)。游戏化数据(localStorage BLS_GAME_v1)不变。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-31">
+<meta name="version" content="部件联动-32">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1249,7 +1249,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-31 ✦ 徽章墙改下拉面板(像二维码) + 砖红配色','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-32 ✦ 徽章9格底色改白','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5477,7 +5477,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-31';
+  const VERSION = '部件联动-32';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6388,8 +6388,8 @@ showHome();
 .gm-wall-x:hover{color:#c84b2f}
 .gm-wall-sub{font-family:Georgia,serif;font-size:.8rem;color:#8b2c2c;margin:5px 0 14px}
 .gm-wall-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.gm-badge{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:rgba(55,74,66,.06);opacity:.42;filter:grayscale(1)}
-.gm-badge.got{opacity:1;filter:none;background:rgba(139,44,44,.10)}
+.gm-badge{display:flex;flex-direction:column;align-items:center;gap:5px;padding:11px 4px;border-radius:12px;background:#fff;opacity:.42;filter:grayscale(1)}
+.gm-badge.got{opacity:1;filter:none;background:#fff}
 .gm-badge-ic{font-size:26px;line-height:1}
 .gm-badge-nm{font-size:11px;color:#374a42;text-align:center;line-height:1.2}
 </style>

@@ -1,5 +1,5 @@
 /* 斑斓部件 · 离线缓存引擎(service worker) */
-const CACHE = 'banlan-bujian-v36';
+const CACHE = 'banlan-bujian-v37';
 const CORE = ['./', './index.html', './manifest.webmanifest',
   './icon-192.png', './icon-512.png', './apple-touch-icon-180.png'];
 

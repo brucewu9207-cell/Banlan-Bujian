@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-36 (2026-06-20) — ③ PWA:可「添加到主屏」当 App + 离线缓存(扫码后 安卓一键装 / 苹果引导装) -->
+<!-- 斑斓部件 · 部件联动-37 (2026-06-20) — ③ PWA:安装邀请条改为对所有访客主动显示(能调起系统安装就调起,否则给图文指引) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-36">
+<meta name="version" content="部件联动-37">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1258,7 +1258,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-36 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-37 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5494,7 +5494,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-36';
+  const VERSION = '部件联动-37';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6592,55 +6592,51 @@ const Game=(function(){
 window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
 </script>
 <script>
-/* ③ PWA:注册离线缓存引擎 + 扫码后「装到主屏」提示(安卓一键 / 苹果引导) */
+/* ③ PWA:注册离线缓存引擎 + 「装到桌面/主屏」邀请条(对所有访客主动显示) */
 (function(){
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
   }
-  var LS_KEY = 'bls_install_dismiss';
+  var APP = '斑斓部件', LS_KEY = 'bls_install_dismiss', BG = '#3c4f45';
   function dismissedRecently(){ try{ var t=+localStorage.getItem(LS_KEY)||0; return (Date.now()-t)<7*24*3600*1000; }catch(e){ return false; } }
   function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
   function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
-  var deferredPrompt = null;
   function dismiss(el){ try{ localStorage.setItem(LS_KEY, Date.now()); }catch(e){} if(el&&el.remove) el.remove(); }
+  var deferredPrompt = null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; });
 
-  window.addEventListener('beforeinstallprompt', function(e){
-    e.preventDefault(); deferredPrompt = e;
-    if (!isStandalone() && !dismissedRecently()) showBanner('android');
-  });
   window.addEventListener('load', function(){
-    if (isIOS() && !isStandalone() && !dismissedRecently()) setTimeout(function(){ showBanner('ios'); }, 1500);
+    if (isStandalone() || dismissedRecently()) return;
+    setTimeout(showBanner, 1200);
   });
 
-  function showBanner(kind){
+  function closeBtn(w){
+    var c=document.createElement('button'); c.textContent='×'; c.setAttribute('aria-label','关闭');
+    c.style.cssText='background:transparent;border:none;color:#cdd6cd;font-size:22px;line-height:1;cursor:pointer;padding:0 4px;';
+    c.onclick=function(){ dismiss(w); }; return c;
+  }
+  function showBanner(){
     if (document.getElementById('bls-install-banner')) return;
-    var wrap = document.createElement('div');
-    wrap.id = 'bls-install-banner';
-    wrap.style.cssText = 'position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;background:#3c4f45;color:#f3ead2;border-radius:14px;padding:13px 15px;box-shadow:0 6px 24px rgba(0,0,0,0.28);display:flex;align-items:center;gap:10px;max-width:560px;margin:0 auto;';
-    var txt = document.createElement('div');
-    txt.style.cssText = 'flex:1;font-size:14px;line-height:1.55;';
-    var btns = document.createElement('div');
-    btns.style.cssText = 'display:flex;gap:8px;align-items:center;flex-shrink:0;';
-    var close = document.createElement('button');
-    close.textContent = '×'; close.setAttribute('aria-label','关闭');
-    close.style.cssText = 'background:transparent;border:none;color:#cdd6cd;font-size:22px;line-height:1;cursor:pointer;padding:0 4px;';
-    close.onclick = function(){ dismiss(wrap); };
-    if (kind === 'android') {
-      txt.innerHTML = '把<b>斑斓部件</b>装到主屏,像 App 一样用,断网也能打开。';
-      var install = document.createElement('button');
-      install.textContent = '安装';
-      install.style.cssText = 'background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 18px;font-size:14px;cursor:pointer;white-space:nowrap;';
-      install.onclick = function(){
-        if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; dismiss(wrap); }); }
-        else { dismiss(wrap); }
-      };
-      btns.appendChild(install); btns.appendChild(close);
+    var w=document.createElement('div'); w.id='bls-install-banner';
+    w.style.cssText='position:fixed;left:12px;right:12px;bottom:12px;z-index:99999;background:'+BG+';color:#f3ead2;border-radius:14px;padding:13px 15px;box-shadow:0 6px 24px rgba(0,0,0,0.28);display:flex;align-items:center;gap:10px;max-width:560px;margin:0 auto;font-size:14px;line-height:1.55;';
+    var txt=document.createElement('div'); txt.style.cssText='flex:1;';
+    var btns=document.createElement('div'); btns.style.cssText='display:flex;gap:8px;align-items:center;flex-shrink:0;';
+    if (isIOS()) {
+      txt.innerHTML='把<b>'+APP+'</b>装到主屏:点屏幕底部 <b>分享</b> <span style="display:inline-block;border:1.5px solid #f3ead2;border-radius:4px;padding:0 5px;">⤴</span> → 选 <b>「添加到主屏幕」</b>。';
+      btns.appendChild(closeBtn(w));
     } else {
-      txt.innerHTML = '把<b>斑斓部件</b>装到主屏:点屏幕底部 <b>分享</b> 按钮 <span style="display:inline-block;border:1.5px solid #f3ead2;border-radius:4px;padding:0 5px;line-height:1.3;">⤴</span> → 选 <b>「添加到主屏幕」</b>。';
-      btns.appendChild(close);
+      txt.innerHTML='把<b>'+APP+'</b>装到桌面/主屏,像 App 一样用,断网也能开。';
+      var install=document.createElement('button'); install.textContent='安装';
+      install.style.cssText='background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap;';
+      install.onclick=function(){
+        if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; dismiss(w); }); return; }
+        txt.innerHTML='在电脑 Chrome:点<b>地址栏右侧的安装图标</b>,或 <b>⋮ 菜单 → 安装'+APP+'</b>。';
+        if (install.parentNode) install.parentNode.removeChild(install);
+      };
+      btns.appendChild(install); btns.appendChild(closeBtn(w));
     }
-    wrap.appendChild(txt); wrap.appendChild(btns);
-    (document.body || document.documentElement).appendChild(wrap);
+    w.appendChild(txt); w.appendChild(btns);
+    (document.body || document.documentElement).appendChild(w);
   }
 })();
 </script>

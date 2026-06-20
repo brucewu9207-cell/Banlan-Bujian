@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-34 (2026-06-20) — 承-33:首页浮动部件改为"开屏瞬间硬出现"+根治 403。内嵌 80 个 HSK 一级部件字的完整笔顺数据(strokes+medians,~186KB),浮动部件只从内嵌池随机抽 → 数据全在手边、同步秒画、全程不碰 CDN(根治 npmmirror 403)。删除部件 opacity 淡入过渡(保留合体滑动)。这 80 字的书写练习亦随之秒开。游戏化数据(localStorage BLS_GAME_v1)不变。 -->
+<!-- 斑斓部件 · 部件联动-35 (2026-06-20) — 承-34：游戏化新增「HSK 分级通关」徽章(🥉HSK1 246字 / 🥈HSK2 125字 / 🥇HSK3 284字)，全对才记入「已完成清单」(去重；任何模式含错题本复习；同一个字任意一次全对即算)，徽章墙显示进度 N/总数，集齐自动点亮 + 弹通关 toast(存档键 doneChars，从 -35 起记，旧档不追认)。手机端练习页新增浮动连击药丸(0 连击淡出)，桌面端顶栏连击不变。内嵌 80 字笔顺 / 根治 403 沿用 -34。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-34">
+<meta name="version" content="部件联动-35">
 <title>斑斓部件 · HSK 3.0</title>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
@@ -1147,6 +1147,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
     </div>
 
     <div id="practice-screen" style="display:none">
+      <div id="gm-combo-practice" class="gm-combo gm-combo-practice is-zero" aria-hidden="true"></div>
       
 
       <div class="practice-layout">
@@ -1250,7 +1251,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-34 ✦ 部件瞬现+根治403(内嵌80字)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-35 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4057,7 +4058,7 @@ function startWritingQuiz(){
           var _wbSrc = state.reviewMode ? 'review' : (state.teacherMode ? 'task' : 'free');
           try{ WrongBook.record(state.currentChar, window._blsCurPy, window._blsCurComp, _wbSrc); }catch(_e){ console.warn('[错题本] record 失败', _e); }
         }
-        try{ var _gmAll=(window._blsCurPy!==false)&&(window._blsCurComp!==false); Game.scoreWrite(_gmAll); }catch(_gmE){ console.warn('[Game] scoreWrite 失败', _gmE); }
+        try{ var _gmAll=(window._blsCurPy!==false)&&(window._blsCurComp!==false); Game.scoreWrite(_gmAll, state.currentChar); }catch(_gmE){ console.warn('[Game] scoreWrite 失败', _gmE); }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
         showExampleWord(state.currentChar); // 🔓 写对汉字后解锁 ④ 例词
         celebrate(); // 🎉 写对汉字后才撒花
@@ -5486,7 +5487,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-34';
+  const VERSION = '部件联动-35';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6401,6 +6402,16 @@ showHome();
 .gm-badge.got{opacity:1;filter:none;background:#fff}
 .gm-badge-ic{font-size:26px;line-height:1}
 .gm-badge-nm{font-size:11px;color:#722f2f;text-align:center;line-height:1.2}
+/* ★ -35：分级通关徽章的进度数字 N/总数 */
+.gm-badge-prog{font-size:10px;font-weight:700;color:#8b2c2c;font-family:Georgia,serif;letter-spacing:.02em;line-height:1;margin-top:1px}
+.gm-badge.got .gm-badge-prog{color:#c84b2f}
+/* ★ -35：手机端练习页浮动连击药丸(桌面端用顶栏，不显示此药丸) */
+.gm-combo-practice{display:none}
+@media(max-width:768px){
+  .gm-combo-practice{display:inline-flex;align-items:center;position:fixed;top:calc(var(--struct-h,56px) + 6px);right:10px;z-index:50;font-family:Georgia,serif;font-size:0.82rem;font-weight:700;color:#fff;background:rgba(20,40,30,0.62);border:1px solid rgba(255,255,255,0.25);border-radius:9px;padding:5px 11px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2;box-shadow:0 3px 10px rgba(20,40,30,.3);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+  .gm-combo-practice.is-zero{opacity:0;transform:translateY(-6px)}
+}
+.gm-combo-practice .gm-combo-n{color:#ff9b73;font-weight:800}
 </style>
 <script>
 /* ══════════════════════════════════════════════════════════
@@ -6409,7 +6420,7 @@ showHome();
    ══════════════════════════════════════════════════════════ */
 const Game=(function(){
   const KEY='BLS_GAME_v1';
-  function _def(){return{points:0,combo:0,bestCombo:0,totalChars:0,lastPlay:'',streak:0,bestStreak:0,badges:{}};}
+  function _def(){return{points:0,combo:0,bestCombo:0,totalChars:0,lastPlay:'',streak:0,bestStreak:0,badges:{},doneChars:{}};}
   let S=_def();
   function _load(){try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(_def(),JSON.parse(r));}catch(e){console.warn('[Game] load 失败',e);}}
   function _save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){console.warn('[Game] save 失败',e);}}
@@ -6425,8 +6436,14 @@ const Game=(function(){
     {id:'combo10',name:'十连击',icon:'⚡',cond:s=>s.bestCombo>=10},
     {id:'d3',name:'三日不断',icon:'📅',cond:s=>s.bestStreak>=3},
     {id:'d7',name:'七日不断',icon:'🗓️',cond:s=>s.bestStreak>=7},
-    {id:'hsk',name:'HSK 通关',icon:'🎯',cond:s=>false}
+    {id:'hsk1',name:'HSK 1 通关',icon:'🥉',cond:s=>_levelDone(s,1)},
+    {id:'hsk2',name:'HSK 2 通关',icon:'🥈',cond:s=>_levelDone(s,2)},
+    {id:'hsk3',name:'HSK 3 通关',icon:'🥇',cond:s=>_levelDone(s,3)}
   ];
+  // ★ -35：HSK 分级通关判定（复用主作用域里的 HSK_LEVEL_CHARS；某级全部字都进了 doneChars 才点亮）
+  function _lvChars(L){ try{ return (typeof HSK_LEVEL_CHARS!=='undefined' && HSK_LEVEL_CHARS[L]) ? HSK_LEVEL_CHARS[L] : []; }catch(e){ return []; } }
+  function _levelProg(s,L){ const arr=_lvChars(L); if(!arr.length) return {done:0,total:0}; let d=0; for(let i=0;i<arr.length;i++){ if(s.doneChars && s.doneChars[arr[i]]) d++; } return {done:d,total:arr.length}; }
+  function _levelDone(s,L){ const p=_levelProg(s,L); return p.total>0 && p.done>=p.total; }
   function _burst(){try{if(typeof confetti==='function')confetti({particleCount:90,spread:72,origin:{y:0.7}});}catch(e){}}
   function popPlus(n,target){
     try{
@@ -6467,16 +6484,21 @@ const Game=(function(){
   function _renderCombo(){
     const html='连击 <span class="gm-combo-n">×'+S.combo+'</span>';
     document.querySelectorAll('.gm-combo').forEach(function(el){el.innerHTML=html;});
+    // ★ -35：练习页浮动连击药丸——0 连击淡出(不打扰书写)
+    const _pc=document.getElementById('gm-combo-practice');
+    if(_pc) _pc.classList.toggle('is-zero', !(S.combo>0));
   }
   function scorePinyin(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('pinyin-options'));_renderTop();}
   function scoreComp(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('structure-panel'));_renderTop();}
-  function scoreWrite(allCorrect){
+  function scoreWrite(allCorrect, char){
     _checkin();
     S.points+=3;S.totalChars+=1;
     popPlus(3,document.getElementById('write-stage')||document.getElementById('write-target'));
     if(allCorrect){
       S.combo+=1;if(S.combo>S.bestCombo)S.bestCombo=S.combo;
       if(S.combo>0&&S.combo%5===0){S.points+=5;_burst();toast('🔥 '+S.combo+' 连击！+5');}
+      // ★ -35：全对才记入「已完成清单」(去重)；任何模式(含错题本复习)都算
+      if(char && char.length===1 && char.charCodeAt(0)>=0x4e00 && char.charCodeAt(0)<=0x9fa5){ S.doneChars[char]=1; }
     }else{S.combo=0;}
     _checkBadges();_save();_renderCombo();_renderTop();
   }
@@ -6546,7 +6568,9 @@ const Game=(function(){
     BADGES.forEach(function(b){
       const got=!!S.badges[b.id];
       const d=document.createElement('div');d.className='gm-badge'+(got?' got':'');
-      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'</div>';
+      let _prog='';
+      if(b.id==='hsk1'||b.id==='hsk2'||b.id==='hsk3'){ const _p=_levelProg(S,+b.id.slice(3)); _prog='<div class="gm-badge-prog">'+_p.done+'/'+_p.total+'</div>'; }
+      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'</div>'+_prog;
       grid.appendChild(d);
     });
   }

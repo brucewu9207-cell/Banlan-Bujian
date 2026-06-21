@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-38 (2026-06-21) — ⑧ 阿语深化第一波:加 EN/عربي 语言切换(中文恒显,切英/阿)+ RTL;主界面(顶栏/首页/四步骤/错题本/练习键)已上阿语 -->
+<!-- 斑斓部件 · 部件联动-39 (2026-06-21) — ⑧ 修正:语言切换按钮改为独立悬浮右上角(原放在 display:none 的模式栏里看不见) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-38">
+<meta name="version" content="部件联动-39">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -875,7 +875,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 </style>
 <style>
 /* ⑧ 语言切换器 + 中/英/阿显隐 + 阿语RTL */
-.lang-switcher{display:inline-flex;gap:4px;margin-inline-start:10px;background:rgba(255,255,255,0.82);border:1px solid rgba(0,0,0,0.12);border-radius:22px;padding:4px;vertical-align:middle}
+.lang-switcher{position:fixed;top:8px;right:14px;z-index:100000;display:inline-flex;gap:4px;background:rgba(255,255,255,0.92);border:1px solid rgba(0,0,0,0.16);border-radius:22px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
 .lang-btn{background:transparent;border:none;color:#4a3f2f;font-size:14px;font-weight:600;padding:7px 13px;border-radius:18px;cursor:pointer;line-height:1;min-width:52px}
 .lang-btn.lang-ar-label{font-family:'Tahoma','Arial',sans-serif;font-size:15px}
 .lang-btn.active{background:#b5763a;color:#fff}
@@ -887,6 +887,10 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 </style>
 </head>
 <body>
+<div class="lang-switcher" role="group" aria-label="Language">
+  <button class="lang-btn" data-lang="en" type="button">EN</button>
+  <button class="lang-btn lang-ar-label" data-lang="ar" type="button">عربي</button>
+</div>
 <div class="ink-dots" aria-hidden="true">
   <div class="ink-dot" style="width:5px;height:5px;top:18%;left:11%;background:#c84b2f;opacity:0.6"></div>
   <div class="ink-dot" style="width:3px;height:3px;top:35%;right:7%;background:#c84b2f;opacity:0.5"></div>
@@ -917,10 +921,6 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
     <div class="mode-tabs">
       <button class="mode-tab active" onclick="switchMode('learn')">🎓 学习模式<span class="lang-en"> / Learn</span><span class="lang-ar"> / تعلّم</span></button>
       <button class="mode-tab" onclick="switchMode('query')">🔍 查询模式<span class="lang-en"> / Query</span><span class="lang-ar"> / بحث</span></button>
-    </div>
-    <div class="lang-switcher" role="group" aria-label="Language">
-      <button class="lang-btn" data-lang="en" type="button">EN</button>
-      <button class="lang-btn lang-ar-label" data-lang="ar" type="button">عربي</button>
     </div>
   </div>
 </nav>
@@ -1274,7 +1274,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-38 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-39 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5510,7 +5510,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-38';
+  const VERSION = '部件联动-39';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

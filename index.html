@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-51 (2026-06-21) — ⑧ 去掉点结构区域折叠(修切换时误折叠)+反馈/结构钮再左移+错题本(今天复习/复习全部/排序/图例/提示)trilingual -->
+<!-- 斑斓部件 · 部件联动-52 (2026-06-21) — ⑧ 修:切换语言不再关闭已打开的成就面板/二维码下拉(点外部关闭逻辑忽略语言切换器) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-51">
+<meta name="version" content="部件联动-52">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1278,7 +1278,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-51 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-52 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2180,7 +2180,7 @@ function toggleQR(){
 document.addEventListener("click",function(e){
   const pop=document.getElementById("qr-popover");
   const btn=document.getElementById("qr-btn");
-  if(pop&&pop.classList.contains("open")&&!pop.contains(e.target)&&btn&&!btn.contains(e.target)){
+  if(pop&&pop.classList.contains("open")&&!pop.contains(e.target)&&btn&&!btn.contains(e.target)&&!(e.target.closest&&e.target.closest(".lang-switcher"))){
     pop.classList.remove("open"); btn.classList.remove("open");
   }
 });
@@ -5508,7 +5508,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-51';
+  const VERSION = '部件联动-52';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6556,6 +6556,7 @@ const Game=(function(){
     const p=document.getElementById('gm-wall'); if(!p) return;
     if(p.contains(e.target)) return;
     if(e.target.closest && e.target.closest('.gm-stat-top')) return;
+    if(e.target.closest && e.target.closest('.lang-switcher')) return;
     closeWall();
   }
   function openWall(anchor){

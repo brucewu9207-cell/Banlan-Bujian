@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-55 (2026-06-21) — ⑧ 顶部4按钮排版仅桌面生效(手机端恢复原样);二维码箭头留文字右侧(flex order);斜杠手机端补回 -->
+<!-- 斑斓部件 · 部件联动-56 (2026-06-21) — ⑧ 状态药丸(分数条/连击)也做桌面端中文上译文下(仅桌面,order保箭头/×N在首行) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-55">
+<meta name="version" content="部件联动-56">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -892,6 +892,8 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .struct-action-btn{flex-wrap:wrap;justify-content:center;text-align:center;line-height:1.12}
 .struct-action-btn>.lang-swap{display:block;flex-basis:100%;order:1;text-align:center;font-size:0.66em;font-weight:400;opacity:0.82;margin-top:1px}
 .struct-action-btn .sl{display:none}
+.gm-stat-top,.gm-combo{flex-wrap:wrap;justify-content:center;line-height:1.12}
+.gm-stat-top>.lang-swap,.gm-combo>.lang-swap{display:block;flex-basis:100%;order:1;text-align:center;font-size:0.62em;font-weight:400;opacity:0.82}
 }
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
@@ -1283,7 +1285,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-55 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-56 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5514,7 +5516,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-55';
+  const VERSION = '部件联动-56';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-52 (2026-06-21) — ⑧ 修:切换语言不再关闭已打开的成就面板/二维码下拉(点外部关闭逻辑忽略语言切换器) -->
+<!-- 斑斓部件 · 部件联动-53 (2026-06-21) — ⑧ 手风琴:二维码与成就面板互斥(打开一个自动关另一个) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-52">
+<meta name="version" content="部件联动-53">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1278,7 +1278,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-52 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-53 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2176,6 +2176,7 @@ function toggleQR(){
   if(!pop) return;
   const open=pop.classList.toggle("open");
   if(btn) btn.classList.toggle("open", open);
+  if(open && window._gmCloseWall) window._gmCloseWall();
 }
 document.addEventListener("click",function(e){
   const pop=document.getElementById("qr-popover");
@@ -5508,7 +5509,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-52';
+  const VERSION = '部件联动-53';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6560,6 +6561,7 @@ const Game=(function(){
     closeWall();
   }
   function openWall(anchor){
+    var _qp=document.getElementById('qr-popover'); if(_qp){_qp.classList.remove('open'); var _qb=document.getElementById('qr-btn'); if(_qb)_qb.classList.remove('open');}
     if(!document.getElementById('gm-wall'))_buildWall();
     _renderWall();
     const p=document.getElementById('gm-wall'); if(!p) return;
@@ -6577,6 +6579,7 @@ const Game=(function(){
     document.removeEventListener('click',_wallOutside,true);
   }
   function _toggleWall(anchor){ if(_wallOpen) closeWall(); else openWall(anchor); }
+  window._gmCloseWall=closeWall;
   function _buildWall(){
     const p=document.createElement('div');p.id='gm-wall';p.className='gm-wall';
     p.innerHTML='<div class="gm-wall-head"><span>成就<span class="lang-swap"><span class="lang-en"> / Achievements</span><span class="lang-ar" dir="rtl"> / الإنجازات</span></span></span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';

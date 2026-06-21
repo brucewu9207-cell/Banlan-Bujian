@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-39 (2026-06-21) — ⑧ 修正:语言切换按钮改为独立悬浮右上角(原放在 display:none 的模式栏里看不见) -->
+<!-- 斑斓部件 · 部件联动-40 (2026-06-21) — ⑧ 第二波:切换按钮移入顶部按钮区(大小统一、不悬浮)+ 13种汉字结构 + 结构栏按钮 全上阿语 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-39">
+<meta name="version" content="部件联动-40">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -875,8 +875,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 </style>
 <style>
 /* ⑧ 语言切换器 + 中/英/阿显隐 + 阿语RTL */
-.lang-switcher{position:fixed;top:8px;right:14px;z-index:100000;display:inline-flex;gap:4px;background:rgba(255,255,255,0.92);border:1px solid rgba(0,0,0,0.16);border-radius:22px;padding:4px;box-shadow:0 2px 10px rgba(0,0,0,0.2)}
-.lang-btn{background:transparent;border:none;color:#4a3f2f;font-size:14px;font-weight:600;padding:7px 13px;border-radius:18px;cursor:pointer;line-height:1;min-width:52px}
+.lang-switcher{display:inline-flex;gap:3px;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.3);border-radius:18px;padding:3px;vertical-align:middle}
+.lang-btn{background:transparent;border:none;color:#4a3f2f;font-size:0.92rem;font-weight:600;padding:6px 12px;border-radius:14px;cursor:pointer;line-height:1;min-width:44px}
 .lang-btn.lang-ar-label{font-family:'Tahoma','Arial',sans-serif;font-size:15px}
 .lang-btn.active{background:#b5763a;color:#fff}
 .lang-btn:hover:not(.active){color:#b5763a}
@@ -887,10 +887,6 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 </style>
 </head>
 <body>
-<div class="lang-switcher" role="group" aria-label="Language">
-  <button class="lang-btn" data-lang="en" type="button">EN</button>
-  <button class="lang-btn lang-ar-label" data-lang="ar" type="button">عربي</button>
-</div>
 <div class="ink-dots" aria-hidden="true">
   <div class="ink-dot" style="width:5px;height:5px;top:18%;left:11%;background:#c84b2f;opacity:0.6"></div>
   <div class="ink-dot" style="width:3px;height:3px;top:35%;right:7%;background:#c84b2f;opacity:0.5"></div>
@@ -943,8 +939,8 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       反馈<span class="lang-en"> / Feedback</span><span class="lang-ar"> / ملاحظات</span>
     </button>
-    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">13种结构 / 13 Structures</button></div>
-    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回 / Back</button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码 / QR Code <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问 · Scan to open</div><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdQAAAHUCAIAAAAMRU47AAALOklEQVR4nO3dO7YbxxVAUdFLA3Hi1MNhwglwSJqAEg3HqRPNBA7oxaVAemoChXuqu/eO+fqDBo7qQazLT4/H4ycAZv2jvgCAOxJfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgR+njzZP//9r8nTbeX3//z3b//Mkdfnzsc5YvI9tuqaj1h1X6ue11VNPlMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgMDrb4YjJvdWrTO6F323ewqp7v+o8gavOZPA5fZ2VL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQ2G62wxF33sO+6nquOitg1cyKVedaZbe5BEec8f0zycoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDVe0232C3+Q+r7mvVNZ9xRgT7sPIFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQJmO5zM5HyDVbMLJuct7DYnYbd5FOzDyhcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCJxytsOqmQO72W3ewuRxzmhyHsUZ5z/c+b1xhJUvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxDYbrbDbvvTz2hyVoDjzBxnN2e85t1Y+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgdHZDkf2ufOxyT31k/MNJk3OWzjjDITdntdVWfkCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHR2Q6rmG/w+rlWvYar7mvVa3jnZ3HEbp+dI854zUdY+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4Age1mO0zu8V9lt+tZZbdZCrvNf9htJsMZZ3pMnmu3z6CVL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQGJ3tsNv+9FV2m2+wym7zMY6YfBaTdvtc7PY673Y9R1j5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCBT4/HY+xkq/aen3HP+G5zLa56zUfsNhtkld1mFxxxxvfzKla+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIHRf72Ye9pt59WS67nqNjnGiC/P262qk77fuwrznO1mO0zOCpi0297z3fa5X9Vuz/SIM87rOCPf+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+MIb3XkTAR8TX4CA+PLnLNlW8Uryp0ZnOxwxOf9h8lOx2zwKRTiX3eY2XHUexeTnwsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgH9Akzf6/PVLfQmv+u2XX+tL4JrEl/Uu0Nzvvt+LCrOWrx1Y7Erl/aOr3hcVK1+WuXyevt2gJTBLjM52mJxvsGqv9yqTe+GTuQ2XL+8fre3v5DyTO9ttnomvHVjgVuX96X73yzuIL0BAfHnVPZeB97xrFhJfXnLnBt353nmd+AIExBcgIL48z+/dXgGeZpMF0574S7JPNG7mLPA08WXO03sTvv3gwTjOnAVe5GsHhry+K+zIEWbOAq+z8mXCH4v2yncIv/3y6wc/PnMWWOKU8V21z33yOEes2pv/+nHetwv+uah9/vrlhxakM2f5IS8+lN3eh2ZNvM7XDrzd96K9spz827m6M2eBVcQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AIFTznaY3Od+xKrr2W1GBAu9+HAnn+nk3IbJz+lurHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgMDobIfJ2QVXnbcwec0s9MEbYPI9tmpuwxnfY7vdl5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxD49Hg8xk42Od/gqufayuevXw7+yd9++fVHf+SJI8yc5a9+hDe56ufLypdRz6XqR39q5izwitGpZtzW569fvqftlcZ9vCCdOQssYeXLkNeLduQIM2eB11n5Mudb155Yk/5QEGfOAi8SX6bNNE5J2ZyvHXie/0PlFeBp4gsQEF+AgPjykjv/3n3ne+d14sur7tmge941C4kvQOCUsx0mTe4HP/L67LY//btb/dWuJ5a9HzzcyfkhR6y6nt3u64jJz5eVL2vc59fw+9wpb2WTBct8q9KFl8Cyy0JWvix21UJd9b6oWPmy3utzdfehubyJ+PJGygV/xdcOAAHxBQiIL0BAfAEC4gsQEF94u9020bKD7f6q2eR+8N3OtdWe+m2HSJzRxy/m5EyPyf8MTH52zsjKFyAgvvw5vynDW4kvQEB8AQLiCxAQX3gX35vzAfGFt1BePia+sJ7y8rfEFxZTXo4QX1hJeTlIfGEZ5eW4T4/HY+xku81kmNwzfsaP5VX31E+afO67zSpZZWyeycHjrGLlCxAQX3jGGX+VYSvbjZSEv3LV0Yvck5UvQEB8AQLiCxAQX4CA+AIExBcgIL4AAfEFCGw322G3eQL2wr/ujM90t2s+wiaUj+32TK18AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DAKf8Bzcl95WfcC7/qmifnP0zOo5i8ryN2mzlwxG6v4RlZ+QIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgIL4AgVPOdlhlcm7DGeckHLHbcY7YbW7D5PPabd7CVe/rCCtfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDw6fF41NfA/51xj/9uswuuavJ5rbLbc9/teqx8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4DA6GyHVfvTz2hyJsNucxJ2m0uw6jWcPM4qV72vI3b7XFj5AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgCB7WY77Lb/+ojd7ssshevZ7ZkesdtshyMmXx8rX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcg8HN9Ac+Y3DO+2174I9ezak7CEbvNbZg8zqRV13zG+zpit/s6wsoXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXICC+AAHxBQiccrbDna2aXbDKbnMSdrueI1Y9r8nZF0esmjWx2zyTVax8AQLiCxAQX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA2Q4XtGq//G5zJCavZ3JWwKrjTM5kWDVv4YjdrmcVK1+AgPgCBMQXICC+AAHxBQiIL0BAfAEC4gsQEF+AgPgCBMQXIHDK2Q677dFeZbd5ApPXc8QZr2c3u81buDMrX4CA+AIExBcgIL4AAfEFCIgvQEB8AQLiCxAQX4CA+AIExBcgsN1sh8m9+Vc1uad+t3kLR5xxvsFuMyvO+B7bbdaElS9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEPj0eDzqawC4HStfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyAgvgAB8QUIiC9AQHwBAuILEBBfgID4AgTEFyDwPzodl4cVtqrFAAAAAElFTkSuQmCC" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span><span id="gm-stat-bar" class="gm-stat-top gm-bar-pill gm-bar-stat" title="点开看成就 / Achievements"></span><span id="gm-combo-bar" class="gm-combo gm-bar-pill gm-bar-combo"></span></div>
+    <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2)">13种结构<span class="lang-en"> / 13 Structures</span><span class="lang-ar"> / 13 بنية</span></button><div class="lang-switcher" role="group" aria-label="Language"><button class="lang-btn" data-lang="en" type="button">EN</button><button class="lang-btn lang-ar-label" data-lang="ar" type="button">عربي</button></div></div>
+    <div style="position:absolute;left:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="nav-back-btn" class="struct-action-btn" onclick="event.stopPropagation();navBack()" style="background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)">← 返回<span class="lang-en"> / Back</span><span class="lang-ar"> / رجوع</span></button><span style="position:relative;display:inline-flex;align-items:center"><button id="qr-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleQR()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">二维码<span class="lang-en"> / QR Code</span><span class="lang-ar"> / رمز QR</span> <svg id="qr-chevron" class="qr-chevron" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg></button><div id="qr-popover" class="qr-popover" onclick="event.stopPropagation()"><div class="qr-title">扫码访问<span class="lang-en"> · Scan to open</span><span class="lang-ar"> · امسح للدخول</span></div><img src="data:image/png;base64,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" alt="斑斓部件 二维码" class="qr-img"><a class="qr-url" href="https://banlan-bujian.vercel.app/" target="_blank" rel="noopener">banlan-bujian.vercel.app</a></div></span><span id="gm-stat-bar" class="gm-stat-top gm-bar-pill gm-bar-stat" title="点开看成就 / Achievements"></span><span id="gm-combo-bar" class="gm-combo gm-bar-pill gm-bar-combo"></span></div>
     <svg class="struct-bar-chevron open" id="struct-chevron" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
   </div>
   <div class="struct-bar-body open" id="struct-body" onclick="toggleStructBar()">
@@ -953,7 +949,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
         <div class="struct-card-num">1</div>
         <svg class="struct-card-svg" viewBox="0 0 48 48"><rect x="6" y="6" width="36" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/></svg>
         <div class="struct-card-name">独体字</div>
-        <div class="struct-card-en">Whole</div>
+        <div class="struct-card-en lang-en">Whole</div><div class="struct-card-en lang-ar" dir="rtl">مفرد</div>
         <div class="struct-card-ex">口、大</div></div>
       <div class="struct-card">
         <div class="struct-card-num">2</div>
@@ -962,7 +958,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="26" y="6" width="16" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">左右结构</div>
-        <div class="struct-card-en">Left-right</div>
+        <div class="struct-card-en lang-en">Left-right</div><div class="struct-card-en lang-ar" dir="rtl">يسار-يمين</div>
         <div class="struct-card-ex">你、好</div></div>
       <div class="struct-card">
         <div class="struct-card-num">3</div>
@@ -971,7 +967,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="6" y="26" width="36" height="16" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">上下结构</div>
-        <div class="struct-card-en">Top-bottom</div>
+        <div class="struct-card-en lang-en">Top-bottom</div><div class="struct-card-en lang-ar" dir="rtl">أعلى-أسفل</div>
         <div class="struct-card-ex">爸、家</div></div>
       <div class="struct-card">
         <div class="struct-card-num">4</div>
@@ -981,7 +977,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="32" y="6" width="12" height="36" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
         </svg>
         <div class="struct-card-name">左中右结构</div>
-        <div class="struct-card-en">Left-center-right</div>
+        <div class="struct-card-en lang-en">Left-center-right</div><div class="struct-card-en lang-ar" dir="rtl">يسار-وسط-يمين</div>
         <div class="struct-card-ex">哪、掰</div></div>
       <div class="struct-card">
         <div class="struct-card-num">5</div>
@@ -991,7 +987,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="6" y="32" width="36" height="12" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.12)"/>
         </svg>
         <div class="struct-card-name">上中下结构</div>
-        <div class="struct-card-en">Top-middle-bottom</div>
+        <div class="struct-card-en lang-en">Top-middle-bottom</div><div class="struct-card-en lang-ar" dir="rtl">أعلى-وسط-أسفل</div>
         <div class="struct-card-ex">喜、梦</div></div>
       <div class="struct-card">
         <div class="struct-card-num">6</div>
@@ -1000,7 +996,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="10" y="10" width="20" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">右上包围</div>
-        <div class="struct-card-en">Up-right surrounded</div>
+        <div class="struct-card-en lang-en">Up-right surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط أعلى اليمين</div>
         <div class="struct-card-ex">可、司</div></div>
       <div class="struct-card">
         <div class="struct-card-num">7</div>
@@ -1009,7 +1005,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="18" y="18" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">左上包围</div>
-        <div class="struct-card-en">Left-up surrounded</div>
+        <div class="struct-card-en lang-en">Left-up surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط أعلى اليسار</div>
         <div class="struct-card-ex">厅、病</div></div>
       <div class="struct-card">
         <div class="struct-card-num">8</div>
@@ -1018,7 +1014,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="14" y="6" width="28" height="28" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">左下包围</div>
-        <div class="struct-card-en">Left-down surrounded</div>
+        <div class="struct-card-en lang-en">Left-down surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط أسفل اليسار</div>
         <div class="struct-card-ex">这、进</div></div>
       <div class="struct-card">
         <div class="struct-card-num">9</div>
@@ -1027,7 +1023,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="14" y="22" width="20" height="18" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">左上右包围</div>
-        <div class="struct-card-en">Left-up-right surrounded</div>
+        <div class="struct-card-en lang-en">Left-up-right surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط يسار-أعلى-يمين</div>
         <div class="struct-card-ex">同、间</div></div>
       <div class="struct-card">
         <div class="struct-card-num">10</div>
@@ -1036,7 +1032,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="14" y="8" width="20" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">左右下包围</div>
-        <div class="struct-card-en">Left-right-down surrounded</div>
+        <div class="struct-card-en lang-en">Left-right-down surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط يسار-يمين-أسفل</div>
         <div class="struct-card-ex">凶、幽</div></div>
       <div class="struct-card">
         <div class="struct-card-num">11</div>
@@ -1045,7 +1041,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="18" y="14" width="22" height="20" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)"/>
         </svg>
         <div class="struct-card-name">上左下包围</div>
-        <div class="struct-card-en">Top-left-bottom surrounded</div>
+        <div class="struct-card-en lang-en">Top-left-bottom surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط أعلى-يسار-أسفل</div>
         <div class="struct-card-ex">巨、区</div></div>
       <div class="struct-card">
         <div class="struct-card-num">12</div>
@@ -1054,7 +1050,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="15" y="15" width="18" height="18" rx="1" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.28)"/>
         </svg>
         <div class="struct-card-name">全包围</div>
-        <div class="struct-card-en">Overall surrounded</div>
+        <div class="struct-card-en lang-en">Overall surrounded</div><div class="struct-card-en lang-ar" dir="rtl">محاط كلّياً</div>
         <div class="struct-card-ex">回、国</div></div>
       <div class="struct-card">
         <div class="struct-card-num">13</div>
@@ -1063,7 +1059,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <rect x="12" y="12" width="32" height="32" rx="2" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="rgba(255,255,255,0.2)" stroke-dasharray="3,2"/>
         </svg>
         <div class="struct-card-name">叠加结构</div>
-        <div class="struct-card-en">Overlaid</div>
+        <div class="struct-card-en lang-en">Overlaid</div><div class="struct-card-en lang-ar" dir="rtl">متراكب</div>
         <div class="struct-card-ex">为、书</div></div>
     </div>
   </div>
@@ -1274,7 +1270,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-39 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-40 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5510,7 +5506,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-39';
+  const VERSION = '部件联动-40';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

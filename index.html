@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-48 (2026-06-21) — ⑧ 收尾波:反馈/结构按钮左移避让语言钮;加入弹窗hint/错误、查询中、连击与11个徽章名 全上阿语 -->
+<!-- 斑斓部件 · 部件联动-50 (2026-06-21) — ⑧ 班级信息窗 + 连击/连续天数条 + 成就标题/副标 上阿语 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-48">
+<meta name="version" content="部件联动-50">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -884,8 +884,8 @@ body.lang-mode-en .lang-ar{display:none !important}
 body.lang-mode-ar .lang-en{display:none !important}
 body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .struct-card-en{min-height:3.6em;display:flex;flex-direction:column;justify-content:center;word-break:break-word}
-.lang-swap{display:inline-grid;vertical-align:bottom}
-.lang-swap>*{grid-area:1/1;white-space:nowrap;text-align:start}
+.lang-swap{display:inline-grid;vertical-align:baseline}
+.lang-swap>*{grid-area:1/1;text-align:start}
 .lang-swap-block{display:grid;justify-items:center;align-items:center}
 .lang-swap-block>*{grid-area:1/1}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
@@ -1194,7 +1194,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             </button>
             <button class="stroke-ctrl-btn" id="step-btn" onclick="nextStroke()" title="下一笔 / Next Stroke">
               <svg viewBox="0 0 24 24"><path d="M7 6v12l8.5-6zM17 6h2v12h-2z"/></svg>
-              <span>下一笔 / <i class="ctrl-en lang-en">Next Stroke</i><i class="ctrl-en lang-ar" dir="rtl">الشطبة التالية</i></span>
+              <span>下一笔 / <span class="lang-swap"><i class="ctrl-en lang-en">Next Stroke</i><i class="ctrl-en lang-ar" dir="rtl">الشطبة التالية</i></span></span>
             </button>
           </div>
           <div class="pinyin-section">
@@ -1278,7 +1278,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-48 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-50 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5514,7 +5514,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-48';
+  const VERSION = '部件联动-50';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5974,25 +5974,25 @@ showHome();
       <div class="bls-modal" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
           <h3>我的班级</h3>
-          <div class="bls-subtitle">My Class</div>
+          <div class="bls-subtitle lang-en">My Class</div><div class="bls-subtitle lang-ar" dir="rtl">صفّي</div>
           <button class="bls-close" id="bls-info-close" aria-label="关闭">×</button>
         </div>
         <div class="bls-modal-body">
           <div class="bls-info-row">
-            <span class="bls-info-label">班级 / Class</span>
+            <span class="bls-info-label">班级<span class="lang-swap"><span class="lang-en"> / Class</span><span class="lang-ar" dir="rtl"> / الصف</span></span></span>
             <span class="bls-info-value bls-code">${escapeHtml(state.classCode)}</span>
           </div>
           <div class="bls-info-row">
-            <span class="bls-info-label">我的名字 / My Name</span>
+            <span class="bls-info-label">我的名字<span class="lang-swap"><span class="lang-en"> / My Name</span><span class="lang-ar" dir="rtl"> / اسمي</span></span></span>
             <span class="bls-info-value">${escapeHtml(state.name)}</span>
           </div>
           <div class="bls-info-row">
-            <span class="bls-info-label">学号 / Student ID</span>
+            <span class="bls-info-label">学号<span class="lang-swap"><span class="lang-en"> / Student ID</span><span class="lang-ar" dir="rtl"> / رقم الطالب</span></span></span>
             <span class="bls-info-value bls-code">${escapeHtml(state.studentCode || '—')}</span>
           </div>
           <div class="bls-tasks-section">
             <div class="bls-tasks-header">
-              <span>📚 任务 / Tasks (${state.tasks ? state.tasks.length : 0})</span>
+              <span>📚 任务<span class="lang-swap"><span class="lang-en"> / Tasks</span><span class="lang-ar" dir="rtl"> / المهام</span></span> (${state.tasks ? state.tasks.length : 0})</span>
               <button class="bls-refresh-btn" id="bls-refresh-tasks" title="刷新 / Refresh">↻</button>
             </div>
             ${tasksHTML}
@@ -6000,7 +6000,7 @@ showHome();
         </div>
         <div class="bls-modal-footer">
           <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
-          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好 / OK</button>
+          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap"><span class="lang-en"> / OK</span><span class="lang-ar" dir="rtl"> / حسناً</span></span></button>
         </div>
       </div>
     `;
@@ -6051,7 +6051,7 @@ showHome();
                          (t === 'sentence') ? 'bls-task-badge-sentence' : 'bls-task-badge-char';
       const badgeText = (t === 'word') ? '词' :
                         (t === 'sentence') ? '句' : '字';
-      const title = task.title || '(未命名 / Untitled)';
+      const title = task.title || tt('(未命名)','(Untitled)','(بدون عنوان)');
       return '<button class="bls-task-card' + (isDone ? ' bls-completed' : '') +
              '" onclick="BLS.openTask(\'' + escapeAttr(task.taskId) + '\')">' +
              '<span class="bls-task-badge ' + badgeClass + '">' + badgeText + '</span>' +
@@ -6505,11 +6505,11 @@ const Game=(function(){
   function _renderTop(){
     let els=document.querySelectorAll('.gm-stat-top');
     if(!els.length){_injectHome();els=document.querySelectorAll('.gm-stat-top');}
-    const html='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天<svg class="gm-stat-chev" viewBox="0 0 16 16" width="11" height="11"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const html='<span class="gm-stat-pts">'+S.points+'</span> 分 · 连续 '+S.streak+' 天'+'<span class="lang-swap"><span class="lang-en"> · pts/streak</span><span class="lang-ar" dir="rtl"> · نقاط/متتالية</span></span>'+'<svg class="gm-stat-chev" viewBox="0 0 16 16" width="11" height="11"><path d="M3.5 6 8 10.5 12.5 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     els.forEach(function(el){el.innerHTML=html;});
   }
   function _renderCombo(){
-    const html='连击 <span class="gm-combo-n">×'+S.combo+'</span>';
+    const html='连击<span class="lang-swap"><span class="lang-en"> Combo</span><span class="lang-ar" dir="rtl"> متتالية</span></span> <span class="gm-combo-n">×'+S.combo+'</span>';
     document.querySelectorAll('.gm-combo').forEach(function(el){el.innerHTML=html;});
     // ★ -35：练习页浮动连击药丸——0 连击淡出(不打扰书写)
     const _pc=document.getElementById('gm-combo-practice');
@@ -6584,12 +6584,12 @@ const Game=(function(){
   function _toggleWall(anchor){ if(_wallOpen) closeWall(); else openWall(anchor); }
   function _buildWall(){
     const p=document.createElement('div');p.id='gm-wall';p.className='gm-wall';
-    p.innerHTML='<div class="gm-wall-head"><span>成就 / Achievements</span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
+    p.innerHTML='<div class="gm-wall-head"><span>成就<span class="lang-swap"><span class="lang-en"> / Achievements</span><span class="lang-ar" dir="rtl"> / الإنجازات</span></span></span><span class="gm-wall-x" id="gm-wall-x">✕</span></div><div class="gm-wall-sub" id="gm-wall-sub"></div><div class="gm-wall-grid" id="gm-wall-grid"></div>';
     document.body.appendChild(p);
     const x=document.getElementById('gm-wall-x');if(x)x.addEventListener('click',function(e){e.stopPropagation();closeWall();});
   }
   function _renderWall(){
-    const sub=document.getElementById('gm-wall-sub');if(sub)sub.textContent='总分 '+S.points+' · 连续 '+S.streak+' 天 · 最长 '+S.bestStreak+' 天';
+    const sub=document.getElementById('gm-wall-sub');if(sub)sub.innerHTML='总分 '+S.points+' · 连续 '+S.streak+' 天 · 最长 '+S.bestStreak+' 天'+'<span class="lang-en"> · pts/streak/best</span><span class="lang-ar" dir="rtl"> · المجموع/المتتالية/الأطول</span>';
     const grid=document.getElementById('gm-wall-grid');if(!grid)return;
     grid.innerHTML='';
     BADGES.forEach(function(b){

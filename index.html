@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-42 (2026-06-21) — ⑧ 第三波:练习页锁定提示/导航键/Skip/演示 + 常见 toast 上阿语;结构格阿语缩字号防撑框 -->
+<!-- 斑斓部件 · 部件联动-43 (2026-06-21) — ⑧ 第四波:班级加入弹窗 + 首页动态描述 + 班级相关 toast 上阿语 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-42">
+<meta name="version" content="部件联动-43">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1108,7 +1108,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
             <span class="home-entry-zh">班级任务</span>
           </div>
           <div class="home-entry-en lang-en">Class Tasks</div><div class="home-entry-en lang-ar" dir="rtl">مهام الفصل</div>
-          <div class="home-entry-desc" id="bls-entry-desc">点此加入班级 / Join a class</div>
+          <div class="home-entry-desc" id="bls-entry-desc">点此加入班级<span class="lang-en"> / Join a class</span><span class="lang-ar"> / انضمّ إلى فصل</span></div>
         </button>
         <!-- ★ 部件联动-18: 入口 D 错题本 -->
         <button class="home-entry wb-home-card" id="wb-entry-card" onclick="showWrongBook()">
@@ -1117,7 +1117,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
             <span class="home-entry-zh">错题本</span>
           </div>
           <div class="home-entry-en lang-en">Mistake Book</div><div class="home-entry-en lang-ar" dir="rtl">دفتر الأخطاء</div>
-          <div class="home-entry-desc" id="wb-home-desc">暂无错题 / All clear</div>
+          <div class="home-entry-desc" id="wb-home-desc">暂无错题<span class="lang-en"> / All clear</span><span class="lang-ar"> / لا أخطاء</span></div>
         </button>
       </div>
     </div>
@@ -1271,7 +1271,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-42 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-43 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4400,8 +4400,8 @@ function updateWrongBookBadge(){
   var n = WrongBook.dueCount();
   var d = document.getElementById('wb-home-desc');
   if(!d) return;
-  if(m === 0){ d.textContent = '暂无错题 / All clear'; }
-  else if(n > 0){ d.textContent = '今天该复习 ' + n + ' 个 / ' + n + ' due today'; }
+  if(m === 0){ d.textContent = tt('暂无错题','All clear','لا أخطاء'); }
+  else if(n > 0){ d.textContent = tt('今天该复习 ' + n + ' 个', n + ' due today', 'للمراجعة اليوم: ' + n); }
   else { d.textContent = '今日已清 · 共 ' + m + ' 个 / All done today'; }
 }
 
@@ -5507,7 +5507,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-42';
+  const VERSION = '部件联动-43';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5715,13 +5715,13 @@ showHome();
       <div class="bls-modal" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
           <h3>加入班级</h3>
-          <div class="bls-subtitle">Join a Class</div>
+          <div class="bls-subtitle lang-en">Join a Class</div><div class="bls-subtitle lang-ar" dir="rtl">انضمّ إلى فصل</div>
           <button class="bls-close" id="bls-join-close" aria-label="关闭">×</button>
         </div>
         <div class="bls-modal-body">
           <div class="bls-field">
             <label class="bls-label" for="bls-join-code">
-              班级码 / Class Code <span class="bls-required">*</span>
+              班级码<span class="lang-en"> / Class Code</span><span class="lang-ar"> / رمز الفصل</span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
             <div class="bls-hint">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</div>
@@ -5729,7 +5729,7 @@ showHome();
           <!-- ★ 17: 名字由名单回显,不再让学生自填 -->
           <div class="bls-field">
             <label class="bls-label" for="bls-join-sid">
-              学号 / Student ID <span class="bls-required">*</span>
+              学号<span class="lang-en"> / Student ID</span><span class="lang-ar"> / رقم الطالب</span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
             <div class="bls-hint">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</div>
@@ -5737,8 +5737,8 @@ showHome();
           <div class="bls-error" id="bls-join-error"></div>
         </div>
         <div class="bls-modal-footer">
-          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消 / Cancel</button>
-          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入 / Join</button>
+          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消<span class="lang-en"> / Cancel</span><span class="lang-ar"> / إلغاء</span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入<span class="lang-en"> / Join</span><span class="lang-ar"> / انضمام</span></button>
         </div>
       </div>
     `;
@@ -5927,7 +5927,7 @@ showHome();
         console.log('[BLS] ★17 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
         closeDialog();
         updateCardSubtitle();
-        showToast('已加入班级 ' + finalCC + ' 🎉');
+        showToast(tt('已加入班级 ' + finalCC + ' 🎉','Joined class ' + finalCC + ' 🎉','انضممت إلى الفصل ' + finalCC + ' 🎉'));
         fetchTasksAndUpdate();
         return;
       }
@@ -6011,7 +6011,7 @@ showHome();
         fetchTasksAndUpdate(function(ok){
           // fetch 完成后重新渲染整个面板 (createOverlay 内部会先 closeDialog)
           openIdentityPanel();
-          showToast(ok ? '任务已刷新 / Tasks refreshed' : '刷新失败 / Failed to refresh');
+          showToast(ok ? tt('任务已刷新','Tasks refreshed','تم تحديث المهام') : tt('刷新失败','Failed to refresh','فشل التحديث'));
         });
       };
     }
@@ -6065,7 +6065,7 @@ showHome();
     const task = (state.tasks || []).find(function(t){ return t.taskId === taskId; });
     if(!task){
       console.warn('[BLS] 任务不存在: ' + taskId);
-      showToast('任务不存在 / Task not found');
+      showToast(tt('任务不存在','Task not found','المهمة غير موجودة'));
       return;
     }
     console.log('[BLS] 打开任务', task);
@@ -6076,7 +6076,7 @@ showHome();
     const input = document.getElementById('teacher-input');
     if(!input || typeof global.startTeacherSession !== 'function'){
       console.error('[BLS] 主页面挥毫入口不可用');
-      showToast('启动练习失败 / Failed to start');
+      showToast(tt('启动练习失败','Failed to start','فشل بدء التمرين'));
       return;
     }
 
@@ -6217,7 +6217,7 @@ showHome();
     clearSession();
     closeDialog();
     updateCardSubtitle();
-    showToast('已离开班级 / Left class');
+    showToast(tt('已离开班级','Left class','غادرت الفصل'));
   }
 
   // ─── HTML 转义 ─────────────────────────────────────────────
@@ -6254,7 +6254,7 @@ showHome();
     try { closeDialog(); } catch(e){}
     if(state.inTaskMode){ try { exitTaskMode(); } catch(e){} }
     updateCardSubtitle();
-    showToast(message || '你已不在该班级，请重新加入 / You are no longer in this class');
+    showToast(message || tt('你已不在该班级，请重新加入','You are no longer in this class','لم تعد في هذا الفصل، أعد الانضمام'));
   }
 
   // ─── 拉任务列表 (★17: 带 studentCode 复验身份) ─────────────
@@ -6299,7 +6299,7 @@ showHome();
     if(!el) return;
 
     if(!state.studentCode){
-      el.innerHTML = '点此加入班级 / Join a class';
+      el.innerHTML = '点此加入班级<span class="lang-en"> / Join a class</span><span class="lang-ar"> / انضمّ إلى فصل</span>';
       return;
     }
     const newCount = state.tasks.filter(function(t){
@@ -6307,7 +6307,7 @@ showHome();
     }).length;
 
     if(newCount > 0){
-      el.innerHTML = escapeHtml(state.classCode) + ' · 🔴 ' + newCount + ' 个新任务';
+      el.innerHTML = escapeHtml(state.classCode) + ' · 🔴 ' + newCount + ' 个新任务<span class="lang-en"> new</span><span class="lang-ar"> جديدة</span>';
     } else {
       el.innerHTML = escapeHtml(state.classCode) + ' · 暂无任务 / No tasks';
     }

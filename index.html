@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-57 (2026-06-21) — ⑧ 桌面端左右分栏:③错题本(左控件/右字卡) + ④班级窗(左信息/右任务,:has 仅作用含任务的窗);手机端不变 -->
+<!-- 斑斓部件 · 部件联动-59 (2026-06-21) — ⑧ 班级窗左右分区改卡片式(A+B:左「基本信息」卡+右「任务」卡,各带小标题);仅桌面 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-57">
+<meta name="version" content="部件联动-59">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -905,9 +905,9 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .wb-screen #wb-grid{grid-column:2;grid-row:2/8}
 .wb-screen #wb-empty{grid-column:2;grid-row:2/8}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
-.bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
-.bls-modal-body:has(.bls-tasks-section) .bls-info-row{grid-column:1}
-.bls-modal-body:has(.bls-tasks-section) .bls-tasks-section{grid-column:2;grid-row:1/6;margin-top:0}
+.bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.bls-modal-body:has(.bls-tasks-section)>.bls-col{background:#f6f2e8;border:1px solid rgba(0,0,0,0.07);border-radius:12px;padding:14px 16px;margin:0}
+.bls-col-h{font-weight:700;color:#5a6b4f;font-size:0.95rem;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(0,0,0,0.1)}
 }
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
@@ -915,6 +915,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 </style>
 </head>
 <body>
+<script>window.tt=function(zh,en,ar){var b=document.body;return zh+"\n"+((b&&b.classList.contains("lang-mode-ar"))?ar:en);};window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-en">'+en+'</span><span class="lang-ar">'+ar+'</span>';};</script>
 <div class="lang-switcher" role="group" aria-label="Language"><button class="lang-btn" data-lang="en" type="button" onclick="event.stopPropagation();setBilingualLang('en')">EN</button><button class="lang-btn lang-ar-label" data-lang="ar" type="button" onclick="event.stopPropagation();setBilingualLang('ar')">عربي</button></div>
 <div class="ink-dots" aria-hidden="true">
   <div class="ink-dot" style="width:5px;height:5px;top:18%;left:11%;background:#c84b2f;opacity:0.6"></div>
@@ -1299,7 +1300,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-57 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-59 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5530,7 +5531,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-57';
+  const VERSION = '部件联动-59';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5994,6 +5995,7 @@ showHome();
           <button class="bls-close" id="bls-info-close" aria-label="关闭">×</button>
         </div>
         <div class="bls-modal-body">
+          <div class="bls-col bls-col-info"><div class="bls-col-h">基本信息<span class="lang-en"> · Info</span><span class="lang-ar" dir="rtl"> · معلومات</span></div>
           <div class="bls-info-row">
             <span class="bls-info-label">班级<span class="lang-swap"><span class="lang-en"> / Class</span><span class="lang-ar" dir="rtl"> / الصف</span></span></span>
             <span class="bls-info-value bls-code">${escapeHtml(state.classCode)}</span>
@@ -6006,7 +6008,8 @@ showHome();
             <span class="bls-info-label">学号<span class="lang-swap"><span class="lang-en"> / Student ID</span><span class="lang-ar" dir="rtl"> / رقم الطالب</span></span></span>
             <span class="bls-info-value bls-code">${escapeHtml(state.studentCode || '—')}</span>
           </div>
-          <div class="bls-tasks-section">
+          </div>
+          <div class="bls-tasks-section bls-col bls-col-tasks">
             <div class="bls-tasks-header">
               <span>📚 任务<span class="lang-swap"><span class="lang-en"> / Tasks</span><span class="lang-ar" dir="rtl"> / المهام</span></span> (${state.tasks ? state.tasks.length : 0})</span>
               <button class="bls-refresh-btn" id="bls-refresh-tasks" title="刷新 / Refresh">↻</button>

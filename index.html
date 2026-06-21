@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-43 (2026-06-21) — ⑧ 第四波:班级加入弹窗 + 首页动态描述 + 班级相关 toast 上阿语 -->
+<!-- 斑斓部件 · 部件联动-44 (2026-06-21) — ⑧ 第五波:结构格高度固定为英文大小(切换不再变高);错题/查询相关剩余 toast 上阿语 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-43">
+<meta name="version" content="部件联动-44">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -883,7 +883,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 body.lang-mode-en .lang-ar{display:none !important}
 body.lang-mode-ar .lang-en{display:none !important}
 body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
-.struct-card-en.lang-ar{font-size:0.6rem;line-height:1.2;word-break:break-word}
+.struct-card-en{min-height:3.6em;display:flex;flex-direction:column;justify-content:center;word-break:break-word}
 @media print{.lang-switcher{display:none !important}}
 </style>
 </head>
@@ -1271,7 +1271,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-43 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-44 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4267,7 +4267,7 @@ function nextCharacter(){
   // ★ 错题本复习模式：按列表顺序逐字，到末尾回错题本
   if(state.reviewMode){
     if(state.sessionIndex>=state.sessionChars.length){
-      showToast('🎉 错题复习完成！Review complete!','success');
+      showToast(tt('🎉 错题复习完成！','Review complete!','اكتملت المراجعة!'),'success');
       setTimeout(showWrongBook,1400);
       return;
     }
@@ -4453,10 +4453,10 @@ function renderWrongBook(){
 function wbDelete(char){ WrongBook.remove(char); renderWrongBook(); updateWrongBookBadge(); }
 function wbPracticeOne(char){ startWrongBookReview([char]); }
 function wbReviewAll(){ startWrongBookReview(WrongBook.list().map(function(x){ return x.char; })); }
-function wbReviewToday(){ var due = WrongBook.dueList().map(function(x){ return x.char; }); if(!due.length){ showToast('今天没有要复习的字 / Nothing due today','success'); return; } startWrongBookReview(due); }
+function wbReviewToday(){ var due = WrongBook.dueList().map(function(x){ return x.char; }); if(!due.length){ showToast(tt('今天没有要复习的字','Nothing due today','لا شيء للمراجعة اليوم'),'success'); return; } startWrongBookReview(due); }
 
 function startWrongBookReview(charList){
-  if(!charList || !charList.length){ showToast('错题本是空的 / Mistake book is empty', 'error'); return; }
+  if(!charList || !charList.length){ showToast(tt('错题本是空的','Mistake book is empty','دفتر الأخطاء فارغ'), 'error'); return; }
   state.teacherMode = false;
   state.reviewMode = true;
   state.currentLevel = null;
@@ -4503,12 +4503,12 @@ function queryCharacter(){
   // 提取第一个汉字
   const match=raw.match(/[\u4e00-\u9fa5]/);
   const char=match?match[0]:'';
-  if(!char){showToast('请输入一个汉字 / Enter a Chinese character','error');return;}
+  if(!char){showToast(tt('请输入一个汉字','Enter a Chinese character','أدخل حرفًا صينيًا'),'error');return;}
   input.value=char;
 
   const data=CHAR_DB[char];
   if(!data){
-    showToast('暂无该字数据，字库持续扩充中 / Not in database yet','error');
+    showToast(tt('暂无该字数据，字库持续扩充中','Not in database yet','الحرف غير متوفّر بعد'),'error');
     document.getElementById('query-result').classList.remove('show');
     return;
   }
@@ -5507,7 +5507,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-43';
+  const VERSION = '部件联动-44';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

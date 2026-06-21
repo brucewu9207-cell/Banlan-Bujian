@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-41 (2026-06-21) — ⑧ 修正:语言按钮改直接绑 onclick(原靠全局监听,被外层 stopPropagation 挡住切不动) -->
+<!-- 斑斓部件 · 部件联动-42 (2026-06-21) — ⑧ 第三波:练习页锁定提示/导航键/Skip/演示 + 常见 toast 上阿语;结构格阿语缩字号防撑框 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-41">
+<meta name="version" content="部件联动-42">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -883,6 +883,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 body.lang-mode-en .lang-ar{display:none !important}
 body.lang-mode-ar .lang-en{display:none !important}
 body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
+.struct-card-en.lang-ar{font-size:0.6rem;line-height:1.2;word-break:break-word}
 @media print{.lang-switcher{display:none !important}}
 </style>
 </head>
@@ -1097,7 +1098,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <div class="home-entry-en lang-en">Search Mode</div><div class="home-entry-en lang-ar" dir="rtl">وضع البحث</div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
-            <button class="teacher-go" onclick="startTeacherSession()">演示 →</button>
+            <button class="teacher-go" onclick="startTeacherSession()">演示<span class="lang-en"> · Demo</span><span class="lang-ar"> · عرض</span></button>
           </div>
         </div>
         <!-- ★ 联动-1: 入口 C 班级任务(BLS 模块) -->
@@ -1195,7 +1196,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <div class="spacer"></div>
           <div id="char-info" style="display:none;margin-top:14px;padding:13px;background:rgba(20,40,30,0.55);border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);font-size:0.96rem;color:#ffffff;line-height:1.7;text-align:center"></div>
           <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
-            Skip · 我已认识 →
+            <span class="lang-en">Skip</span><span class="lang-ar">تخطٍّ</span> · 我已认识 →
           </button>
         </div>
         <!-- 中栏：上下两个独立方框 -->
@@ -1206,7 +1207,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
             <!-- 锁定遮罩：拖拽成功前显示 -->
             <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light);min-height:240px">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span></p>
+              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span class="lang-ar" dir="rtl">أكمل الخطوة ② أولاً</span></p>
             </div>
             <div class="write-stage" id="write-stage" style="display:none" oncontextmenu="return false">
               <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -1227,7 +1228,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
             <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
             <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
               <div style="font-size:2.7rem;margin-bottom:12px">🔒</div>
-              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span></p>
+              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></p>
             </div>
             <div id="next-btn-wrap" style="display:none;padding:10px 0 0;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></button>
@@ -1239,7 +1240,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
           <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center;position:relative"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title-zh">② 拖拽部件</span><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-            <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span></p>
+            <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span class="lang-ar" dir="rtl">أكمل الخطوة ① أولاً</span></p>
           </div>
           <div id="drag-content" style="display:none;flex:1;flex-direction:column;height:100%;min-height:0">
             <div class="drag-split-box">
@@ -1270,7 +1271,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-41 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-42 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2271,9 +2272,9 @@ function wizBuildNav(){
   ).join('');
   const nav=document.createElement('div');
   nav.id='wizard-nav';
-  nav.innerHTML=`<button id="wiz-prev" class="wiz-btn" onclick="wizPrev()">‹ 上一步</button>`
+  nav.innerHTML=`<button id="wiz-prev" class="wiz-btn" onclick="wizPrev()">‹ 上一步<span class="lang-en"> · Prev</span><span class="lang-ar"> · السابق</span></button>`
     +`<div class="wizard-dots">${dots}</div>`
-    +`<button id="wiz-next" class="wiz-btn">下一步 ›</button>`;
+    +`<button id="wiz-next" class="wiz-btn">下一步<span class="lang-en"> · Next ›</span><span class="lang-ar"> · التالي ›</span></button>`;
   ps.appendChild(nav);
 }
 
@@ -2378,7 +2379,7 @@ function startTeacherSession(){
   const raw=inp?inp.value:'';
   // 从输入中提取所有汉字，保持原顺序（"你好吗"→[你,好,吗]）
   const chars=(raw.match(/[\u4e00-\u9fa5]/g))||[];
-  if(chars.length===0){showToast('请输入至少一个汉字 / Enter a character','error');return;}
+  if(chars.length===0){showToast(tt('请输入至少一个汉字','Enter a character','أدخل حرفًا واحدًا على الأقل'),'error');return;}
   state.teacherMode=true;
   state.reviewMode=false;
   state.currentLevel=null;
@@ -2475,7 +2476,7 @@ function startLevel(level){
   // 取本级别所有字，过滤掉独体字（whole/ov）和未入 CHAR_DB 的字
   const levelChars = HSK_LEVEL_CHARS[level] || [];
   const practiceChars = levelChars.filter(c=>CHAR_DB[c]&&CHAR_DB[c].structure!=='whole'&&CHAR_DB[c].structure!=='ov');
-  if(practiceChars.length===0){showToast('HSK'+level+' 字库扩展中，敬请期待！','error');return;}
+  if(practiceChars.length===0){showToast(tt('HSK'+level+' 字库扩展中，敬请期待！','HSK'+level+' library expanding — stay tuned!','مكتبة HSK'+level+' قيد التوسعة!'),'error');return;}
   state.currentLevel = level;
   state.sessionChars=practiceChars.sort(()=>Math.random()-0.5);
   state.sessionIndex=0;
@@ -2503,7 +2504,7 @@ function loadCharacter(char){
     if(state.sessionIndex<state.sessionChars.length){
       loadCharacter(state.sessionChars[state.sessionIndex]);
     } else {
-      showToast('🎉 全部完成！Session complete!','success');
+      showToast(tt('🎉 全部完成！','Session complete!','اكتملت الجلسة!'),'success');
       setTimeout(backToLevelSelect,1500);
     }
     return;
@@ -3299,7 +3300,7 @@ function handleDrop(zoneEl,zoneIdx,data){
 
   // 已放置检查
   if(state.droppedComponents[zoneIdx]!==undefined){
-    showToast('该位置已有部件 / Already filled!','error');return;
+    showToast(tt('该位置已有部件','Already filled!','هذا المكان مشغول!'),'error');return;
   }
 
   // ✓ 正确放置
@@ -4276,7 +4277,7 @@ function nextCharacter(){
   // ★ 老师输入模式：按输入顺序逐字翻页，到末尾即结束
   if(state.teacherMode){
     if(state.sessionIndex>=state.sessionChars.length){
-      showToast('🎉 全部完成！Session complete!','success');
+      showToast(tt('🎉 全部完成！','Session complete!','اكتملت الجلسة!'),'success');
       setTimeout(showHome,1400);
       return;
     }
@@ -5506,7 +5507,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-41';
+  const VERSION = '部件联动-42';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-47 (2026-06-21) — ⑧ 语言切换按钮改回独立悬浮(右上角,固定,任何页面可见) -->
+<!-- 斑斓部件 · 部件联动-48 (2026-06-21) — ⑧ 收尾波:反馈/结构按钮左移避让语言钮;加入弹窗hint/错误、查询中、连击与11个徽章名 全上阿语 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-47">
+<meta name="version" content="部件联动-48">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -943,7 +943,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <span class="based-on-hsk" style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
-    <div style="position:absolute;right:16px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
+    <div style="position:absolute;right:128px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;gap:6px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
       反馈<span class="lang-swap"><span class="lang-en"> / Feedback</span><span class="lang-ar"> / ملاحظات</span></span>
     </button>
@@ -1278,7 +1278,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-47 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-48 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5514,7 +5514,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-47';
+  const VERSION = '部件联动-48';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5731,7 +5731,7 @@ showHome();
               班级码<span class="lang-swap"><span class="lang-en"> / Class Code</span><span class="lang-ar"> / رمز الفصل</span></span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</div>
+            <div class="bls-hint"><span class="lang-swap"><span class="lang-en">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</span><span class="lang-ar" dir="rtl">2-20 位字母、数字、横线、下划线 (大小写均可) / ٢-٢٠ خانة (أحرف/أرقام/-/_)</span></span></div>
           </div>
           <!-- ★ 17: 名字由名单回显,不再让学生自填 -->
           <div class="bls-field">
@@ -5739,7 +5739,7 @@ showHome();
               学号<span class="lang-swap"><span class="lang-en"> / Student ID</span><span class="lang-ar"> / رقم الطالب</span></span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</div>
+            <div class="bls-hint"><span class="lang-swap"><span class="lang-en">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</span><span class="lang-ar" dir="rtl">每人唯一，用于区分同名同学 / مُعرّف فريد لتمييز الطلاب المتشابهين بالاسم</span></span></div>
           </div>
           <div class="bls-error" id="bls-join-error"></div>
         </div>
@@ -5824,7 +5824,7 @@ showHome();
       codeInput.focus(); return;
     }
     if(!CLASS_CODE_REGEX.test(classCode)){
-      showJoinError('班级码格式不对：需 2-20 位字母/数字/横线/下划线 / Invalid format');
+      showJoinError(tt('班级码格式不对：需 2-20 位字母/数字/横线/下划线','Invalid class code format','صيغة رمز الفصل غير صحيحة'));
       codeInput.focus(); return;
     }
     if(!studentId){
@@ -5844,7 +5844,7 @@ showHome();
     if(variants.indexOf(lower) < 0) variants.push(lower);
 
     submitBtn.disabled = true;
-    submitBtn.textContent = '查询中... / Checking...';
+    submitBtn.textContent = tt('查询中...','Checking...','جارٍ التحقق...');
     codeInput.disabled = true;
     sidInput.disabled = true;
 
@@ -6455,17 +6455,17 @@ const Game=(function(){
   function _today(){return _ymd(new Date());}
   function _yesterday(){const d=new Date();d.setDate(d.getDate()-1);return _ymd(d);}
   const BADGES=[
-    {id:'first',name:'初次落笔',icon:'🖌️',cond:s=>s.totalChars>=1},
-    {id:'c10',name:'小有所成',icon:'✍️',cond:s=>s.totalChars>=10},
-    {id:'c50',name:'勤学不辍',icon:'📖',cond:s=>s.totalChars>=50},
-    {id:'c100',name:'百字成林',icon:'🏯',cond:s=>s.totalChars>=100},
-    {id:'combo5',name:'五连击',icon:'🔥',cond:s=>s.bestCombo>=5},
-    {id:'combo10',name:'十连击',icon:'⚡',cond:s=>s.bestCombo>=10},
-    {id:'d3',name:'三日不断',icon:'📅',cond:s=>s.bestStreak>=3},
-    {id:'d7',name:'七日不断',icon:'🗓️',cond:s=>s.bestStreak>=7},
-    {id:'hsk1',name:'HSK 1 通关',icon:'🥉',cond:s=>_levelDone(s,1)},
-    {id:'hsk2',name:'HSK 2 通关',icon:'🥈',cond:s=>_levelDone(s,2)},
-    {id:'hsk3',name:'HSK 3 通关',icon:'🥇',cond:s=>_levelDone(s,3)}
+    {id:'first',name:'初次落笔',en:'First Stroke',ar:'أول خطّ',icon:'🖌️',cond:s=>s.totalChars>=1},
+    {id:'c10',name:'小有所成',en:'Good Start',ar:'بداية جيدة',icon:'✍️',cond:s=>s.totalChars>=10},
+    {id:'c50',name:'勤学不辍',en:'Diligent',ar:'مثابرة',icon:'📖',cond:s=>s.totalChars>=50},
+    {id:'c100',name:'百字成林',en:'100 Characters',ar:'١٠٠ حرف',icon:'🏯',cond:s=>s.totalChars>=100},
+    {id:'combo5',name:'五连击',en:'5 Combo',ar:'٥ متتالية',icon:'🔥',cond:s=>s.bestCombo>=5},
+    {id:'combo10',name:'十连击',en:'10 Combo',ar:'١٠ متتالية',icon:'⚡',cond:s=>s.bestCombo>=10},
+    {id:'d3',name:'三日不断',en:'3-Day Streak',ar:'٣ أيام متتالية',icon:'📅',cond:s=>s.bestStreak>=3},
+    {id:'d7',name:'七日不断',en:'7-Day Streak',ar:'٧ أيام متتالية',icon:'🗓️',cond:s=>s.bestStreak>=7},
+    {id:'hsk1',name:'HSK 1 通关',en:'HSK 1 Cleared',ar:'HSK 1 مكتمل',icon:'🥉',cond:s=>_levelDone(s,1)},
+    {id:'hsk2',name:'HSK 2 通关',en:'HSK 2 Cleared',ar:'HSK 2 مكتمل',icon:'🥈',cond:s=>_levelDone(s,2)},
+    {id:'hsk3',name:'HSK 3 通关',en:'HSK 3 Cleared',ar:'HSK 3 مكتمل',icon:'🥇',cond:s=>_levelDone(s,3)}
   ];
   // ★ -35：HSK 分级通关判定（复用主作用域里的 HSK_LEVEL_CHARS；某级全部字都进了 doneChars 才点亮）
   function _lvChars(L){ try{ return (typeof HSK_LEVEL_CHARS!=='undefined' && HSK_LEVEL_CHARS[L]) ? HSK_LEVEL_CHARS[L] : []; }catch(e){ return []; } }
@@ -6500,7 +6500,7 @@ const Game=(function(){
     if(S.streak>S.bestStreak)S.bestStreak=S.streak;
   }
   function _checkBadges(){
-    BADGES.forEach(function(b){if(!S.badges[b.id]&&b.cond(S)){S.badges[b.id]=_today();toast(b.icon+' 解锁徽章：'+b.name);}});
+    BADGES.forEach(function(b){if(!S.badges[b.id]&&b.cond(S)){S.badges[b.id]=_today();toast(b.icon+' '+tt('解锁徽章','Badge unlocked','وسام مفتوح')+'：'+b.name);}});
   }
   function _renderTop(){
     let els=document.querySelectorAll('.gm-stat-top');
@@ -6523,7 +6523,7 @@ const Game=(function(){
     popPlus(3,document.getElementById('write-stage')||document.getElementById('write-target'));
     if(allCorrect){
       S.combo+=1;if(S.combo>S.bestCombo)S.bestCombo=S.combo;
-      if(S.combo>0&&S.combo%5===0){S.points+=5;_burst();toast('🔥 '+S.combo+' 连击！+5');}
+      if(S.combo>0&&S.combo%5===0){S.points+=5;_burst();toast('🔥 '+S.combo+' '+tt('连击！+5','combo! +5','متتالية! +5'));}
       // ★ -35：全对才记入「已完成清单」(去重)；任何模式(含错题本复习)都算
       if(char && char.length===1 && char.charCodeAt(0)>=0x4e00 && char.charCodeAt(0)<=0x9fa5){ S.doneChars[char]=1; }
     }else{S.combo=0;}
@@ -6597,7 +6597,7 @@ const Game=(function(){
       const d=document.createElement('div');d.className='gm-badge'+(got?' got':'');
       let _prog='';
       if(b.id==='hsk1'||b.id==='hsk2'||b.id==='hsk3'){ const _p=_levelProg(S,+b.id.slice(3)); _prog='<div class="gm-badge-prog">'+_p.done+'/'+_p.total+'</div>'; }
-      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'</div>'+_prog;
+      d.innerHTML='<div class="gm-badge-ic">'+b.icon+'</div><div class="gm-badge-nm">'+b.name+'<span class="lang-swap"><span class="lang-en"> '+(b.en||'')+'</span><span class="lang-ar"> '+(b.ar||'')+'</span></span></div>'+_prog;
       grid.appendChild(d);
     });
   }

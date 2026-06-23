@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-64 (2026-06-23) — ⑧ 班级窗续调(我的班级):浅墨绿分区+放大(840→1150)+基本信息宽/任务窄(1.6fr:1fr)名字一行+名字深绿徽章+两标题等大+刷新键居中+任务卡hover深绿白字徽章清晰+三标题译文×1.2。加入班级弹窗:缩到0.6倍(680px)+标签/说明/按钮中上译下去掉「/」(手机端保留)+副标题×1.3+班级码/学号做成「加入」按钮同款深绿块(中文×0.7放大、译文14px居中、间距对齐按钮)+按钮译文居中;均仅桌面 -->
+<!-- 斑斓部件 · 部件联动-65 (2026-06-23) — 错题本:复习按钮中上译下+排序/图例竖排+管理按钮双语+左框宽度×1.6(360→576px) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-64">
+<meta name="version" content="部件联动-65">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -847,7 +847,11 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-review-row{display:flex;gap:12px;margin-bottom:12px}
 .wb-review-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border:2px solid rgba(255,255,255,0.25);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1.15rem;font-weight:700;cursor:pointer;transition:all .2s}
 .wb-review-btn:hover{background:var(--bamboo-light);transform:translateY(-2px)}
-.wb-due-badge{position:absolute;top:-7px;left:-6px;background:var(--bamboo);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:2}
+.wb-due-badge{position:absolute;top:-7px;left:-6px;background:var(--bamboo);color:#fff;font-size:0.6rem;padding:2px 6px;border-radius:8px;line-height:1.05;box-shadow:0 2px 5px rgba(0,0,0,0.3);z-index:2;display:flex;flex-direction:column;align-items:center}
+.wb-due-badge .lang-swap{font-size:0.82em;opacity:0.9;font-weight:400}
+.wb-tip-tr{display:grid;margin-top:4px}
+.wb-tip-tr .lang-en,.wb-tip-tr .lang-ar{font-size:0.82em;opacity:0.9}
+.wb-col-left,.wb-col-right{display:contents}
 .wb-chip-due{border-color:var(--bamboo-light);background:rgba(181,118,58,0.22)}
 .wb-tools{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;font-size:0.85rem;color:#fff;margin-bottom:12px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:10px;padding:8px 14px}
 .wb-legend{display:inline-flex;align-items:center;gap:5px}
@@ -901,13 +905,21 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 }
 @media (min-width:769px){
 /* ③ 错题本页:左=控件,右=错字集字卡格 */
-.wb-screen{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
-.wb-screen .wb-head{grid-column:1/-1}
-.wb-screen #wb-review-row{grid-column:1;grid-row:2;flex-wrap:wrap}
-.wb-screen #wb-tools{grid-column:1;grid-row:3}
-.wb-screen #wb-tip{grid-column:1;grid-row:4}
-.wb-screen #wb-grid{grid-column:2;grid-row:2/8}
-.wb-screen #wb-empty{grid-column:2;grid-row:2/8}
+.wb-screen{display:grid!important;grid-template-columns:576px 1fr;gap:18px;align-items:stretch;max-width:none;margin:0;padding:16px 8px}
+.wb-screen .wb-col-left,.wb-screen .wb-col-right{display:flex!important;flex-direction:column;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px}
+.wb-screen .wb-head{margin:0 auto 14px;width:259px;box-sizing:border-box}
+.wb-screen #wb-review-row{flex-direction:column;flex-wrap:nowrap;margin-bottom:12px}
+.wb-screen .wb-review-btn{width:100%;flex-direction:column;align-items:center;gap:2px}
+.wb-screen .wb-btn-tr{font-size:0.84em;opacity:0.9;width:100%}
+.wb-screen #wb-tip{margin-bottom:0}
+.wb-screen .wb-tools{flex-direction:column;align-items:flex-start;gap:8px}
+.wb-screen .wb-sort{display:flex;flex-direction:column;gap:1px}
+.wb-screen .wb-sort-tr{font-size:0.86em;opacity:0.88}
+.wb-screen .wb-legend{display:flex;flex-direction:column;gap:4px}
+.wb-screen .wb-legend-item{display:flex;flex-direction:column;gap:1px;align-items:flex-start}
+.wb-screen .wb-legend-tr{font-size:0.86em;opacity:0.88;padding-left:18px}
+.wb-screen .wb-manage-btn{display:inline-flex;flex-direction:column;align-items:center;gap:1px}
+.wb-screen .wb-manage-tr{font-size:0.84em;opacity:0.9}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
 .bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1.6fr 1fr;gap:30px;align-items:stretch}
 .bls-modal-body:has(.bls-tasks-section)>.bls-col{background:#e3ece7;border:2px solid rgba(55,74,66,0.30);box-shadow:0 2px 12px rgba(55,74,66,0.10);border-radius:18px;padding:28px 34px;margin:0}
@@ -1195,6 +1207,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     </div>
 
     <div id="wrongbook-screen" class="wb-screen" style="display:none">
+      <div class="wb-col-left">
       <div class="wb-head">
         <div class="wb-title-wrap">
           <span class="wb-title-icon">📕</span>
@@ -1206,21 +1219,31 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
       </div>
       <div id="wb-review-row" class="wb-review-row" style="display:none">
         <button id="wb-review-today" class="wb-review-btn" onclick="wbReviewToday()" style="display:none">
-          <span>🔥 今天复习<span class="lang-swap"><span class="lang-en"> Review today</span><span class="lang-ar" dir="rtl"> مراجعة اليوم</span></span></span><span class="wb-ra-num" id="wb-today-num">(0)</span>
+          <span class="wb-btn-zh">🔥 今天复习 <span class="wb-ra-num" id="wb-today-num">(0)</span></span>
+          <span class="lang-swap-block wb-btn-tr"><span class="lang-en">Review today</span><span class="lang-ar" dir="rtl">مراجعة اليوم</span></span>
         </button>
-        <button id="wb-review-all" class="wb-review-btn" onclick="wbReviewAll()"><span>复习全部<span class="lang-swap"><span class="lang-en"> Review all</span><span class="lang-ar" dir="rtl"> مراجعة الكل</span></span></span><span class="wb-ra-num">(0)</span></button>
+        <button id="wb-review-all" class="wb-review-btn" onclick="wbReviewAll()">
+          <span class="wb-btn-zh">复习全部 <span class="wb-ra-num">(0)</span></span>
+          <span class="lang-swap-block wb-btn-tr"><span class="lang-en">Review all</span><span class="lang-ar" dir="rtl">مراجعة الكل</span></span>
+        </button>
       </div>
       <div id="wb-tools" class="wb-tools" style="display:none">
-        <span class="wb-sort">↓ 错最多优先<span class="lang-swap"><span class="lang-en"> Most errors first</span><span class="lang-ar" dir="rtl"> الأكثر خطأً أولاً</span></span></span>
-        <span class="wb-legend"><span class="wb-dot wb-dot-py"></span>拼音错<span class="lang-swap"><span class="lang-en"> Pinyin err</span><span class="lang-ar" dir="rtl"> خطأ بينيين</span></span> <span class="wb-dot wb-dot-comp"></span>部件错<span class="lang-swap"><span class="lang-en"> Parts err</span><span class="lang-ar" dir="rtl"> خطأ مكوّنات</span></span></span>
-        <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()">管理<span class="lang-swap"><span class="lang-en"> / Manage</span><span class="lang-ar"> / إدارة</span></span></button>
+        <span class="wb-sort">↓ 错最多优先<span class="lang-swap-block wb-sort-tr"><span class="lang-en">Most errors first</span><span class="lang-ar" dir="rtl">الأكثر خطأً أولاً</span></span></span>
+        <span class="wb-legend">
+          <span class="wb-legend-item"><span class="wb-dot wb-dot-py"></span>拼音错<span class="lang-swap-block wb-legend-tr"><span class="lang-en">Pinyin err</span><span class="lang-ar" dir="rtl">خطأ بينيين</span></span></span>
+          <span class="wb-legend-item"><span class="wb-dot wb-dot-comp"></span>部件错<span class="lang-swap-block wb-legend-tr"><span class="lang-en">Parts err</span><span class="lang-ar" dir="rtl">خطأ مكوّنات</span></span></span>
+        </span>
+        <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()"><span class="wb-manage-zh">管理</span><span class="lang-swap-block wb-manage-tr"><span class="lang-en">Manage</span><span class="lang-ar" dir="rtl">إدارة</span></span></button>
       </div>
-      <div id="wb-tip" class="wb-tip">💡 间隔复习：答对一次，下次间隔拉长（1→3→7→16天）；熬过 16 天那级自动移出 · 答错退回起点<span class="lang-en" style="display:block;font-size:0.82em;opacity:0.9;margin-top:4px">Spaced review: answer right once and the next gap grows (1→3→7→16 days); survive 16 days and it leaves · a wrong answer resets to start</span><span class="lang-ar" dir="rtl" style="display:block;font-size:0.82em;opacity:0.9;margin-top:4px">المراجعة المتباعدة: أجب صحيحًا مرّة فيطول الفاصل (1→3→7→16 يومًا)؛ بعد 16 يومًا يخرج الحرف · الخطأ يعيدك للبداية</span></div>
+      <div id="wb-tip" class="wb-tip">💡 间隔复习：答对一次，下次间隔拉长（1→3→7→16天）；熬过 16 天那级自动移出 · 答错退回起点<span class="lang-swap wb-tip-tr"><span class="lang-en">Spaced review: answer right once and the next gap grows (1→3→7→16 days); survive 16 days and it leaves · a wrong answer resets to start</span><span class="lang-ar" dir="rtl">المراجعة المتباعدة: أجب صحيحًا مرّة فيطول الفاصل (1→3→7→16 يومًا)؛ بعد 16 يومًا يخرج الحرف · الخطأ يعيدك للبداية</span></span></div>
+      </div>
+      <div class="wb-col-right">
       <div id="wb-grid" class="wb-grid"></div>
       <div id="wb-empty" class="wb-empty" style="display:none">
         <div class="wb-empty-icon">🎉</div>
         <div class="wb-empty-zh">暂无错题，继续加油 💪</div>
         <div class="lang-swap-block"><div class="wb-empty-en lang-en">No mistakes yet — keep practicing!</div><div class="wb-empty-en lang-ar" dir="rtl">لا أخطاء بعد — واصل التدريب!</div></div>
+      </div>
       </div>
     </div>
 
@@ -1329,7 +1352,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-64 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-65 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4465,7 +4488,7 @@ function renderWrongBook(){
   var cEl = document.getElementById('wb-count'); if(cEl) cEl.textContent = cnt;
   var cdEl = document.getElementById('wb-count-due'); if(cdEl) cdEl.textContent = dueN;
   var mEl = document.getElementById('wb-manage-btn');
-  if(mEl){ mEl.textContent = _wbManage ? '完成 / Done' : '管理 / Manage'; mEl.style.display = cnt ? 'inline-block' : 'none'; }
+  if(mEl){ var _mzh=_wbManage?'完成':'管理',_men=_wbManage?'Done':'Manage',_mar=_wbManage?'تم':'إدارة'; mEl.innerHTML='<span class="wb-manage-zh">'+_mzh+'</span><span class="lang-swap-block wb-manage-tr"><span class="lang-en">'+_men+'</span><span class="lang-ar" dir="rtl">'+_mar+'</span></span>'; mEl.style.display=cnt?'inline-flex':'none'; }
   var rRow = document.getElementById('wb-review-row');
   if(rRow) rRow.style.display = cnt ? 'flex' : 'none';
   var rToday = document.getElementById('wb-review-today');
@@ -4484,7 +4507,7 @@ function renderWrongBook(){
              + (it.compWrong ? '<span class="wb-dot wb-dot-comp" title="部件错"></span>' : '');
     var del = _wbManage ? '<span class="wb-del" data-del="'+it.char+'">×</span>' : '';
     var times = (it.wrongCount>1) ? '<span class="wb-times">×'+it.wrongCount+'</span>' : '';
-    var dueBadge = it.dueToday ? '<span class="wb-due-badge">今日</span>' : '';
+    var dueBadge = it.dueToday ? '<span class="wb-due-badge">今日<span class="lang-swap"><span class="lang-en">Today</span><span class="lang-ar" dir="rtl">اليوم</span></span></span>' : '';
     var chipCls = 'wb-chip' + (it.dueToday ? ' wb-chip-due' : '');
     return '<button class="'+chipCls+'" data-char="'+it.char+'">'+del+dueBadge
       +'<span class="wb-dots">'+dots+'</span>'
@@ -5560,7 +5583,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-64';
+  const VERSION = '部件联动-65';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

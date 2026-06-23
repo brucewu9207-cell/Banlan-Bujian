@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-63 (2026-06-23) — ⑧ 班级窗续调:卡片改浅墨绿(#e3ece7)+加重边框+阴影,分区更清;整体放大(840→1150);基本信息框加宽/任务框收窄(1.6fr:1fr)→名字一行;名字做成深墨绿徽章(同班级码);基本信息=任务标题等大;刷新键垂直居中、两标题框等高;任务卡hover深墨绿+白字、徽章保持白底清晰;三标题译文×1.2;仅桌面 -->
+<!-- 斑斓部件 · 部件联动-64 (2026-06-23) — ⑧ 班级窗续调(我的班级):浅墨绿分区+放大(840→1150)+基本信息宽/任务窄(1.6fr:1fr)名字一行+名字深绿徽章+两标题等大+刷新键居中+任务卡hover深绿白字徽章清晰+三标题译文×1.2。加入班级弹窗:缩到0.6倍(680px)+标签/说明/按钮中上译下去掉「/」(手机端保留)+副标题×1.3+班级码/学号做成「加入」按钮同款深绿块(中文×0.7放大、译文14px居中、间距对齐按钮)+按钮译文居中;均仅桌面 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-63">
+<meta name="version" content="部件联动-64">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -911,7 +911,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
 .bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1.6fr 1fr;gap:30px;align-items:stretch}
 .bls-modal-body:has(.bls-tasks-section)>.bls-col{background:#e3ece7;border:2px solid rgba(55,74,66,0.30);box-shadow:0 2px 12px rgba(55,74,66,0.10);border-radius:18px;padding:28px 34px;margin:0}
-.bls-col-h{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;color:#5a6b4f;font-size:1.5rem;margin-bottom:20px;padding:12px 16px;border:2px solid rgba(55,74,66,0.2);background:rgba(55,74,66,0.07);border-radius:10px}.bls-col-h .lang-en,.bls-col-h .lang-ar{font-size:0.72em;font-weight:400;opacity:0.8}.bls-modal{max-width:1150px!important}.bls-modal-header h3{font-size:30px!important}.bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}.bls-modal .bls-info-label .lang-swap{font-size:0.78em!important;opacity:0.78;font-weight:400}.bls-tasks-header{position:relative;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:2px;padding:12px 16px!important;border:2px solid rgba(55,74,66,0.2);background:rgba(55,74,66,0.07);border-radius:10px;margin-bottom:20px;font-size:1.5rem!important;line-height:1.05}.bls-tasks-header .bls-th-tr{font-size:0.72em!important;font-weight:400;opacity:0.8}.bls-tasks-header .bls-refresh-btn{position:absolute!important;right:6px;top:50%;margin-top:-14px}
+.bls-col-h{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;color:#5a6b4f;font-size:1.5rem;margin-bottom:20px;padding:12px 16px;border:2px solid rgba(55,74,66,0.2);background:rgba(55,74,66,0.07);border-radius:10px}.bls-col-h .lang-en,.bls-col-h .lang-ar{font-size:0.72em;font-weight:400;opacity:0.8}.bls-modal:has(.bls-tasks-section){max-width:1150px!important}.bls-modal-header h3{font-size:30px!important}.bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}.bls-modal .bls-info-label .lang-swap{font-size:0.78em!important;opacity:0.78;font-weight:400}.bls-tasks-header{position:relative;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:2px;padding:12px 16px!important;border:2px solid rgba(55,74,66,0.2);background:rgba(55,74,66,0.07);border-radius:10px;margin-bottom:20px;font-size:1.5rem!important;line-height:1.05}.bls-tasks-header .bls-th-tr{font-size:0.72em!important;font-weight:400;opacity:0.8}.bls-tasks-header .bls-refresh-btn{position:absolute!important;right:6px;top:50%;margin-top:-14px}
 /* ④ 放大:信息行 / 标签 / 任务卡 等比放大(仅班级任务双栏弹窗) */
 .bls-modal-body:has(.bls-tasks-section) .bls-info-row{padding:16px 0!important}
 .bls-modal-body:has(.bls-tasks-section) .bls-info-label{font-size:17px!important}
@@ -922,6 +922,21 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .bls-modal-body:has(.bls-tasks-section) .bls-task-badge{font-size:14px!important;padding:4px 12px!important}
 /* ① 标题译文放大 1.2 倍(仅班级任务双栏弹窗的副标题) */
 .bls-modal:has(.bls-tasks-section) .bls-subtitle{font-size:13.2px!important}
+/* 加入班级弹窗:缩到0.6倍 + 标签中上译下 + 副标题×1.3(仅桌面) */
+.bls-modal:has(.bls-field){max-width:680px!important}
+.bls-modal:has(.bls-field) .bls-label{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:baseline;background:#374a42;color:#fff;border-radius:4px;padding:6px 13px;box-shadow:0 3px 8px rgba(55,74,66,0.12);width:fit-content;font-weight:600;letter-spacing:.5px;font-size:18.2px;line-height:1.15;row-gap:1px;margin-bottom:8px}
+.bls-modal:has(.bls-field) .bls-label .lang-swap{flex-basis:100%;width:100%;order:1;font-size:14px;text-align:center;opacity:.9;font-weight:400}
+.bls-modal:has(.bls-field) .bls-label .lang-swap>span{display:block;width:100%;text-align:center}
+.bls-modal:has(.bls-field) .bls-label .bls-required{color:#ffd2c6}
+.bls-modal:has(.bls-field) .bls-subtitle{font-size:14.3px!important}
+/* 桌面竖排时隐藏「/」分隔符(手机端并排仍保留) */
+.bls-modal:has(.bls-field) .bls-sep{display:none}
+/* 说明:中文在上、译文在下 */
+.bls-modal:has(.bls-field) .bls-hint{display:flex;flex-direction:column;gap:1px}
+/* 按钮:中文在上、译文在下 */
+.bls-modal:has(.bls-field) .bls-btn{display:flex;flex-direction:column;align-items:center;line-height:1.15;gap:1px}
+.bls-modal:has(.bls-field) .bls-btn .lang-swap{width:100%;text-align:center}
+.bls-modal:has(.bls-field) .bls-btn .lang-swap>span{display:block;width:100%;text-align:center}
 }
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
@@ -1314,7 +1329,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-63 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-64 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5545,7 +5560,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-63';
+  const VERSION = '部件联动-64';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5761,24 +5776,24 @@ showHome();
         <div class="bls-modal-body">
           <div class="bls-field">
             <label class="bls-label" for="bls-join-code">
-              班级码<span class="lang-swap"><span class="lang-en"> / Class Code</span><span class="lang-ar"> / رمز الفصل</span></span> <span class="bls-required">*</span>
+              班级码<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Class Code</span><span class="lang-ar"><i class="bls-sep"> / </i>رمز الفصل</span></span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-code" class="bls-input" placeholder="如：HSK3A、MyClass2024" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint"><span class="lang-swap"><span class="lang-en">2-20 位字母、数字、横线、下划线 (大小写均可) / 2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</span><span class="lang-ar" dir="rtl">2-20 位字母、数字、横线、下划线 (大小写均可) / ٢-٢٠ خانة (أحرف/أرقام/-/_)</span></span></div>
+            <div class="bls-hint"><span class="bls-hint-zh">2-20 位字母、数字、横线、下划线 (大小写均可)</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>2-20 chars (A-Z, a-z, 0-9, -, _) · case insensitive</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>٢-٢٠ خانة (أحرف/أرقام/-/_)</span></span></div>
           </div>
           <!-- ★ 17: 名字由名单回显,不再让学生自填 -->
           <div class="bls-field">
             <label class="bls-label" for="bls-join-sid">
-              学号<span class="lang-swap"><span class="lang-en"> / Student ID</span><span class="lang-ar"> / رقم الطالب</span></span> <span class="bls-required">*</span>
+              学号<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Student ID</span><span class="lang-ar"><i class="bls-sep"> / </i>رقم الطالب</span></span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint"><span class="lang-swap"><span class="lang-en">每人唯一，用于区分同名同学 / Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</span><span class="lang-ar" dir="rtl">每人唯一，用于区分同名同学 / مُعرّف فريد لتمييز الطلاب المتشابهين بالاسم</span></span></div>
+            <div class="bls-hint"><span class="bls-hint-zh">每人唯一，用于区分同名同学</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>مُعرّف فريد لتمييز الطلاب المتشابهين بالاسم</span></span></div>
           </div>
           <div class="bls-error" id="bls-join-error"></div>
         </div>
         <div class="bls-modal-footer">
-          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消<span class="lang-swap"><span class="lang-en"> / Cancel</span><span class="lang-ar"> / إلغاء</span></span></button>
-          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入<span class="lang-swap"><span class="lang-en"> / Join</span><span class="lang-ar"> / انضمام</span></span></button>
+          <button class="bls-btn bls-btn-secondary" id="bls-join-cancel">取消<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Cancel</span><span class="lang-ar"><i class="bls-sep"> / </i>إلغاء</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-join-submit">加入<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Join</span><span class="lang-ar"><i class="bls-sep"> / </i>انضمام</span></span></button>
         </div>
       </div>
     `;

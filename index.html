@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-65 (2026-06-23) — 错题本:复习按钮中上译下+排序/图例竖排+管理按钮双语+左框宽度×1.6(360→576px) -->
+<!-- 斑斓部件 · 部件联动-66 (2026-06-23) — 修桌面端主页漏出错题本两大方框:#wrongbook-screen[style*="block"] 收紧选择器,只在真打开时排 grid;手机端 0 影响 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-65">
+<meta name="version" content="部件联动-66">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -905,7 +905,8 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 }
 @media (min-width:769px){
 /* ③ 错题本页:左=控件,右=错字集字卡格 */
-.wb-screen{display:grid!important;grid-template-columns:576px 1fr;gap:18px;align-items:stretch;max-width:none;margin:0;padding:16px 8px}
+/* 部件联动-66:选择器收紧为 #wrongbook-screen[style*="block"],避免主页时 display:grid!important 顶掉 inline display:none、导致两个大方框漏出 */
+#wrongbook-screen[style*="block"]{display:grid!important;grid-template-columns:576px 1fr;gap:18px;align-items:stretch;max-width:none;margin:0;padding:16px 8px}
 .wb-screen .wb-col-left,.wb-screen .wb-col-right{display:flex!important;flex-direction:column;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px}
 .wb-screen .wb-head{margin:0 auto 14px;width:259px;box-sizing:border-box}
 .wb-screen #wb-review-row{flex-direction:column;flex-wrap:nowrap;margin-bottom:12px}
@@ -1352,7 +1353,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-65 ✦ HSK分级通关徽章(🥉🥈🥇) + 练习页连击','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-66 ✦ 修桌面端主页漏出错题本两大方框','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5583,7 +5584,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-65';
+  const VERSION = '部件联动-66';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

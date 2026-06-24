@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-70 (2026-06-24) — 错题本:桌面译文左对齐放大;错题卡的字改笔画图形渲染(复用 renderGlyphInto,两端生效) -->
+<!-- 斑斓部件 · 部件联动-72 (2026-06-24) — 工具栏译文只居中于纯中文(箭头/圆点不计,桌面)+解锁遮罩阿语也居中(lang-swap-block,两端) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-70">
+<meta name="version" content="部件联动-72">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -914,13 +914,15 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .wb-screen .wb-review-btn{flex:1;width:auto;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;font-size:0.95rem}
 .wb-screen .wb-btn-tr{font-size:0.84em;opacity:0.9;width:100%}
 .wb-screen #wb-tip{margin-bottom:0}
-/* 部件联动-70:工具栏四项一行、顶端对齐;圆点在文字左;译文左对齐中文并放大到参考「今天复习」按钮 */
+/* 部件联动-72:错题卡放大(桌面);译文只居中于纯中文(箭头/圆点在居中列外) */
+.wb-screen .wb-char{font-size:2.6rem}   /* 1.3 × 2rem;笔画 SVG(1em)跟着放大,桌面端 */
 .wb-screen .wb-tools{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:4px 20px;font-size:0.95rem}
-.wb-screen .wb-sort{display:inline-flex;flex-direction:column;gap:1px;align-items:flex-start}
-.wb-screen .wb-sort-tr{font-size:0.84em;opacity:0.88;justify-items:start;text-align:left}
+.wb-screen .wb-sort{display:inline-flex;flex-direction:row;align-items:flex-start;gap:5px}
 .wb-screen .wb-legend{display:inline-flex;flex-direction:row;gap:20px;align-items:flex-start}
-.wb-screen .wb-legend-item{display:inline-flex;flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:5px;row-gap:1px}
-.wb-screen .wb-legend-tr{flex-basis:100%;font-size:0.84em;opacity:0.88;padding-left:13px;justify-items:start;text-align:left}
+.wb-screen .wb-legend-item{display:inline-flex;flex-direction:row;align-items:flex-start;column-gap:5px}
+.wb-screen .wb-tcol{display:inline-flex;flex-direction:column;align-items:center}   /* 中文在上、译文居中其下;箭头/圆点是列外兄弟,不影响居中 */
+.wb-screen .wb-dot{margin-top:0.45em}   /* 圆点垂直对齐中文行 */
+.wb-screen .wb-sort-tr,.wb-screen .wb-legend-tr{font-size:0.84em;opacity:0.88;justify-items:center;text-align:center}
 .wb-screen .wb-manage-btn{margin:0;display:inline-flex;flex-direction:column;align-items:center;gap:1px}
 .wb-screen .wb-manage-tr{font-size:0.84em;opacity:0.9}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
@@ -1231,10 +1233,10 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         </button>
       </div>
       <div id="wb-tools" class="wb-tools" style="display:none">
-        <span class="wb-sort">↓ 错最多优先<span class="lang-swap-block wb-sort-tr"><span class="lang-en">Most errors first</span><span class="lang-ar" dir="rtl">الأكثر خطأً أولاً</span></span></span>
+        <span class="wb-sort"><span class="wb-tmk">↓</span><span class="wb-tcol"><span class="wb-tzh">错最多优先</span><span class="lang-swap-block wb-sort-tr"><span class="lang-en">Most errors first</span><span class="lang-ar" dir="rtl">الأكثر خطأً أولاً</span></span></span></span>
         <span class="wb-legend">
-          <span class="wb-legend-item"><span class="wb-dot wb-dot-py"></span>拼音错<span class="lang-swap-block wb-legend-tr"><span class="lang-en">Pinyin err</span><span class="lang-ar" dir="rtl">خطأ بينيين</span></span></span>
-          <span class="wb-legend-item"><span class="wb-dot wb-dot-comp"></span>部件错<span class="lang-swap-block wb-legend-tr"><span class="lang-en">Parts err</span><span class="lang-ar" dir="rtl">خطأ مكوّنات</span></span></span>
+          <span class="wb-legend-item"><span class="wb-dot wb-dot-py"></span><span class="wb-tcol"><span class="wb-tzh">拼音错</span><span class="lang-swap-block wb-legend-tr"><span class="lang-en">Pinyin err</span><span class="lang-ar" dir="rtl">خطأ بينيين</span></span></span></span>
+          <span class="wb-legend-item"><span class="wb-dot wb-dot-comp"></span><span class="wb-tcol"><span class="wb-tzh">部件错</span><span class="lang-swap-block wb-legend-tr"><span class="lang-en">Parts err</span><span class="lang-ar" dir="rtl">خطأ مكوّنات</span></span></span></span>
         </span>
         <button id="wb-manage-btn" class="wb-manage-btn" onclick="toggleWrongBookManage()"><span class="wb-manage-zh">管理</span><span class="lang-swap-block wb-manage-tr"><span class="lang-en">Manage</span><span class="lang-ar" dir="rtl">إدارة</span></span></button>
       </div>
@@ -1291,7 +1293,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             <!-- 锁定遮罩：拖拽成功前显示 -->
             <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light);min-height:240px">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ② first</span class="lang-ar" dir="rtl">أكمل الخطوة ② أولاً</span></p>
+              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ② first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ② أولاً</span></span></p>
             </div>
             <div class="write-stage" id="write-stage" style="display:none" oncontextmenu="return false">
               <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -1312,7 +1314,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
             <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
               <div style="font-size:2.7rem;margin-bottom:12px">🔒</div>
-              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.11rem">Complete Step ③ first</span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></p>
+              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.11rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
             <div id="next-btn-wrap" style="display:none;padding:10px 0 0;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
@@ -1324,7 +1326,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center;position:relative"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title-zh">② 拖拽部件</span><span class="lang-swap"><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-            <p style="font-size:1.32rem">先完成读音选择<br><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span class="lang-en"></span><span style="font-family:Georgia;font-style:italic;font-size:1.17rem">Complete Step ① first</span class="lang-ar" dir="rtl">أكمل الخطوة ① أولاً</span></p>
+            <p style="font-size:1.32rem;text-align:center">先完成读音选择<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ① first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ① أولاً</span></span></p>
           </div>
           <div id="drag-content" style="display:none;flex:1;flex-direction:column;height:100%;min-height:0">
             <div class="drag-split-box">
@@ -1355,7 +1357,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-70 ✦ 错题本译文左对齐放大+错题卡笔画图形渲染','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-72 ✦ 工具栏译文居中纯中文+解锁遮罩阿语居中','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5592,7 +5594,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-70';
+  const VERSION = '部件联动-72';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

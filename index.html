@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-72 (2026-06-24) — 工具栏译文只居中于纯中文(箭头/圆点不计,桌面)+解锁遮罩阿语也居中(lang-swap-block,两端) -->
+<!-- 斑斓部件 · 部件联动-76 (2026-06-24) — step标题加墨绿背景框;拼音框/部件框由灰改墨绿(同释义框色) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-72">
+<meta name="version" content="部件联动-76">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -51,6 +51,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .mode-tab:hover:not(.active){background:rgba(181,118,58,0.15)}
 .main-content{position:relative;z-index:1;padding:28px 32px;margin:0 auto;min-height:calc(100vh - 45px)}
 .card{background:#c4c4c4;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(120,120,120,0.5);backdrop-filter:blur(4px);color:#ffffff}
+/* 部件联动-73:练习页 4 张 step 面板改墨绿半透明,与错题卡背景一致(只命中 practice-layout 内的 card,不动 level-select 等) */
+.practice-layout .card{background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2)}
 
 /* 级别选择 */
 /* ══ 首页：二选一入口 ══ */
@@ -232,7 +234,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
-.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#c4c4c4;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大到原来的 1.1 倍（2.3→2.53rem） */
+.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:rgba(20,40,30,0.55);cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大1.1倍;部件联动-76:底改墨绿(同释义框) */
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -307,7 +309,7 @@ body::before{content:'';position:fixed;inset:0;background:
   display:block;
   max-height:100%;
   font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;
-  color:rgba(20,40,30,0.55);
+  color:#fff;   /* 部件联动-75:拖拽成功的字配墨绿底改白 */
   animation:mergeIn .5s cubic-bezier(.34,1.56,.64,1);
 }
 .drag-right .result-label{
@@ -336,7 +338,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool{margin-bottom:8px;flex-shrink:0}
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
-.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#c4c4c4;color:#ffffff;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}
+.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:rgba(20,40,30,0.55);color:#ffffff;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}  /* 部件联动-76:底改墨绿 */
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -517,14 +519,17 @@ body::before{content:'';position:fixed;inset:0;background:
   font-size:calc(1.2rem*var(--ui-scale));
   letter-spacing:0.06em;
   margin-bottom:calc(12px*var(--ui-scale));
-  padding:0 2px;
+  padding:5px 16px;
   text-align:center;
+  /* 部件联动-76:标题加墨绿背景框(同释义框色) */
+  display:inline-block;align-self:center;
+  background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);border-radius:8px;
 }
-.step-title-zh{font-family:Georgia,'STSong','宋体',serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase}
+.step-title-zh{font-family:Georgia,'STSong','宋体',serif;font-weight:700;color:#fff;letter-spacing:0.12em;text-transform:uppercase}  /* 部件联动-75:配墨绿底改白 */
 /* ★ v38 ③：step② 标题左侧"当前要拖的字"提示——楷体小字，提示学生此刻在拼哪个字 */
-.drag-hint-char{position:absolute;left:0;top:50%;transform:translateY(-50%);font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:1.7rem;line-height:1;color:var(--ink-dark);background:rgba(20,40,30,0.08);border:1.5px solid rgba(20,40,30,0.25);border-radius:8px;padding:2px 10px;letter-spacing:0;text-transform:none;font-weight:400}
+.drag-hint-char{font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:1.7rem;line-height:1;color:var(--ink-dark);background:#fff;border:1.5px solid rgba(20,40,30,0.25);border-radius:8px;padding:2px 10px;letter-spacing:0;text-transform:none;font-weight:400;flex-shrink:0}  /* 部件联动-75:小方框白底;-76:改 flex 内静态定位(在标题框左侧) */
 .drag-hint-char:empty{display:none}
-.step-title-en{font-family:Georgia,serif;font-weight:700;color:#8b2c2c;letter-spacing:0.12em;text-transform:uppercase;margin-left:8px}
+.step-title-en{font-family:Georgia,serif;font-weight:700;color:#fff;letter-spacing:0.12em;text-transform:uppercase;margin-left:8px}  /* 部件联动-75:配墨绿底改白 */
 
 .drag-right .retry-btn-inline{
   margin-top:0;padding:10px 18px;
@@ -717,7 +722,7 @@ body::after{
   /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔/播放」按钮点完变红卡住）→ 中和 hover 背景 */
   .stroke-ctrl-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
   .play-circle-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
-  .pinyin-btn:hover:not(:disabled){background:#c4c4c4;border-color:rgba(255,255,255,0.4)}
+  .pinyin-btn:hover:not(:disabled){background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.4)}
   .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
   /* ★ v57：iOS Safari 上父级 .struct-bar 的 backdrop-filter:blur 会把返回按钮的 bamboo 实色与背景混色变暗(实测 135,106,62 vs 期望 181,118,58)。
      用 isolation:isolate + transform:translateZ(0) 强制独立合成层,跳出 backdrop-filter 影响。 */
@@ -914,8 +919,10 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .wb-screen .wb-review-btn{flex:1;width:auto;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;font-size:0.95rem}
 .wb-screen .wb-btn-tr{font-size:0.84em;opacity:0.9;width:100%}
 .wb-screen #wb-tip{margin-bottom:0}
-/* 部件联动-72:错题卡放大(桌面);译文只居中于纯中文(箭头/圆点在居中列外) */
+/* 部件联动-73:错题卡放大(桌面);译文居中纯中文;拼音/今日图标 ×1.3(桌面) */
 .wb-screen .wb-char{font-size:2.6rem}   /* 1.3 × 2rem;笔画 SVG(1em)跟着放大,桌面端 */
+.wb-screen .wb-py{font-size:1.105rem}      /* 部件联动-73:0.85 × 1.3 */
+.wb-screen .wb-due-badge{font-size:0.78rem} /* 部件联动-73:0.6 × 1.3 */
 .wb-screen .wb-tools{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:4px 20px;font-size:0.95rem}
 .wb-screen .wb-sort{display:inline-flex;flex-direction:row;align-items:flex-start;gap:5px}
 .wb-screen .wb-legend{display:inline-flex;flex-direction:row;gap:20px;align-items:flex-start}
@@ -1291,7 +1298,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           <div class="card write-box">
             <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">③ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></div>
             <!-- 锁定遮罩：拖拽成功前显示 -->
-            <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light);min-height:240px">
+            <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;min-height:240px">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ② first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ② أولاً</span></span></p>
             </div>
@@ -1312,9 +1319,9 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           <div class="card word-box">
             <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">④ 例词</span><span class="lang-swap"><span class="step-title-en lang-en">Example Word</span><span class="step-title-en lang-ar" dir="rtl">كلمة مثال</span></span></div>
             <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
-            <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-light)">
-              <div style="font-size:2.7rem;margin-bottom:12px">🔒</div>
-              <p style="font-size:1.23rem;text-align:center">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.11rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
+            <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+              <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
+              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
             <div id="next-btn-wrap" style="display:none;padding:10px 0 0;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
@@ -1323,8 +1330,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         </div>
         <!-- 右栏：Step 2 -->
         <div class="card structure-panel" id="structure-panel">
-          <h3 style="font-size:1.2rem;margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;text-align:center;position:relative"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title-zh">② 拖拽部件</span><span class="lang-swap"><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></span></h3>
-          <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:var(--ink-light);flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
+          <h3 style="margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title" style="margin-bottom:0"><span class="step-title-zh">② 拖拽部件</span><span class="lang-swap"><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></span></span></h3>
+          <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:#fff;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
             <p style="font-size:1.32rem;text-align:center">先完成读音选择<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ① first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ① أولاً</span></span></p>
           </div>
@@ -1357,7 +1364,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-72 ✦ 工具栏译文居中纯中文+解锁遮罩阿语居中','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-76 ✦ step标题加墨绿框+拼音/部件框改墨绿','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -3252,7 +3259,7 @@ function renderCompPool(char,data){
     const chipCol=entry.isCorrect
       ? COMP_COLORS[entry.correctIndex%COMP_COLORS.length]
       : COMP_COLORS[(entry.correctIndex+3+i)%COMP_COLORS.length];
-    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#ffffff;background:#c4c4c4;border-width:1.5px`;
+    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#ffffff;background:rgba(20,40,30,0.55);border-width:1.5px`;   /* 部件联动-76:底改墨绿 */
 
     // ★ 指针拖拽：一个事件统一鼠标 / 触屏 / 触控笔
     chip.addEventListener('pointerdown',e=>{
@@ -5594,7 +5601,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-72';
+  const VERSION = '部件联动-76';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-66 (2026-06-23) — 修桌面端主页漏出错题本两大方框:#wrongbook-screen[style*="block"] 收紧选择器,只在真打开时排 grid;手机端 0 影响 -->
+<!-- 斑斓部件 · 部件联动-70 (2026-06-24) — 错题本:桌面译文左对齐放大;错题卡的字改笔画图形渲染(复用 renderGlyphInto,两端生效) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-66">
+<meta name="version" content="部件联动-70">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -909,17 +909,19 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 #wrongbook-screen[style*="block"]{display:grid!important;grid-template-columns:576px 1fr;gap:18px;align-items:stretch;max-width:none;margin:0;padding:16px 8px}
 .wb-screen .wb-col-left,.wb-screen .wb-col-right{display:flex!important;flex-direction:column;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px}
 .wb-screen .wb-head{margin:0 auto 14px;width:259px;box-sizing:border-box}
-.wb-screen #wb-review-row{flex-direction:column;flex-wrap:nowrap;margin-bottom:12px}
-.wb-screen .wb-review-btn{width:100%;flex-direction:column;align-items:center;gap:2px}
+/* 部件联动-69:复习两钮缩小并排同一行 */
+.wb-screen #wb-review-row{flex-direction:row;flex-wrap:nowrap;margin-bottom:12px}
+.wb-screen .wb-review-btn{flex:1;width:auto;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;font-size:0.95rem}
 .wb-screen .wb-btn-tr{font-size:0.84em;opacity:0.9;width:100%}
 .wb-screen #wb-tip{margin-bottom:0}
-.wb-screen .wb-tools{flex-direction:column;align-items:flex-start;gap:8px}
-.wb-screen .wb-sort{display:flex;flex-direction:column;gap:1px}
-.wb-screen .wb-sort-tr{font-size:0.86em;opacity:0.88}
-.wb-screen .wb-legend{display:flex;flex-direction:column;gap:4px}
-.wb-screen .wb-legend-item{display:flex;flex-direction:column;gap:1px;align-items:flex-start}
-.wb-screen .wb-legend-tr{font-size:0.86em;opacity:0.88;padding-left:18px}
-.wb-screen .wb-manage-btn{display:inline-flex;flex-direction:column;align-items:center;gap:1px}
+/* 部件联动-70:工具栏四项一行、顶端对齐;圆点在文字左;译文左对齐中文并放大到参考「今天复习」按钮 */
+.wb-screen .wb-tools{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:4px 20px;font-size:0.95rem}
+.wb-screen .wb-sort{display:inline-flex;flex-direction:column;gap:1px;align-items:flex-start}
+.wb-screen .wb-sort-tr{font-size:0.84em;opacity:0.88;justify-items:start;text-align:left}
+.wb-screen .wb-legend{display:inline-flex;flex-direction:row;gap:20px;align-items:flex-start}
+.wb-screen .wb-legend-item{display:inline-flex;flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:5px;row-gap:1px}
+.wb-screen .wb-legend-tr{flex-basis:100%;font-size:0.84em;opacity:0.88;padding-left:13px;justify-items:start;text-align:left}
+.wb-screen .wb-manage-btn{margin:0;display:inline-flex;flex-direction:column;align-items:center;gap:1px}
 .wb-screen .wb-manage-tr{font-size:0.84em;opacity:0.9}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
 .bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1.6fr 1fr;gap:30px;align-items:stretch}
@@ -1353,7 +1355,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-66 ✦ 修桌面端主页漏出错题本两大方框','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-70 ✦ 错题本译文左对齐放大+错题卡笔画图形渲染','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4512,9 +4514,15 @@ function renderWrongBook(){
     var chipCls = 'wb-chip' + (it.dueToday ? ' wb-chip-due' : '');
     return '<button class="'+chipCls+'" data-char="'+it.char+'">'+del+dueBadge
       +'<span class="wb-dots">'+dots+'</span>'
-      +'<span class="wb-char">'+it.char+'</span>'
+      +'<span class="wb-char"></span>'   /* 部件联动-70:空壳,下面用 renderGlyphInto 渲染成笔画 SVG */
       +'<span class="wb-py">'+(it.pinyin||'')+'</span>'+times+'</button>';
   }).join('');
+  /* 部件联动-70:错题卡的字改用笔画图形渲染(复用背景飘字同款 renderGlyphInto),白色跟随卡片;两端生效 */
+  grid.querySelectorAll('.wb-chip').forEach(function(chip){
+    var ch = chip.getAttribute('data-char');
+    var el = chip.querySelector('.wb-char');
+    if(el && ch) renderGlyphInto(el, ch);
+  });
   if(!grid._wbBound){
     grid._wbBound = true;
     grid.addEventListener('click', function(ev){
@@ -5584,7 +5592,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-66';
+  const VERSION = '部件联动-70';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

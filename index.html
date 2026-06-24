@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-76 (2026-06-24) — step标题加墨绿背景框;拼音框/部件框由灰改墨绿(同释义框色) -->
+<!-- 斑斓部件 · 部件联动-77 (2026-06-24) — step③标题改单行(对齐其它step);缩小拼音框上下padding+释义框上下间距 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-76">
+<meta name="version" content="部件联动-77">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -234,7 +234,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
-.pinyin-btn{padding:calc(10px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:rgba(20,40,30,0.55);cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大1.1倍;部件联动-76:底改墨绿(同释义框) */
+.pinyin-btn{padding:calc(6px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:rgba(20,40,30,0.55);cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em}   /* ★ v37：拼音框放大1.1倍;-76:底墨绿;-77:竖向padding 10→6 */
 .pinyin-btn:hover:not(:disabled){border-color:var(--porcelain);background:rgba(74,94,138,0.06)}
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
@@ -521,6 +521,7 @@ body::before{content:'';position:fixed;inset:0;background:
   margin-bottom:calc(12px*var(--ui-scale));
   padding:5px 16px;
   text-align:center;
+  white-space:nowrap;   /* 部件联动-77:标题中文+译文强制单行(对齐①②④) */
   /* 部件联动-76:标题加墨绿背景框(同释义框色) */
   display:inline-block;align-self:center;
   background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);border-radius:8px;
@@ -817,7 +818,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
    ════════════════════════════════════════════════ */
 @media(min-width:769px){
   /* ① 释义框整体放大约 1.5 倍（内层字号用 !important 盖过 JS 写死的内联值） */
-  #char-info{padding:20px 26px !important;border-radius:12px !important;margin-top:18px !important;line-height:1.5 !important}
+  #char-info{padding:10px 26px !important;border-radius:12px !important;margin-top:10px !important;line-height:1.35 !important}   /* 部件联动-77:缩小上下间距(竖向 20→10、margin 18→10) */
   #char-info strong{font-size:3rem !important}     /* v60：在 v59 (2rem) 基础上再 ×1.5 */
   #char-info span{font-size:1.95rem !important}    /* v60：在 v59 (1.3rem) 基础上再 ×1.5 */
 
@@ -1364,7 +1365,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-76 ✦ step标题加墨绿框+拼音/部件框改墨绿','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-77 ✦ step③标题单行+缩拼音框/释义框上下间距','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5601,7 +5602,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-76';
+  const VERSION = '部件联动-77';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

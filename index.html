@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-115 (2026-06-26) — 练习页:step①②③④标题框改回墨绿(释义框色)+skip按钮改橙(返回主页色)并加悬浮+下一个字加悬浮 -->
+<!-- 斑斓部件 · 部件联动-116 (2026-06-26) — 首页4卡片改名+换图标+重排+底部小字统一中上译下居中 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-115">
+<meta name="version" content="部件联动-116">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -66,7 +66,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-entry-icon{position:absolute;right:calc(100% + 12px);top:50%;transform:translateY(-50%);font-size:2rem;line-height:1}
 .home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em;display:inline-block}
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
-.home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}
+.home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}.entry-sub{line-height:1.35;text-align:center}.entry-sub .es-zh{display:block}.entry-sub .lang-en,.entry-sub .lang-ar{display:block;font-style:italic;opacity:0.88}
 .home-entry-input{cursor:default}
 .home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
 .teacher-input{flex:1;min-width:0;padding:12px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
@@ -1200,15 +1200,25 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <div class="deco-merge-pinyin" id="deco-merge-pinyin"></div>
       </div>
       <div class="home-grid">
-        <!-- 入口 A：HSK 分级挑战 -->
+        <!-- 入口 1：班级模式(BLS 模块) -->
+        <button class="home-entry" id="bls-entry-card" onclick="BLS.onCardClick()">
+          <div class="home-entry-header">
+            <span class="home-entry-icon">🧑‍🏫</span>
+            <span class="home-entry-zh">班级模式</span>
+          </div>
+          <div class="lang-swap-block"><div class="home-entry-en lang-en">Class Mode</div><div class="home-entry-en lang-ar" dir="rtl">وضع الفصل</div></div>
+          <div class="home-entry-desc entry-sub" id="bls-entry-desc"><div class="es-zh">点此加入班级</div><div class="lang-en">Join a class</div><div class="lang-ar" dir="rtl">انضمّ إلى فصل</div></div>
+        </button>
+        <!-- 入口 2：自学模式(HSK 分级挑战) -->
         <button class="home-entry" onclick="showLevelSelect()">
           <div class="home-entry-header">
-            <span class="home-entry-icon">🎯</span>
-            <span class="home-entry-zh">挑战模式</span>
+            <span class="home-entry-icon">🏋️</span>
+            <span class="home-entry-zh">自学模式</span>
           </div>
-          <div class="lang-swap-block"><div class="home-entry-en lang-en">HSK Level Challenge</div><div class="home-entry-en lang-ar" dir="rtl">تحدّي مستويات HSK</div></div>
+          <div class="lang-swap-block"><div class="home-entry-en lang-en">Self-study Mode</div><div class="home-entry-en lang-ar" dir="rtl">وضع التعلّم الذاتي</div></div>
+          <div class="home-entry-desc entry-sub"><div class="es-zh">HSK分级挑战</div><div class="lang-en">HSK Level Challenge</div><div class="lang-ar" dir="rtl">تحدّي مستويات HSK</div></div>
         </button>
-        <!-- 入口 B：请输入字/词 -->
+        <!-- 入口 3：请输入字/词 -->
         <div class="home-entry home-entry-input">
           <div class="home-entry-header">
             <span class="home-entry-icon">🔍</span>
@@ -1220,23 +1230,14 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             <button class="teacher-go" onclick="startTeacherSession()">演示<span class="lang-swap"><span class="lang-en"> · Demo</span><span class="lang-ar"> · عرض</span></span></button>
           </div>
         </div>
-        <!-- ★ 联动-1: 入口 C 班级任务(BLS 模块) -->
-        <button class="home-entry" id="bls-entry-card" onclick="BLS.onCardClick()">
-          <div class="home-entry-header">
-            <span class="home-entry-icon">📚</span>
-            <span class="home-entry-zh">班级任务</span>
-          </div>
-          <div class="lang-swap-block"><div class="home-entry-en lang-en">Class Tasks</div><div class="home-entry-en lang-ar" dir="rtl">مهام الفصل</div></div>
-          <div class="home-entry-desc" id="bls-entry-desc">点此加入班级<span class="lang-swap"><span class="lang-en"> / Join a class</span><span class="lang-ar"> / انضمّ إلى فصل</span></span></div>
-        </button>
-        <!-- ★ 部件联动-18: 入口 D 错题本 -->
+        <!-- ★ 部件联动-18: 入口 4 错题集 -->
         <button class="home-entry wb-home-card" id="wb-entry-card" onclick="showWrongBook()">
           <div class="home-entry-header">
-            <span class="home-entry-icon">📕</span>
-            <span class="home-entry-zh">错题本</span>
+            <span class="home-entry-icon">📒</span>
+            <span class="home-entry-zh">错题集</span>
           </div>
-          <div class="lang-swap-block"><div class="home-entry-en lang-en">Mistake Book</div><div class="home-entry-en lang-ar" dir="rtl">دفتر الأخطاء</div></div>
-          <div class="home-entry-desc" id="wb-home-desc">暂无错题<span class="lang-swap"><span class="lang-en"> / All clear</span><span class="lang-ar"> / لا أخطاء</span></span></div>
+          <div class="lang-swap-block"><div class="home-entry-en lang-en">Mistake Book</div><div class="home-entry-en lang-ar" dir="rtl">مجموعة الأخطاء</div></div>
+          <div class="home-entry-desc entry-sub" id="wb-home-desc"><div class="es-zh">暂无错题</div><div class="lang-en">All clear</div><div class="lang-ar" dir="rtl">لا أخطاء</div></div>
         </button>
       </div>
     </div>
@@ -1401,7 +1402,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-115 ✦ 练习页:step标题框改墨绿+skip改橙带悬浮+下一个字带悬浮','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-116 ✦ 首页4卡片改名+换图标+重排+底部小字统一中上译下居中','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4655,9 +4656,10 @@ function updateWrongBookBadge(){
   var n = WrongBook.dueCount();
   var d = document.getElementById('wb-home-desc');
   if(!d) return;
-  if(m === 0){ d.textContent = tt('暂无错题','All clear','لا أخطاء'); }
-  else if(n > 0){ d.textContent = tt('今天该复习 ' + n + ' 个', n + ' due today', 'للمراجعة اليوم: ' + n); }
-  else { d.textContent = '今日已清 · 共 ' + m + ' 个 / All done today'; }
+  function sub(zh,en,ar){return '<div class="es-zh">'+zh+'</div><div class="lang-en">'+en+'</div><div class="lang-ar" dir="rtl">'+ar+'</div>';}
+  if(m === 0){ d.innerHTML = sub('暂无错题','All clear','لا أخطاء'); }
+  else if(n > 0){ d.innerHTML = sub('今天该复习 ' + n + ' 个', n + ' due today', 'للمراجعة اليوم: ' + n); }
+  else { d.innerHTML = sub('今日已清 · 共 ' + m + ' 个', 'All done today · ' + m, 'تم اليوم · ' + m); }
 }
 
 function renderWrongBook(){
@@ -5768,7 +5770,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-115';
+  const VERSION = '部件联动-116';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6563,19 +6565,19 @@ showHome();
   function updateCardSubtitle(){
     const el = document.getElementById('bls-entry-desc');
     if(!el) return;
-
+    function sub(zh,en,ar){return '<div class="es-zh">'+zh+'</div><div class="lang-en">'+en+'</div><div class="lang-ar" dir="rtl">'+ar+'</div>';}
     if(!state.studentCode){
-      el.innerHTML = '点此加入班级<span class="lang-swap"><span class="lang-en"> / Join a class</span><span class="lang-ar"> / انضمّ إلى فصل</span></span>';
+      el.innerHTML = sub('点此加入班级','Join a class','انضمّ إلى فصل');
       return;
     }
     const newCount = state.tasks.filter(function(t){
       return !state.completedTasks.includes(t.taskId);
     }).length;
-
+    const code = escapeHtml(state.classCode);
     if(newCount > 0){
-      el.innerHTML = escapeHtml(state.classCode) + ' · 🔴 ' + newCount + ' 个新任务<span class="lang-swap"><span class="lang-en"> new</span><span class="lang-ar"> جديدة</span></span>';
+      el.innerHTML = sub(code + ' · 🔴 ' + newCount + ' 个新任务', code + ' · ' + newCount + ' new', code + ' · ' + newCount + ' جديدة');
     } else {
-      el.innerHTML = escapeHtml(state.classCode) + ' · 暂无任务 / No tasks';
+      el.innerHTML = sub(code + ' · 暂无任务', code + ' · No tasks', code + ' · لا مهام');
     }
   }
 

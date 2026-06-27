@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-129 (2026-06-27) — 手机端13结构彩色组紧凑化:组标题1.44rem→0.9rem缩小、压掉组内留白(组盒/卡片行/组间间距全收紧),每组从一整屏压成标题一行+卡片一排的矮块,保持标签在上。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-130 (2026-06-27) — 手机端13结构改横条式:组标签移到左侧固定窄列、卡片靠右排一行放不下换行,每组变一条矮横条,大幅省高度。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-129">
+<meta name="version" content="部件联动-130">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -521,13 +521,13 @@ body::before{content:'';position:fixed;inset:0;background:
 .sap-piece-inner svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .sap-py{font-family:Georgia,serif;font-style:italic;font-size:38px;font-weight:700;color:#2a3a30;margin-top:10px;line-height:1}
 @media(max-width:900px){
-  /* ★ 联动-128/129:把电脑端「6 个彩色结构组」搬到手机端——竖向堆叠;-129:整体缩小紧凑(缩组标题+压留白),每组只占一个矮块 */
-  .struct-grid{display:flex;flex-direction:column;gap:6px;padding:8px 12px 10px}
-  .sg{display:flex !important;flex-direction:column;width:100%;flex:none !important;padding:4px 6px 5px;border-radius:9px;box-shadow:0 2px 6px rgba(20,40,30,0.22)}   /* 彩色组盒(inline background 即组色);-129:压紧 */
-  .sg-label{display:block;font-size:0.9rem;letter-spacing:0.02em;padding:0;margin:0}   /* -129:组标题 1.44rem→0.9rem 缩小,去掉撑高 */
-  .sg-label .lang-swap-block{font-size:0.6em;margin-top:0}   /* -129:组标题译文也缩小、贴紧 */
-  .sg-row{display:flex !important;flex:none;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:2px}   /* 卡片横排换行;-129:覆盖桌面 flex:1 防被拉高、收紧 */
-  .sg>.sg-row>.struct-card{flex:0 0 30%;min-width:0;border-right:none}   /* 每张约1/3宽;单卡组居中 */
+  /* ★ 联动-130:13结构改「横条式」——组标签在左、卡片靠右排一行(放不下换行);每组变一条矮横条,最省高度。仅手机端 */
+  .struct-grid{display:flex;flex-direction:column;gap:6px;padding:8px 10px 10px}
+  .sg{display:flex !important;flex-direction:row;align-items:center;width:100%;flex:none !important;gap:6px;padding:4px 8px;border-radius:9px;box-shadow:0 2px 6px rgba(20,40,30,0.22)}   /* 横排:标签左·卡片右(inline background 即组色) */
+  .sg-label{display:block;flex:0 0 66px;text-align:center;font-size:0.8rem;line-height:1.15;letter-spacing:0;padding:0;margin:0}   /* 左侧固定窄列 */
+  .sg-label .lang-swap-block{font-size:0.62em;margin-top:1px}   /* 译文小、贴紧 */
+  .sg-row{display:flex !important;flex:1 1 auto;flex-wrap:wrap;gap:4px;justify-content:center;margin:0}   /* 右侧卡片占满,放不下换行(半包围6个→两行) */
+  .sg>.sg-row>.struct-card{flex:0 0 30%;min-width:0;border-right:none}   /* 每张约1/3宽 */
   .struct-bar-body{background:rgba(20,40,30,0.25)}   /* 部件联动-92:手机/平板端tile条底改回深色(无色平铺白字需深底) */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
   .struct-card-num{display:none}   /* 部件联动-98:手机端不显圆圈数字(保持现状) */
@@ -1433,7 +1433,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-129 ✦ 手机端13结构彩色组紧凑化:组标题1.44rem→0.9rem缩小、压掉组内留白(组盒/卡片行/组间间距全收紧),每组从一整屏压成标题一行+卡片一排的矮块,保持标签在上。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-130 ✦ 手机端13结构改横条式:组标签移到左侧固定窄列、卡片靠右排一行放不下换行,每组变一条矮横条,大幅省高度。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5832,7 +5832,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-129';
+  const VERSION = '部件联动-130';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

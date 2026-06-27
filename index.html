@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-132 (2026-06-27) — 手机端结构卡片再调:例字移到标题(中文名+英文)右边,两个例字上下叠(你上好下);卡片改图标|标题|例字三列。桌面端例字仍显示「你、好」一行(JS拆字+CSS两端分别排)。仅手机端视觉变化 -->
+<!-- 斑斓部件 · 部件联动-133 (2026-06-27) — 手机端结构卡片再微调:中文名与译文改严格居中对齐、并贴近(名贴下/译文贴上,消除图标跨行撑开的缝);单图标组(独体字/全包围/品字)改左对齐。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-132">
+<meta name="version" content="部件联动-133">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -531,11 +531,13 @@ body::before{content:'';position:fixed;inset:0;background:
   /* ★ 联动-131/132:卡片横向——图标左 | 标题(中文名+英文)中 | 例字(两字上下叠)右 */
   .sg .struct-card{display:grid !important;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:5px;row-gap:0;padding:3px 5px;border-right:none}
   .sg .struct-card>.struct-card-svg{grid-column:1;grid-row:1 / span 2;align-self:center;margin:0}
-  .sg .struct-card>.struct-card-name{grid-column:2;grid-row:1;text-align:left;margin:0}
-  .sg .struct-card>.lang-swap-block{grid-column:2;grid-row:2;justify-items:start;text-align:left;margin:0}
+  .sg .struct-card>.struct-card-name{grid-column:2;grid-row:1;text-align:center;align-self:end;margin:0;line-height:1.15}   /* -133:居中+贴下(与译文会合,缝变小) */
+  .sg .struct-card>.lang-swap-block{grid-column:2;grid-row:2;justify-items:center;text-align:center;align-self:start;margin:0}   /* -133:居中+贴上 */
+  .sg .struct-card>.lang-swap-block .struct-card-en{margin:0;line-height:1.1}   /* -133:译文去边距收紧 */
   .sg .struct-card>.struct-card-ex{grid-column:3;grid-row:1 / span 2;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;margin:0;padding-left:2px}   /* -132:例字移到标题右边,两字上下叠 */
   .sg .struct-card-ex .ex-sep{display:none}   /* -132:手机端隐藏「、」,两字分上下 */
   .sg .struct-card-ex .ex-c{display:block}
+  .sg-solo .sg-row{justify-content:flex-start}   /* ★ 联动-133:单图标组(独体字/全包围/品字)左对齐,不再居中 */
   .struct-bar-body{background:rgba(20,40,30,0.25)}   /* 部件联动-92:手机/平板端tile条底改回深色(无色平铺白字需深底) */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
   .struct-card-num{display:none}   /* 部件联动-98:手机端不显圆圈数字(保持现状) */
@@ -1441,7 +1443,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-132 ✦ 手机端结构卡片再调:例字移到标题(中文名+英文)右边,两个例字上下叠(你上好下);卡片改图标|标题|例字三列。桌面端例字仍显示「你、好」一行(JS拆字+CSS两端分别排)。仅手机端视觉变化','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-133 ✦ 手机端结构卡片再微调:中文名与译文改严格居中对齐、并贴近(名贴下/译文贴上,消除图标跨行撑开的缝);单图标组(独体字/全包围/品字)改左对齐。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5851,7 +5853,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-132';
+  const VERSION = '部件联动-133';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

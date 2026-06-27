@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-137 (2026-06-27) — 整屏结构页微调:①返回主页按钮 译文移到中文下方 ②标题 汉字基本结构 译文也移到中文下方 ③标题区加粗下边框与内容区分 ④13结构内容在标题下方剩余空间上下居中。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-138 (2026-06-27) — ①整屏结构页标题移到底部(顶栏只留返回主页,标题放页面下方)。②Step1选对拼音后不再隐藏4个选项(保留)+结果框放大(字号+内边距)。③Step1/2/3/4标题手机端缩小字号收紧字距→不溢出标题框。均手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-137">
+<meta name="version" content="部件联动-138">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -477,7 +477,7 @@ body::before{content:'';position:fixed;inset:0;background:
   background:var(--bg-main);   /* 部件联动-92:tile条底色改页面色(彩色组块浮于其上);手机端@media内改回深色护白字 */
 }
 .struct-bar-body.open{max-height:320px}
-.struct-fs-bar{display:none}   /* ★ 联动-136:整屏弹出页顶栏默认隐藏(桌面端结构条常驻,不需要) */
+.struct-fs-bar,.struct-fs-titlebar{display:none}   /* ★ 联动-136:整屏弹出页顶栏/底部标题默认隐藏(桌面端结构条常驻,不需要) */
 @media(max-width:768px){
   /* ★ 联动-136:手机端「汉字基本结构」改整屏弹出页——点开占满全屏、可滚动、白底,顶部带「返回主页」 */
   .struct-bar-body.open{position:fixed !important;inset:0;z-index:9000;max-height:none !important;height:100vh;height:100dvh;overflow-y:auto;background:#fff;padding:0 0 24px;display:flex;flex-direction:column}   /* -137:flex列→内容可垂直居中 */
@@ -486,6 +486,12 @@ body::before{content:'';position:fixed;inset:0;background:
   .struct-fs-title{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:1.05rem;font-weight:700;color:var(--ink-dark);white-space:nowrap}   /* -137:中文上·译文下 */
   .struct-fs-back .fs-tr,.struct-fs-title .fs-tr{font-size:0.64em;font-weight:400;opacity:0.85;margin-top:1px;letter-spacing:0}   /* -137:译文小、在中文下方 */
   .struct-bar-body.open .struct-grid{margin-top:auto;margin-bottom:auto}   /* ★ -137:13结构内容在标题下方的剩余空间里上下居中 */
+  /* ★ 联动-138:标题挪到结构页底部 */
+  .struct-fs-titlebar{display:flex;justify-content:center;flex:0 0 auto;padding:12px 14px 18px;border-top:2px solid rgba(0,0,0,0.12)}
+  /* ★ 联动-138:Step 1/2/3/4 标题缩小+收紧字距→塞进标题框不溢出 */
+  .step-title{font-size:calc(0.86rem*var(--ui-scale));letter-spacing:0.01em;padding:5px 8px}
+  .step-title-zh{letter-spacing:0.04em}
+  .step-title-en{font-size:0.86em;letter-spacing:0.02em;margin-left:5px}
 }
 .struct-grid{
   display:flex;align-items:stretch;gap:6px;
@@ -1123,7 +1129,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
   </div>
   <div class="struct-bar-body open" id="struct-body">
     <!-- ★ 联动-136:手机端整屏弹出页顶栏(返回主页+标题);桌面端 display:none 不显示 -->
-    <div class="struct-fs-bar"><button class="struct-fs-back" onclick="event.stopPropagation();navBack()"><span class="fs-zh">‹ 返回主页</span><span class="lang-swap fs-tr"><span class="lang-en">Home</span><span class="lang-ar">الرئيسية</span></span></button><span class="struct-fs-title"><span class="fs-zh">汉字基本结构</span><span class="lang-swap fs-tr"><span class="lang-en">Basic Structures</span><span class="lang-ar" dir="rtl">البنى الأساسية</span></span></span></div>
+    <div class="struct-fs-bar"><button class="struct-fs-back" onclick="event.stopPropagation();navBack()"><span class="fs-zh">‹ 返回主页</span><span class="lang-swap fs-tr"><span class="lang-en">Home</span><span class="lang-ar">الرئيسية</span></span></button></div>
     <div class="struct-grid">
       <div class="sg sg-solo" style="flex:1;background:#5f7a86"><div class="sg-label">1 独体字<span class="lang-swap-block"><span class="lang-en">Single-comp.</span><span class="lang-ar" dir="rtl">مفرد</span></span></div><div class="sg-row"><div class="struct-card">
         <div class="struct-card-num">1</div>
@@ -1236,6 +1242,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <div class="lang-swap-block"><div class="struct-card-en lang-en">Repeated-comp.</div><div class="struct-card-en lang-ar" dir="rtl">مكرّر</div></div>
         <div class="struct-card-ex">品、森</div></div></div></div>
     </div>
+    <!-- ★ 联动-138:标题挪到结构页底部 -->
+    <div class="struct-fs-titlebar"><span class="struct-fs-title"><span class="fs-zh">汉字基本结构</span><span class="lang-swap fs-tr"><span class="lang-en">Basic Structures</span><span class="lang-ar" dir="rtl">البنى الأساسية</span></span></span></div>
   </div>
 </div>
 <!-- ══ end 结构参考栏 ══ -->
@@ -1380,7 +1388,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             <div class="pinyin-options" id="pinyin-options"></div>
           </div>
           <div class="spacer"></div>
-          <div id="char-info" style="display:none;margin-top:14px;padding:13px;background:rgba(20,40,30,0.55);border-radius:8px;border:1.5px solid rgba(255,255,255,0.3);font-size:0.96rem;color:#ffffff;line-height:1.7;text-align:center"></div>
+          <div id="char-info" style="display:none;margin-top:14px;padding:20px 16px;background:rgba(20,40,30,0.55);border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);font-size:1.2rem;color:#ffffff;line-height:1.7;text-align:center"></div>
           <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:var(--bamboo);color:#ffffff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
             <span class="lang-swap"><span class="lang-en">Skip</span><span class="lang-ar">تخطٍّ</span></span> · 我已认识 →
           </button>
@@ -1457,7 +1465,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-137 ✦ 整屏结构页微调:①返回主页按钮 译文移到中文下方 ②标题 汉字基本结构 译文也移到中文下方 ③标题区加粗下边框与内容区分 ④13结构内容在标题下方剩余空间上下居中。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-138 ✦ ①整屏结构页标题移到底部(顶栏只留返回主页,标题放页面下方)。②Step1选对拼音后不再隐藏4个选项(保留)+结果框放大(字号+内边距)。③Step1/2/3/4标题手机端缩小字号收紧字距→不溢出标题框。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2929,7 +2937,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     // ★ v64：手机端（≤768px）释义框中的字头改用笔画 SVG 渲染（同例词 ex-word-zh 路径，楷体），电脑端保持原字体显示
     const _isMobile=window.matchMedia('(max-width:768px)').matches;
     if(_isMobile){
-      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:1.25rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;
+      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:2rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:1.45rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;   /* ★ 联动-138:结果框放大(1.25→2rem / 0.92→1.45rem) */
     } else {
       info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
     }
@@ -2940,9 +2948,8 @@ function checkPinyin(btn,chosen,correct,data,char){
     // char-panel overflow:hidden + 高度锁死,新增的拼音按钮 + char-info 超出一屏
     // 解法: 选对后隐藏 pinyin-options 容器,让出空间给 char-info; 同时 scrollIntoView
     if(_isMobile){
+      // ★ 联动-138:不再隐藏拼音选项(墨舟要保留 4 个选项);仍滚动让放大的结果框可见
       setTimeout(function(){
-        const pinContainer = document.getElementById('pinyin-options');
-        if(pinContainer) pinContainer.style.display = 'none';
         if(info && typeof info.scrollIntoView === 'function'){
           info.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
@@ -5876,7 +5883,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-137';
+  const VERSION = '部件联动-138';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

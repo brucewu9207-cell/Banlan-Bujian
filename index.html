@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-116 (2026-06-26) — 首页4卡片改名+换图标+重排+底部小字统一中上译下居中 -->
+<!-- 斑斓部件 · 部件联动-118 (2026-06-27) — ① 班级入口 5 new→5 new tasks ② 我的班级弹窗学号栏补白色虚线 ③ 班级/名字/学号标签+虚线放大1.2倍 ④ 阿语OK按钮斜杠归中(好 / حسناً) ⑤ 基本信息标题框切语言固定同高、防移位 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-116">
+<meta name="version" content="部件联动-118">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -155,12 +155,12 @@ body::before{content:'';position:fixed;inset:0;background:
   background:rgba(20,40,30,0.55);color:#ffffff;cursor:pointer;font-family:inherit;transition:all .25s;
   /* ★ v95:flex column + min-height 让 9 个方框等高,锁头/无锁头都一致 */
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  min-height:108px;
+  min-height:108px;position:relative;
 }
 .level-btn:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:var(--bamboo-light)}
 .level-btn .level-num{font-size:1.6rem;font-weight:bold;color:#ffffff;display:block;line-height:1}
 .level-btn .level-label{font-size:0.72rem;color:#ffffff;margin-top:4px;display:block}
-.level-btn .level-count{font-size:0.68rem;color:rgba(255,255,255,0.7);margin-top:2px;display:block}
+.level-btn .level-count{font-size:0.82rem;color:rgba(255,255,255,0.7);position:absolute;right:10px;bottom:8px;line-height:1.2;direction:ltr;text-align:right}
 /* ★ v94:未解锁等级 — 用 🔒 锁头表示;卡片整体略淡以示区分 */
 .level-btn .level-lock{font-size:1.5rem;line-height:1;display:block;margin-top:10px}
 .level-btn.level-locked{opacity:0.6}
@@ -979,10 +979,10 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* ④ 班级窗(仅含任务的那个):左=班级/名字/学号,右=任务 */
 .bls-modal-body:has(.bls-tasks-section){display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:stretch}
 .bls-modal-body:has(.bls-tasks-section)>.bls-col{background:rgba(189,204,198,0.82);border:2px solid rgba(55,74,66,0.22);box-shadow:0 6px 20px rgba(0,0,0,0.22);border-radius:18px;padding:34px 41px;margin:0}
-.bls-col-h{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;color:#fff;font-size:1.5rem;margin-bottom:20px;padding:12px 16px;border:2px solid rgba(255,255,255,0.22);background:rgba(20,40,30,0.45);border-radius:10px}.bls-col-h .lang-en,.bls-col-h .lang-ar{font-size:0.72em;font-weight:400;opacity:0.8}.bls-modal:has(.bls-tasks-section){max-width:1380px!important;background:transparent!important;border:none!important;box-shadow:none!important}.bls-modal:has(.bls-tasks-section)::before{display:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header{border-bottom:none}.bls-modal:has(.bls-tasks-section) .bls-modal-footer{background:transparent;border-top:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header h3,.bls-modal:has(.bls-tasks-section) .bls-modal-header .bls-subtitle{display:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header{padding:8px 16px 0}.bls-overlay:has(.bls-tasks-section){background:rgba(120,140,130,0.42)}.bls-modal-header h3{font-size:30px!important}.bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}.bls-modal .bls-info-label .lang-swap{font-size:0.78em!important;opacity:0.78;font-weight:400}.bls-tasks-header{position:relative;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:2px;padding:12px 16px!important;border:2px solid rgba(255,255,255,0.22);background:rgba(20,40,30,0.45);color:#fff;border-radius:10px;margin-bottom:20px;font-size:1.5rem!important;line-height:1.05}.bls-tasks-header .bls-th-tr{font-size:0.72em!important;font-weight:400;opacity:0.8}.bls-tasks-header .bls-refresh-btn{position:absolute!important;right:6px;top:50%;margin-top:-14px}
+.bls-col-h{display:flex;flex-direction:column;align-items:center;gap:2px;font-weight:700;color:#fff;font-size:1.5rem;margin-bottom:20px;padding:12px 16px;border:2px solid rgba(255,255,255,0.22);background:rgba(20,40,30,0.45);border-radius:10px}.bls-col-h .lang-en,.bls-col-h .lang-ar{font-size:0.72em;font-weight:400;opacity:0.8;line-height:1.5;height:1.5em;display:flex;align-items:center;justify-content:center}.bls-modal:has(.bls-tasks-section){max-width:1380px!important;background:transparent!important;border:none!important;box-shadow:none!important}.bls-modal:has(.bls-tasks-section)::before{display:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header{border-bottom:none}.bls-modal:has(.bls-tasks-section) .bls-modal-footer{background:transparent;border-top:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header h3,.bls-modal:has(.bls-tasks-section) .bls-modal-header .bls-subtitle{display:none}.bls-modal:has(.bls-tasks-section) .bls-modal-header{padding:8px 16px 0}.bls-overlay:has(.bls-tasks-section){background:rgba(120,140,130,0.42)}.bls-modal-header h3{font-size:30px!important}.bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}.bls-modal .bls-info-label .lang-swap{font-size:0.78em!important;opacity:0.78;font-weight:400}.bls-tasks-header{position:relative;display:flex!important;flex-direction:column!important;justify-content:center!important;align-items:center!important;gap:2px;padding:12px 16px!important;border:2px solid rgba(255,255,255,0.22);background:rgba(20,40,30,0.45);color:#fff;border-radius:10px;margin-bottom:20px;font-size:1.5rem!important;line-height:1.05}.bls-tasks-header .bls-th-tr{font-size:0.72em!important;font-weight:400;opacity:0.8}.bls-tasks-header .bls-refresh-btn{position:absolute!important;right:6px;top:50%;margin-top:-14px}
 /* ④ 放大:信息行 / 标签 / 任务卡 等比放大(仅班级任务双栏弹窗) */
-.bls-modal-body:has(.bls-tasks-section) .bls-info-row{padding:16px 0!important}
-.bls-modal-body:has(.bls-tasks-section) .bls-info-label{font-size:17px!important}
+.bls-modal-body:has(.bls-tasks-section) .bls-info-row{padding:16px 0!important;border-bottom:1.2px dashed rgba(255,255,255,0.55)!important}
+.bls-modal-body:has(.bls-tasks-section) .bls-info-label{font-size:20.4px!important}
 .bls-modal-body:has(.bls-tasks-section) .bls-info-value{font-size:20px!important}
 .bls-modal-body:has(.bls-tasks-section) .bls-info-value.bls-code{font-size:17px!important;padding:5px 14px!important}
 .bls-modal-body:has(.bls-tasks-section) .bls-task-card{padding:14px 18px!important}
@@ -1244,9 +1244,9 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
     <div id="level-select" class="card level-select-screen" style="display:none">
       <div class="level-grid">
-        <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span></button>
-        <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span></button>
-        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span></button>
+        <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-count" data-lv="1"></span></button>
+        <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-count" data-lv="2"></span></button>
+        <button class="level-btn" onclick="startLevel(3)"><span class="level-num">HSK 3</span><span class="level-count" data-lv="3"></span></button>
         <button class="level-btn level-locked" onclick="startLevel(4)"><span class="level-num">HSK 4</span><span class="level-lock">🔒</span></button>
         <button class="level-btn level-locked" onclick="startLevel(5)"><span class="level-num">HSK 5</span><span class="level-lock">🔒</span></button>
         <button class="level-btn level-locked" onclick="startLevel(6)"><span class="level-num">HSK 6</span><span class="level-lock">🔒</span></button>
@@ -1402,7 +1402,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-116 ✦ 首页4卡片改名+换图标+重排+底部小字统一中上译下居中','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-118 ✦ ① 班级入口 5 new→5 new tasks ② 我的班级弹窗学号栏补白色虚线 ③ 班级/名字/学号标签+虚线放大1.2倍 ④ 阿语OK按钮斜杠归中(好 / حسناً) ⑤ 基本信息标题框切语言固定同高、防移位','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2609,6 +2609,11 @@ function showLevelSelect(){
   document.getElementById('home-screen').style.display='none';
   document.getElementById('level-select').style.display='block';
   document.getElementById('practice-screen').style.display='none';
+  // 部件联动-117:HSK 方框右下角填该级字数(三语,动态读字库)
+  document.querySelectorAll('.level-count[data-lv]').forEach(function(el){
+    var arr=HSK_LEVEL_CHARS[el.dataset.lv]; if(!arr)return;
+    el.innerHTML=arr.length+' 字 / <span class="lang-swap"><span class="lang-en">chars</span><span class="lang-ar">حرف</span></span>';
+  });
   // 顶栏返回按钮：在等级选择页显示，点击回首页
   const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='block';
 }
@@ -5770,7 +5775,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-116';
+  const VERSION = '部件联动-118';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6261,7 +6266,7 @@ showHome();
         </div>
         <div class="bls-modal-footer">
           <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
-          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap"><span class="lang-en"> / OK</span><span class="lang-ar" dir="rtl"> / حسناً</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap"><span class="lang-en"> / OK</span><span class="lang-ar" dir="rtl"> حسناً / </span></span></button>
         </div>
       </div>
     `;
@@ -6575,7 +6580,7 @@ showHome();
     }).length;
     const code = escapeHtml(state.classCode);
     if(newCount > 0){
-      el.innerHTML = sub(code + ' · 🔴 ' + newCount + ' 个新任务', code + ' · ' + newCount + ' new', code + ' · ' + newCount + ' جديدة');
+      el.innerHTML = sub(code + ' · 🔴 ' + newCount + ' 个新任务', code + ' · ' + newCount + ' new tasks', code + ' · ' + newCount + ' جديدة');
     } else {
       el.innerHTML = sub(code + ' · 暂无任务', code + ' · No tasks', code + ' · لا مهام');
     }

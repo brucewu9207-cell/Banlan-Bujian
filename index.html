@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-140 (2026-06-27) — 结构页:①大标题汉字基本结构移到6组上面(不再最下);②大标题调大1.05→1.5rem、组小标题调小0.8→0.68rem;③大标题与组间距加大;标题+组整体上下居中。④顶栏连击/分数框内内容居中。⑤三张主卡上半(标题)与下半(描述)间距拉开(7→18px)。均手机端 -->
+<!-- 斑斓部件 · 部件联动-141 (2026-06-28) — 三张主卡:标题(班级模式/自学模式/错题集)+图标放大×1.3(zh 0.9→1.17rem、icon 1.2→1.56rem);标题下小字(A1班5个新任务/HSK分级挑战/暂无错题)缩小到0.6rem,明显小于标题。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-140">
+<meta name="version" content="部件联动-141">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -412,8 +412,9 @@ body::before{content:'';position:fixed;inset:0;background:
     min-height:0;                     /* 解除 268px 死高度（一屏装不下的元凶） */
     padding:14px 13px;                /* ★ v86:20 18→14 13 (×0.7) */
   }
-  .home-entry-icon{font-size:1.2rem}                  /* ★ v86:1.7→1.2 (×0.7) */
-  .home-entry-zh{font-size:0.9rem}                    /* ★ v86:1.25→0.9 (×0.7) */
+  .home-entry-icon{font-size:1.56rem}                 /* ★ v86:1.2;联动-141:随标题×1.3 → 1.56rem */
+  .home-entry-zh{font-size:1.17rem}                   /* ★ v86:0.9;联动-141:标题×1.3 → 1.17rem */
+  .home-entry-desc{font-size:0.6rem}                  /* ★ 联动-141:标题下小字(A1班5个新任务/HSK分级挑战/暂无错题)缩小,明显小于标题 */
   .home-entry-en{font-size:0.6rem;margin-bottom:18px}  /* ★ v86:0.85→0.6;联动-140:7→18 拉开上半(标题)与下半(描述)间距 */
   .home-input-row{margin:3px 0 6px;max-width:196px}   /* ★ v86:280→196 (×0.7) */
   .teacher-input{padding:7px 9px;font-size:0.75rem}   /* ★ v86:9 12, 1.05→7 9, 0.75 (×0.7) */
@@ -1472,7 +1473,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-140 ✦ 结构页:①大标题汉字基本结构移到6组上面(不再最下);②大标题调大1.05→1.5rem、组小标题调小0.8→0.68rem;③大标题与组间距加大;标题+组整体上下居中。④顶栏连击/分数框内内容居中。⑤三张主卡上半(标题)与下半(描述)间距拉开(7→18px)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-141 ✦ 三张主卡:标题(班级模式/自学模式/错题集)+图标放大×1.3(zh 0.9→1.17rem、icon 1.2→1.56rem);标题下小字(A1班5个新任务/HSK分级挑战/暂无错题)缩小到0.6rem,明显小于标题。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5890,7 +5891,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-140';
+  const VERSION = '部件联动-141';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

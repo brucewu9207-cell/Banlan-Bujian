@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-122 (2026-06-27) — 手机端顶栏重排:第一排固定[返回|分数|连击|⋯更多]只占一行;二维码/反馈/汉字结构折叠进「⋯更多」,默认完全隐藏、点开才展开(可两排);仅手机端,桌面端不变 -->
+<!-- 斑斓部件 · 部件联动-123 (2026-06-27) — 手机端顶栏第一排修正:返回|分数药丸|连击|⋯更多 真正同排(取消隐藏顶栏分数/连击药丸、藏浮动计分条);反馈/汉字结构也改汉字上译文下;折叠区二维码/反馈/结构占第二排。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-122">
+<meta name="version" content="部件联动-123">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -722,6 +722,14 @@ body::after{
   .struct-action-btn svg{width:11px;height:11px;flex-shrink:0}
   .nav-home-icon{display:none}   /* 部件联动-90:手机端紧凑按钮隐藏🏠图标,防「返回主页」四字+图标挤/溢出 */
   .hab-more-btn{font-size:1.05rem !important;letter-spacing:0;color:#fff;padding:7px 12px !important}
+  /* ★ 联动-123:第一排显示顶栏「分数·连续 / 连击」药丸(手机端取消隐藏,内容本就有);太窄→缩小字号、藏下拉箭头 */
+  #header-actions-bar #gm-stat-bar,
+  #header-actions-bar #gm-combo-bar{display:inline-flex !important;font-size:0.58rem !important;padding:5px 5px !important;border-radius:6px}
+  #header-actions-bar #gm-stat-bar .gm-stat-chev{display:none}   /* 第一排太挤,藏掉下拉箭头省地方(仍可点开成就墙) */
+  /* ★ 联动-123:反馈 / 汉字基本结构 也改「汉字在上·译文在下」(.tbw 手机端是 display:contents,把按钮设成纵向即可) */
+  #feedback-btn,#toggle-struct-btn{flex-direction:column !important;column-gap:0 !important;row-gap:1px}
+  #feedback-btn .sl,#toggle-struct-btn .sl{display:none}   /* 去掉「 / 」分隔符 */
+  #feedback-btn .lang-swap,#toggle-struct-btn .lang-swap{font-size:0.84em;opacity:0.82;font-weight:400}
   /* ★ v95:手机端 QR popover 改为 fixed 居中,不再从父按钮位置左下展开 → 永远不会被挤出屏幕 */
   .qr-popover{
     position:fixed !important;
@@ -1413,7 +1421,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-122 ✦ 手机端顶栏重排:第一排固定[返回|分数|连击|⋯更多]只占一行;二维码/反馈/汉字结构折叠进「⋯更多」,默认完全隐藏、点开才展开(可两排);仅手机端,桌面端不变','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-123 ✦ 手机端顶栏第一排修正:返回|分数药丸|连击|⋯更多 真正同排(取消隐藏顶栏分数/连击药丸、藏浮动计分条);反馈/汉字结构也改汉字上译文下;折叠区二维码/反馈/结构占第二排。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5812,7 +5820,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-122';
+  const VERSION = '部件联动-123';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6711,7 +6719,7 @@ try{
 .gm-bar-stat{cursor:pointer;transition:all .2s}
 .gm-bar-stat:hover{background:rgba(20,40,30,0.75);border-color:var(--bamboo,#b5763a)}
 @media(min-width:769px){.gm-home-bar{display:none}}
-@media(max-width:768px){.gm-bar-pill{display:none}}
+@media(max-width:768px){.gm-bar-pill{display:none}.gm-home-bar{display:none}}   /* 联动-123:手机端分数/连击移入顶栏第一排(取消隐藏顶栏药丸),浮动计分条隐藏免重复 */
 @media(max-width:768px){
   .gm-home-bar{gap:8px;margin-bottom:12px}
   .gm-home-bar .gm-stat-top,.gm-home-bar .gm-combo{font-size:0.82rem;padding:6px 12px;border-radius:9px}

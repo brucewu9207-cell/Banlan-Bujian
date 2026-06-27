@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-134 (2026-06-27) — ①返回主页改为一键关掉所有弹层/面板(结构面板/二维码/反馈/成就墙/⋯折叠)回到干净首页,首页时也照样全关。②手机端汉字结构区底色深墨绿→浅白半透明,让彩色组跳出、与绿色主页区分开 -->
+<!-- 斑斓部件 · 部件联动-135 (2026-06-27) — ①手机端汉字结构区底色改纯白(彩色组最跳出)。②练习页底部进度条:上一步/下一步改中文上·译文下(按钮变窄,下一步不再被挤出屏;并修 wizSync 用 textContent 抹掉译文的坑)。③去掉练习页浮动连击框(连击已在顶栏显示、重复且压住步骤标题)。均手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-134">
+<meta name="version" content="部件联动-135">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -538,7 +538,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .sg .struct-card-ex .ex-sep{display:none}   /* -132:手机端隐藏「、」,两字分上下 */
   .sg .struct-card-ex .ex-c{display:block}
   .sg-solo .sg-row{justify-content:flex-start}   /* ★ 联动-133:单图标组(独体字/全包围/品字)左对齐,不再居中 */
-  .struct-bar-body{background:rgba(255,255,255,0.55)}   /* 部件联动-92深底;-134:改浅白半透明→上面6彩色组跳出、与下面绿色主页区分开(白字都在彩色组上、不在此底,故可浅) */
+  .struct-bar-body{background:#ffffff}   /* 部件联动-92深底;-134浅白半透明;-135:改纯白→彩色组最跳出、与绿色主页清晰分开 */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
   .struct-card-num{display:none}   /* 部件联动-98:手机端不显圆圈数字(保持现状) */
   .struct-card .lang-swap-block{display:grid}   /* 部件联动-96:手机端恢复tile英文/阿语 */
@@ -817,12 +817,14 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
    ════════════════════════════════════════════════ */
 #wizard-nav{display:none}   /* 桌面：始终隐藏 */
 #wizard-nav .wiz-btn{
-  flex:0 0 auto;padding:9px 12px;border-radius:10px;
+  flex:0 0 auto;display:flex;flex-direction:column;align-items:center;line-height:1.1;   /* ★ 联动-135:中文上·译文下→按钮变窄,「下一步」不被挤出屏 */
+  padding:6px 12px;border-radius:10px;
   border:1px solid rgba(255,255,255,0.3);
   background:var(--bamboo);color:#fff;       /* ★ v55：bamboo 实色,与演示按钮一致 */
   font-family:inherit;font-size:0.92rem;letter-spacing:0.04em;cursor:pointer;
   white-space:nowrap;transition:opacity .2s;
 }
+#wizard-nav .wiz-btn .wiz-tr{font-size:0.68em;font-weight:400;opacity:0.85;margin-top:1px;letter-spacing:0}   /* ★ 联动-135:译文小、在中文下方 */
 #wizard-nav .wiz-btn:disabled{opacity:0.3;cursor:default}
 #wizard-nav .wizard-dots{display:flex;gap:4px;flex:1 1 auto;justify-content:center}
 #wizard-nav .wdot{
@@ -1443,7 +1445,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-134 ✦ ①返回主页改为一键关掉所有弹层/面板(结构面板/二维码/反馈/成就墙/⋯折叠)回到干净首页,首页时也照样全关。②手机端汉字结构区底色深墨绿→浅白半透明,让彩色组跳出、与绿色主页区分开','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-135 ✦ ①手机端汉字结构区底色改纯白(彩色组最跳出)。②练习页底部进度条:上一步/下一步改中文上·译文下(按钮变窄,下一步不再被挤出屏;并修 wizSync 用 textContent 抹掉译文的坑)。③去掉练习页浮动连击框(连击已在顶栏显示、重复且压住步骤标题)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2595,9 +2597,9 @@ function wizBuildNav(){
   ).join('');
   const nav=document.createElement('div');
   nav.id='wizard-nav';
-  nav.innerHTML=`<button id="wiz-prev" class="wiz-btn" onclick="wizPrev()">‹ 上一步<span class="lang-swap"><span class="lang-en"> · Prev</span><span class="lang-ar"> · السابق</span></span></button>`
+  nav.innerHTML=`<button id="wiz-prev" class="wiz-btn" onclick="wizPrev()"><span class="wiz-zh">‹ 上一步</span><span class="lang-swap wiz-tr"><span class="lang-en">Prev</span><span class="lang-ar">السابق</span></span></button>`
     +`<div class="wizard-dots">${dots}</div>`
-    +`<button id="wiz-next" class="wiz-btn">下一步<span class="lang-swap"><span class="lang-en"> · Next ›</span><span class="lang-ar"> · التالي ›</span></span></button>`;
+    +`<button id="wiz-next" class="wiz-btn"><span class="wiz-zh">下一步 ›</span><span class="lang-swap wiz-tr"><span class="lang-en">Next</span><span class="lang-ar">التالي</span></span></button>`;
   ps.appendChild(nav);
 }
 
@@ -2613,11 +2615,11 @@ function wizSync(){
   if(prev) prev.disabled=(_wiz.step<=1);
   if(next){
     if(_wiz.step>=4){            // 最后一页：按钮文案改为「下一步」（仍切到下一个字）
-      next.textContent='下一步 →';
+      var _nz=next.querySelector('.wiz-zh'); if(_nz)_nz.textContent='下一步 →';   // 联动-135:只改中文、保留下方译文
       next.disabled=false;
       next.onclick=()=>nextCharacter();
     } else {
-      next.textContent='下一步 ›';
+      var _nz2=next.querySelector('.wiz-zh'); if(_nz2)_nz2.textContent='下一步 ›';   // 联动-135:同上
       next.disabled=(_wiz.step>=_wiz.max);   // 只能前进到已解锁的步
       next.onclick=()=>wizNext();
     }
@@ -5862,7 +5864,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-134';
+  const VERSION = '部件联动-135';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6789,7 +6791,7 @@ try{
 /* ★ -35：手机端练习页浮动连击药丸(桌面端用顶栏，不显示此药丸) */
 .gm-combo-practice{display:none}
 @media(max-width:768px){
-  .gm-combo-practice{display:inline-flex;align-items:center;position:fixed;top:calc(var(--struct-h,56px) + 6px);right:10px;z-index:50;font-family:Georgia,serif;font-size:0.82rem;font-weight:700;color:#fff;background:rgba(20,40,30,0.62);border:1px solid rgba(255,255,255,0.25);border-radius:9px;padding:5px 11px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2;box-shadow:0 3px 10px rgba(20,40,30,.3);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+  .gm-combo-practice{display:none;align-items:center;position:fixed;top:calc(var(--struct-h,56px) + 6px);right:10px;z-index:50;   /* ★ 联动-135:去掉练习页浮动连击框(连击已在顶栏显示,这里重复又压住步骤标题) */font-family:Georgia,serif;font-size:0.82rem;font-weight:700;color:#fff;background:rgba(20,40,30,0.62);border:1px solid rgba(255,255,255,0.25);border-radius:9px;padding:5px 11px;letter-spacing:0.03em;white-space:nowrap;line-height:1.2;box-shadow:0 3px 10px rgba(20,40,30,.3);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
   .gm-combo-practice.is-zero{opacity:0;transform:translateY(-6px)}
 }
 .gm-combo-practice .gm-combo-n{color:#ff9b73;font-weight:800}

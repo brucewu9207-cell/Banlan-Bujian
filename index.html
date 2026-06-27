@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-123 (2026-06-27) — 手机端顶栏第一排修正:返回|分数药丸|连击|⋯更多 真正同排(取消隐藏顶栏分数/连击药丸、藏浮动计分条);反馈/汉字结构也改汉字上译文下;折叠区二维码/反馈/结构占第二排。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-126 (2026-06-27) — 手机端三张主卡(班级/自学/错题集)宽度收窄(max-width 308→260px),margin:0 auto 居中。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-123">
+<meta name="version" content="部件联动-126">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -407,8 +407,8 @@ body::before{content:'';position:fixed;inset:0;background:
   /* ★ v86:撤销 zoom:0.7(iOS Safari 表现不稳),改用直接缩小内部所有数值 → 0.7 倍,layout 真实变化 */
   .home-grid{grid-template-columns:1fr;justify-items:center;gap:10px;width:100%}   /* gap 14→10 */
   .home-grid .home-entry{
-    width:100%;max-width:308px;       /* ★ v86:440→308 (×0.7),卡片真实变小 */
-    margin:0 auto;
+    width:100%;max-width:260px;       /* ★ v86:440→308;联动-126:308→260 进一步收窄(手机端) */
+    margin:0 auto;                    /* 居中 */
     min-height:0;                     /* 解除 268px 死高度（一屏装不下的元凶） */
     padding:14px 13px;                /* ★ v86:20 18→14 13 (×0.7) */
   }
@@ -693,17 +693,18 @@ body::after{
   #header-actions-bar > div > #gm-stat-bar{order:2}
   #header-actions-bar > div > #gm-combo-bar{order:3}
   #header-actions-bar > #hab-more{order:4;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-  #header-actions-bar > div > .qr-wrap{order:5}
-  #header-actions-bar > div > #feedback-btn{order:6}
-  #header-actions-bar > div > #toggle-struct-btn{order:7}
+  #header-actions-bar.fold-open::after{content:"";flex-basis:100%;width:100%;height:0;order:5}   /* ★ 联动-124:展开时强制换行→折叠三项整体落到第二行,第一行原封不动 */
+  #header-actions-bar > div > .qr-wrap{order:6}
+  #header-actions-bar > div > #feedback-btn{order:7}
+  #header-actions-bar > div > #toggle-struct-btn{order:8}
   /* 第一排三主项均分填满整行→把折叠项挤到下一排,保证第一排只占一行 */
   #header-actions-bar > div > #nav-back-btn,
   #header-actions-bar > div > #gm-stat-bar,
   #header-actions-bar > div > #gm-combo-bar{flex:1 1 0;min-width:0;width:auto !important}
-  /* 折叠项:展开时约半行宽→自然分两排 */
+  /* 折叠项:展开时三项均分第二行(一排) */
   #header-actions-bar > div > .qr-wrap,
   #header-actions-bar > div > #feedback-btn,
-  #header-actions-bar > div > #toggle-struct-btn{flex:1 1 44%;min-width:0;width:auto !important}
+  #header-actions-bar > div > #toggle-struct-btn{flex:1 1 0;min-width:0;width:auto !important}
   #header-actions-bar .qr-wrap > #qr-btn{width:100% !important}
   /* 默认收起:三个折叠项完全隐藏(点「⋯更多」才展开) */
   #header-actions-bar:not(.fold-open) > div > .qr-wrap,
@@ -726,10 +727,16 @@ body::after{
   #header-actions-bar #gm-stat-bar,
   #header-actions-bar #gm-combo-bar{display:inline-flex !important;font-size:0.58rem !important;padding:5px 5px !important;border-radius:6px}
   #header-actions-bar #gm-stat-bar .gm-stat-chev{display:none}   /* 第一排太挤,藏掉下拉箭头省地方(仍可点开成就墙) */
-  /* ★ 联动-123:反馈 / 汉字基本结构 也改「汉字在上·译文在下」(.tbw 手机端是 display:contents,把按钮设成纵向即可) */
-  #feedback-btn,#toggle-struct-btn{flex-direction:column !important;column-gap:0 !important;row-gap:1px}
+  /* ★ 联动-125:反馈/汉字结构 手机端走竖盒(汉字行在上·译文在下);反馈的信封与「反馈」同一行、信封在左 */
+  #feedback-btn .tbw,#toggle-struct-btn .tbw{display:inline-flex !important;flex-direction:column;align-items:center;line-height:1.2}
+  #feedback-btn .tbw-r1{display:inline-flex !important;align-items:center;column-gap:5px}   /* 信封 + 反馈 同一行,信封在左 */
+  #feedback-btn .tbw>.lang-swap,#toggle-struct-btn .tbw>.lang-swap{display:grid;justify-items:center;font-size:0.84em;font-weight:400;opacity:0.82}
   #feedback-btn .sl,#toggle-struct-btn .sl{display:none}   /* 去掉「 / 」分隔符 */
-  #feedback-btn .lang-swap,#toggle-struct-btn .lang-swap{font-size:0.84em;opacity:0.82;font-weight:400}
+  /* ★ 联动-125:第二行三按钮等高——取消固定 42px、同行拉伸到一致高度(align-items:stretch) */
+  #header-actions-bar > div > .qr-wrap,
+  #header-actions-bar > div > #feedback-btn,
+  #header-actions-bar > div > #toggle-struct-btn{height:auto !important;min-height:42px}
+  #header-actions-bar .qr-wrap > #qr-btn{height:100% !important;min-height:42px}
   /* ★ v95:手机端 QR popover 改为 fixed 居中,不再从父按钮位置左下展开 → 永远不会被挤出屏幕 */
   .qr-popover{
     position:fixed !important;
@@ -1421,7 +1428,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-123 ✦ 手机端顶栏第一排修正:返回|分数药丸|连击|⋯更多 真正同排(取消隐藏顶栏分数/连击药丸、藏浮动计分条);反馈/汉字结构也改汉字上译文下;折叠区二维码/反馈/结构占第二排。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-126 ✦ 手机端三张主卡(班级/自学/错题集)宽度收窄(max-width 308→260px),margin:0 auto 居中。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5820,7 +5827,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-123';
+  const VERSION = '部件联动-126';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-126 (2026-06-27) — 手机端三张主卡(班级/自学/错题集)宽度收窄(max-width 308→260px),margin:0 auto 居中。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-128 (2026-06-27) — 手机端13汉字结构:把电脑端「6彩色组」搬来,改成竖向堆叠(一组一行、组色+组标签恢复、组内卡片横排放不下换行);展开高度上限加大免裁切。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-126">
+<meta name="version" content="部件联动-128">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -521,21 +521,24 @@ body::before{content:'';position:fixed;inset:0;background:
 .sap-piece-inner svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .sap-py{font-family:Georgia,serif;font-style:italic;font-size:38px;font-weight:700;color:#2a3a30;margin-top:10px;line-height:1}
 @media(max-width:900px){
-  .struct-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;padding:6px 0 8px}
-  .sg{display:contents}.sg-label{display:none}.sg-row{display:contents}   /* 部件联动-91:≤900px回退平铺,组框/标签/色全隐→手机/平板端渲染不变 */
+  /* ★ 联动-128:把电脑端「6 个彩色结构组」搬到手机端——竖向堆叠(一组占一行),组内卡片横排放不下换行;组色/组标签全恢复 */
+  .struct-grid{display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px}
+  .sg{display:flex !important;flex-direction:column;width:100%;flex:none !important;padding:5px 8px 7px;border-radius:10px;box-shadow:0 3px 10px rgba(20,40,30,0.25)}   /* 恢复彩色组盒(inline background 即组色) */
+  .sg-label{display:block}   /* 恢复组标签(1独体字/2左右…) */
+  .sg-row{display:flex !important;flex-wrap:wrap;gap:5px;justify-content:center}   /* 组内卡片横排,放不下换行(半包围6个→两行) */
+  .sg>.sg-row>.struct-card{flex:0 0 30%;min-width:0;border-right:none}   /* 每张约1/3宽;单卡组居中 */
   .struct-bar-body{background:rgba(20,40,30,0.25)}   /* 部件联动-92:手机/平板端tile条底改回深色(无色平铺白字需深底) */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
   .struct-card-num{display:none}   /* 部件联动-98:手机端不显圆圈数字(保持现状) */
   .struct-card .lang-swap-block{display:grid}   /* 部件联动-96:手机端恢复tile英文/阿语 */
   .sg-solo .struct-card-name{visibility:visible}   /* 部件联动-93恢复;-95:占位改visibility后,手机端改visible显示单格名 */
-  .struct-bar-body.open{max-height:320px}
+  .struct-bar-body.open{max-height:1600px}   /* ★ 联动-128:竖向成组后内容更高,加大上限免裁切 */
 }
 @media(max-width:500px){
   .struct-grid{
-    grid-template-columns:repeat(4,1fr);
-    padding:4px 0 5px;                         /* ★ v88:6 0 8 → 4 0 5 (×0.6) */
+    padding:6px 12px 10px;   /* ★ 联动-128:竖向成组后保留左右留白(原 4 0 5 会贴边);grid 列已被 flex 取代 */
   }
-  .struct-bar-body.open{max-height:900px}
+  .struct-bar-body.open{max-height:1600px}
   .struct-bar-header{padding:10px 16px}
   /* ★ v88:手机端 13 种汉字结构卡片整体缩到 0.6 倍 — padding / 字号 / SVG 尺寸 全部 ×0.6 */
   .struct-card{padding:3px 2px}                                  /* 6 4 → 3 2 */
@@ -757,6 +760,7 @@ body::after{
   /* ★ v97 反馈弹窗:① 铺满整个手机屏幕 ② iframe 容器 overflow:hidden + iframe 高度多 64px → 裁掉底部 Microsoft 365 水印 */
   #feedback-modal{
     padding:0 !important;
+    z-index:100001 !important;   /* ★ 联动-127:抬到语言切换钮(z-index 100000)之上→遮罩盖住切换钮,右上角关闭键 × 不再被挡(手机端) */
   }
   #feedback-modal > div{
     width:100vw !important;
@@ -1428,7 +1432,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-126 ✦ 手机端三张主卡(班级/自学/错题集)宽度收窄(max-width 308→260px),margin:0 auto 居中。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-128 ✦ 手机端13汉字结构:把电脑端「6彩色组」搬来,改成竖向堆叠(一组一行、组色+组标签恢复、组内卡片横排放不下换行);展开高度上限加大免裁切。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5827,7 +5831,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-126';
+  const VERSION = '部件联动-128';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

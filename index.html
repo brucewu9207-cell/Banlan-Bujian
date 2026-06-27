@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-130 (2026-06-27) — 手机端13结构改横条式:组标签移到左侧固定窄列、卡片靠右排一行放不下换行,每组变一条矮横条,大幅省高度。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-131 (2026-06-27) — 手机端结构卡片内部改横向:图标在左,中文名/英文/例字竖排在图标右侧(原4行竖排→图标高度),卡片大幅变矮;横向卡更宽改每行2个。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-130">
+<meta name="version" content="部件联动-131">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -527,7 +527,13 @@ body::before{content:'';position:fixed;inset:0;background:
   .sg-label{display:block;flex:0 0 66px;text-align:center;font-size:0.8rem;line-height:1.15;letter-spacing:0;padding:0;margin:0}   /* 左侧固定窄列 */
   .sg-label .lang-swap-block{font-size:0.62em;margin-top:1px}   /* 译文小、贴紧 */
   .sg-row{display:flex !important;flex:1 1 auto;flex-wrap:wrap;gap:4px;justify-content:center;margin:0}   /* 右侧卡片占满,放不下换行(半包围6个→两行) */
-  .sg>.sg-row>.struct-card{flex:0 0 30%;min-width:0;border-right:none}   /* 每张约1/3宽 */
+  .sg>.sg-row>.struct-card{flex:0 0 48%;min-width:0;border-right:none}   /* 联动-131:横向卡更宽→每行 2 个 */
+  /* ★ 联动-131:卡片内部也改「图标在左·文字在右」——中文名/英文/例字 竖排在图标右侧,卡片从 4 行高压成图标那么高 */
+  .sg .struct-card{display:grid !important;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:5px;row-gap:0;padding:3px 5px;border-right:none}
+  .sg .struct-card>.struct-card-svg{grid-column:1;grid-row:1 / span 3;align-self:center;margin:0}
+  .sg .struct-card>.struct-card-name{grid-column:2;grid-row:1;text-align:left;margin:0}
+  .sg .struct-card>.lang-swap-block{grid-column:2;grid-row:2;justify-items:start;text-align:left;margin:0}
+  .sg .struct-card>.struct-card-ex{grid-column:2;grid-row:3;text-align:left;margin:0}
   .struct-bar-body{background:rgba(20,40,30,0.25)}   /* 部件联动-92:手机/平板端tile条底改回深色(无色平铺白字需深底) */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
   .struct-card-num{display:none}   /* 部件联动-98:手机端不显圆圈数字(保持现状) */
@@ -1433,7 +1439,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-130 ✦ 手机端13结构改横条式:组标签移到左侧固定窄列、卡片靠右排一行放不下换行,每组变一条矮横条,大幅省高度。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-131 ✦ 手机端结构卡片内部改横向:图标在左,中文名/英文/例字竖排在图标右侧(原4行竖排→图标高度),卡片大幅变矮;横向卡更宽改每行2个。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5832,7 +5838,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-130';
+  const VERSION = '部件联动-131';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

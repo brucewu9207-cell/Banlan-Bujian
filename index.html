@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-118 (2026-06-27) — ① 班级入口 5 new→5 new tasks ② 我的班级弹窗学号栏补白色虚线 ③ 班级/名字/学号标签+虚线放大1.2倍 ④ 阿语OK按钮斜杠归中(好 / حسناً) ⑤ 基本信息标题框切语言固定同高、防移位 -->
+<!-- 斑斓部件 · 部件联动-120 (2026-06-27) — 搜索模式入口手机端彻底隐藏(@media≤768px display:none!important;连墨舟?demo=1也不显示);桌面端门控不动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-118">
+<meta name="version" content="部件联动-120">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -68,6 +68,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
 .home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}.entry-sub{line-height:1.35;text-align:center}.entry-sub .es-zh{display:block}.entry-sub .lang-en,.entry-sub .lang-ar{display:block;font-style:italic;opacity:0.88}
 .home-entry-input{cursor:default}
+@media(max-width:768px){.home-entry-input{display:none!important}}   /* 联动-120:搜索模式手机端彻底隐藏(连墨舟 ?demo=1 也不显示);桌面端门控不动 */
 .home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
 .teacher-input{flex:1;min-width:0;padding:12px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
 .teacher-input:focus{border-color:var(--bamboo-light)}
@@ -442,7 +443,7 @@ body::before{content:'';position:fixed;inset:0;background:
   backdrop-filter:blur(6px);
   border-bottom:1px solid rgba(255,255,255,0.12);
 }
-@media(min-width:901px){.struct-bar{box-shadow:0 12px 32px rgba(20,40,30,0.55)}}   /* 部件联动-100:整个结构区向下投影、整条悬浮(仅桌面;手机端不动);-101:阴影加深更明显 */
+@media(min-width:901px){.struct-bar{box-shadow:0 12px 32px rgba(20,40,30,0.55)}.struct-bar-header{z-index:20}}   /* 部件联动-100:整个结构区向下投影、整条悬浮(仅桌面;手机端不动);-101:阴影加深更明显;-118:header抬z-index→二维码弹窗浮于结构卡片之上(仅桌面;手机端弹窗本就fixed居中,不受影响) */
 .struct-bar-header{
   display:flex;align-items:center;justify-content:center;
   padding:8px 28px;cursor:pointer;user-select:none;
@@ -1219,7 +1220,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           <div class="home-entry-desc entry-sub"><div class="es-zh">HSK分级挑战</div><div class="lang-en">HSK Level Challenge</div><div class="lang-ar" dir="rtl">تحدّي مستويات HSK</div></div>
         </button>
         <!-- 入口 3：请输入字/词 -->
-        <div class="home-entry home-entry-input">
+        <div class="home-entry home-entry-input" style="display:none"><!-- 联动-118:搜索模式入口默认隐藏(仅墨舟测试用);带 ?demo=1 访问一次→本机记住显示;班级任务走底层机制、不受影响 -->
           <div class="home-entry-header">
             <span class="home-entry-icon">🔍</span>
             <span class="home-entry-zh">搜索模式</span>
@@ -1402,7 +1403,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-118 ✦ ① 班级入口 5 new→5 new tasks ② 我的班级弹窗学号栏补白色虚线 ③ 班级/名字/学号标签+虚线放大1.2倍 ④ 阿语OK按钮斜杠归中(好 / حسناً) ⑤ 基本信息标题框切语言固定同高、防移位','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-120 ✦ 搜索模式入口手机端彻底隐藏(@media≤768px display:none!important;连墨舟?demo=1也不显示);桌面端门控不动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5727,6 +5728,11 @@ window._origLocked = document.getElementById('locked-overlay').innerHTML;
 window._origWordLocked = document.getElementById('word-locked').innerHTML;
 switchMode('learn');
 showHome();
+// ★ 联动-118:搜索模式入口门控——仅墨舟测试用,默认对学生隐藏
+try{
+  if(new URLSearchParams(location.search).get('demo')==='1') localStorage.setItem('bls_demo','1');   // 带参访问一次→本机永久记住
+  if(localStorage.getItem('bls_demo')==='1'){ var _demoEntry=document.querySelector('.home-entry-input'); if(_demoEntry) _demoEntry.style.display=''; }   // 本机记住过→显示给墨舟
+}catch(e){}
 </script>
 
 <!-- 反馈弹窗（嵌入 Microsoft Forms） -->
@@ -5775,7 +5781,7 @@ showHome();
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-118';
+  const VERSION = '部件联动-120';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

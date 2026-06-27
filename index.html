@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-120 (2026-06-27) — 搜索模式入口手机端彻底隐藏(@media≤768px display:none!important;连墨舟?demo=1也不显示);桌面端门控不动 -->
+<!-- 斑斓部件 · 部件联动-121 (2026-06-27) — 首页3卡水平居中(搜索卡藏起不再偏左);错题集卡背景改竹黄;测试模式标签浮在搜索卡正上方+点击退出(+?demo=0网址也能退);均仅桌面端,手机端不受影响 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-120">
+<meta name="version" content="部件联动-121">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -58,7 +58,8 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ══ 首页：二选一入口 ══ */
 .home-screen{text-align:center;padding:28px 14px;max-width:1280px;margin:0 auto}  /* ★ 19: 1100→1280 容纳四张卡片并排 */
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:18px;max-width:1260px;margin:0 auto;position:relative;z-index:1}  /* ★ 19: 四张卡并排一行,3列→4列, 1080→1260 */
+.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;max-width:940px;margin:0 auto;position:relative;z-index:1}  /* ★ 19:四卡并排;联动-121:默认3列居中(搜索卡藏起→3卡不偏左);测试模式见 .demo-on */
+@media(min-width:769px){.home-grid.demo-on{grid-template-columns:1fr 1fr 1fr 1fr;max-width:1260px}}  /* 联动-121:测试模式4卡一行(仅桌面;手机端 demo 永不触发) */
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 /* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
@@ -67,8 +68,10 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em;display:inline-block}
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
 .home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}.entry-sub{line-height:1.35;text-align:center}.entry-sub .es-zh{display:block}.entry-sub .lang-en,.entry-sub .lang-ar{display:block;font-style:italic;opacity:0.88}
-.home-entry-input{cursor:default}
+.home-entry-input{cursor:default;position:relative}
 @media(max-width:768px){.home-entry-input{display:none!important}}   /* 联动-120:搜索模式手机端彻底隐藏(连墨舟 ?demo=1 也不显示);桌面端门控不动 */
+.demo-tag{position:absolute;left:50%;top:-34px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:#c84b2f;color:#fff;font-size:0.82rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(20,40,30,0.35);white-space:nowrap;cursor:pointer;z-index:5;letter-spacing:0.04em}  /* 联动-121:测试模式标签,浮在搜索卡正上方;点击退出 */
+.demo-tag:hover{background:#b33939}
 .home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
 .teacher-input{flex:1;min-width:0;padding:12px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
 .teacher-input:focus{border-color:var(--bamboo-light)}
@@ -872,6 +875,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 }
 
 /* ══ 错题本 (部件联动-18) ══ */
+.wb-home-card{background:rgba(181,118,58,0.88);border-color:rgba(255,245,225,0.5)}  /* 联动-121:错题集卡竹黄背景(显眼+暖调统一) */
+.wb-home-card:hover{background:rgba(181,118,58,0.96);border-color:rgba(255,250,235,0.65)}  /* hover 稍亮,保留上浮/投影 */
 .wb-home-card .home-entry-icon{color:var(--vermillion)}
 .wb-screen{max-width:680px;margin:0 auto;padding:18px 14px;color:#fff}
 .wb-head{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;width:fit-content;max-width:100%;margin:0 auto 16px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 22px}
@@ -1221,6 +1226,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         </button>
         <!-- 入口 3：请输入字/词 -->
         <div class="home-entry home-entry-input" style="display:none"><!-- 联动-118:搜索模式入口默认隐藏(仅墨舟测试用);带 ?demo=1 访问一次→本机记住显示;班级任务走底层机制、不受影响 -->
+          <div class="demo-tag" onclick="exitDemoMode()" title="点击退出测试模式 / Exit test mode">🔧 测试模式</div>
           <div class="home-entry-header">
             <span class="home-entry-icon">🔍</span>
             <span class="home-entry-zh">搜索模式</span>
@@ -1403,7 +1409,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-120 ✦ 搜索模式入口手机端彻底隐藏(@media≤768px display:none!important;连墨舟?demo=1也不显示);桌面端门控不动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-121 ✦ 首页3卡水平居中(搜索卡藏起不再偏左);错题集卡背景改竹黄;测试模式标签浮在搜索卡正上方+点击退出(+?demo=0网址也能退);均仅桌面端,手机端不受影响','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5728,10 +5734,21 @@ window._origLocked = document.getElementById('locked-overlay').innerHTML;
 window._origWordLocked = document.getElementById('word-locked').innerHTML;
 switchMode('learn');
 showHome();
-// ★ 联动-118:搜索模式入口门控——仅墨舟测试用,默认对学生隐藏
+// ★ 联动-118/121:搜索模式入口门控——仅墨舟测试用,默认对学生隐藏
+function exitDemoMode(){   // 点「测试模式」标签→退出本机测试模式
+  try{ localStorage.removeItem('bls_demo'); }catch(e){}
+  var _se=document.querySelector('.home-entry-input'); if(_se) _se.style.display='none';
+  var _sg=document.querySelector('.home-grid'); if(_sg) _sg.classList.remove('demo-on');
+  if(typeof showToast==='function') showToast('已退出测试模式','success');
+}
 try{
-  if(new URLSearchParams(location.search).get('demo')==='1') localStorage.setItem('bls_demo','1');   // 带参访问一次→本机永久记住
-  if(localStorage.getItem('bls_demo')==='1'){ var _demoEntry=document.querySelector('.home-entry-input'); if(_demoEntry) _demoEntry.style.display=''; }   // 本机记住过→显示给墨舟
+  var _sp=new URLSearchParams(location.search);
+  if(_sp.get('demo')==='1') localStorage.setItem('bls_demo','1');   // 带参访问一次→本机永久记住
+  if(_sp.get('demo')==='0') localStorage.removeItem('bls_demo');     // 联动-121:?demo=0 网址也能退出
+  if(localStorage.getItem('bls_demo')==='1'){
+    var _demoEntry=document.querySelector('.home-entry-input'); if(_demoEntry) _demoEntry.style.display='';   // 显示搜索卡
+    var _demoGrid=document.querySelector('.home-grid'); if(_demoGrid) _demoGrid.classList.add('demo-on');     // 切4卡布局
+  }
 }catch(e){}
 </script>
 
@@ -5781,7 +5798,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-120';
+  const VERSION = '部件联动-121';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

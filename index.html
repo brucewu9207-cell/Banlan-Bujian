@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-128 (2026-06-27) — 手机端13汉字结构:把电脑端「6彩色组」搬来,改成竖向堆叠(一组一行、组色+组标签恢复、组内卡片横排放不下换行);展开高度上限加大免裁切。仅手机端 -->
+<!-- 斑斓部件 · 部件联动-129 (2026-06-27) — 手机端13结构彩色组紧凑化:组标题1.44rem→0.9rem缩小、压掉组内留白(组盒/卡片行/组间间距全收紧),每组从一整屏压成标题一行+卡片一排的矮块,保持标签在上。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-128">
+<meta name="version" content="部件联动-129">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -521,11 +521,12 @@ body::before{content:'';position:fixed;inset:0;background:
 .sap-piece-inner svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 .sap-py{font-family:Georgia,serif;font-style:italic;font-size:38px;font-weight:700;color:#2a3a30;margin-top:10px;line-height:1}
 @media(max-width:900px){
-  /* ★ 联动-128:把电脑端「6 个彩色结构组」搬到手机端——竖向堆叠(一组占一行),组内卡片横排放不下换行;组色/组标签全恢复 */
-  .struct-grid{display:flex;flex-direction:column;gap:8px;padding:10px 12px 12px}
-  .sg{display:flex !important;flex-direction:column;width:100%;flex:none !important;padding:5px 8px 7px;border-radius:10px;box-shadow:0 3px 10px rgba(20,40,30,0.25)}   /* 恢复彩色组盒(inline background 即组色) */
-  .sg-label{display:block}   /* 恢复组标签(1独体字/2左右…) */
-  .sg-row{display:flex !important;flex-wrap:wrap;gap:5px;justify-content:center}   /* 组内卡片横排,放不下换行(半包围6个→两行) */
+  /* ★ 联动-128/129:把电脑端「6 个彩色结构组」搬到手机端——竖向堆叠;-129:整体缩小紧凑(缩组标题+压留白),每组只占一个矮块 */
+  .struct-grid{display:flex;flex-direction:column;gap:6px;padding:8px 12px 10px}
+  .sg{display:flex !important;flex-direction:column;width:100%;flex:none !important;padding:4px 6px 5px;border-radius:9px;box-shadow:0 2px 6px rgba(20,40,30,0.22)}   /* 彩色组盒(inline background 即组色);-129:压紧 */
+  .sg-label{display:block;font-size:0.9rem;letter-spacing:0.02em;padding:0;margin:0}   /* -129:组标题 1.44rem→0.9rem 缩小,去掉撑高 */
+  .sg-label .lang-swap-block{font-size:0.6em;margin-top:0}   /* -129:组标题译文也缩小、贴紧 */
+  .sg-row{display:flex !important;flex:none;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:2px}   /* 卡片横排换行;-129:覆盖桌面 flex:1 防被拉高、收紧 */
   .sg>.sg-row>.struct-card{flex:0 0 30%;min-width:0;border-right:none}   /* 每张约1/3宽;单卡组居中 */
   .struct-bar-body{background:rgba(20,40,30,0.25)}   /* 部件联动-92:手机/平板端tile条底改回深色(无色平铺白字需深底) */
   .struct-card-name{display:block}   /* 部件联动-96:手机端恢复tile名(大标题手机隐藏,靠tile名) */
@@ -1432,7 +1433,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-128 ✦ 手机端13汉字结构:把电脑端「6彩色组」搬来,改成竖向堆叠(一组一行、组色+组标签恢复、组内卡片横排放不下换行);展开高度上限加大免裁切。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-129 ✦ 手机端13结构彩色组紧凑化:组标题1.44rem→0.9rem缩小、压掉组内留白(组盒/卡片行/组间间距全收紧),每组从一整屏压成标题一行+卡片一排的矮块,保持标签在上。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5831,7 +5832,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-128';
+  const VERSION = '部件联动-129';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

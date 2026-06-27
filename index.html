@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-136 (2026-06-27) — 手机端「汉字基本结构」改整屏弹出页:点按钮→占满全屏白底页、可滚动看13结构,顶部带「返回主页」按钮(走navBack关页回主页);结构卡拼合动画层级抬到整屏页之上。桌面端结构条常驻不变 -->
+<!-- 斑斓部件 · 部件联动-137 (2026-06-27) — 整屏结构页微调:①返回主页按钮 译文移到中文下方 ②标题 汉字基本结构 译文也移到中文下方 ③标题区加粗下边框与内容区分 ④13结构内容在标题下方剩余空间上下居中。仅手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-136">
+<meta name="version" content="部件联动-137">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -480,10 +480,12 @@ body::before{content:'';position:fixed;inset:0;background:
 .struct-fs-bar{display:none}   /* ★ 联动-136:整屏弹出页顶栏默认隐藏(桌面端结构条常驻,不需要) */
 @media(max-width:768px){
   /* ★ 联动-136:手机端「汉字基本结构」改整屏弹出页——点开占满全屏、可滚动、白底,顶部带「返回主页」 */
-  .struct-bar-body.open{position:fixed !important;inset:0;z-index:9000;max-height:none !important;height:100vh;height:100dvh;overflow-y:auto;background:#fff;padding:0 0 24px}
-  .struct-fs-bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:3;background:#fff;padding:10px 14px;border-bottom:1px solid rgba(0,0,0,0.10)}
-  .struct-fs-back{flex:0 0 auto;background:var(--bamboo);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:9px;padding:8px 14px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;white-space:nowrap}
-  .struct-fs-title{font-size:1.05rem;font-weight:700;color:var(--ink-dark);white-space:nowrap}
+  .struct-bar-body.open{position:fixed !important;inset:0;z-index:9000;max-height:none !important;height:100vh;height:100dvh;overflow-y:auto;background:#fff;padding:0 0 24px;display:flex;flex-direction:column}   /* -137:flex列→内容可垂直居中 */
+  .struct-fs-bar{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:3;flex:0 0 auto;background:#fff;padding:10px 14px 12px;border-bottom:2px solid rgba(0,0,0,0.12)}   /* -137:加粗下边框→与内容区分 */
+  .struct-fs-back{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;line-height:1.15;background:var(--bamboo);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:9px;padding:6px 14px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;white-space:nowrap}   /* -137:中文上·译文下 */
+  .struct-fs-title{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:1.05rem;font-weight:700;color:var(--ink-dark);white-space:nowrap}   /* -137:中文上·译文下 */
+  .struct-fs-back .fs-tr,.struct-fs-title .fs-tr{font-size:0.64em;font-weight:400;opacity:0.85;margin-top:1px;letter-spacing:0}   /* -137:译文小、在中文下方 */
+  .struct-bar-body.open .struct-grid{margin-top:auto;margin-bottom:auto}   /* ★ -137:13结构内容在标题下方的剩余空间里上下居中 */
 }
 .struct-grid{
   display:flex;align-items:stretch;gap:6px;
@@ -1121,7 +1123,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
   </div>
   <div class="struct-bar-body open" id="struct-body">
     <!-- ★ 联动-136:手机端整屏弹出页顶栏(返回主页+标题);桌面端 display:none 不显示 -->
-    <div class="struct-fs-bar"><button class="struct-fs-back" onclick="event.stopPropagation();navBack()">‹ 返回主页<span class="lang-swap"><span class="lang-en"> · Home</span><span class="lang-ar"> · الرئيسية</span></span></button><span class="struct-fs-title">汉字基本结构<span class="lang-swap"><span class="lang-en"> / Basic Structures</span><span class="lang-ar" dir="rtl"> / البنى الأساسية</span></span></span></div>
+    <div class="struct-fs-bar"><button class="struct-fs-back" onclick="event.stopPropagation();navBack()"><span class="fs-zh">‹ 返回主页</span><span class="lang-swap fs-tr"><span class="lang-en">Home</span><span class="lang-ar">الرئيسية</span></span></button><span class="struct-fs-title"><span class="fs-zh">汉字基本结构</span><span class="lang-swap fs-tr"><span class="lang-en">Basic Structures</span><span class="lang-ar" dir="rtl">البنى الأساسية</span></span></span></div>
     <div class="struct-grid">
       <div class="sg sg-solo" style="flex:1;background:#5f7a86"><div class="sg-label">1 独体字<span class="lang-swap-block"><span class="lang-en">Single-comp.</span><span class="lang-ar" dir="rtl">مفرد</span></span></div><div class="sg-row"><div class="struct-card">
         <div class="struct-card-num">1</div>
@@ -1455,7 +1457,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-136 ✦ 手机端「汉字基本结构」改整屏弹出页:点按钮→占满全屏白底页、可滚动看13结构,顶部带「返回主页」按钮(走navBack关页回主页);结构卡拼合动画层级抬到整屏页之上。桌面端结构条常驻不变','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-137 ✦ 整屏结构页微调:①返回主页按钮 译文移到中文下方 ②标题 汉字基本结构 译文也移到中文下方 ③标题区加粗下边框与内容区分 ④13结构内容在标题下方剩余空间上下居中。仅手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5874,7 +5876,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-136';
+  const VERSION = '部件联动-137';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

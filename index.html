@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-139 (2026-06-27) — ①Step1234标题真正缩小:改固定0.8rem+!important(原乘ui-scale被放大撑出框/被base盖住)→塞进框。②选对拼音的结果框再放大(字2→2.5rem/1.45→1.75rem,盒内边距加大)。③Step3书写米字格垂直居中于面板(原置顶,下方大片空)。均手机端 -->
+<!-- 斑斓部件 · 部件联动-140 (2026-06-27) — 结构页:①大标题汉字基本结构移到6组上面(不再最下);②大标题调大1.05→1.5rem、组小标题调小0.8→0.68rem;③大标题与组间距加大;标题+组整体上下居中。④顶栏连击/分数框内内容居中。⑤三张主卡上半(标题)与下半(描述)间距拉开(7→18px)。均手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-139">
+<meta name="version" content="部件联动-140">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -414,7 +414,7 @@ body::before{content:'';position:fixed;inset:0;background:
   }
   .home-entry-icon{font-size:1.2rem}                  /* ★ v86:1.7→1.2 (×0.7) */
   .home-entry-zh{font-size:0.9rem}                    /* ★ v86:1.25→0.9 (×0.7) */
-  .home-entry-en{font-size:0.6rem;margin-bottom:7px}  /* ★ v86:0.85, 10→0.6, 7 (×0.7) */
+  .home-entry-en{font-size:0.6rem;margin-bottom:18px}  /* ★ v86:0.85→0.6;联动-140:7→18 拉开上半(标题)与下半(描述)间距 */
   .home-input-row{margin:3px 0 6px;max-width:196px}   /* ★ v86:280→196 (×0.7) */
   .teacher-input{padding:7px 9px;font-size:0.75rem}   /* ★ v86:9 12, 1.05→7 9, 0.75 (×0.7) */
   .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
@@ -485,9 +485,13 @@ body::before{content:'';position:fixed;inset:0;background:
   .struct-fs-back{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;line-height:1.15;background:var(--bamboo);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:9px;padding:6px 14px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;white-space:nowrap}   /* -137:中文上·译文下 */
   .struct-fs-title{display:flex;flex-direction:column;align-items:center;line-height:1.15;font-size:1.05rem;font-weight:700;color:var(--ink-dark);white-space:nowrap}   /* -137:中文上·译文下 */
   .struct-fs-back .fs-tr,.struct-fs-title .fs-tr{font-size:0.64em;font-weight:400;opacity:0.85;margin-top:1px;letter-spacing:0}   /* -137:译文小、在中文下方 */
-  .struct-bar-body.open .struct-grid{margin-top:auto;margin-bottom:auto}   /* ★ -137:13结构内容在标题下方的剩余空间里上下居中 */
-  /* ★ 联动-138:标题挪到结构页底部 */
-  .struct-fs-titlebar{display:flex;justify-content:center;flex:0 0 auto;padding:12px 14px 18px;border-top:2px solid rgba(0,0,0,0.12)}
+  .struct-bar-body.open .struct-grid{margin-bottom:auto}   /* ★ -140:大标题+6组 整体在面板里上下居中(标题margin-top:auto在上) */
+  /* ★ 联动-140:大标题放在 6 组上面、调大、与组拉开间距 */
+  .struct-fs-titlebar{display:flex;justify-content:center;flex:0 0 auto;margin-top:auto;padding:6px 14px 0}
+  .struct-fs-titlebar .struct-fs-title{font-size:1.5rem}   /* 大标题调大(1.05→1.5rem) */
+  .struct-fs-titlebar .struct-fs-title .fs-tr{font-size:0.5em}
+  .struct-bar-body.open .struct-grid{margin-top:16px}   /* 大标题↔6组 间距加大 */
+  .sg-label{font-size:0.68rem !important}   /* 组小标题调小(0.8→0.68rem) */
   /* ★ 联动-138:Step 1/2/3/4 标题缩小+收紧字距→塞进标题框不溢出 */
   .step-title{font-size:0.8rem !important;letter-spacing:0.01em;padding:5px 8px}   /* ★ 联动-139:固定0.8rem(不乘ui-scale,防被放大撑出框)+!important盖过base */
   .step-title-zh{letter-spacing:0.03em}
@@ -755,7 +759,7 @@ body::after{
   .hab-more-btn{font-size:1.05rem !important;letter-spacing:0;color:#fff;padding:7px 12px !important}
   /* ★ 联动-123:第一排显示顶栏「分数·连续 / 连击」药丸(手机端取消隐藏,内容本就有);太窄→缩小字号、藏下拉箭头 */
   #header-actions-bar #gm-stat-bar,
-  #header-actions-bar #gm-combo-bar{display:inline-flex !important;font-size:0.58rem !important;padding:5px 5px !important;border-radius:6px}
+  #header-actions-bar #gm-combo-bar{display:inline-flex !important;justify-content:center;align-items:center;text-align:center;font-size:0.58rem !important;padding:5px 5px !important;border-radius:6px}   /* ★ 联动-140:连击/分数 框内内容居中 */
   #header-actions-bar #gm-stat-bar .gm-stat-chev{display:none}   /* 第一排太挤,藏掉下拉箭头省地方(仍可点开成就墙) */
   /* ★ 联动-125:反馈/汉字结构 手机端走竖盒(汉字行在上·译文在下);反馈的信封与「反馈」同一行、信封在左 */
   #feedback-btn .tbw,#toggle-struct-btn .tbw{display:inline-flex !important;flex-direction:column;align-items:center;line-height:1.2}
@@ -1133,6 +1137,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
   <div class="struct-bar-body open" id="struct-body">
     <!-- ★ 联动-136:手机端整屏弹出页顶栏(返回主页+标题);桌面端 display:none 不显示 -->
     <div class="struct-fs-bar"><button class="struct-fs-back" onclick="event.stopPropagation();navBack()"><span class="fs-zh">‹ 返回主页</span><span class="lang-swap fs-tr"><span class="lang-en">Home</span><span class="lang-ar">الرئيسية</span></span></button></div>
+    <!-- ★ 联动-140:大标题放在 6 个组上面 -->
+    <div class="struct-fs-titlebar"><span class="struct-fs-title"><span class="fs-zh">汉字基本结构</span><span class="lang-swap fs-tr"><span class="lang-en">Basic Structures</span><span class="lang-ar" dir="rtl">البنى الأساسية</span></span></span></div>
     <div class="struct-grid">
       <div class="sg sg-solo" style="flex:1;background:#5f7a86"><div class="sg-label">1 独体字<span class="lang-swap-block"><span class="lang-en">Single-comp.</span><span class="lang-ar" dir="rtl">مفرد</span></span></div><div class="sg-row"><div class="struct-card">
         <div class="struct-card-num">1</div>
@@ -1245,8 +1251,6 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <div class="lang-swap-block"><div class="struct-card-en lang-en">Repeated-comp.</div><div class="struct-card-en lang-ar" dir="rtl">مكرّر</div></div>
         <div class="struct-card-ex">品、森</div></div></div></div>
     </div>
-    <!-- ★ 联动-138:标题挪到结构页底部 -->
-    <div class="struct-fs-titlebar"><span class="struct-fs-title"><span class="fs-zh">汉字基本结构</span><span class="lang-swap fs-tr"><span class="lang-en">Basic Structures</span><span class="lang-ar" dir="rtl">البنى الأساسية</span></span></span></div>
   </div>
 </div>
 <!-- ══ end 结构参考栏 ══ -->
@@ -1468,7 +1472,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-139 ✦ ①Step1234标题真正缩小:改固定0.8rem+!important(原乘ui-scale被放大撑出框/被base盖住)→塞进框。②选对拼音的结果框再放大(字2→2.5rem/1.45→1.75rem,盒内边距加大)。③Step3书写米字格垂直居中于面板(原置顶,下方大片空)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-140 ✦ 结构页:①大标题汉字基本结构移到6组上面(不再最下);②大标题调大1.05→1.5rem、组小标题调小0.8→0.68rem;③大标题与组间距加大;标题+组整体上下居中。④顶栏连击/分数框内内容居中。⑤三张主卡上半(标题)与下半(描述)间距拉开(7→18px)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5886,7 +5890,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-139';
+  const VERSION = '部件联动-140';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

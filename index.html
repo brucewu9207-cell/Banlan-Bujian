@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-138 (2026-06-27) — ①整屏结构页标题移到底部(顶栏只留返回主页,标题放页面下方)。②Step1选对拼音后不再隐藏4个选项(保留)+结果框放大(字号+内边距)。③Step1/2/3/4标题手机端缩小字号收紧字距→不溢出标题框。均手机端 -->
+<!-- 斑斓部件 · 部件联动-139 (2026-06-27) — ①Step1234标题真正缩小:改固定0.8rem+!important(原乘ui-scale被放大撑出框/被base盖住)→塞进框。②选对拼音的结果框再放大(字2→2.5rem/1.45→1.75rem,盒内边距加大)。③Step3书写米字格垂直居中于面板(原置顶,下方大片空)。均手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-138">
+<meta name="version" content="部件联动-139">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -489,9 +489,9 @@ body::before{content:'';position:fixed;inset:0;background:
   /* ★ 联动-138:标题挪到结构页底部 */
   .struct-fs-titlebar{display:flex;justify-content:center;flex:0 0 auto;padding:12px 14px 18px;border-top:2px solid rgba(0,0,0,0.12)}
   /* ★ 联动-138:Step 1/2/3/4 标题缩小+收紧字距→塞进标题框不溢出 */
-  .step-title{font-size:calc(0.86rem*var(--ui-scale));letter-spacing:0.01em;padding:5px 8px}
-  .step-title-zh{letter-spacing:0.04em}
-  .step-title-en{font-size:0.86em;letter-spacing:0.02em;margin-left:5px}
+  .step-title{font-size:0.8rem !important;letter-spacing:0.01em;padding:5px 8px}   /* ★ 联动-139:固定0.8rem(不乘ui-scale,防被放大撑出框)+!important盖过base */
+  .step-title-zh{letter-spacing:0.03em}
+  .step-title-en{font-size:0.82em;letter-spacing:0.01em;margin-left:5px}
 }
 .struct-grid{
   display:flex;align-items:stretch;gap:6px;
@@ -886,7 +886,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .play-circle-btn svg{width:calc(17px*var(--ui-scale)) !important;height:calc(17px*var(--ui-scale)) !important}
   .stroke-ctrl-btn{padding:5px 9px !important;font-size:0.7rem !important;flex-shrink:1;min-width:0}
   .stroke-ctrl-btn .ctrl-en{font-size:0.62rem}
-  #char-info{padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important;line-height:1.2 !important}   /* ★ 与 Skip 按钮同样大小（单行） */
+  #char-info{padding:calc(18px*var(--ui-scale)) 16px !important;margin-top:calc(8px*var(--ui-scale)) !important;line-height:1.4 !important}   /* ★ 联动-139:结果框加大内边距/行高,框更大 */
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -895,7 +895,10 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="3"] > .word-panel,
   .practice-layout.wizard[data-step="4"] > .word-panel{display:flex}
   .practice-layout.wizard[data-step="3"] .word-box{display:none}   /* ③ 书写：只显示书写框 */
-  .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:flex-start}   /* ★ 第③步：标题置顶，书写格在下方充分放大 */
+  .practice-layout.wizard[data-step="3"] .write-box{flex:1;min-height:0;justify-content:flex-start}   /* ★ 第③步：标题置顶 */
+  .practice-layout.wizard[data-step="3"] .write-stage{margin-top:auto}        /* ★ 联动-139:米字格垂直居中于面板剩余空间 */
+  .practice-layout.wizard[data-step="3"] .write-reset-btn{margin-bottom:auto} /* 重写键随米字格居中(下方留白对称) */
+  .practice-layout.wizard[data-step="3"] #write-locked{margin:auto 0}         /* 未解锁时锁提示也居中 */
   .practice-layout.wizard[data-step="4"] .write-box{display:none}  /* ④ 例词：只显示例词框 */
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
@@ -1465,7 +1468,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-138 ✦ ①整屏结构页标题移到底部(顶栏只留返回主页,标题放页面下方)。②Step1选对拼音后不再隐藏4个选项(保留)+结果框放大(字号+内边距)。③Step1/2/3/4标题手机端缩小字号收紧字距→不溢出标题框。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-139 ✦ ①Step1234标题真正缩小:改固定0.8rem+!important(原乘ui-scale被放大撑出框/被base盖住)→塞进框。②选对拼音的结果框再放大(字2→2.5rem/1.45→1.75rem,盒内边距加大)。③Step3书写米字格垂直居中于面板(原置顶,下方大片空)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2937,7 +2940,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     // ★ v64：手机端（≤768px）释义框中的字头改用笔画 SVG 渲染（同例词 ex-word-zh 路径，楷体），电脑端保持原字体显示
     const _isMobile=window.matchMedia('(max-width:768px)').matches;
     if(_isMobile){
-      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:2rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:1.45rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;   /* ★ 联动-138:结果框放大(1.25→2rem / 0.92→1.45rem) */
+      info.innerHTML=`<strong class="info-char-zh" data-glyph="${char}" style="font-size:2.5rem;display:inline-block;vertical-align:middle;line-height:1">${char}</strong> <span style="font-size:1.75rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;vertical-align:middle">${data.py} — ${enShort}</span>`;   /* ★ 联动-138/139:结果框再放大(2→2.5rem / 1.45→1.75rem) */
     } else {
       info.innerHTML=`<strong style="font-size:1.25rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${char}</strong> <span style="font-size:0.92rem;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif">${data.py} — ${enShort}</span>`;
     }
@@ -5883,7 +5886,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-138';
+  const VERSION = '部件联动-139';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-166 (2026-06-28) — 搜索模式(墨舟测试)练习页直接解开②拖拽③书写④例词全部锁,无需逐步完成;正常学生不受影响 -->
+<!-- 斑斓部件 · 部件联动-167 (2026-06-28) — 练习页所有方框改方案3浅墨绿#97a99f+深字#243a30(拼音框/部件框/HSK徽章/播放键/下一笔/重写键/拖拽框/例词框);手机电脑同步 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-166">
+<meta name="version" content="部件联动-167">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -201,8 +201,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .write-check{position:absolute;top:6px;right:6px;display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#2a9d8f;font-size:1.3rem;color:#fff;font-weight:700;pointer-events:none;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
 .write-check.show{display:flex;animation:fadeIn .3s}
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
-.write-reset-btn{margin-top:8px;padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.85rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
-.write-reset-btn:hover{background:rgba(20,40,30,0.78);transform:translateY(-2px)}
+.write-reset-btn{margin-top:8px;padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:0.85rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
+.write-reset-btn:hover{background:#8a9d92;transform:translateY(-2px)}
 
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -220,16 +220,16 @@ body::before{content:'';position:fixed;inset:0;background:
 /* 汉字下方的笔顺控制按钮（播放 / 下一笔） */
 .stroke-controls{display:flex;gap:10px;justify-content:center;align-items:center;margin-bottom:calc(12px*var(--ui-scale));flex-wrap:wrap}
 /* HSK 级别方框（与例词里的 HSK 方框样式一致），位于控制区左侧 */
-.hsk-level-badge{display:inline-block;padding:4px 13px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:0.95rem;color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;line-height:1.2;white-space:nowrap}
-.stroke-ctrl-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:rgba(20,40,30,0.55);color:#fff;font-family:inherit;font-size:0.95rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
+.hsk-level-badge{display:inline-block;padding:4px 13px;border-radius:40px;background:#97a99f;border:2px solid rgba(139,44,44,0.7);font-size:0.95rem;color:#243a30;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;line-height:1.2;white-space:nowrap}
+.stroke-ctrl-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:0.95rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .stroke-ctrl-btn:hover{background:#8b2c2c;transform:translateY(-2px)}
 .stroke-ctrl-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
 .stroke-ctrl-btn .ctrl-en{font-family:Georgia,serif;font-style:italic;font-size:0.82rem;opacity:0.85}
 .stroke-ctrl-btn.playing{background:var(--bamboo)}
 .stroke-ctrl-btn.playing svg{fill:#fff}
 /* 播放圆钮：纯圆、白三角，划过变猪肝红 */
-.play-circle-btn{width:calc(50px*var(--ui-scale));height:calc(50px*var(--ui-scale));border-radius:50%;border:none;background:rgba(20,40,30,0.55);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,0.18);padding:0}
-.play-circle-btn svg{width:calc(22px*var(--ui-scale));height:calc(22px*var(--ui-scale));fill:#fff;margin-left:3px}
+.play-circle-btn{width:calc(50px*var(--ui-scale));height:calc(50px*var(--ui-scale));border-radius:50%;border:none;background:#97a99f;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;box-shadow:0 2px 7px rgba(0,0,0,0.18);padding:0}
+.play-circle-btn svg{width:calc(22px*var(--ui-scale));height:calc(22px*var(--ui-scale));fill:#243a30;margin-left:3px}
 .play-circle-btn:hover{background:#8b2c2c;transform:scale(1.08)}
 .play-circle-btn.playing{background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)}   /* ★ v56：暂停态加白描边,与演示/返回/上下步统一 */
 .char-display .play-btn:hover{transform:scale(1.1);background:#fff}
@@ -238,9 +238,9 @@ body::before{content:'';position:fixed;inset:0;background:
 .char-display .char-step-label{display:none}
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
-.pinyin-btn{padding:calc(6px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:rgba(20,40,30,0.55);cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#ffffff;transition:all .2s;letter-spacing:0.06em;line-height:1.1}   /* ★ v37：拼音框放大1.1倍;-76:底墨绿;-77:竖向padding;-79:锁定行高防选对后撑高 */
+.pinyin-btn{padding:calc(6px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#97a99f;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#243a30;transition:all .2s;letter-spacing:0.06em;line-height:1.1}   /* ★ v37：拼音框放大1.1倍;-76:底墨绿;-77:竖向padding;-79:锁定行高防选对后撑高 */
 .pinyin-btn:hover:not(:disabled){background:#8b2c2c;border-color:rgba(255,255,255,0.4);transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红(同播放键) */
-.pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
+.pinyin-btn.correct{background:#97a99f;border-color:rgba(255,255,255,0.3);color:#243a30}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
 .pinyin-btn:disabled{cursor:default}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
@@ -332,17 +332,17 @@ body::before{content:'';position:fixed;inset:0;background:
 /* 兼容旧 drag-canvas-wrap */
 .drag-canvas-wrap{display:none}
 .drag-canvas{width:100%;aspect-ratio:1/1;position:relative;background:transparent;border:none;border-radius:10px;overflow:hidden}
-.drop-zone{position:absolute;border:2px dashed rgba(255,255,255,0.6);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;background:rgba(255,255,255,0.1);overflow:hidden}
+.drop-zone{position:absolute;border:2px dashed rgba(20,40,30,0.35);border-radius:6px;display:flex;align-items:center;justify-content:center;transition:border-color .2s,background .2s;background:#97a99f;overflow:hidden}
 .drop-zone.drag-over{border-color:var(--bamboo);background:rgba(181,118,58,0.12)}
 .drop-zone.filled{border-style:solid}
 .drop-zone.correct-placed{border-color:var(--jade)}
 .drop-zone.wrong-placed{border-color:var(--vermillion);background:rgba(200,75,47,0.07);animation:shake .3s}
-.zone-label{font-size:2.4rem;color:rgba(255,255,255,0.6);pointer-events:none;user-select:none}
+.zone-label{font-size:2.4rem;color:rgba(20,40,30,0.55);pointer-events:none;user-select:none}
 
 .components-pool{margin-bottom:8px;flex-shrink:0}
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
-.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:rgba(20,40,30,0.55);color:#ffffff;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}  /* 部件联动-76:底改墨绿 */
+.comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#97a99f;color:#243a30;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}  /* 部件联动-76:底改墨绿 */
 .comp-chip:hover:not(.used){background:#8b2c2c !important;transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红 */
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
@@ -815,9 +815,9 @@ body::after{
   .comp-chip:hover{transform:none;box-shadow:none}   /* 触屏无真悬停，去掉残留位移 */
   .comp-chip{min-height:64px}
   /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔/播放」按钮点完变红卡住）→ 中和 hover 背景 */
-  .stroke-ctrl-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
-  .play-circle-btn:not(.playing):hover{background:rgba(20,40,30,0.55);transform:none}
-  .pinyin-btn:hover:not(:disabled){background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.4)}
+  .stroke-ctrl-btn:not(.playing):hover{background:#8a9d92;transform:none}
+  .play-circle-btn:not(.playing):hover{background:#8a9d92;transform:none}
+  .pinyin-btn:hover:not(:disabled){background:#8a9d92;border-color:rgba(255,255,255,0.4)}
   .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
   /* ★ v57：iOS Safari 上父级 .struct-bar 的 backdrop-filter:blur 会把返回按钮的 bamboo 实色与背景混色变暗(实测 135,106,62 vs 期望 181,118,58)。
      用 isolation:isolate + transform:translateZ(0) 强制独立合成层,跳出 backdrop-filter 影响。 */
@@ -1538,7 +1538,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-166 ✦ 搜索模式(墨舟测试)练习页直接解开②拖拽③书写④例词全部锁,无需逐步完成;正常学生不受影响','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-167 ✦ 练习页所有方框改方案3浅墨绿#97a99f+深字#243a30(拼音框/部件框/HSK徽章/播放键/下一笔/重写键/拖拽框/例词框);手机电脑同步','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4451,13 +4451,13 @@ function showExampleWord(char){
   if(words.length===0) words=data.words;
   words=words.slice(0,1);   // ★ 例词只保留一个
   hint.innerHTML=words.map(w=>{
-    const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:rgba(20,40,30,0.55);border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#ffffff;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
+    const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:#97a99f;border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#243a30;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
     return `<div style="text-align:center">
       <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
-      <div class="ex-word-inner" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:rgba(20,40,30,0.55);border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
-        <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#ffffff;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
-        <span style="font-size:calc(1.5rem*var(--ui-scale));color:#ffffff;letter-spacing:0.05em;line-height:1.1">${w.py}</span>
-        <span style="font-size:calc(1.2rem*var(--ui-scale));color:#ffffff;font-style:italic;font-family:Georgia,serif;line-height:1.1">${w.en}</span>
+      <div class="ex-word-inner" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
+        <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#243a30;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
+        <span style="font-size:calc(1.5rem*var(--ui-scale));color:#243a30;letter-spacing:0.05em;line-height:1.1">${w.py}</span>
+        <span style="font-size:calc(1.2rem*var(--ui-scale));color:#243a30;font-style:italic;font-family:Georgia,serif;line-height:1.1">${w.en}</span>
       </div>
     </div>`;
   }).join('');
@@ -5969,7 +5969,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-166';
+  const VERSION = '部件联动-167';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

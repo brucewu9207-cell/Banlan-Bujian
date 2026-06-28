@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-171 (2026-06-28) — 修班级模式误全解锁(解锁加非inTaskMode判定);部件SVG笔画字改黑;拼音框桌面hover(242行)改深绿白字;部件hover时SVG笔画变白;下一个字按钮加内距缩字防被挤出 -->
+<!-- 斑斓部件 · 部件联动-172 (2026-06-28) — 真修班级任务误解锁(根因:班级inTaskMode在BLS自己的state上,改查body的bls-in-task-mode类);下一个字按钮收回过大间距+缩例词框防挤出;练习面板上移(顶留白28→14);重写阿语span补dir=rtl修斜杠错位 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-171">
+<meta name="version" content="部件联动-172">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -49,7 +49,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .mode-tab{padding:8px 20px;border:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:0.85rem;transition:all .25s;color:var(--ink-mid);background:transparent}
 .mode-tab.active{background:var(--bamboo);color:var(--paper);box-shadow:0 2px 8px rgba(181,118,58,0.4)}
 .mode-tab:hover:not(.active){background:rgba(181,118,58,0.15)}
-.main-content{position:relative;z-index:1;padding:28px 32px;margin:0 auto;min-height:calc(100vh - 45px)}
+.main-content{position:relative;z-index:1;padding:14px 32px 28px;margin:0 auto;min-height:calc(100vh - 45px)}   /* ★ 172:顶部留白28→14,练习①②③④面板上移靠近结构条 */
 .card{background:#c4c4c4;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(120,120,120,0.5);backdrop-filter:blur(4px);color:#ffffff}
 /* 部件联动-73:练习页 4 张 step 面板改墨绿半透明,与错题卡背景一致(只命中 practice-layout 内的 card,不动 level-select 等) */
 .practice-layout .card{background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2)}
@@ -176,7 +176,7 @@ body::before{content:'';position:fixed;inset:0;background:
 
 .back-btn{padding:7px 15px;border:1.5px solid var(--paper-shadow);border-radius:8px;background:var(--paper);cursor:pointer;font-family:inherit;font-size:0.82rem;color:var(--ink-mid);transition:all .2s}
 .back-btn:hover{border-color:var(--bamboo);color:var(--bamboo)}
-.next-btn{background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 26px;font-family:inherit;font-size:1.2rem;line-height:1.25;cursor:pointer;transition:all .2s;letter-spacing:0.06em}   /* 部件联动-78:竖向 padding 14→8 降高 */
+.next-btn{background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:9px 22px;font-family:inherit;font-size:1.12rem;line-height:1.2;cursor:pointer;transition:all .2s;letter-spacing:0.04em}   /* 部件联动-78:竖向 padding 14→8 降高 */
 .next-btn:hover{background:rgba(20,40,30,0.75);transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,0.28)}   /* 部件联动-115:加悬浮 */
 #skip-btn:hover{background:var(--bamboo-light);transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,0.28)}   /* 部件联动-115:橙+悬浮 */
 
@@ -1488,7 +1488,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
               <div id="write-target" oncontextmenu="return false"></div>
               <div id="write-check" class="write-check">✓</div>
             </div>
-            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写<span class="lang-swap"><span class="lang-en"> / Redo</span><span class="lang-ar"> / إعادة</span></span></button>
+            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写<span class="lang-swap"><span class="lang-en"> / Redo</span><span class="lang-ar" dir="rtl"> / إعادة</span></span></button>
           </div>
           <!-- 下方框：例词（选对拼音后出现） -->
           <div class="card word-box">
@@ -1498,7 +1498,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
-            <div id="next-btn-wrap" style="display:none;padding:20px 0 4px;flex-shrink:0">
+            <div id="next-btn-wrap" style="display:none;padding:8px 0 2px;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
             </div>
           </div>
@@ -1539,7 +1539,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-171 ✦ 修班级模式误全解锁(解锁加非inTaskMode判定);部件SVG笔画字改黑;拼音框桌面hover(242行)改深绿白字;部件hover时SVG笔画变白;下一个字按钮加内距缩字防被挤出','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-172 ✦ 真修班级任务误解锁(根因:班级inTaskMode在BLS自己的state上,改查body的bls-in-task-mode类);下一个字按钮收回过大间距+缩例词框防挤出;练习面板上移(顶留白28→14);重写阿语span补dir=rtl修斜杠错位','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2973,8 +2973,8 @@ function loadCharacter(char){
   requestAnimationFrame(updateStructHeight);
   setTimeout(updateStructHeight, 200);
   wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
-  // ★ 联动-166/171:仅【搜索模式】(墨舟测试)解开②③④全部锁;班级任务也走 teacherMode 但带 inTaskMode=true,必须排除,否则学生班级任务也全解锁
-  if(state.teacherMode && !state.inTaskMode){
+  // ★ 联动-166/172:仅【搜索模式】(墨舟测试)解开②③④全部锁;班级模块的 inTaskMode 在它自己的 state 上(主 state 读不到)→ 改查 body 的 bls-in-task-mode 类(班级任务时存在),这样班级任务不解锁
+  if(state.teacherMode && !document.body.classList.contains('bls-in-task-mode')){
     try{
       unlockDragSection(char, data);   // 揭锁 ② 拖拽部件(含兜底渲染)
       unlockWriting();                 // 揭锁 ③ 书写练习
@@ -4454,8 +4454,8 @@ function showExampleWord(char){
   hint.innerHTML=words.map(w=>{
     const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:#97a99f;border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#243a30;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;vertical-align:middle;margin-left:8px">HSK ${w.lv}</span>`:'';
     return `<div style="text-align:center">
-      <div style="margin-bottom:calc(12px*var(--ui-scale))">${lvBadge}</div>
-      <div class="ex-word-inner" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(16px*var(--ui-scale)) calc(28px*var(--ui-scale))">
+      <div style="margin-bottom:calc(6px*var(--ui-scale))">${lvBadge}</div>
+      <div class="ex-word-inner" style="display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(8px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,0.3);border-radius:12px;padding:calc(10px*var(--ui-scale)) calc(24px*var(--ui-scale))">
         <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.4rem*var(--ui-scale));font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;color:#243a30;letter-spacing:0.06em;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}" style="display:inline-block;line-height:1">${c}</span>`).join('')}</span>
         <span style="font-size:calc(1.5rem*var(--ui-scale));color:#243a30;letter-spacing:0.05em;line-height:1.1">${w.py}</span>
         <span style="font-size:calc(1.2rem*var(--ui-scale));color:#243a30;font-style:italic;font-family:Georgia,serif;line-height:1.1">${w.en}</span>
@@ -5970,7 +5970,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-171';
+  const VERSION = '部件联动-172';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

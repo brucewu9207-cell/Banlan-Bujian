@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-174 (2026-06-28) — 重写按钮强制dir=ltr,阿语模式下也按 重写/إعادة 从左到右排,斜杠钉在中文与译文中间 -->
+<!-- 斑斓部件 · 部件联动-175 (2026-06-28) — 重写斜杠真修:根因是body.lang-mode-ar .lang-ar强制direction:rtl把斜杠倒过去;把斜杠移到lang标签外当固定分隔符,中文/译文中间不再受RTL影响 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-174">
+<meta name="version" content="部件联动-175">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1488,7 +1488,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
               <div id="write-target" oncontextmenu="return false"></div>
               <div id="write-check" class="write-check">✓</div>
             </div>
-            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" dir="ltr" style="display:none">↺ 重写<span class="lang-swap"><span class="lang-en"> / Redo</span><span class="lang-ar"> / <bdi>إعادة</bdi></span></span></button>
+            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" dir="ltr" style="display:none">↺ 重写 / <span class="lang-swap"><span class="lang-en">Redo</span><span class="lang-ar"><bdi>إعادة</bdi></span></span></button>
           </div>
           <!-- 下方框：例词（选对拼音后出现） -->
           <div class="card word-box">
@@ -1539,7 +1539,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-174 ✦ 重写按钮强制dir=ltr,阿语模式下也按 重写/إعادة 从左到右排,斜杠钉在中文与译文中间','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-175 ✦ 重写斜杠真修:根因是body.lang-mode-ar .lang-ar强制direction:rtl把斜杠倒过去;把斜杠移到lang标签外当固定分隔符,中文/译文中间不再受RTL影响','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5970,7 +5970,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-174';
+  const VERSION = '部件联动-175';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-167 (2026-06-28) — 练习页所有方框改方案3浅墨绿#97a99f+深字#243a30(拼音框/部件框/HSK徽章/播放键/下一笔/重写键/拖拽框/例词框);手机电脑同步 -->
+<!-- 斑斓部件 · 部件联动-169 (2026-06-28) — 补漏:拖拽框ZONE_COLORS+部件池chip行内+char-info释义框 三处写死深绿改浅墨绿#97a99f配深字(167漏的行内/JS) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-167">
+<meta name="version" content="部件联动-169">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -223,7 +223,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .hsk-level-badge{display:inline-block;padding:4px 13px;border-radius:40px;background:#97a99f;border:2px solid rgba(139,44,44,0.7);font-size:0.95rem;color:#243a30;font-family:Georgia,serif;font-weight:700;font-style:normal;letter-spacing:0.1em;line-height:1.2;white-space:nowrap}
 .stroke-ctrl-btn{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:10px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:0.95rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .stroke-ctrl-btn:hover{background:#8b2c2c;transform:translateY(-2px)}
-.stroke-ctrl-btn svg{width:15px;height:15px;fill:#fff;flex-shrink:0}
+.stroke-ctrl-btn svg{width:15px;height:15px;fill:#243a30;flex-shrink:0}
 .stroke-ctrl-btn .ctrl-en{font-family:Georgia,serif;font-style:italic;font-size:0.82rem;opacity:0.85}
 .stroke-ctrl-btn.playing{background:var(--bamboo)}
 .stroke-ctrl-btn.playing svg{fill:#fff}
@@ -1461,7 +1461,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
             <div class="pinyin-options" id="pinyin-options"></div>
           </div>
           <div class="spacer"></div>
-          <div id="char-info" style="display:none;margin-top:14px;padding:20px 16px;background:rgba(20,40,30,0.55);border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);font-size:1.2rem;color:#ffffff;line-height:1.7;text-align:center"></div>
+          <div id="char-info" style="display:none;margin-top:14px;padding:20px 16px;background:#97a99f;border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);font-size:1.2rem;color:#243a30;line-height:1.7;text-align:center"></div>
           <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:var(--bamboo);color:#ffffff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
             <span class="lang-swap"><span class="lang-en">Skip</span><span class="lang-ar">تخطٍّ</span></span> · 我已认识 →
           </button>
@@ -1538,7 +1538,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-167 ✦ 练习页所有方框改方案3浅墨绿#97a99f+深字#243a30(拼音框/部件框/HSK徽章/播放键/下一笔/重写键/拖拽框/例词框);手机电脑同步','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-169 ✦ 补漏:拖拽框ZONE_COLORS+部件池chip行内+char-info释义框 三处写死深绿改浅墨绿#97a99f配深字(167漏的行内/JS)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2264,9 +2264,9 @@ const COMP_COLORS=[
 
 // 拖拽落位区专用配色：统一用反馈按钮的深墨绿色
 const ZONE_COLORS=[
-  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
-  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
-  {border:'rgba(20,40,30,0.55)',bg:'rgba(20,40,30,0.55)',text:'#ffffff'},
+  {border:'rgba(20,40,30,0.30)',bg:'#97a99f',text:'#243a30'},
+  {border:'rgba(20,40,30,0.30)',bg:'#97a99f',text:'#243a30'},
+  {border:'rgba(20,40,30,0.30)',bg:'#97a99f',text:'#243a30'},
 ];
 
 let state={mode:'learn',currentChar:null,pinyinDone:false,droppedComponents:{},sessionChars:[],sessionIndex:0,failedQueue:[],currentCharFailed:false,currentLevel:1};
@@ -3609,7 +3609,7 @@ function renderCompPool(char,data){
     const chipCol=entry.isCorrect
       ? COMP_COLORS[entry.correctIndex%COMP_COLORS.length]
       : COMP_COLORS[(entry.correctIndex+3+i)%COMP_COLORS.length];
-    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#ffffff;background:rgba(20,40,30,0.55);border-width:1.5px`;   /* 部件联动-76:底改墨绿 */
+    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#243a30;background:#97a99f;border-width:1.5px`;   /* 部件联动-76:底改墨绿;167:改浅墨绿#97a99f+深字 */
 
     // ★ 指针拖拽：一个事件统一鼠标 / 触屏 / 触控笔
     chip.addEventListener('pointerdown',e=>{
@@ -5969,7 +5969,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-167';
+  const VERSION = '部件联动-169';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

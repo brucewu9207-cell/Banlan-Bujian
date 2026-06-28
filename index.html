@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-144 (2026-06-28) — HSK等级框下方字数(246字/chars)压成一行(nowrap+略缩字号0.72rem,手机端);主页飘字部件加多(手机端pairCountMb 10到18、桌面pairCount 34到42,卡片收窄后空间更大) -->
+<!-- 斑斓部件 · 部件联动-145 (2026-06-28) — 练习页提速:①选对拼音后写死的最短等待大幅缩短(合体字 min 600到250ms、兜底 2500到1500ms;独体字 600到250ms)→下一步和部件出现更快;②加部件SVG渲染缓存(同部件/同参数克隆秒返,免重复loadStrokeData和离屏getBBox重排),常用偏旁/回看的字提速 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-144">
+<meta name="version" content="部件联动-145">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1474,7 +1474,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-144 ✦ HSK等级框下方字数(246字/chars)压成一行(nowrap+略缩字号0.72rem,手机端);主页飘字部件加多(手机端pairCountMb 10到18、桌面pairCount 34到42,卡片收窄后空间更大)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-145 ✦ 练习页提速:①选对拼音后写死的最短等待大幅缩短(合体字 min 600到250ms、兜底 2500到1500ms;独体字 600到250ms)→下一步和部件出现更快;②加部件SVG渲染缓存(同部件/同参数克隆秒返,免重复loadStrokeData和离屏getBBox重排),常用偏旁/回看的字提速','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2975,13 +2975,13 @@ function checkPinyin(btn,chosen,correct,data,char){
         state.sessionIndex++;   // ★ 联动-12: 模拟 mergeCharacter 的 sessionIndex++,让"下一个字"按钮能跳转
         unlockWriting();    // 解锁右栏书写
         wizUnlock(3);       // wizard: 跳过 step ②,max = 3
-      }, 600);
+      }, 250);   // ★ 联动-145:独体字解锁等待 600→250ms,「下一步」更快
     } else {
-      // 合体字: 预渲染 step ② 部件,等笔画都画好(或2.5s兜底)再揭开,避免边揭开边加载(部件联动-79)
+      // 合体字: 预渲染 step ② 部件,等笔画都画好(或兜底)再揭开,避免边揭开边加载(部件联动-79)
       renderDragZones(char,data);
       const _poolReady = renderCompPool(char,data);
-      const _min = new Promise(r=>setTimeout(r,600));    // 动画最短时长
-      const _cap = new Promise(r=>setTimeout(r,2500));   // 兜底:数据极慢最多等 2.5s
+      const _min = new Promise(r=>setTimeout(r,250));    // ★ 联动-145:动画最短时长 600→250ms
+      const _cap = new Promise(r=>setTimeout(r,1500));   // ★ 联动-145:兜底 2500→1500ms
       Promise.all([_min, Promise.race([_poolReady, _cap])]).then(()=>unlockDragSection(char,data));
     }
   } else {
@@ -3360,8 +3360,11 @@ const COMP_STROKE_RENDER = {
   '服_d3': { src:'胆', strokes:'all' },
 };
 // 从源字的指定笔画生成一个自动裁剪到部件包围盒的 SVG（返回 <svg> 元素，宽高由调用方设置）
+const _compSvgCache = {};   // ★ 联动-145:部件SVG渲染缓存(同部件+同参数→克隆秒返,免重复 loadStrokeData+离屏getBBox重排)
 async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
   if(typeof HanziWriter === 'undefined') return null;
+  const _ck=srcChar+'|'+(Array.isArray(strokeIdx)?strokeIdx.join(','):strokeIdx)+'|'+sharedScale+'|'+(color||'#fff');
+  if(_compSvgCache[_ck]) return _compSvgCache[_ck].cloneNode(true);
   let data;
   try{ data = await loadStrokeData(srcChar); }catch(e){ return null; }
   if(!data || !data.strokes) return null;
@@ -3418,6 +3421,7 @@ async function renderComponentStrokes(srcChar, strokeIdx, color, sharedScale){
     }
   }
   svg.removeAttribute('style');
+  _compSvgCache[_ck] = svg.cloneNode(true);   // ★ 联动-145:缓存渲染结果,下次同部件秒返
   return svg;
 }
 
@@ -5892,7 +5896,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-144';
+  const VERSION = '部件联动-145';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

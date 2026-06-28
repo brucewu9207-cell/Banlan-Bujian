@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-147 (2026-06-28) — Step1拼音框高度放大约1.5倍(竖向padding 2到9px);手机端表头整体右留位避开右上角语言切换钮(标题不再被遮);我的班级页去掉基本信息标题 -->
+<!-- 斑斓部件 · 部件联动-148 (2026-06-28) — 撤销147的表头padding(它把斑斓部件挤换行了),表头恢复原样不动;改为只把手机端语言切换钮下移避开BRILLIANT COMPONENTS标题;我的班级弹窗底色换浅墨绿(677a70到8a9d92);手机端任务头改竖排居中(任务标题居中、Tasks译文移到中文下、刷新键绝对定位) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-147">
+<meta name="version" content="部件联动-148">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -886,7 +886,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
   .pinyin-btn{font-size:calc(1.25rem*var(--ui-scale)) !important;padding:calc(9px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ v37:字号；联动-147:竖向padding 2→9px,框高×1.5 */
-  .struct-bar-title{padding-right:96px}   /* ★ 联动-147:表头整体右留位→标题不被右上角语言切换钮遮住(手机端) */
+  /* ★ 联动-148:撤销 147 的表头 padding(它把「斑斓部件」挤换行了);改为只下移语言切换钮避让 */
   .pinyin-options{gap:calc(4px*var(--ui-scale)) !important;margin-bottom:calc(4px*var(--ui-scale)) !important}   /* ★ 两行拼音间距与下方留白再收紧 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
@@ -1019,7 +1019,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* 部件联动-61:顶栏按钮(操作钮/药丸/语言切换)统一等高+垂直对齐 */
 .struct-action-btn,.gm-bar-pill,.lang-switcher{height:42px!important;align-items:center!important;box-sizing:border-box!important}
 .struct-action-btn svg{height:12px!important;width:auto!important;flex-shrink:0}
-.lang-switcher{top:15px!important}
+.lang-switcher{top:66px!important}   /* ★ 联动-148:手机端语言钮下移,避开「BRILLIANT COMPONENTS」标题(表头本身不动) */
 }
 @media (min-width:769px){
 /* ③ 错题本页:左=控件,右=错字集字卡格 */
@@ -1477,7 +1477,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-147 ✦ Step1拼音框高度放大约1.5倍(竖向padding 2到9px);手机端表头整体右留位避开右上角语言切换钮(标题不再被遮);我的班级页去掉基本信息标题','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-148 ✦ 撤销147的表头padding(它把斑斓部件挤换行了),表头恢复原样不动;改为只把手机端语言切换钮下移避开BRILLIANT COMPONENTS标题;我的班级弹窗底色换浅墨绿(677a70到8a9d92);手机端任务头改竖排居中(任务标题居中、Tasks译文移到中文下、刷新键绝对定位)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5899,7 +5899,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-147';
+  const VERSION = '部件联动-148';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5980,7 +5980,7 @@ try{
       @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
 
       /* 弹窗主体 - 白底,跟老师端 .bl-modal 一脉相承 */
-      .bls-modal{background:#677a70;border-radius:10px;border:1px solid rgba(255,255,255,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.4);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      .bls-modal{background:#8a9d92;border-radius:10px;   /* ★ 联动-148:我的班级弹窗底色 #677a70→#8a9d92 换浅一点的墨绿 */border:1px solid rgba(255,255,255,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.4);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
       @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
       /* 顶部装饰条 - 深墨绿 */
       .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:var(--bamboo);border-radius:0 0 4px 4px;opacity:.95}
@@ -6041,7 +6041,9 @@ try{
 
       /* ★ v8: 任务列表区域 */
       .bls-tasks-section{margin-top:14px}
-      .bls-tasks-header{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#fff;font-weight:700;padding:0 4px 8px;letter-spacing:.4px}
+      .bls-tasks-header{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;font-size:13px;color:#fff;font-weight:700;padding:0 4px 8px;letter-spacing:.4px}   /* ★ 联动-148:手机端任务头改竖排居中(任务标题居中、译文Tasks移到中文下) */
+      .bls-tasks-header .bls-th-tr{font-size:0.82em;font-weight:400;opacity:0.82}   /* 译文小、在中文下 */
+      .bls-tasks-header .bls-refresh-btn{position:absolute;right:6px;top:50%;transform:translateY(-50%)}   /* 刷新键绝对定位到右侧,不破坏竖排居中 */
       .bls-refresh-btn{background:rgba(255,255,255,0.13);border:1px solid rgba(255,255,255,0.42);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;transition:all .25s;padding:0}
       .bls-refresh-btn:hover:not(:disabled){background:var(--bamboo);color:#fff;border-color:var(--bamboo-light);transform:rotate(180deg)}
       .bls-refresh-btn:disabled{opacity:.55;cursor:not-allowed}

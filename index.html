@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-170 (2026-06-28) — 练习页:6部件文字改黑;重写键放大1.2倍并加大与书写区距离;拼音选对态改深绿白字;拼音框+部件框hover改深墨绿白字(参考Step1标题深绿) -->
+<!-- 斑斓部件 · 部件联动-171 (2026-06-28) — 修班级模式误全解锁(解锁加非inTaskMode判定);部件SVG笔画字改黑;拼音框桌面hover(242行)改深绿白字;部件hover时SVG笔画变白;下一个字按钮加内距缩字防被挤出 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-170">
+<meta name="version" content="部件联动-171">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -176,7 +176,7 @@ body::before{content:'';position:fixed;inset:0;background:
 
 .back-btn{padding:7px 15px;border:1.5px solid var(--paper-shadow);border-radius:8px;background:var(--paper);cursor:pointer;font-family:inherit;font-size:0.82rem;color:var(--ink-mid);transition:all .2s}
 .back-btn:hover{border-color:var(--bamboo);color:var(--bamboo)}
-.next-btn{background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px 28px;font-family:inherit;font-size:1.35rem;cursor:pointer;transition:all .2s;letter-spacing:0.08em}   /* 部件联动-78:竖向 padding 14→8 降高 */
+.next-btn{background:rgba(20,40,30,0.55);color:#ffffff;border:1px solid rgba(255,255,255,0.2);border-radius:10px;padding:12px 26px;font-family:inherit;font-size:1.2rem;line-height:1.25;cursor:pointer;transition:all .2s;letter-spacing:0.06em}   /* 部件联动-78:竖向 padding 14→8 降高 */
 .next-btn:hover{background:rgba(20,40,30,0.75);transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,0.28)}   /* 部件联动-115:加悬浮 */
 #skip-btn:hover{background:var(--bamboo-light);transform:translateY(-2px);box-shadow:0 5px 14px rgba(0,0,0,0.28)}   /* 部件联动-115:橙+悬浮 */
 
@@ -239,7 +239,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .pinyin-section h3{font-size:0.78rem;color:var(--ink-light);margin-bottom:calc(12px*var(--ui-scale));letter-spacing:0.04em;font-family:Georgia,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
 .pinyin-btn{padding:calc(6px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#97a99f;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#243a30;transition:all .2s;letter-spacing:0.06em;line-height:1.1}   /* ★ v37：拼音框放大1.1倍;-76:底墨绿;-77:竖向padding;-79:锁定行高防选对后撑高 */
-.pinyin-btn:hover:not(:disabled){background:#8b2c2c;border-color:rgba(255,255,255,0.4);transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红(同播放键) */
+.pinyin-btn:hover:not(:disabled){background:rgba(20,40,30,0.55);color:#ffffff;border-color:rgba(255,255,255,0.4);transform:translateY(-2px)}   /* 部件联动-79;171:hover 改深墨绿+白字(同Step1标题深绿) */
 .pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
 .pinyin-btn:disabled{cursor:default}
@@ -343,7 +343,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
 .comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#97a99f;color:#243a30;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}  /* 部件联动-76:底改墨绿 */
-.comp-chip:hover:not(.used){background:rgba(20,40,30,0.55) !important;color:#ffffff !important;transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红 */
+.comp-chip:hover:not(.used){background:rgba(20,40,30,0.55) !important;color:#ffffff !important;transform:translateY(-2px)}   /* 部件联动-79;171:hover 改深墨绿+字白 */
+.comp-chip:hover:not(.used) svg path{fill:#ffffff !important}   /* ★ 171:部件是SVG笔画字,hover时笔画也变白 */
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -1497,7 +1498,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
-            <div id="next-btn-wrap" style="display:none;padding:10px 0 0;flex-shrink:0">
+            <div id="next-btn-wrap" style="display:none;padding:20px 0 4px;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
             </div>
           </div>
@@ -1538,7 +1539,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-170 ✦ 练习页:6部件文字改黑;重写键放大1.2倍并加大与书写区距离;拼音选对态改深绿白字;拼音框+部件框hover改深墨绿白字(参考Step1标题深绿)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-171 ✦ 修班级模式误全解锁(解锁加非inTaskMode判定);部件SVG笔画字改黑;拼音框桌面hover(242行)改深绿白字;部件hover时SVG笔画变白;下一个字按钮加内距缩字防被挤出','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2972,8 +2973,8 @@ function loadCharacter(char){
   requestAnimationFrame(updateStructHeight);
   setTimeout(updateStructHeight, 200);
   wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
-  // ★ 联动-166:搜索模式(仅墨舟测试,teacherMode=true)→ 直接解开 ②③④ 全部锁,无需逐步完成;正常学生不受影响
-  if(state.teacherMode){
+  // ★ 联动-166/171:仅【搜索模式】(墨舟测试)解开②③④全部锁;班级任务也走 teacherMode 但带 inTaskMode=true,必须排除,否则学生班级任务也全解锁
+  if(state.teacherMode && !state.inTaskMode){
     try{
       unlockDragSection(char, data);   // 揭锁 ② 拖拽部件(含兜底渲染)
       unlockWriting();                 // 揭锁 ③ 书写练习
@@ -3587,13 +3588,13 @@ function renderCompPool(char,data){
       chip.textContent='';
       const _src = entry.isCorrect ? char : entry.comp;
       const _stk = entry.isCorrect ? data.splitRanges[entry.correctIndex] : 'all';
-      _renderJobs.push(renderComponentStrokes(_src,_stk,'#ffffff', entry.isCorrect).then(svg=>{
+      _renderJobs.push(renderComponentStrokes(_src,_stk,'#1a1a1a', entry.isCorrect).then(svg=>{
         if(svg){ svg.style.cssText='width:2.9rem;height:2.9rem;display:block'; chip.appendChild(svg); }
         else { chip.textContent=entry.comp; }
       }));
     } else if(_srChip){
       chip.textContent='';
-      _renderJobs.push(renderComponentStrokes(_srChip.src,_srChip.strokes,'#ffffff', true).then(svg=>{
+      _renderJobs.push(renderComponentStrokes(_srChip.src,_srChip.strokes,'#1a1a1a', true).then(svg=>{
         if(svg){ svg.style.cssText='width:2.9rem;height:2.9rem;display:block'; chip.appendChild(svg); }
         else { chip.textContent=entry.comp; }
       }));
@@ -5969,7 +5970,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-170';
+  const VERSION = '部件联动-171';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

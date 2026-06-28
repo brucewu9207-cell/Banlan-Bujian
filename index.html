@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-142 (2026-06-28) — 自学模式9个HSK框垂直居中(showLevelSelect改为不写死block、让CSS手机端flex居中生效);三张主卡再收窄260到210px;Step2拖拽部件6个部件框压矮(原撑满改固定96px行高、部件池垂直居中)。均手机端 -->
+<!-- 斑斓部件 · 部件联动-143 (2026-06-28) — 自学模式9个HSK等级框放大1.3倍(min-height78到101px、字号同步放大、锁头放大);三张主卡宽度再收窄210到175px。均手机端 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-142">
+<meta name="version" content="部件联动-143">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -407,7 +407,7 @@ body::before{content:'';position:fixed;inset:0;background:
   /* ★ v86:撤销 zoom:0.7(iOS Safari 表现不稳),改用直接缩小内部所有数值 → 0.7 倍,layout 真实变化 */
   .home-grid{grid-template-columns:1fr;justify-items:center;gap:10px;width:100%}   /* gap 14→10 */
   .home-grid .home-entry{
-    width:100%;max-width:210px;       /* ★ v86:440→308;联动-126:308→260;联动-142:260→210 再收窄(左右留白) */
+    width:100%;max-width:175px;       /* ★ v86:440→308;联动-126:308→260;联动-142:260→210;联动-143:210→175 再收窄 */
     margin:0 auto;                    /* 居中 */
     min-height:0;                     /* 解除 268px 死高度（一屏装不下的元凶） */
     padding:14px 13px;                /* ★ v86:20 18→14 13 (×0.7) */
@@ -432,12 +432,12 @@ body::before{content:'';position:fixed;inset:0;background:
     justify-content:center;
   }
   /* ★ v93:手机端缩小等级方框内"HSK 1"字号,让 HSK 和数字保持同一行(不再换行) */
-  .level-btn .level-num{font-size:1.15rem;white-space:nowrap}
-  .level-btn{padding:14px 8px;min-height:78px}    /* ★ v95:手机端等高 78px(适配缩小后的字号) */
-  .level-btn .level-label{font-size:0.66rem}
-  .level-btn .level-count{font-size:0.62rem}
+  .level-btn .level-num{font-size:1.5rem;white-space:nowrap}    /* ★ 联动-143:HSK框×1.3 — 1.15→1.5rem */
+  .level-btn{padding:18px 10px;min-height:101px}    /* ★ 联动-143:×1.3 — 78→101px */
+  .level-btn .level-label{font-size:0.86rem}        /* ★ 联动-143:0.66→0.86rem */
+  .level-btn .level-count{font-size:0.81rem}        /* ★ 联动-143:0.62→0.81rem */
   /* ★ v94:手机端锁头跟随大字号 */
-  .level-btn .level-lock{font-size:1.2rem;margin-top:8px}
+  .level-btn .level-lock{font-size:1.56rem;margin-top:10px}   /* ★ 联动-143:1.2→1.56rem */
 }
 
 /* ══ 结构参考栏 ══ */
@@ -1474,7 +1474,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-142 ✦ 自学模式9个HSK框垂直居中(showLevelSelect改为不写死block、让CSS手机端flex居中生效);三张主卡再收窄260到210px;Step2拖拽部件6个部件框压矮(原撑满改固定96px行高、部件池垂直居中)。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-143 ✦ 自学模式9个HSK等级框放大1.3倍(min-height78到101px、字号同步放大、锁头放大);三张主卡宽度再收窄210到175px。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5892,7 +5892,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-142';
+  const VERSION = '部件联动-143';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

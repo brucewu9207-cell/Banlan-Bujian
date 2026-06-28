@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-159 (2026-06-28) — 班级码学号标签盒两端加盒换中浅墨绿#55706a；弹窗说明输入文字改深提升对比；错误框加深红底白字 -->
+<!-- 斑斓部件 · 部件联动-160 (2026-06-28) — 确认本人弹窗由原生confirm改为自定义居中弹窗风格同加入班级中上译下；弹窗说明文字改回亮白 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-159">
+<meta name="version" content="部件联动-160">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1124,7 +1124,8 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
   .bls-modal:has(.bls-field) .bls-btn .lang-swap>span{display:block;width:100%;text-align:center}
 }
 /* ★ 联动-159:浅底弹窗里说明/输入文字本是白色→在 #9caea3 浅底上发糊;改深墨绿提升对比(两端通用) */
-.bls-modal:has(.bls-field) .bls-hint{color:rgba(24,40,32,0.82)}
+.bls-modal:has(.bls-field) .bls-hint{color:rgba(255,255,255,0.95)}   /* ★ 联动-160:说明文字改回白色但提亮(浅底上用亮白) */
+.bls-confirm-val{color:rgba(255,255,255,0.96);font-size:16px;font-weight:600;letter-spacing:.3px;padding:1px 2px 2px;word-break:break-word}   /* ★ 联动-160:确认本人弹窗的姓名/学号值 */
 .bls-modal:has(.bls-field) .bls-input{color:#22382e;background:rgba(255,255,255,0.5);border-color:rgba(24,40,32,0.28)}
 .bls-modal:has(.bls-field) .bls-input::placeholder{color:rgba(24,40,32,0.5)}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
@@ -1530,7 +1531,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-159 ✦ 班级码学号标签盒两端加盒换中浅墨绿#55706a；弹窗说明输入文字改深提升对比；错误框加深红底白字','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-160 ✦ 确认本人弹窗由原生confirm改为自定义居中弹窗风格同加入班级中上译下；弹窗说明文字改回亮白','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5952,7 +5953,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-159';
+  const VERSION = '部件联动-160';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6158,6 +6159,41 @@ try{
     if(old) old.remove();
   }
 
+  // ─── ★ 联动-160:自定义「确认本人」弹窗(居中、风格同加入班级、中上译下;替代原生 confirm)──
+  // 单独叠一层(新 id),不删底下的加入表单;取消只关自己、表单还在可改学号
+  function blsConfirmIdentity(name, sid, onOk, onCancel){
+    function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+    const ov = document.createElement('div');
+    ov.className = 'bls-overlay bls-show';
+    ov.id = 'bls-confirm-overlay';
+    ov.innerHTML = `
+      <div class="bls-modal" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>确认是你本人吗?</h3>
+          <div class="lang-swap-block"><div class="bls-subtitle lang-en">Is this you?</div><div class="bls-subtitle lang-ar" dir="rtl">هل هذا أنت؟</div></div>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-field">
+            <label class="bls-label">姓名<span class="lang-swap"><span class="lang-en">Name</span><span class="lang-ar">الاسم</span></span></label>
+            <div class="bls-confirm-val">${esc(name)}</div>
+          </div>
+          <div class="bls-field">
+            <label class="bls-label">学号<span class="lang-swap"><span class="lang-en">Student ID</span><span class="lang-ar">رقم الطالب</span></span></label>
+            <div class="bls-confirm-val">${esc(sid)}</div>
+          </div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-secondary" id="bls-confirm-cancel">取消<span class="lang-swap"><span class="lang-en">Cancel</span><span class="lang-ar">إلغاء</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-confirm-ok">确定<span class="lang-swap"><span class="lang-en">OK</span><span class="lang-ar">تأكيد</span></span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    function close(){ if(ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+    document.getElementById('bls-confirm-ok').onclick = function(){ close(); if(onOk) onOk(); };
+    document.getElementById('bls-confirm-cancel').onclick = function(){ close(); if(onCancel) onCancel(); };
+    ov.addEventListener('click', function(e){ if(e.target === ov){ close(); if(onCancel) onCancel(); } });
+  }
+
   // ─── 加入班级弹窗 ──────────────────────────────────────────
   function openJoinDialog(){
     console.log('[BLS] 打开加入班级弹窗');
@@ -6352,12 +6388,15 @@ try{
 
   // ─── ★ 17: 确认是本人 → 正式加入(join,不传名字) ───────────
   function confirmIdentityAndJoin(classCode, sid, name, submitBtn, codeInput){
-    const ok = confirm('确认是你本人吗？\n姓名：' + name + '\n学号：' + sid + '\n\nIs this you?\nName: ' + name + '\nID: ' + sid);
-    if(!ok){
-      resetJoinForm(submitBtn, codeInput);   // 取消 → 恢复表单,可改学号
-      return;
-    }
-    if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '加入中... / Joining...'; }
+    // ★ 联动-160:原生 confirm 换成自定义居中弹窗(风格同加入班级、中上译下);点确定才真正 join
+    blsConfirmIdentity(name, sid, function(){            // 点「确定」
+      if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '加入中... / Joining...'; }
+      doJoin();
+    }, function(){                                       // 点「取消」→ 恢复表单,可改学号
+      resetJoinForm(submitBtn, codeInput);
+    });
+    return;
+    function doJoin(){
 
     fetch(BLS_API_BASE + '/student/join', {
       method: 'POST',
@@ -6396,6 +6435,7 @@ try{
       showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
       resetJoinForm(submitBtn, codeInput);
     });
+    }
   }
 
   // ─── 重置加入表单 (★17: 去掉 name) ─────────────────────────

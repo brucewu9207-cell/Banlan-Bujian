@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-165 (2026-06-28) — 桌面端错题本左栏各方框间隔统一为14px(左栏设gap+贴合内容,各方框清自带边距);手机端未动 -->
+<!-- 斑斓部件 · 部件联动-166 (2026-06-28) — 搜索模式(墨舟测试)练习页直接解开②拖拽③书写④例词全部锁,无需逐步完成;正常学生不受影响 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-165">
+<meta name="version" content="部件联动-166">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1538,7 +1538,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-165 ✦ 桌面端错题本左栏各方框间隔统一为14px(左栏设gap+贴合内容,各方框清自带边距);手机端未动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-166 ✦ 搜索模式(墨舟测试)练习页直接解开②拖拽③书写④例词全部锁,无需逐步完成;正常学生不受影响','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2972,6 +2972,15 @@ function loadCharacter(char){
   requestAnimationFrame(updateStructHeight);
   setTimeout(updateStructHeight, 200);
   wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
+  // ★ 联动-166:搜索模式(仅墨舟测试,teacherMode=true)→ 直接解开 ②③④ 全部锁,无需逐步完成;正常学生不受影响
+  if(state.teacherMode){
+    try{
+      unlockDragSection(char, data);   // 揭锁 ② 拖拽部件(含兜底渲染)
+      unlockWriting();                 // 揭锁 ③ 书写练习
+      showExampleWord(char);           // 揭锁 ④ 例词
+      wizUnlock(4);                    // 向导解锁到第 4 步
+    }catch(_e){ console.warn('[搜索模式全解锁] 失败', _e); }
+  }
 }
 
 function renderPinyinOptions(char,data){
@@ -5960,7 +5969,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-165';
+  const VERSION = '部件联动-166';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

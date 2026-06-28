@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-149 (2026-06-28) — 语言钮挪到整个表头之下(top 66到182)彻底不挡标题;手机端补齐:我的班级页班级/名字/学号译文移到中文下;错题本今天复习/复习全部按钮译文移到中文下;管理键译文移到中文下并推到行最右;间隔复习提示框整体缩小(1.2到0.82rem) -->
+<!-- 斑斓部件 · 部件联动-150 (2026-06-28) — 修大坑:语言钮的下移之前误写进桌面@media(min-width769)、手机端根本没生效——桌面还原top15、手机端@media里才下移到表头之下。本轮:学号行下面补虚线;我的名字标签与右侧值之间留距;今天复习/复习全部按钮压矮(减上下留白、中文不换行只占两行);管理键与错最多优先/拼音错部件错三项排同一行(不换行) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-149">
+<meta name="version" content="部件联动-150">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -984,16 +984,24 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-tip{font-size:1.2rem;color:rgba(255,255,255,0.85);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.16);border-radius:10px;padding:12px 18px;margin-bottom:16px;text-align:center;line-height:1.5}
 /* ★ 联动-149:手机端补齐「译文放中文下/管理键移右/间隔提示缩小」(原这些只桌面@media有) */
 @media(max-width:768px){
-  /* ② 我的班级 信息标签(班级/我的名字/学号):中文上·译文下 */
+  /* ★ 联动-150:手机端语言钮挪到整个表头之下(真·手机端,避开标题) */
+  .lang-switcher{top:182px!important}
+  /* 我的班级 信息标签(班级/我的名字/学号):中文上·译文下 */
   .bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}
   .bls-modal .bls-info-label .lang-swap{font-size:0.82em;opacity:0.78;font-weight:400}
-  /* ③ 今天复习/复习全部:中文上·译文下 */
-  .wb-screen .wb-review-btn{flex-direction:column;gap:2px}
-  .wb-screen .wb-btn-tr{font-size:0.82em;opacity:0.9;width:100%}
-  /* ④ 管理键:中文上·译文下 + 推到行最右 */
-  .wb-screen .wb-manage-btn{margin-left:auto;display:inline-flex;flex-direction:column;align-items:center;gap:1px}
+  /* ★ 联动-150:① 学号(最后一行)下面也加虚线;② 标签与右侧值之间留距 */
+  .bls-modal .bls-info-row:last-child{border-bottom:1px dashed rgba(255,255,255,0.55)}
+  .bls-modal .bls-info-row{gap:14px}
+  /* 今天复习/复习全部:中文上·译文下;★ 联动-150:压矮(减上下留白)、中文不换行→只占两行 */
+  .wb-screen .wb-review-btn{flex-direction:column;gap:1px;padding:8px 8px;font-size:0.95rem}
+  .wb-screen .wb-btn-zh{white-space:nowrap}
+  .wb-screen .wb-btn-tr{font-size:0.8em;opacity:0.9;width:100%}
+  /* ★ 联动-150:管理键与「错最多优先」「拼音错/部件错」同一行(三项一行不换行) */
+  .wb-screen .wb-tools{flex-wrap:nowrap;gap:6px;font-size:0.66rem;align-items:center}
+  .wb-screen .wb-legend{gap:8px}
+  .wb-screen .wb-manage-btn{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-size:0.66rem;padding:4px 8px}
   .wb-screen .wb-manage-tr{font-size:0.84em;opacity:0.9}
-  /* ⑤ 间隔复习提示框:整体缩小(中文+译文),不再占半个框 */
+  /* 间隔复习提示框:整体缩小(中文+译文) */
   .wb-screen .wb-tip{font-size:0.82rem;padding:10px 14px;line-height:1.4}
 }
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
@@ -1033,7 +1041,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* 部件联动-61:顶栏按钮(操作钮/药丸/语言切换)统一等高+垂直对齐 */
 .struct-action-btn,.gm-bar-pill,.lang-switcher{height:42px!important;align-items:center!important;box-sizing:border-box!important}
 .struct-action-btn svg{height:12px!important;width:auto!important;flex-shrink:0}
-.lang-switcher{top:182px!important}   /* ★ 联动-149:手机端语言钮挪到整个表头(标题2行+返回主页那排)之下,彻底不挡标题;表头本身不动 */
+.lang-switcher{top:15px!important}   /* ★ 联动-150:还原桌面端(148/149误把手机改动写到这个桌面@media里了);手机端的下移改到下面的 max-width:768 块 */
 }
 @media (min-width:769px){
 /* ③ 错题本页:左=控件,右=错字集字卡格 */
@@ -1491,7 +1499,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-149 ✦ 语言钮挪到整个表头之下(top 66到182)彻底不挡标题;手机端补齐:我的班级页班级/名字/学号译文移到中文下;错题本今天复习/复习全部按钮译文移到中文下;管理键译文移到中文下并推到行最右;间隔复习提示框整体缩小(1.2到0.82rem)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-150 ✦ 修大坑:语言钮的下移之前误写进桌面@media(min-width769)、手机端根本没生效——桌面还原top15、手机端@media里才下移到表头之下。本轮:学号行下面补虚线;我的名字标签与右侧值之间留距;今天复习/复习全部按钮压矮(减上下留白、中文不换行只占两行);管理键与错最多优先/拼音错部件错三项排同一行(不换行)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5913,7 +5921,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-149';
+  const VERSION = '部件联动-150';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

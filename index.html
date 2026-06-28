@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-160 (2026-06-28) — 确认本人弹窗由原生confirm改为自定义居中弹窗风格同加入班级中上译下；弹窗说明文字改回亮白 -->
+<!-- 斑斓部件 · 部件联动-161 (2026-06-28) — 确认本人弹窗Is this you副标题放大约1.5倍；姓名学号值移到标签盒右边 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-160">
+<meta name="version" content="部件联动-161">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1126,6 +1126,11 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* ★ 联动-159:浅底弹窗里说明/输入文字本是白色→在 #9caea3 浅底上发糊;改深墨绿提升对比(两端通用) */
 .bls-modal:has(.bls-field) .bls-hint{color:rgba(255,255,255,0.95)}   /* ★ 联动-160:说明文字改回白色但提亮(浅底上用亮白) */
 .bls-confirm-val{color:rgba(255,255,255,0.96);font-size:16px;font-weight:600;letter-spacing:.3px;padding:1px 2px 2px;word-break:break-word}   /* ★ 联动-160:确认本人弹窗的姓名/学号值 */
+/* ★ 联动-161:确认本人弹窗专属——副标题放大~1.5倍 + 姓名/学号值放标签盒右边 */
+.bls-modal.bls-confirm .bls-subtitle{font-size:21px!important}
+.bls-modal.bls-confirm .bls-field{display:flex;align-items:center;gap:14px}
+.bls-modal.bls-confirm .bls-label{margin-bottom:0}
+.bls-modal.bls-confirm .bls-confirm-val{padding:0}
 .bls-modal:has(.bls-field) .bls-input{color:#22382e;background:rgba(255,255,255,0.5);border-color:rgba(24,40,32,0.28)}
 .bls-modal:has(.bls-field) .bls-input::placeholder{color:rgba(24,40,32,0.5)}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
@@ -1531,7 +1536,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-160 ✦ 确认本人弹窗由原生confirm改为自定义居中弹窗风格同加入班级中上译下；弹窗说明文字改回亮白','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-161 ✦ 确认本人弹窗Is this you副标题放大约1.5倍；姓名学号值移到标签盒右边','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5953,7 +5958,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-160';
+  const VERSION = '部件联动-161';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6167,7 +6172,7 @@ try{
     ov.className = 'bls-overlay bls-show';
     ov.id = 'bls-confirm-overlay';
     ov.innerHTML = `
-      <div class="bls-modal" role="dialog" aria-modal="true">
+      <div class="bls-modal bls-confirm" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
           <h3>确认是你本人吗?</h3>
           <div class="lang-swap-block"><div class="bls-subtitle lang-en">Is this you?</div><div class="bls-subtitle lang-ar" dir="rtl">هل هذا أنت؟</div></div>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-164 (2026-06-28) — 桌面端错题本复习两钮排到左栏方框底部(order+margin-top auto);手机端未动 -->
+<!-- 斑斓部件 · 部件联动-165 (2026-06-28) — 桌面端错题本左栏各方框间隔统一为14px(左栏设gap+贴合内容,各方框清自带边距);手机端未动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-164">
+<meta name="version" content="部件联动-165">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1063,9 +1063,10 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* 部件联动-66:选择器收紧为 #wrongbook-screen[style*="block"],避免主页时 display:grid!important 顶掉 inline display:none、导致两个大方框漏出 */
 #wrongbook-screen[style*="block"]{display:grid!important;grid-template-columns:576px 1fr;gap:18px;align-items:stretch;max-width:none;margin:0;padding:16px 8px}
 .wb-screen .wb-col-left,.wb-screen .wb-col-right{display:flex!important;flex-direction:column;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:16px;padding:16px}
-.wb-screen .wb-head{margin:0 auto 14px;width:259px;box-sizing:border-box}
+.wb-screen .wb-col-left{gap:14px;align-self:start}   /* ★ 联动-165:左栏方框间隔统一14px+贴合内容(不被卡片列拉高) */
+.wb-screen .wb-head{margin:0 auto;width:259px;box-sizing:border-box}   /* ★ 联动-165:去底边距,改用 gap 统一间隔 */
 /* 部件联动-69:复习两钮缩小并排同一行 */
-.wb-screen #wb-review-row{order:99;margin-top:auto;margin-bottom:0;flex-direction:row;flex-wrap:nowrap}   /* ★ 联动-164:桌面端复习两钮排到左栏方框底部(order+margin-top:auto);手机端不受影响 */
+.wb-screen #wb-review-row{order:99;margin:0;flex-direction:row;flex-wrap:nowrap}   /* ★ 联动-164/165:桌面端复习两钮排左栏底部(order);间隔交给 gp 统一 */
 .wb-screen .wb-review-btn{flex:1;width:auto;flex-direction:column;align-items:center;gap:2px;padding:8px 10px;font-size:1.2rem}   /* 部件联动-81:字号参考图2提示框 1.2rem */
 .wb-screen .wb-btn-tr{font-size:0.82em;opacity:0.9;width:100%}   /* 部件联动-81:译文参考提示框 0.82em */
 .wb-screen #wb-tip{margin-bottom:0}
@@ -1074,7 +1075,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .wb-screen .wb-py{font-size:1.105rem}      /* 部件联动-73:0.85 × 1.3 */
 .wb-screen .wb-due-badge{font-size:0.78rem;top:-10px} /* 部件联动-73:0.6×1.3;-80:稍上移避开笔画 */
 .wb-screen .wb-dots{top:0}   /* 部件联动-80:圆点上移到卡片上沿、抬离笔画(仍在卡片内) */
-.wb-screen .wb-tools{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:4px 20px;font-size:0.95rem}
+.wb-screen .wb-tools{flex-direction:row;flex-wrap:wrap;align-items:flex-start;justify-content:flex-start;gap:4px 20px;font-size:0.95rem;margin:0}   /* ★ 联动-165:清自带底边距,改用左栏 gap 统一间隔 */
 .wb-screen .wb-sort{display:inline-flex;flex-direction:row;align-items:flex-start;gap:5px}
 .wb-screen .wb-legend{display:inline-flex;flex-direction:row;gap:20px;align-items:flex-start}
 .wb-screen .wb-legend-item{display:inline-flex;flex-direction:row;align-items:flex-start;column-gap:5px}
@@ -1537,7 +1538,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-164 ✦ 桌面端错题本复习两钮排到左栏方框底部(order+margin-top auto);手机端未动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-165 ✦ 桌面端错题本左栏各方框间隔统一为14px(左栏设gap+贴合内容,各方框清自带边距);手机端未动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5959,7 +5960,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-164';
+  const VERSION = '部件联动-165';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

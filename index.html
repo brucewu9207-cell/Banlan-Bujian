@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-145 (2026-06-28) — 练习页提速:①选对拼音后写死的最短等待大幅缩短(合体字 min 600到250ms、兜底 2500到1500ms;独体字 600到250ms)→下一步和部件出现更快;②加部件SVG渲染缓存(同部件/同参数克隆秒返,免重复loadStrokeData和离屏getBBox重排),常用偏旁/回看的字提速 -->
+<!-- 斑斓部件 · 部件联动-146 (2026-06-28) — Step2拖拽区整体放大(手机端):顶部拖拽区竖向占更多(drag-split-box flex 0 0 auto到1.2)、目标格区加宽(drag-left flex到1.8)→米字格更大、结果完整汉字放大(5到6.2rem);下面6个部件的上下留白随之变小 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-145">
+<meta name="version" content="部件联动-146">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -701,7 +701,9 @@ body::after{
   }
   /* 拖拽方框居中、限宽，避免在平板上铺太大；同时是个大号触摸目标 */
   .drag-canvas{max-width:420px;margin:0 auto;width:100%}
-  .drag-split-box{flex:0 0 auto}
+  .drag-split-box{flex:1.2;min-height:0}   /* ★ 联动-146:顶部拖拽区占更多竖向空间→下面部件上下留白变小 */
+  .drag-left{flex:1.8}   /* ★ 联动-146:目标格区加宽→米字格(拖拽区)更大 */
+  .drag-right .result-char{font-size:calc(6.2rem*var(--ui-scale))}   /* ★ 联动-146:结果完整汉字放大 5→6.2rem */
   /* 部件卡片：保证触摸目标足够大、间距更舒展 */
   .comp-options{gap:12px;flex:0 0 auto;grid-template-rows:repeat(2,96px)}   /* ★ 联动-142:部件框压矮(原flex:1撑满→固定96px行高) */
   .components-pool{justify-content:center}   /* 部件池在剩余空间垂直居中,避免底部空一大块 */
@@ -1474,7 +1476,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-145 ✦ 练习页提速:①选对拼音后写死的最短等待大幅缩短(合体字 min 600到250ms、兜底 2500到1500ms;独体字 600到250ms)→下一步和部件出现更快;②加部件SVG渲染缓存(同部件/同参数克隆秒返,免重复loadStrokeData和离屏getBBox重排),常用偏旁/回看的字提速','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-146 ✦ Step2拖拽区整体放大(手机端):顶部拖拽区竖向占更多(drag-split-box flex 0 0 auto到1.2)、目标格区加宽(drag-left flex到1.8)→米字格更大、结果完整汉字放大(5到6.2rem);下面6个部件的上下留白随之变小','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5896,7 +5898,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-145';
+  const VERSION = '部件联动-146';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

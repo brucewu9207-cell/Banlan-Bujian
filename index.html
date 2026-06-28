@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-150 (2026-06-28) — 修大坑:语言钮的下移之前误写进桌面@media(min-width769)、手机端根本没生效——桌面还原top15、手机端@media里才下移到表头之下。本轮:学号行下面补虚线;我的名字标签与右侧值之间留距;今天复习/复习全部按钮压矮(减上下留白、中文不换行只占两行);管理键与错最多优先/拼音错部件错三项排同一行(不换行) -->
+<!-- 斑斓部件 · 部件联动-152 (2026-06-28) — 错题本改成独立整屏浮层(手机端,像汉字基本结构):点错题本→position fixed占满全屏、盖住共用顶栏、顶部带专门返回主页按钮(走navBack回主页);桌面端2栏布局不变 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-150">
+<meta name="version" content="部件联动-152">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -943,6 +943,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-home-card:hover{background:rgba(181,118,58,0.96);border-color:rgba(255,250,235,0.65)}  /* hover 稍亮,保留上浮/投影 */
 .wb-home-card .home-entry-icon{color:var(--vermillion)}
 .wb-screen{max-width:680px;margin:0 auto;padding:18px 14px;color:#fff}
+.wb-fs-bar{display:none}   /* ★ 联动-152:错题本整屏顶栏默认隐藏(桌面端不需要) */
 .wb-head{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;width:fit-content;max-width:100%;margin:0 auto 16px;background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.3);border-radius:12px;padding:10px 22px}
 .wb-title-wrap{display:flex;align-items:center;gap:12px}
 .wb-title-icon{font-size:2rem;line-height:1}
@@ -984,8 +985,13 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .wb-tip{font-size:1.2rem;color:rgba(255,255,255,0.85);background:rgba(20,40,30,0.45);border:1px solid rgba(255,255,255,0.16);border-radius:10px;padding:12px 18px;margin-bottom:16px;text-align:center;line-height:1.5}
 /* ★ 联动-149:手机端补齐「译文放中文下/管理键移右/间隔提示缩小」(原这些只桌面@media有) */
 @media(max-width:768px){
-  /* ★ 联动-150:手机端语言钮挪到整个表头之下(真·手机端,避开标题) */
-  .lang-switcher{top:182px!important}
+  /* ★ 联动-152:错题本改独立整屏浮层(像汉字基本结构),顶部带返回主页;盖住共用顶栏 */
+  #wrongbook-screen[style*="block"]{position:fixed!important;inset:0;z-index:9000;background:var(--bg-main);overflow-y:auto;max-width:none!important;margin:0!important;padding:0 14px 24px!important}
+  .wb-fs-bar{display:flex;align-items:center;position:sticky;top:0;z-index:3;margin:0 -14px;background:var(--bg-main);padding:10px 14px;border-bottom:2px solid rgba(20,40,30,0.18)}   /* 负边距→顶栏铺满全宽,内容仍留14px边距 */
+  .wb-fs-back{display:flex;flex-direction:column;align-items:center;line-height:1.15;background:var(--bamboo);color:#fff;border:1px solid rgba(255,255,255,0.3);border-radius:9px;padding:6px 14px;font-family:inherit;font-size:0.9rem;font-weight:700;cursor:pointer;white-space:nowrap}
+  .wb-fs-back .fs-tr{font-size:0.64em;font-weight:400;opacity:0.85;margin-top:1px}
+  /* ★ 联动-151:语言钮缩小、放回表头右侧「BRILLIANT COMPONENTS」与「BASED ON HSK 3.0」之间的空隙 */
+  .lang-switcher{top:72px!important;right:12px;transform:scale(0.68);transform-origin:top right}
   /* 我的班级 信息标签(班级/我的名字/学号):中文上·译文下 */
   .bls-modal .bls-info-label{display:flex!important;flex-direction:column;align-items:flex-start;gap:1px}
   .bls-modal .bls-info-label .lang-swap{font-size:0.82em;opacity:0.78;font-weight:400}
@@ -993,7 +999,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .bls-modal .bls-info-row:last-child{border-bottom:1px dashed rgba(255,255,255,0.55)}
   .bls-modal .bls-info-row{gap:14px}
   /* 今天复习/复习全部:中文上·译文下;★ 联动-150:压矮(减上下留白)、中文不换行→只占两行 */
-  .wb-screen .wb-review-btn{flex-direction:column;gap:1px;padding:8px 8px;font-size:0.95rem}
+  .wb-screen .wb-review-btn{flex-direction:column;gap:0;padding:4px 8px;font-size:0.95rem}   /* ★ 联动-151:再压矮(padding 8→4、gap 0) */
   .wb-screen .wb-btn-zh{white-space:nowrap}
   .wb-screen .wb-btn-tr{font-size:0.8em;opacity:0.9;width:100%}
   /* ★ 联动-150:管理键与「错最多优先」「拼音错/部件错」同一行(三项一行不换行) */
@@ -1002,7 +1008,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .wb-screen .wb-manage-btn{flex-shrink:0;display:inline-flex;flex-direction:column;align-items:center;gap:1px;font-size:0.66rem;padding:4px 8px}
   .wb-screen .wb-manage-tr{font-size:0.84em;opacity:0.9}
   /* 间隔复习提示框:整体缩小(中文+译文) */
-  .wb-screen .wb-tip{font-size:0.82rem;padding:10px 14px;line-height:1.4}
+  .wb-screen .wb-tip{font-size:0.82rem;padding:10px 14px;line-height:1.5;text-align:left}   /* ★ 联动-151:中文乱→改左对齐 */
 }
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
 @media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
@@ -1354,6 +1360,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     </div>
 
     <div id="wrongbook-screen" class="wb-screen" style="display:none">
+      <!-- ★ 联动-152:错题本整屏页顶栏(返回主页);桌面端 display:none 不显示 -->
+      <div class="wb-fs-bar"><button class="wb-fs-back" onclick="event.stopPropagation();navBack()"><span class="fs-zh">‹ 返回主页</span><span class="lang-swap fs-tr"><span class="lang-en">Home</span><span class="lang-ar">الرئيسية</span></span></button></div>
       <div class="wb-col-left">
       <div class="wb-head">
         <div class="wb-title-wrap">
@@ -1499,7 +1507,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-150 ✦ 修大坑:语言钮的下移之前误写进桌面@media(min-width769)、手机端根本没生效——桌面还原top15、手机端@media里才下移到表头之下。本轮:学号行下面补虚线;我的名字标签与右侧值之间留距;今天复习/复习全部按钮压矮(减上下留白、中文不换行只占两行);管理键与错最多优先/拼音错部件错三项排同一行(不换行)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-152 ✦ 错题本改成独立整屏浮层(手机端,像汉字基本结构):点错题本→position fixed占满全屏、盖住共用顶栏、顶部带专门返回主页按钮(走navBack回主页);桌面端2栏布局不变','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5921,7 +5929,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-150';
+  const VERSION = '部件联动-152';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

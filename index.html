@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-146 (2026-06-28) — Step2拖拽区整体放大(手机端):顶部拖拽区竖向占更多(drag-split-box flex 0 0 auto到1.2)、目标格区加宽(drag-left flex到1.8)→米字格更大、结果完整汉字放大(5到6.2rem);下面6个部件的上下留白随之变小 -->
+<!-- 斑斓部件 · 部件联动-147 (2026-06-28) — Step1拼音框高度放大约1.5倍(竖向padding 2到9px);手机端表头整体右留位避开右上角语言切换钮(标题不再被遮);我的班级页去掉基本信息标题 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-146">
+<meta name="version" content="部件联动-147">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -885,7 +885,8 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard > .char-panel{padding-bottom:calc(6px*var(--ui-scale)) !important}   /* ★ ② 收窄面板底部留白，让 Skip / 释义框更贴近灰框下边 */
   /* 死高度元素缩一号，帮助一屏收敛 */
   #skip-btn{font-size:calc(1.05rem*var(--ui-scale)) !important;padding:calc(8px*var(--ui-scale)) 18px !important;margin-top:calc(8px*var(--ui-scale)) !important}   /* ★ 改为跟随缩放：不再因固定尺寸被挤出底边裁切 */
-  .pinyin-btn{font-size:calc(1.25rem*var(--ui-scale)) !important;padding:calc(2px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ v37：在原 1.14rem 基础上再放大到 1.1 倍（→1.25rem） */
+  .pinyin-btn{font-size:calc(1.25rem*var(--ui-scale)) !important;padding:calc(9px*var(--ui-scale)) 10px !important;line-height:1.15 !important}   /* ★ v37:字号；联动-147:竖向padding 2→9px,框高×1.5 */
+  .struct-bar-title{padding-right:96px}   /* ★ 联动-147:表头整体右留位→标题不被右上角语言切换钮遮住(手机端) */
   .pinyin-options{gap:calc(4px*var(--ui-scale)) !important;margin-bottom:calc(4px*var(--ui-scale)) !important}   /* ★ 两行拼音间距与下方留白再收紧 */
   /* ★ ①拼音控制区：HSK徽章 / 播放 / 下一笔 三个缩小后挤进一行 */
   .stroke-controls{flex-wrap:nowrap !important;gap:6px}
@@ -1476,7 +1477,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-146 ✦ Step2拖拽区整体放大(手机端):顶部拖拽区竖向占更多(drag-split-box flex 0 0 auto到1.2)、目标格区加宽(drag-left flex到1.8)→米字格更大、结果完整汉字放大(5到6.2rem);下面6个部件的上下留白随之变小','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-147 ✦ Step1拼音框高度放大约1.5倍(竖向padding 2到9px);手机端表头整体右留位避开右上角语言切换钮(标题不再被遮);我的班级页去掉基本信息标题','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5898,7 +5899,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-146';
+  const VERSION = '部件联动-147';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6365,7 +6366,7 @@ try{
           <button class="bls-close" id="bls-info-close" aria-label="关闭">×</button>
         </div>
         <div class="bls-modal-body">
-          <div class="bls-col bls-col-info"><div class="bls-col-h">基本信息<span class="lang-en">Info</span><span class="lang-ar" dir="rtl">معلومات</span></div>
+          <div class="bls-col bls-col-info"><!-- 联动-147:去掉「基本信息」标题 -->
           <div class="bls-info-row">
             <span class="bls-info-label">班级<span class="lang-swap"><span class="lang-en">Class</span><span class="lang-ar" dir="rtl">الصف</span></span></span>
             <span class="bls-info-value bls-code">${escapeHtml(state.classCode)}</span>

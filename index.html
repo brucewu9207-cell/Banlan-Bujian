@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-172 (2026-06-28) — 真修班级任务误解锁(根因:班级inTaskMode在BLS自己的state上,改查body的bls-in-task-mode类);下一个字按钮收回过大间距+缩例词框防挤出;练习面板上移(顶留白28→14);重写阿语span补dir=rtl修斜杠错位 -->
+<!-- 斑斓部件 · 部件联动-173 (2026-06-28) — 重写阿语斜杠改用bdi隔离(去掉dir=rtl,让阿语词隔离、斜杠归位成 重写/إعادة 同英文);练习面板顶部留白再缩14→6继续上移 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-172">
+<meta name="version" content="部件联动-173">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -49,7 +49,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .mode-tab{padding:8px 20px;border:none;border-radius:7px;cursor:pointer;font-family:inherit;font-size:0.85rem;transition:all .25s;color:var(--ink-mid);background:transparent}
 .mode-tab.active{background:var(--bamboo);color:var(--paper);box-shadow:0 2px 8px rgba(181,118,58,0.4)}
 .mode-tab:hover:not(.active){background:rgba(181,118,58,0.15)}
-.main-content{position:relative;z-index:1;padding:14px 32px 28px;margin:0 auto;min-height:calc(100vh - 45px)}   /* ★ 172:顶部留白28→14,练习①②③④面板上移靠近结构条 */
+.main-content{position:relative;z-index:1;padding:6px 32px 28px;margin:0 auto;min-height:calc(100vh - 45px)}   /* ★ 172/173:顶部留白28→6,练习①②③④面板再上移靠近结构条 */
 .card{background:#c4c4c4;border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid rgba(120,120,120,0.5);backdrop-filter:blur(4px);color:#ffffff}
 /* 部件联动-73:练习页 4 张 step 面板改墨绿半透明,与错题卡背景一致(只命中 practice-layout 内的 card,不动 level-select 等) */
 .practice-layout .card{background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2)}
@@ -1488,7 +1488,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
               <div id="write-target" oncontextmenu="return false"></div>
               <div id="write-check" class="write-check">✓</div>
             </div>
-            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写<span class="lang-swap"><span class="lang-en"> / Redo</span><span class="lang-ar" dir="rtl"> / إعادة</span></span></button>
+            <button class="write-reset-btn" id="write-reset-btn" onclick="startWritingQuiz()" style="display:none">↺ 重写<span class="lang-swap"><span class="lang-en"> / Redo</span><span class="lang-ar"> / <bdi>إعادة</bdi></span></span></button>
           </div>
           <!-- 下方框：例词（选对拼音后出现） -->
           <div class="card word-box">
@@ -1539,7 +1539,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-172 ✦ 真修班级任务误解锁(根因:班级inTaskMode在BLS自己的state上,改查body的bls-in-task-mode类);下一个字按钮收回过大间距+缩例词框防挤出;练习面板上移(顶留白28→14);重写阿语span补dir=rtl修斜杠错位','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-173 ✦ 重写阿语斜杠改用bdi隔离(去掉dir=rtl,让阿语词隔离、斜杠归位成 重写/إعادة 同英文);练习面板顶部留白再缩14→6继续上移','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5970,7 +5970,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-172';
+  const VERSION = '部件联动-173';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

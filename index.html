@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-157 (2026-06-28) — 手机端加入班级弹窗也中上译下并隐藏斜杠分隔符；主屏标签默认全名斑斓部件HSK3.0 -->
+<!-- 斑斓部件 · 部件联动-158 (2026-06-28) — 加入班级弹窗底色再换浅一档#8a9d92→#9caea3；学号说明的字符集括号另起一行 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-157">
+<meta name="version" content="部件联动-158">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1526,7 +1526,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-157 ✦ 手机端加入班级弹窗也中上译下并隐藏斜杠分隔符；主屏标签默认全名斑斓部件HSK3.0','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-158 ✦ 加入班级弹窗底色再换浅一档#8a9d92→#9caea3；学号说明的字符集括号另起一行','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5948,7 +5948,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-157';
+  const VERSION = '部件联动-158';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6029,7 +6029,7 @@ try{
       @keyframes bls-fade-in{from{opacity:0}to{opacity:1}}
 
       /* 弹窗主体 - 白底,跟老师端 .bl-modal 一脉相承 */
-      .bls-modal{background:#8a9d92;border-radius:10px;   /* ★ 联动-148:我的班级弹窗底色 #677a70→#8a9d92 换浅一点的墨绿 */border:1px solid rgba(255,255,255,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.4);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
+      .bls-modal{background:#9caea3;border-radius:10px;   /* ★ 联动-158:弹窗底色再换浅一档 #8a9d92→#9caea3(原148:#677a70→#8a9d92);白字仍可读 */border:1px solid rgba(255,255,255,0.2);box-shadow:0 24px 60px rgba(0,0,0,0.4);width:100%;max-width:420px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;animation:bls-slide-in .22s cubic-bezier(.2,.8,.3,1)}
       @keyframes bls-slide-in{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:none}}
       /* 顶部装饰条 - 深墨绿 */
       .bls-modal::before{content:'';position:absolute;top:0;left:24px;right:24px;height:3px;background:var(--bamboo);border-radius:0 0 4px 4px;opacity:.95}
@@ -6178,7 +6178,7 @@ try{
               学号<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Student ID</span><span class="lang-ar"><i class="bls-sep"> / </i>رقم الطالب</span></span> <span class="bls-required">*</span>
             </label>
             <input type="text" id="bls-join-sid" class="bls-input" placeholder="如：2024001、S01、stu_li" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false">
-            <div class="bls-hint"><span class="bls-hint-zh">每人唯一，用于区分同名同学</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>Unique ID, distinguishes same-name students (A-Z, 0-9, -, _)</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>مُعرّف فريد لتمييز الطلاب المتشابهين بالاسم</span></span></div>
+            <div class="bls-hint"><span class="bls-hint-zh">每人唯一，用于区分同名同学</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>Unique ID, distinguishes same-name students<br>(A-Z, 0-9, -, _)</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>مُعرّف فريد لتمييز الطلاب المتشابهين بالاسم</span></span></div>
           </div>
           <div class="bls-error" id="bls-join-error"></div>
         </div>

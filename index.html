@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-156 (2026-06-28) — 错题本整屏页顶栏的错题本标题宽度改按内容(原flex:1太宽)、居中,与返回主页同行同高不变 -->
+<!-- 斑斓部件 · 部件联动-157 (2026-06-28) — 手机端加入班级弹窗也中上译下并隐藏斜杠分隔符；主屏标签默认全名斑斓部件HSK3.0 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-156">
+<meta name="version" content="部件联动-157">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="斑斓部件">
+<meta name="apple-mobile-web-app-title" content="斑斓部件HSK3.0">
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
@@ -1112,6 +1112,17 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .bls-modal:has(.bls-field) .bls-btn .lang-swap{width:100%;text-align:center}
 .bls-modal:has(.bls-field) .bls-btn .lang-swap>span{display:block;width:100%;text-align:center}
 }
+/* ★ 联动-157:手机端「加入班级」弹窗也中上译下 + 删「/」(原仅桌面@media有,手机仍并排带斜杠) */
+@media(max-width:768px){
+  .bls-modal:has(.bls-field) .bls-sep{display:none}
+  .bls-modal:has(.bls-field) .bls-label{display:flex;flex-wrap:wrap;align-items:baseline}
+  .bls-modal:has(.bls-field) .bls-label .lang-swap{flex-basis:100%;width:100%;order:1;font-weight:400;opacity:.85}
+  .bls-modal:has(.bls-field) .bls-label .lang-swap>span{display:block;width:100%}
+  .bls-modal:has(.bls-field) .bls-hint{display:flex;flex-direction:column;gap:1px}
+  .bls-modal:has(.bls-field) .bls-btn{display:flex;flex-direction:column;align-items:center;line-height:1.18;gap:1px}
+  .bls-modal:has(.bls-field) .bls-btn .lang-swap{width:100%;text-align:center}
+  .bls-modal:has(.bls-field) .bls-btn .lang-swap>span{display:block;width:100%;text-align:center}
+}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
 @media print{.lang-switcher{display:none !important}}
@@ -1515,7 +1526,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-156 ✦ 错题本整屏页顶栏的错题本标题宽度改按内容(原flex:1太宽)、居中,与返回主页同行同高不变','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-157 ✦ 手机端加入班级弹窗也中上译下并隐藏斜杠分隔符；主屏标签默认全名斑斓部件HSK3.0','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5937,7 +5948,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-156';
+  const VERSION = '部件联动-157';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

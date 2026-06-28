@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-158 (2026-06-28) — 加入班级弹窗底色再换浅一档#8a9d92→#9caea3；学号说明的字符集括号另起一行 -->
+<!-- 斑斓部件 · 部件联动-159 (2026-06-28) — 班级码学号标签盒两端加盒换中浅墨绿#55706a；弹窗说明输入文字改深提升对比；错误框加深红底白字 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-158">
+<meta name="version" content="部件联动-159">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1098,7 +1098,7 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .bls-modal:has(.bls-tasks-section) .bls-subtitle{font-size:13.2px!important}
 /* 加入班级弹窗:缩到0.6倍 + 标签中上译下 + 副标题×1.3(仅桌面) */
 .bls-modal:has(.bls-field){max-width:680px!important}
-.bls-modal:has(.bls-field) .bls-label{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:baseline;background:#374a42;color:#fff;border-radius:4px;padding:6px 13px;box-shadow:0 3px 8px rgba(55,74,66,0.12);width:fit-content;font-weight:600;letter-spacing:.5px;font-size:18.2px;line-height:1.15;row-gap:1px;margin-bottom:8px}
+.bls-modal:has(.bls-field) .bls-label{display:flex!important;flex-wrap:wrap;justify-content:center;align-items:baseline;background:#55706a;color:#fff;border-radius:4px;padding:6px 13px;box-shadow:0 3px 8px rgba(55,74,66,0.12);width:fit-content;font-weight:600;letter-spacing:.5px;font-size:18.2px;line-height:1.15;row-gap:1px;margin-bottom:8px}
 .bls-modal:has(.bls-field) .bls-label .lang-swap{flex-basis:100%;width:100%;order:1;font-size:14px;text-align:center;opacity:.9;font-weight:400}
 .bls-modal:has(.bls-field) .bls-label .lang-swap>span{display:block;width:100%;text-align:center}
 .bls-modal:has(.bls-field) .bls-label .bls-required{color:#ffd2c6}
@@ -1115,14 +1115,18 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 /* ★ 联动-157:手机端「加入班级」弹窗也中上译下 + 删「/」(原仅桌面@media有,手机仍并排带斜杠) */
 @media(max-width:768px){
   .bls-modal:has(.bls-field) .bls-sep{display:none}
-  .bls-modal:has(.bls-field) .bls-label{display:flex;flex-wrap:wrap;align-items:baseline}
-  .bls-modal:has(.bls-field) .bls-label .lang-swap{flex-basis:100%;width:100%;order:1;font-weight:400;opacity:.85}
+  .bls-modal:has(.bls-field) .bls-label{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;background:#55706a;color:#fff;border-radius:4px;padding:6px 13px;box-shadow:0 3px 8px rgba(55,74,66,0.12);width:fit-content;font-weight:600;margin-bottom:8px}
+  .bls-modal:has(.bls-field) .bls-label .lang-swap{flex-basis:100%;width:100%;order:1;font-weight:400;opacity:.9;text-align:center}
   .bls-modal:has(.bls-field) .bls-label .lang-swap>span{display:block;width:100%}
   .bls-modal:has(.bls-field) .bls-hint{display:flex;flex-direction:column;gap:1px}
   .bls-modal:has(.bls-field) .bls-btn{display:flex;flex-direction:column;align-items:center;line-height:1.18;gap:1px}
   .bls-modal:has(.bls-field) .bls-btn .lang-swap{width:100%;text-align:center}
   .bls-modal:has(.bls-field) .bls-btn .lang-swap>span{display:block;width:100%;text-align:center}
 }
+/* ★ 联动-159:浅底弹窗里说明/输入文字本是白色→在 #9caea3 浅底上发糊;改深墨绿提升对比(两端通用) */
+.bls-modal:has(.bls-field) .bls-hint{color:rgba(24,40,32,0.82)}
+.bls-modal:has(.bls-field) .bls-input{color:#22382e;background:rgba(255,255,255,0.5);border-color:rgba(24,40,32,0.28)}
+.bls-modal:has(.bls-field) .bls-input::placeholder{color:rgba(24,40,32,0.5)}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
 @media print{.lang-switcher{display:none !important}}
@@ -1526,7 +1530,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-158 ✦ 加入班级弹窗底色再换浅一档#8a9d92→#9caea3；学号说明的字符集括号另起一行','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-159 ✦ 班级码学号标签盒两端加盒换中浅墨绿#55706a；弹窗说明输入文字改深提升对比；错误框加深红底白字','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5948,7 +5952,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-158';
+  const VERSION = '部件联动-159';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6055,7 +6059,7 @@ try{
       .bls-hint{font-size:11.5px;color:rgba(255,255,255,0.6);margin-top:5px;line-height:1.5;letter-spacing:.2px}
 
       /* 错误提示 - 朱砂红(深底提亮) */
-      .bls-error{font-size:13px;color:#e8917a;margin-top:8px;padding:8px 12px;background:rgba(200,75,47,0.18);border-left:3px solid #c84b2f;border-radius:4px;line-height:1.5;display:none}
+      .bls-error{font-size:13px;color:#fff;margin-top:8px;padding:8px 12px;background:rgba(180,50,30,0.55);border-left:3px solid #8a2418;border-radius:4px;line-height:1.5;display:none}
       .bls-error.bls-show{display:block;animation:bls-fade-in .18s ease}
 
       /* 底部按钮区 */

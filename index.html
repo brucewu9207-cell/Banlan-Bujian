@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-143 (2026-06-28) — 自学模式9个HSK等级框放大1.3倍(min-height78到101px、字号同步放大、锁头放大);三张主卡宽度再收窄210到175px。均手机端 -->
+<!-- 斑斓部件 · 部件联动-144 (2026-06-28) — HSK等级框下方字数(246字/chars)压成一行(nowrap+略缩字号0.72rem,手机端);主页飘字部件加多(手机端pairCountMb 10到18、桌面pairCount 34到42,卡片收窄后空间更大) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-143">
+<meta name="version" content="部件联动-144">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -435,7 +435,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .level-btn .level-num{font-size:1.5rem;white-space:nowrap}    /* ★ 联动-143:HSK框×1.3 — 1.15→1.5rem */
   .level-btn{padding:18px 10px;min-height:101px}    /* ★ 联动-143:×1.3 — 78→101px */
   .level-btn .level-label{font-size:0.86rem}        /* ★ 联动-143:0.66→0.86rem */
-  .level-btn .level-count{font-size:0.81rem}        /* ★ 联动-143:0.62→0.81rem */
+  .level-btn .level-count{font-size:0.72rem;white-space:nowrap}   /* ★ 联动-143:0.62→0.81;联动-144:压一行(nowrap+略缩到0.72) */
   /* ★ v94:手机端锁头跟随大字号 */
   .level-btn .level-lock{font-size:1.56rem;margin-top:10px}   /* ★ 联动-143:1.2→1.56rem */
 }
@@ -1474,7 +1474,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-143 ✦ 自学模式9个HSK等级框放大1.3倍(min-height78到101px、字号同步放大、锁头放大);三张主卡宽度再收窄210到175px。均手机端','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-144 ✦ HSK等级框下方字数(246字/chars)压成一行(nowrap+略缩字号0.72rem,手机端);主页飘字部件加多(手机端pairCountMb 10到18、桌面pairCount 34到42,卡片收窄后空间更大)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4950,8 +4950,8 @@ function showToast(msg,type=''){
 //      12-15%透明度 + 三边环绕 + 悬停合体（B方案：邻居聚合）
 // ══════════════════════════════════════════════════════════════
 const DECO_CFG = {
-  pairCount:   34,    // v74：从 30 增到 34,补偿去掉笔画装饰后的密度
-  pairCountMb: 10,    // ★ v85:从 16 降到 10 — 手机端可用区小,过多必失败,降数提高成功率
+  pairCount:   42,    // v74:30→34;联动-144:34→42 主页飘字加多
+  pairCountMb: 18,    // ★ v85:16→10;联动-144:10→18 加多(卡片收窄后空间更大,失败概率降低)
   loneStroke:   0,    // v74：去掉单笔画装饰（不参与合体,纯装饰太被动）
   loneStrokeMb: 0,    // 同上
   baseOpacity: 1.0,   // 不透明（v67修订②：用户反馈"颜色太浅,不做透明了"）
@@ -5892,7 +5892,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-143';
+  const VERSION = '部件联动-144';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

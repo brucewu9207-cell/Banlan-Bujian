@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-162 (2026-06-28) — 手机端错题本复习两钮挪到卡片下方(order)；顶栏加底边距与内容拉开;桌面端未动 -->
+<!-- 斑斓部件 · 部件联动-163 (2026-06-28) — 手机端错题本顶栏标题贴到返回主页旁(去居中)；复习两钮改fixed钉屏幕底部+底留白加大;桌面端未动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-162">
+<meta name="version" content="部件联动-163">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -988,11 +988,11 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* ★ 联动-152:错题本改独立整屏浮层(像汉字基本结构),顶部带返回主页;盖住共用顶栏 */
   /* ★ 联动-154:错题本打开时把 .main-content(z-index:1)抬到表头(z-index:9)之上→整屏浮层才能盖住「斑斓部件」标题(根治层叠上下文坑) */
   .main-content:has(#wrongbook-screen[style*="block"]){z-index:9001!important}
-  #wrongbook-screen[style*="block"]{position:fixed!important;inset:0;display:flex!important;flex-direction:column;z-index:9000;background:var(--bg-main);overflow-y:auto;max-width:none!important;margin:0!important;padding:0 14px 24px!important}
+  #wrongbook-screen[style*="block"]{position:fixed!important;inset:0;display:flex!important;flex-direction:column;z-index:9000;background:var(--bg-main);overflow-y:auto;max-width:none!important;margin:0!important;padding:0 14px 100px!important}   /* ★ 联动-163:底部留白加大→卡片能滚到固定复习栏上方 */
   .wb-fs-bar{display:flex;align-items:stretch;gap:10px;position:sticky;top:0;z-index:3;margin:0 -14px 18px;background:var(--bg-main);padding:10px 14px;border-bottom:2px solid rgba(20,40,30,0.18)}   /* 负边距铺满;align-items:stretch→返回主页与错题本标题等高;★联动-162:加底边距与内容拉开 */
   .wb-screen .wb-head{display:none}   /* ★ 联动-155:大标题卡挪进顶栏→隐藏原大卡 */
-  .wb-screen #wb-review-row{order:99;margin:14px 0 0}   /* ★ 联动-162:手机端复习两钮挪到卡片下方(order)+与卡片拉开;桌面不受影响 */
-  .wb-fs-title{flex:0 1 auto;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:9px;color:#fff;padding:4px 14px}   /* 错题本标题:与返回主页同行同高;★ 联动-156:宽度改按内容(原 flex:1 太宽)、居中 */
+  .wb-screen #wb-review-row{position:fixed;left:0;right:0;bottom:0;z-index:5;margin:0;gap:10px;padding:9px 14px calc(9px + env(safe-area-inset-bottom));background:var(--bg-main);border-top:2px solid rgba(20,40,30,0.18);box-shadow:0 -4px 14px rgba(20,40,30,0.16)}   /* ★ 联动-163:手机端复习两钮钉在屏幕底部(fixed);桌面不受影响 */
+  .wb-fs-title{flex:0 1 auto;margin:0;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(20,40,30,0.42);border:1px solid rgba(255,255,255,0.2);border-radius:9px;color:#fff;padding:4px 14px}   /* 错题本标题:与返回主页同行同高;★ 联动-163:去掉 margin:0 auto 居中→贴到返回主页右边 */
   .wb-fs-title .wb-fs-ticon{font-size:1.3rem;line-height:1}
   .wb-fs-title .wb-fs-tcol{display:flex;flex-direction:column;align-items:center;line-height:1.1}
   .wb-fs-title .wb-fs-tzh{font-size:1.05rem;font-weight:700}
@@ -1537,7 +1537,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-162 ✦ 手机端错题本复习两钮挪到卡片下方(order)；顶栏加底边距与内容拉开;桌面端未动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-163 ✦ 手机端错题本顶栏标题贴到返回主页旁(去居中)；复习两钮改fixed钉屏幕底部+底留白加大;桌面端未动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5959,7 +5959,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-162';
+  const VERSION = '部件联动-163';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

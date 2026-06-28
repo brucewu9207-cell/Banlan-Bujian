@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-169 (2026-06-28) — 补漏:拖拽框ZONE_COLORS+部件池chip行内+char-info释义框 三处写死深绿改浅墨绿#97a99f配深字(167漏的行内/JS) -->
+<!-- 斑斓部件 · 部件联动-170 (2026-06-28) — 练习页:6部件文字改黑;重写键放大1.2倍并加大与书写区距离;拼音选对态改深绿白字;拼音框+部件框hover改深墨绿白字(参考Step1标题深绿) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-169">
+<meta name="version" content="部件联动-170">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -201,7 +201,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .write-check{position:absolute;top:6px;right:6px;display:none;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:#2a9d8f;font-size:1.3rem;color:#fff;font-weight:700;pointer-events:none;z-index:4;box-shadow:0 1px 4px rgba(0,0,0,0.25)}
 .write-check.show{display:flex;animation:fadeIn .3s}
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
-.write-reset-btn{margin-top:8px;padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:0.85rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
+.write-reset-btn{margin-top:22px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .write-reset-btn:hover{background:#8a9d92;transform:translateY(-2px)}
 
 /* 左栏 */
@@ -240,7 +240,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .pinyin-options{display:grid;grid-template-columns:1fr 1fr;gap:calc(8px*var(--ui-scale));margin-bottom:calc(8px*var(--ui-scale))}
 .pinyin-btn{padding:calc(6px*var(--ui-scale)) 18px;border:1.5px solid rgba(255,255,255,0.4);border-radius:10px;background:#97a99f;cursor:pointer;font-family:inherit;font-size:calc(2.53rem*var(--ui-scale));color:#243a30;transition:all .2s;letter-spacing:0.06em;line-height:1.1}   /* ★ v37：拼音框放大1.1倍;-76:底墨绿;-77:竖向padding;-79:锁定行高防选对后撑高 */
 .pinyin-btn:hover:not(:disabled){background:#8b2c2c;border-color:rgba(255,255,255,0.4);transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红(同播放键) */
-.pinyin-btn.correct{background:#97a99f;border-color:rgba(255,255,255,0.3);color:#243a30}
+.pinyin-btn.correct{background:rgba(20,40,30,0.55);border-color:rgba(255,255,255,0.3);color:#ffffff}
 .pinyin-btn.wrong{background:#8b2c2c;border-color:rgba(255,255,255,0.3);color:#ffffff;animation:shake .3s}
 .pinyin-btn:disabled{cursor:default}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
@@ -343,7 +343,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .components-pool h3{font-size:0.78rem;color:#ffffff;margin-bottom:6px;letter-spacing:0.06em;font-family:Georgia,serif}
 .comp-options{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr;gap:14px;width:100%;flex:1;min-height:0}
 .comp-chip{padding:calc(14px*var(--ui-scale)) 0;border-radius:12px;font-size:calc(3.6rem*var(--ui-scale));cursor:grab;border:1.5px solid;transition:all .2s;user-select:none;-webkit-user-select:none;touch-action:none;background:#97a99f;color:#243a30;line-height:1;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;text-align:center;min-width:0;display:flex;align-items:center;justify-content:center}  /* 部件联动-76:底改墨绿 */
-.comp-chip:hover:not(.used){background:#8b2c2c !important;transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红 */
+.comp-chip:hover:not(.used){background:rgba(20,40,30,0.55) !important;color:#ffffff !important;transform:translateY(-2px)}   /* 部件联动-79:hover 悬浮+猪肝红 */
 .comp-chip:active{cursor:grabbing;transform:scale(1.1)}
 .comp-chip:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
 .comp-chip.used{opacity:.25;cursor:not-allowed;pointer-events:none}
@@ -817,7 +817,7 @@ body::after{
   /* ★ 触屏点击后 :hover 状态会卡住不消失（如「下一笔/播放」按钮点完变红卡住）→ 中和 hover 背景 */
   .stroke-ctrl-btn:not(.playing):hover{background:#8a9d92;transform:none}
   .play-circle-btn:not(.playing):hover{background:#8a9d92;transform:none}
-  .pinyin-btn:hover:not(:disabled){background:#8a9d92;border-color:rgba(255,255,255,0.4)}
+  .pinyin-btn:hover:not(:disabled){background:rgba(20,40,30,0.55);color:#ffffff;border-color:rgba(255,255,255,0.4)}
   .struct-action-btn:hover{background:rgba(20,40,30,0.55);transform:none}
   /* ★ v57：iOS Safari 上父级 .struct-bar 的 backdrop-filter:blur 会把返回按钮的 bamboo 实色与背景混色变暗(实测 135,106,62 vs 期望 181,118,58)。
      用 isolation:isolate + transform:translateZ(0) 强制独立合成层,跳出 backdrop-filter 影响。 */
@@ -1538,7 +1538,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-169 ✦ 补漏:拖拽框ZONE_COLORS+部件池chip行内+char-info释义框 三处写死深绿改浅墨绿#97a99f配深字(167漏的行内/JS)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-170 ✦ 练习页:6部件文字改黑;重写键放大1.2倍并加大与书写区距离;拼音选对态改深绿白字;拼音框+部件框hover改深墨绿白字(参考Step1标题深绿)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -3609,7 +3609,7 @@ function renderCompPool(char,data){
     const chipCol=entry.isCorrect
       ? COMP_COLORS[entry.correctIndex%COMP_COLORS.length]
       : COMP_COLORS[(entry.correctIndex+3+i)%COMP_COLORS.length];
-    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#243a30;background:#97a99f;border-width:1.5px`;   /* 部件联动-76:底改墨绿;167:改浅墨绿#97a99f+深字 */
+    chip.style.cssText=`border-color:rgba(255,255,255,0.4);color:#1a1a1a;background:#97a99f;border-width:1.5px`;   /* 部件联动-76:底改墨绿;167:浅墨绿#97a99f;170:部件字改黑 */
 
     // ★ 指针拖拽：一个事件统一鼠标 / 触屏 / 触控笔
     chip.addEventListener('pointerdown',e=>{
@@ -5969,7 +5969,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-169';
+  const VERSION = '部件联动-170';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

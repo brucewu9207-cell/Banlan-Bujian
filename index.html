@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-177 (2026-06-28) — 手机端同步:触屏块里下一笔/播放按下时也改深墨绿+图标白(原#8a9d92);拼音框与重写本已是深绿白字 -->
+<!-- 斑斓部件 · 部件联动-178 (2026-07-01) — 配合去掉字/词/句任务类型:删任务卡片上的类型徽章(字/词/句),其余不动;类型对学生练习本就无影响 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-177">
+<meta name="version" content="部件联动-178">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1543,7 +1543,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-177 ✦ 手机端同步:触屏块里下一笔/播放按下时也改深墨绿+图标白(原#8a9d92);拼音框与重写本已是深绿白字','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-178 ✦ 配合去掉字/词/句任务类型:删任务卡片上的类型徽章(字/词/句),其余不动;类型对学生练习本就无影响','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5974,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-177';
+  const VERSION = '部件联动-178';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6552,15 +6552,9 @@ try{
 
     return '<div class="bls-task-list">' + sorted.map(function(task){
       const isDone = state.completedTasks.indexOf(task.taskId) >= 0;
-      const t = task.type || 'char';
-      const badgeClass = (t === 'word') ? 'bls-task-badge-word' :
-                         (t === 'sentence') ? 'bls-task-badge-sentence' : 'bls-task-badge-char';
-      const badgeText = (t === 'word') ? '词' :
-                        (t === 'sentence') ? '句' : '字';
       const title = task.title || tt('(未命名)','(Untitled)','(بدون عنوان)');
       return '<button class="bls-task-card' + (isDone ? ' bls-completed' : '') +
              '" onclick="BLS.openTask(\'' + escapeAttr(task.taskId) + '\')">' +
-             '<span class="bls-task-badge ' + badgeClass + '">' + badgeText + '</span>' +
              '<span class="bls-task-title">' + escapeHtml(title) + '</span>' +
              (isDone ? '<span class="bls-task-check" title="已完成">✓</span>' : '') +
              '</button>';

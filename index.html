@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-181 (2026-07-02) — 密码弹窗左右框真正等高:输入框撑满整行高与标签盒齐平(修掉被旧规则压住的问题) -->
+<!-- 斑斓部件 · 部件联动-182 (2026-07-02) — 版本号角标+新版本更新提醒:右下角常显 v1(用户版号,墨舟定何时进位),检测到线上出新版时顶部墨绿条提醒、点击即刷新;打开10秒/每30分钟/切回前台三个时机检测 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-181">
+<meta name="version" content="部件联动-182">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1543,7 +1543,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-181 ✦ 密码弹窗左右框真正等高:输入框撑满整行高与标签盒齐平(修掉被旧规则压住的问题)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-182 ✦ 版本号角标+新版本更新提醒:右下角常显 v1(用户版号,墨舟定何时进位),检测到线上出新版时顶部墨绿条提醒、点击即刷新;打开10秒/每30分钟/切回前台三个时机检测','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5974,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-181';
+  const VERSION = '部件联动-182';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7397,6 +7397,47 @@ const Game=(function(){
   return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
 })();
 window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
+</script>
+<script>
+/* ★ 部件-182:版本号角标 + 新版本更新条
+   右下角 v1 = 给用户看的版号(墨舟说进位才改);检测用内部版本(meta version),每次交付都触发提醒 */
+(function(){
+  var USER_VERSION = 'v1';   // ← 墨舟说「版本号调到 N」时只改这里
+  function onReady(fn){ if(document.body) fn(); else document.addEventListener('DOMContentLoaded', fn); }
+  onReady(function(){
+    var tag = document.createElement('div');
+    tag.id = 'banlan-user-ver';
+    tag.textContent = USER_VERSION;
+    tag.style.cssText = 'position:fixed;right:8px;bottom:6px;z-index:900;font-size:11px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;';
+    document.body.appendChild(tag);
+  });
+  // —— 新版本检测:悄悄拉线上 index.html 的 meta version 和自己身上的比 ——
+  var MY = (document.querySelector('meta[name="version"]')||{}).content || '';
+  if(!/^https?:$/.test(location.protocol) || !MY) return;   // 本地文件/无标记 → 不查
+  var shown = false;
+  function showBar(){
+    if(shown) return; shown = true;
+    var isAr = document.body && document.body.classList.contains('lang-mode-ar');
+    var bar = document.createElement('div');
+    bar.id = 'banlan-upbar';
+    bar.textContent = '🆕 有新版本,点这里更新\n' + (isAr ? 'إصدار جديد — اضغط للتحديث' : 'New version — tap to update');
+    bar.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:99999;background:#374a42;color:#fff;text-align:center;padding:8px 12px;font-size:14px;line-height:1.35;cursor:pointer;white-space:pre-line;box-shadow:0 2px 10px rgba(0,0,0,0.28);';
+    bar.onclick = function(){ location.reload(); };   // 网页联网优先,刷新即新版
+    onReady(function(){ document.body.appendChild(bar); });
+  }
+  function check(){
+    fetch('index.html?upcheck=' + Date.now(), { cache: 'no-store' })
+      .then(function(r){ return r.ok ? r.text() : ''; })
+      .then(function(t){
+        var m = t.match(/<meta name="version" content="([^"]+)"/);
+        if(m && m[1] && m[1] !== MY) showBar();   // 线上标记和本页不同 = 出新版了
+      })
+      .catch(function(){});   // 查失败静默,不打扰
+  }
+  setTimeout(check, 10000);                        // 打开 10 秒后查一次
+  setInterval(check, 30*60*1000);                  // 之后每 30 分钟一次
+  document.addEventListener('visibilitychange', function(){ if(document.visibilityState === 'visible') check(); });   // 切回前台再查
+})();
 </script>
 <script>
 /* ③ PWA:注册离线缓存引擎 + 「装到桌面/主屏」邀请条(对所有访客主动显示) */

@@ -24,6 +24,9 @@ self.addEventListener('fetch', e => {
   // 后端接口(workers.dev)不缓存,直连服务器
   if (/workers\.dev$/i.test(url.hostname)) return;
 
+  // 版本检测请求(?upcheck=,部件-182 新版本提醒用):直连不缓存,防止每次检测都往缓存里堆一份
+  if (url.searchParams.has('upcheck')) return;
+
   // 网页本体:联网优先,断网回退到缓存
   const accept = req.headers.get('accept') || '';
   if (req.mode === 'navigate' || accept.includes('text/html')) {

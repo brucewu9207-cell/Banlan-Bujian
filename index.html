@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-180 (2026-07-02) — 密码弹窗观感五处:弹窗文字全白,设密码/改密码行框统一定宽等高,修改密码按钮改墨绿;真流程截图逐条核对 -->
+<!-- 斑斓部件 · 部件联动-181 (2026-07-02) — 密码弹窗左右框真正等高:输入框撑满整行高与标签盒齐平(修掉被旧规则压住的问题) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-180">
+<meta name="version" content="部件联动-181">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1543,7 +1543,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-180 ✦ 密码弹窗观感五处:弹窗文字全白,设密码/改密码行框统一定宽等高,修改密码按钮改墨绿;真流程截图逐条核对','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-181 ✦ 密码弹窗左右框真正等高:输入框撑满整行高与标签盒齐平(修掉被旧规则压住的问题)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5974,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-180';
+  const VERSION = '部件联动-181';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6236,10 +6236,11 @@ try{
       '.bls-remember-row input{width:16px;height:16px;accent-color:#374a42;cursor:pointer;}',
       '.bls-pwd-intro{font-size:14px;color:rgba(255,255,255,0.96);margin-bottom:10px;}',
       '.bls-pwdm .bls-hint,.bls-pwdm .bls-hint-zh,.bls-pwdm .bls-hint-tr,.bls-pwdm .bls-hint .lang-swap span{color:rgba(255,255,255,0.95);}',
-      '.bls-pwdm .bls-field{display:flex;align-items:stretch;gap:14px;}',
-      '.bls-pwdm .bls-field .bls-label{width:216px;min-width:216px;box-sizing:border-box;align-content:center;margin-bottom:0;min-height:62px;}',
-      '.bls-pwdm .bls-field .bls-pwd-wrap{flex:1 1 0;display:flex;}',
-      '.bls-pwdm .bls-field .bls-input{width:100%;box-sizing:border-box;}',
+      /* 部件-181:选择器提到 .bls-modal.bls-pwdm,压过旧的 align-items:center;左右框真正等高(输入框撑满整行高) */
+      '.bls-modal.bls-pwdm .bls-field{display:flex;align-items:stretch;gap:14px;}',
+      '.bls-modal.bls-pwdm .bls-field .bls-label{width:216px;min-width:216px;box-sizing:border-box;align-content:center;margin-bottom:0;min-height:62px;}',
+      '.bls-modal.bls-pwdm .bls-field .bls-pwd-wrap{flex:1 1 0;display:flex;align-items:stretch;}',
+      '.bls-modal.bls-pwdm .bls-field .bls-input{width:100%;box-sizing:border-box;height:auto;}',
       '.bls-btn-green{background:#374a42 !important;border-color:#2c3a34 !important;color:#fff !important;}',
       '.bls-btn-green:hover:not(:disabled){background:#2c3a34 !important;}'
     ].join('\n');

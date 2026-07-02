@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-178 (2026-07-01) — 配合去掉字/词/句任务类型:删任务卡片上的类型徽章(字/词/句),其余不动;类型对学生练习本就无影响 -->
+<!-- 斑斓部件 · 部件联动-179 (2026-07-02) — 密码体系第一批(学生端):首次进班自己设密码(输两遍),之后进班或换设备要验密码,身份面板可修改密码与退出登录,密码框带显示切换,支持记住密码;忘了由老师端重置 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-178">
+<meta name="version" content="部件联动-179">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1543,7 +1543,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-178 ✦ 配合去掉字/词/句任务类型:删任务卡片上的类型徽章(字/词/句),其余不动;类型对学生练习本就无影响','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-179 ✦ 密码体系第一批(学生端):首次进班自己设密码(输两遍),之后进班或换设备要验密码,身份面板可修改密码与退出登录,密码框带显示切换,支持记住密码;忘了由老师端重置','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5974,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-178';
+  const VERSION = '部件联动-179';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -5983,7 +5983,8 @@ try{
     STUDENT_CODE:    'banlan_student_studentCode',   // 学生身份标识 (Worker 用它认人)
     CLASS_CODE:      'banlan_student_classCode',     // 班级码
     NAME:            'banlan_student_name',          // 学生姓名 (= 加入时 name 字段)
-    COMPLETED_TASKS: 'banlan_student_completedTasks' // 已完成任务 id 数组
+    COMPLETED_TASKS: 'banlan_student_completedTasks', // 已完成任务 id 数组
+    REMEMBER:        'banlan_student_rememberPwd'     // ★ pwd(179): '0'=不记住(每次打开要输密码),其余/缺省=记住
   };
 
   // 班级码格式: 2-20 位字母数字横线下划线 (与老师端一致)
@@ -6215,6 +6216,284 @@ try{
     ov.addEventListener('click', function(e){ if(e.target === ov){ close(); if(onCancel) onCancel(); } });
   }
 
+  // ════════════════════════════════════════════════════════════
+  // ★ pwd(部件-179): 学生密码体系
+  //   首次进班自己设密码;之后进班/换设备要验密码;身份面板可改密码/退出登录;
+  //   忘了 → 老师端一键重置(清空后下次进班重设,或老师直接指定新密码)。
+  // ════════════════════════════════════════════════════════════
+
+  // 密码相关小样式(👁小眼睛 / 记住密码行 / 红色退出按钮)只注入一次
+  function injectPwdStyles(){
+    if(document.getElementById('bls-pwd-styles')) return;
+    const st = document.createElement('style');
+    st.id = 'bls-pwd-styles';
+    st.textContent = [
+      '.bls-pwd-wrap{position:relative;}',
+      '.bls-pwd-input{padding-right:40px;}',
+      '.bls-pwd-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:17px;cursor:pointer;opacity:.45;padding:4px;line-height:1;}',
+      '.bls-pwd-eye.bls-eye-on{opacity:1;}',
+      '.bls-remember-row{display:flex;align-items:center;gap:8px;margin:2px 0 6px;font-size:14px;color:#374a42;cursor:pointer;user-select:none;}',
+      '.bls-remember-row input{width:16px;height:16px;accent-color:#374a42;cursor:pointer;}',
+      '.bls-pwd-intro{font-size:14px;color:#5a655f;margin-bottom:10px;}'
+    ].join('\n');
+    document.head.appendChild(st);
+  }
+
+  // 生成一个带 👁 的密码输入格(样式与加入班级弹窗一致)
+  function blsPwdFieldHTML(id, zh, en, ar){
+    return `
+      <div class="bls-field">
+        <label class="bls-label" for="${id}">${zh}<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>${en}</span><span class="lang-ar"><i class="bls-sep"> / </i>${ar}</span></span> <span class="bls-required">*</span></label>
+        <div class="bls-pwd-wrap">
+          <input type="password" id="${id}" class="bls-input bls-pwd-input" maxlength="32" autocomplete="off">
+          <button type="button" class="bls-pwd-eye" data-for="${id}" aria-label="显示/隐藏密码">👁</button>
+        </div>
+      </div>`;
+  }
+
+  // 「记住密码」勾选行(默认勾上=这台设备记住;不勾=每次打开都要重输)
+  function blsRememberRowHTML(id){
+    return `
+      <label class="bls-remember-row"><input type="checkbox" id="${id}" checked>记住密码<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Remember me</span><span class="lang-ar"><i class="bls-sep"> / </i>تذكرني</span></span></label>`;
+  }
+
+  // 给弹窗里所有 👁 绑定 显示/隐藏 切换
+  function blsBindEyes(root){
+    (root || document).querySelectorAll('.bls-pwd-eye').forEach(function(btn){
+      btn.onclick = function(){
+        const inp = document.getElementById(btn.getAttribute('data-for'));
+        if(!inp) return;
+        const show = inp.type === 'password';
+        inp.type = show ? 'text' : 'password';
+        btn.classList.toggle('bls-eye-on', show);
+      };
+    });
+  }
+
+  // 记住密码落盘:不勾 → 存 '0';勾 → 清掉标记。本次会话一律放行
+  function blsSaveRemember(remember){
+    try {
+      if(remember) localStorage.removeItem(LS_KEYS.REMEMBER);
+      else localStorage.setItem(LS_KEYS.REMEMBER, '0');
+    } catch(e) {}
+    try { sessionStorage.setItem('bls_pwd_ok', '1'); } catch(e) {}
+  }
+  // 这次打开需不需要先验密码?(选过「不记住」且本会话还没验过)
+  function blsNeedsPwdCheck(){
+    try {
+      return localStorage.getItem(LS_KEYS.REMEMBER) === '0' && sessionStorage.getItem('bls_pwd_ok') !== '1';
+    } catch(e) { return false; }
+  }
+
+  // 带密码调 join(密码为空则不带,兼容还没设密码的老学生)
+  function blsJoinWithPassword(classCode, sid, password, onOk, onErr){
+    const payload = { classCode: classCode, studentCode: sid };
+    if(password) payload.password = password;
+    fetch(BLS_API_BASE + '/student/join', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+    .then(function(res){
+      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){ onOk(res.body); return; }
+      onErr(res.body || {}, res.status);
+    })
+    .catch(function(){ onErr({ error: '网络似乎有点问题，请稍后重试 / Network error' }, 0); });
+  }
+
+  // 通用小弹窗骨架(标题三语 + 自定内容 + 取消/确定),返回 {ov, close, okBtn, errEl}
+  function blsPwdModal(titleZh, titleEn, titleAr, bodyHTML, okZh, okEn, okAr){
+    injectPwdStyles();
+    const ov = document.createElement('div');
+    ov.className = 'bls-overlay bls-show';
+    ov.innerHTML = `
+      <div class="bls-modal bls-confirm" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>${titleZh}</h3>
+          <div class="lang-swap-block"><div class="bls-subtitle lang-en">${titleEn}</div><div class="bls-subtitle lang-ar" dir="rtl">${titleAr}</div></div>
+        </div>
+        <div class="bls-modal-body">
+          ${bodyHTML}
+          <div class="bls-error" id="bls-pwd-error"></div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-secondary" id="bls-pwd-cancel">取消<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Cancel</span><span class="lang-ar"><i class="bls-sep"> / </i>إلغاء</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-pwd-ok">${okZh}<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>${okEn}</span><span class="lang-ar"><i class="bls-sep"> / </i>${okAr}</span></span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    blsBindEyes(ov);
+    function close(){ if(ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+    function showErr(msg){ const el = ov.querySelector('#bls-pwd-error'); if(el){ el.textContent = msg; el.classList.add('bls-show'); } }
+    return { ov: ov, close: close, okBtn: ov.querySelector('#bls-pwd-ok'), cancelBtn: ov.querySelector('#bls-pwd-cancel'), showErr: showErr };
+  }
+
+  // 「输入密码」弹窗:已设过密码的学生进班/换设备/重新打开时用;成功后完成 join
+  function blsPromptPassword(classCode, sid, name, onDone, onCancel){
+    const body = `
+      <div class="bls-pwd-intro">${escapeHtml(name || '')} · ${escapeHtml(sid || '')}</div>
+      ${blsPwdFieldHTML('bls-pwd-in', '密码', 'Password', 'كلمة المرور')}
+      ${blsRememberRowHTML('bls-pwd-remember')}
+      <div class="bls-hint"><span class="bls-hint-zh">忘记密码? 请老师帮你重置</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>Forgot it? Ask your teacher to reset</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>نسيتها؟ اطلب من معلمك إعادة تعيينها</span></span></div>`;
+    const m = blsPwdModal('输入密码', 'Enter password', 'أدخل كلمة المرور', body, '进入', 'Enter', 'دخول');
+    m.cancelBtn.onclick = function(){ m.close(); if(onCancel) onCancel(); };
+    const inp = m.ov.querySelector('#bls-pwd-in');
+    inp.addEventListener('keydown', function(e){ if(e.key === 'Enter') m.okBtn.click(); });
+    setTimeout(function(){ inp.focus(); }, 60);
+    m.okBtn.onclick = function(){
+      const pwd = inp.value;
+      if(!pwd){ m.showErr('请输入密码 / Please enter your password'); return; }
+      m.okBtn.disabled = true;
+      blsJoinWithPassword(classCode, sid, pwd, function(resBody){
+        blsSaveRemember(m.ov.querySelector('#bls-pwd-remember').checked);
+        m.close();
+        if(onDone) onDone(resBody);
+      }, function(b, status){
+        m.okBtn.disabled = false;
+        if(b.status === 'wrong_password'){ m.showErr('密码错误，再试试 / Wrong password, try again'); }
+        else if(b.status === 'not_in_roster' || b.status === 'removed'){ m.showErr('你已不在该班级名单，请联系老师 / You are no longer on the class list'); }
+        else { m.showErr(b.error ? String(b.error) : ('进入失败 (' + status + ') / Failed')); }
+      });
+    };
+  }
+
+  // 「设置密码」弹窗:首次进班(或被老师清空后)自己设;成功后顺手完成 join
+  //   onlySet=true 时只设密码不 join(身份面板里老学生补设用)
+  function blsPromptSetPassword(classCode, sid, name, onDone, onCancel, onlySet){
+    const body = `
+      <div class="bls-pwd-intro">${escapeHtml(name || '')} · ${escapeHtml(sid || '')}<br>第一次进班,给自己设一个密码吧<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>First time here — set your password</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>المرة الأولى؟ عيّن كلمة مرور</span></span></div>
+      ${blsPwdFieldHTML('bls-pwd-new1', '新密码(至少4位)', 'New password (min 4)', 'كلمة مرور جديدة (٤+ خانات)')}
+      ${blsPwdFieldHTML('bls-pwd-new2', '再输一遍', 'Repeat it', 'أعد إدخالها')}
+      ${blsRememberRowHTML('bls-pwd-remember')}`;
+    const m = blsPwdModal('设置密码', 'Set your password', 'تعيين كلمة المرور', body, '确定', 'OK', 'تأكيد');
+    m.cancelBtn.onclick = function(){ m.close(); if(onCancel) onCancel(); };
+    const in1 = m.ov.querySelector('#bls-pwd-new1');
+    const in2 = m.ov.querySelector('#bls-pwd-new2');
+    in2.addEventListener('keydown', function(e){ if(e.key === 'Enter') m.okBtn.click(); });
+    setTimeout(function(){ in1.focus(); }, 60);
+    m.okBtn.onclick = function(){
+      const p1 = in1.value, p2 = in2.value;
+      if(p1.length < 4){ m.showErr('密码至少 4 位 / At least 4 characters'); return; }
+      if(p1 !== p2){ m.showErr('两次输入不一致 / Passwords do not match'); return; }
+      m.okBtn.disabled = true;
+      fetch(BLS_API_BASE + '/student/set-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ classCode: classCode, studentCode: sid, password: p1 })
+      })
+      .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+      .then(function(res){
+        if(res.status === 200 && res.body && res.body.success){
+          blsSaveRemember(m.ov.querySelector('#bls-pwd-remember').checked);
+          if(onlySet){ m.close(); if(onDone) onDone(null); return; }
+          // 设好密码 → 带着它正式进班
+          blsJoinWithPassword(classCode, sid, p1, function(resBody){ m.close(); if(onDone) onDone(resBody); },
+            function(b, status){ m.okBtn.disabled = false; m.showErr(b.error ? String(b.error) : ('进入失败 (' + status + ') / Failed')); });
+          return;
+        }
+        m.okBtn.disabled = false;
+        if(res.body && res.body.status === 'already_set'){
+          // 老师可能刚指定过密码 → 转「输入密码」
+          m.close();
+          blsPromptPassword(classCode, sid, name, onDone, onCancel);
+          return;
+        }
+        m.showErr((res.body && res.body.error) ? String(res.body.error) : ('设置失败 (' + res.status + ') / Failed'));
+      })
+      .catch(function(){ m.okBtn.disabled = false; m.showErr('网络似乎有点问题，请稍后重试 / Network error'); });
+    };
+  }
+
+  // 身份面板「修改密码」:先查有没有设过 → 设过走「旧换新」,没设过走「补设」
+  function blsOpenChangePwd(){
+    if(!state.studentCode || !state.classCode) return;
+    const cc = state.classCode, sid = state.studentCode, name = state.name;
+    fetch(BLS_API_BASE + '/student/lookup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ classCode: cc, studentCode: sid })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(b){
+      if(!(b && b.found)){ showToast(tt('身份校验失败,请稍后再试','Could not verify identity','تعذر التحقق')); return; }
+      if(!b.hasPassword){
+        // 老学生还没设过密码 → 直接补设
+        blsPromptSetPassword(cc, sid, name, function(){ showToast(tt('密码已设置 ✓','Password set ✓','تم تعيين كلمة المرور ✓')); }, null, true);
+        return;
+      }
+      // 已有密码 → 旧换新
+      const body = `
+        ${blsPwdFieldHTML('bls-cp-old', '旧密码', 'Old password', 'كلمة المرور القديمة')}
+        ${blsPwdFieldHTML('bls-cp-new1', '新密码(至少4位)', 'New password (min 4)', 'كلمة مرور جديدة (٤+ خانات)')}
+        ${blsPwdFieldHTML('bls-cp-new2', '再输一遍', 'Repeat it', 'أعد إدخالها')}
+        <div class="bls-hint"><span class="bls-hint-zh">忘记旧密码? 请老师帮你重置</span><span class="lang-swap bls-hint-tr"><span class="lang-en"><i class="bls-sep"> / </i>Forgot it? Ask your teacher to reset</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>نسيتها؟ اطلب من معلمك إعادة تعيينها</span></span></div>`;
+      const m = blsPwdModal('修改密码', 'Change password', 'تغيير كلمة المرور', body, '确定', 'OK', 'تأكيد');
+      m.cancelBtn.onclick = function(){ m.close(); };
+      setTimeout(function(){ const el = m.ov.querySelector('#bls-cp-old'); if(el) el.focus(); }, 60);
+      m.okBtn.onclick = function(){
+        const po = m.ov.querySelector('#bls-cp-old').value;
+        const p1 = m.ov.querySelector('#bls-cp-new1').value;
+        const p2 = m.ov.querySelector('#bls-cp-new2').value;
+        if(!po){ m.showErr('请输入旧密码 / Enter old password'); return; }
+        if(p1.length < 4){ m.showErr('新密码至少 4 位 / At least 4 characters'); return; }
+        if(p1 !== p2){ m.showErr('两次输入不一致 / Passwords do not match'); return; }
+        m.okBtn.disabled = true;
+        fetch(BLS_API_BASE + '/student/change-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ classCode: cc, studentCode: sid, oldPassword: po, newPassword: p1 })
+        })
+        .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
+        .then(function(res){
+          if(res.status === 200 && res.body && res.body.success){
+            m.close();
+            showToast(tt('密码已修改 ✓','Password changed ✓','تم تغيير كلمة المرور ✓'));
+            return;
+          }
+          m.okBtn.disabled = false;
+          if(res.body && res.body.status === 'wrong_password'){ m.showErr('旧密码错误 / Old password is wrong'); }
+          else { m.showErr((res.body && res.body.error) ? String(res.body.error) : ('修改失败 (' + res.status + ') / Failed')); }
+        })
+        .catch(function(){ m.okBtn.disabled = false; m.showErr('网络似乎有点问题，请稍后重试 / Network error'); });
+      };
+    })
+    .catch(function(){ showToast(tt('网络似乎有点问题','Network error','مشكلة في الشبكة')); });
+  }
+
+  // 「退出登录」:只清这台设备记住的身份,名单和成绩都在服务器,随时可重进
+  function blsLogout(){
+    injectPwdStyles();
+    const ov = document.createElement('div');
+    ov.className = 'bls-overlay bls-show';
+    ov.innerHTML = `
+      <div class="bls-modal bls-confirm" role="dialog" aria-modal="true">
+        <div class="bls-modal-header">
+          <h3>退出登录?</h3>
+          <div class="lang-swap-block"><div class="bls-subtitle lang-en">Log out?</div><div class="bls-subtitle lang-ar" dir="rtl">تسجيل الخروج؟</div></div>
+        </div>
+        <div class="bls-modal-body">
+          <div class="bls-pwd-intro">退出后这台设备不再记住你;下次进班要重新输班级码、学号和密码。你的名单和成绩都还在。<span class="lang-swap"><span class="lang-en"><br>This device will forget you. Your records are safe on the server.</span><span class="lang-ar" dir="rtl"><br>سينسى هذا الجهاز هويتك؛ سجلاتك محفوظة.</span></span></div>
+        </div>
+        <div class="bls-modal-footer">
+          <button class="bls-btn bls-btn-secondary" id="bls-lo-cancel">取消<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Cancel</span><span class="lang-ar"><i class="bls-sep"> / </i>إلغاء</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-lo-ok">退出<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Log out</span><span class="lang-ar"><i class="bls-sep"> / </i>خروج</span></span></button>
+        </div>
+      </div>`;
+    document.body.appendChild(ov);
+    function close(){ if(ov && ov.parentNode) ov.parentNode.removeChild(ov); }
+    ov.querySelector('#bls-lo-cancel').onclick = close;
+    ov.querySelector('#bls-lo-ok').onclick = function(){
+      close();
+      clearSession();
+      try { localStorage.removeItem(LS_KEYS.REMEMBER); } catch(e) {}
+      try { sessionStorage.removeItem('bls_pwd_ok'); } catch(e) {}
+      closeDialog();          // 关掉身份面板
+      updateCardSubtitle();
+      showToast(tt('已退出登录','Logged out','تم تسجيل الخروج'));
+    };
+  }
+
   // ─── 加入班级弹窗 ──────────────────────────────────────────
   function openJoinDialog(){
     console.log('[BLS] 打开加入班级弹窗');
@@ -6372,10 +6651,10 @@ try{
       console.log('[BLS] ★17 lookup 响应 [' + cc + ']', res);
       const b = res.body || {};
 
-      // 找到本人 → 弹确认
+      // 找到本人 → 弹确认(★pwd: 带上 hasPassword,决定后面走「设密码」还是「输密码」)
       if(res.status === 200 && b.found === true && b.name){
         const finalCC = (b.classInfo && b.classInfo.classCode) ? b.classInfo.classCode : cc;
-        confirmIdentityAndJoin(finalCC, sid, b.name, submitBtn, codeInput);
+        confirmIdentityAndJoin(finalCC, sid, b.name, b.hasPassword === true, submitBtn, codeInput);
         return;
       }
 
@@ -6407,55 +6686,32 @@ try{
     });
   }
 
-  // ─── ★ 17: 确认是本人 → 正式加入(join,不传名字) ───────────
-  function confirmIdentityAndJoin(classCode, sid, name, submitBtn, codeInput){
-    // ★ 联动-160:原生 confirm 换成自定义居中弹窗(风格同加入班级、中上译下);点确定才真正 join
+  // ─── ★ 17: 确认是本人 → ★pwd(179): 设/验密码 → 正式加入 ───────────
+  function confirmIdentityAndJoin(classCode, sid, name, hasPassword, submitBtn, codeInput){
+    // ★ 联动-160:原生 confirm 换成自定义居中弹窗;★pwd: 确认本人后,有密码→输密码,没密码→首次设密码(join 由密码弹窗完成)
     blsConfirmIdentity(name, sid, function(){            // 点「确定」
-      if(submitBtn){ submitBtn.disabled = true; submitBtn.textContent = '加入中... / Joining...'; }
-      doJoin();
+      if(hasPassword){
+        blsPromptPassword(classCode, sid, name, afterJoin, function(){ resetJoinForm(submitBtn, codeInput); });
+      } else {
+        blsPromptSetPassword(classCode, sid, name, afterJoin, function(){ resetJoinForm(submitBtn, codeInput); });
+      }
     }, function(){                                       // 点「取消」→ 恢复表单,可改学号
       resetJoinForm(submitBtn, codeInput);
     });
-    return;
-    function doJoin(){
 
-    fetch(BLS_API_BASE + '/student/join', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ classCode: classCode, studentCode: sid })   // ★17: 不传 name,名字以名单为准
-    })
-    .then(function(r){ return r.json().then(function(d){ return { status: r.status, body: d }; }); })
-    .then(function(res){
-      console.log('[BLS] ★17 join 响应', res);
-      if(res.status === 200 && res.body && res.body.classInfo && res.body.student){
-        const cInfo = res.body.classInfo;
-        const student = res.body.student;
-        const finalCC = cInfo.classCode || classCode;
-        const finalSC = student.studentCode || sid;
-        const finalName = student.name || name;
-        saveJoinResult(finalCC, finalSC, finalName);
-        console.log('[BLS] ★17 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
-        closeDialog();
-        updateCardSubtitle();
-        showToast(tt('已加入班级 ' + finalCC + ' 🎉','Joined class ' + finalCC + ' 🎉','انضممت إلى الفصل ' + finalCC + ' 🎉'));
-        fetchTasksAndUpdate();
-        return;
-      }
-      const b = res.body || {};
-      if(b.status === 'not_in_roster'){
-        showJoinError('学号不在班级名单里，请联系老师 / Your ID is not on the class list');
-      } else if(b.status === 'no_name'){
-        showJoinError('老师还没给你的学号填姓名，请联系老师 / Your name is not set yet');
-      } else {
-        showJoinError(b.error ? ('加入失败 / Failed: ' + b.error) : ('加入失败 (' + res.status + ') / Join failed'));
-      }
-      resetJoinForm(submitBtn, codeInput);
-    })
-    .catch(function(err){
-      console.error('[BLS] ★17 join 网络错误', err);
-      showJoinError('网络似乎有点问题，请稍后重试 / Network error, please try again');
-      resetJoinForm(submitBtn, codeInput);
-    });
+    // join 成功后的收尾(存身份/关弹窗/拉任务)
+    function afterJoin(resBody){
+      const cInfo = (resBody && resBody.classInfo) || {};
+      const student = (resBody && resBody.student) || {};
+      const finalCC = cInfo.classCode || classCode;
+      const finalSC = student.studentCode || sid;
+      const finalName = student.name || name;
+      saveJoinResult(finalCC, finalSC, finalName);
+      console.log('[BLS] ★pwd 加入成功 · 班级=' + finalCC + ' · 姓名=' + finalName + ' · 学号=' + finalSC);
+      closeDialog();
+      updateCardSubtitle();
+      showToast(tt('已加入班级 ' + finalCC + ' 🎉','Joined class ' + finalCC + ' 🎉','انضممت إلى الفصل ' + finalCC + ' 🎉'));
+      fetchTasksAndUpdate();
     }
   }
 
@@ -6506,14 +6762,20 @@ try{
         </div>
         <div class="bls-modal-footer">
           <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
+          <!-- ★ pwd(179): 加「修改密码」「退出登录」;退出只清本机记忆,不动名单成绩 -->
+          <button class="bls-btn bls-btn-secondary" id="bls-info-chpwd">修改密码<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Password</span><span class="lang-ar"><i class="bls-sep"> / </i>كلمة المرور</span></span></button>
+          <button class="bls-btn bls-btn-secondary bls-btn-danger" id="bls-info-logout">退出登录<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Log out</span><span class="lang-ar"><i class="bls-sep"> / </i>خروج</span></span></button>
           <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap"><span class="lang-en"> / OK</span><span class="lang-ar" dir="rtl"> حسناً / </span></span></button>
         </div>
       </div>
     `;
     createOverlay(html);
+    injectPwdStyles();
     document.getElementById('bls-info-close').onclick = closeDialog;
     document.getElementById('bls-info-ok').onclick = closeDialog;
-    // ★ 17: 离开按钮已移除
+    // ★ 17: 离开按钮已移除;★pwd(179): 改密码/退出登录
+    document.getElementById('bls-info-chpwd').onclick = blsOpenChangePwd;
+    document.getElementById('bls-info-logout').onclick = blsLogout;
 
     // 刷新按钮
     const refreshBtn = document.getElementById('bls-refresh-tasks');
@@ -6824,6 +7086,10 @@ try{
   function onCardClick(){
     if(!state.studentCode){
       openJoinDialog();
+    } else if(blsNeedsPwdCheck()){
+      // ★ pwd(179): 「不记住密码」且本次还没验过 → 先验密码再开面板
+      blsPromptPassword(state.classCode, state.studentCode, state.name,
+        function(){ fetchTasksAndUpdate(); openIdentityPanel(); }, null);
     } else {
       openIdentityPanel();
     }
@@ -6860,7 +7126,15 @@ try{
 
     if(state.studentCode){
       console.log('[BLS] 已加入 · 班级=' + state.classCode + ' · 姓名=' + state.name + ' · 学号=' + state.studentCode);
-      fetchTasksAndUpdate();
+      // ★ pwd(179): 选过「不记住密码」的,每次打开先验密码再拉任务
+      if(blsNeedsPwdCheck()){
+        console.log('[BLS] ★pwd 记住密码=关,先验密码');
+        blsPromptPassword(state.classCode, state.studentCode, state.name,
+          function(){ fetchTasksAndUpdate(); },
+          function(){ console.log('[BLS] ★pwd 用户取消验证,点卡片时再验'); });
+      } else {
+        fetchTasksAndUpdate();
+      }
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
     }

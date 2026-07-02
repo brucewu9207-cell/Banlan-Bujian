@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-182 (2026-07-02) — 版本号角标+新版本更新提醒:右下角常显 v1(用户版号,墨舟定何时进位),检测到线上出新版时顶部墨绿条提醒、点击即刷新;打开10秒/每30分钟/切回前台三个时机检测 -->
+<!-- 斑斓部件 · 部件联动-183 (2026-07-02) — 版本角标放大到 24px(墨舟要求 2.2 倍) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-182">
+<meta name="version" content="部件联动-183">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1543,7 +1543,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-182 ✦ 版本号角标+新版本更新提醒:右下角常显 v1(用户版号,墨舟定何时进位),检测到线上出新版时顶部墨绿条提醒、点击即刷新;打开10秒/每30分钟/切回前台三个时机检测','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-183 ✦ 版本角标放大到 24px(墨舟要求 2.2 倍)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5974,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-182';
+  const VERSION = '部件联动-183';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7408,7 +7408,7 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     var tag = document.createElement('div');
     tag.id = 'banlan-user-ver';
     tag.textContent = USER_VERSION;
-    tag.style.cssText = 'position:fixed;right:8px;bottom:6px;z-index:900;font-size:11px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;';
+    tag.style.cssText = 'position:fixed;right:8px;bottom:6px;z-index:900;font-size:24px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;';   /* 部件-183:字号 11→24(墨舟要求放大 2.2 倍) */
     document.body.appendChild(tag);
   });
   // —— 新版本检测:悄悄拉线上 index.html 的 meta version 和自己身上的比 ——

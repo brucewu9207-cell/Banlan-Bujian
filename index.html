@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-183 (2026-07-02) — 版本角标放大到 24px(墨舟要求 2.2 倍) -->
+<!-- 斑斓部件 · 部件联动-184 (2026-07-03) — 学生端三个进班弹窗统一美化:①确认本人弹窗姓名/学号标签盒等宽+值进等高盒;②设置密码去掉提示句、名字学号单独居中放大1.5倍、标题副标缩小;③加入班级弹窗改成同款左标签盒等宽右输入框对齐;④记住密码中上译下且阿语归位左对齐 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-183">
+<meta name="version" content="部件联动-184">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1135,9 +1135,15 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .bls-confirm-val{color:rgba(255,255,255,0.96);font-size:16px;font-weight:600;letter-spacing:.3px;padding:1px 2px 2px;word-break:break-word}   /* ★ 联动-160:确认本人弹窗的姓名/学号值 */
 /* ★ 联动-161:确认本人弹窗专属——副标题放大~1.5倍 + 姓名/学号值放标签盒右边 */
 .bls-modal.bls-confirm .bls-subtitle{font-size:21px!important}
-.bls-modal.bls-confirm .bls-field{display:flex;align-items:center;gap:14px}
-.bls-modal.bls-confirm .bls-label{margin-bottom:0}
-.bls-modal.bls-confirm .bls-confirm-val{padding:0}
+/* ★ 部件-184:确认本人弹窗——姓名/学号两个标签盒等宽;右边姓名/学号值也做成等高的盒 */
+.bls-modal.bls-confirm .bls-field{display:flex;align-items:stretch;gap:14px}
+.bls-modal.bls-confirm .bls-label{margin-bottom:0;width:108px;box-sizing:border-box;flex-shrink:0}
+.bls-modal.bls-confirm .bls-confirm-val{padding:0 14px;flex:1;display:flex;align-items:center;background:rgba(255,255,255,0.12);border-radius:4px}
+/* ★ 部件-184:加入班级弹窗改成跟确认弹窗一样——左边班级码/学号两个墨绿盒等宽,右边输入框对齐,提示语整行放下方 */
+.bls-modal.bls-join2 .bls-field{display:grid;grid-template-columns:120px 1fr;column-gap:14px;row-gap:4px;margin-bottom:16px}
+.bls-modal.bls-join2 .bls-label{grid-column:1;grid-row:1;width:120px;box-sizing:border-box;align-self:stretch;margin-bottom:0}
+.bls-modal.bls-join2 .bls-input{grid-column:2;grid-row:1;align-self:stretch}
+.bls-modal.bls-join2 .bls-hint{grid-column:1 / -1;grid-row:2}
 .bls-modal:has(.bls-field) .bls-input{color:#22382e;background:rgba(255,255,255,0.5);border-color:rgba(24,40,32,0.28)}
 .bls-modal:has(.bls-field) .bls-input::placeholder{color:rgba(24,40,32,0.5)}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
@@ -1543,7 +1549,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-183 ✦ 版本角标放大到 24px(墨舟要求 2.2 倍)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-184 ✦ 学生端三个进班弹窗统一美化:①确认本人弹窗姓名/学号标签盒等宽+值进等高盒;②设置密码去掉提示句、名字学号单独居中放大1.5倍、标题副标缩小;③加入班级弹窗改成同款左标签盒等宽右输入框对齐;④记住密码中上译下且阿语归位左对齐','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5974,7 +5980,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-183';
+  const VERSION = '部件联动-184';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6234,7 +6240,20 @@ try{
       '.bls-pwd-eye.bls-eye-on{opacity:1;}',
       '.bls-remember-row{display:flex;align-items:center;gap:8px;margin:2px 0 6px;font-size:14px;color:#fff;cursor:pointer;user-select:none;}',
       '.bls-remember-row input{width:16px;height:16px;accent-color:#374a42;cursor:pointer;}',
-      '.bls-pwd-intro{font-size:14px;color:rgba(255,255,255,0.96);margin-bottom:10px;}',
+      /* 部件-184:记住密码中文在上、译文在下,左对齐 */
+      '.bls-remember-txt{display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;text-align:left;}',
+      '.bls-remember-txt .lang-swap,.bls-remember-txt .lang-swap>span{display:block;font-size:12.5px;opacity:.9;text-align:left;}',
+      /* 部件-184:记住密码行只显示当前语言的译文(不给隐藏的另一语言占位),避免阿语跑偏+空行 */
+      'body.lang-mode-ar .bls-remember-txt .lang-swap>.lang-en{display:none!important;}',
+      'body.lang-mode-en .bls-remember-txt .lang-swap>.lang-ar{display:none!important;}',
+      '.bls-pwd-intro{font-size:14px;color:rgba(255,255,255,0.96);margin-bottom:10px;text-align:center;}',
+      /* 部件-184:名字/学号单独居中、放大1.5倍(14→21) */
+      '.bls-pwd-who{font-size:21px;font-weight:600;line-height:1.25;margin-bottom:6px;}',
+      /* 部件-184:提示语中文在上、译文在下(各自成行、居中) */
+      '.bls-pwd-tip{line-height:1.4;}',
+      '.bls-pwd-tip .lang-swap,.bls-pwd-tip .lang-swap>span{display:block;text-align:center;}',
+      /* 部件-184:设置密码弹窗标题副标(Set your password)缩小,参考其他标题 */
+      '.bls-modal.bls-pwdm .bls-subtitle{font-size:14px!important;}',
       '.bls-pwdm .bls-hint,.bls-pwdm .bls-hint-zh,.bls-pwdm .bls-hint-tr,.bls-pwdm .bls-hint .lang-swap span{color:rgba(255,255,255,0.95);}',
       /* 部件-181:选择器提到 .bls-modal.bls-pwdm,压过旧的 align-items:center;左右框真正等高(输入框撑满整行高) */
       '.bls-modal.bls-pwdm .bls-field{display:flex;align-items:stretch;gap:14px;}',
@@ -6263,7 +6282,7 @@ try{
   // 「记住密码」勾选行(默认勾上=这台设备记住;不勾=每次打开都要重输)
   function blsRememberRowHTML(id){
     return `
-      <label class="bls-remember-row"><input type="checkbox" id="${id}" checked>记住密码<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Remember me</span><span class="lang-ar"><i class="bls-sep"> / </i>تذكرني</span></span></label>`;
+      <label class="bls-remember-row"><input type="checkbox" id="${id}" checked><span class="bls-remember-txt">记住密码<span class="lang-swap"><span class="lang-en">Remember me</span><span class="lang-ar">تذكرني</span></span></span></label>`;
   }
 
   // 给弹窗里所有 👁 绑定 显示/隐藏 切换
@@ -6371,7 +6390,9 @@ try{
   //   onlySet=true 时只设密码不 join(身份面板里老学生补设用)
   function blsPromptSetPassword(classCode, sid, name, onDone, onCancel, onlySet){
     const body = `
-      <div class="bls-pwd-intro">${escapeHtml(name || '')} · ${escapeHtml(sid || '')}<br>第一次进班,给自己设一个密码吧<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>First time here — set your password</span><span class="lang-ar" dir="rtl"><i class="bls-sep"> / </i>المرة الأولى؟ عيّن كلمة مرور</span></span></div>
+      <div class="bls-pwd-intro">
+        <div class="bls-pwd-who">${escapeHtml(name || '')} · ${escapeHtml(sid || '')}</div>
+      </div>
       ${blsPwdFieldHTML('bls-pwd-new1', '新密码(至少4位)', 'New password (min 4)', 'كلمة مرور جديدة (٤+ خانات)')}
       ${blsPwdFieldHTML('bls-pwd-new2', '再输一遍', 'Repeat it', 'أعد إدخالها')}
       ${blsRememberRowHTML('bls-pwd-remember')}`;
@@ -6507,7 +6528,7 @@ try{
   function openJoinDialog(){
     console.log('[BLS] 打开加入班级弹窗');
     const html = `
-      <div class="bls-modal" role="dialog" aria-modal="true">
+      <div class="bls-modal bls-join2" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
           <h3>加入班级</h3>
           <div class="lang-swap-block"><div class="bls-subtitle lang-en">Join a Class</div><div class="bls-subtitle lang-ar" dir="rtl">انضمّ إلى فصل</div></div>

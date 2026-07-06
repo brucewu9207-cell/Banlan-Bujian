@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-185 (2026-07-06) — 扫老师分享码?class=XXX进来自动预填班级码只需再输学号;自学模式加反向推荐斑斓汉字卡片(二维码可离线) -->
+<!-- 斑斓部件 · 部件联动-187 (2026-07-06) — PWA安装横幅做成三语切换(译文另起一行):桌面/iOS/电脑Chrome兜底提示+安装按钮全覆盖,跟语言切换器走 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-185">
+<meta name="version" content="部件联动-187">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1567,7 +1567,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-185 ✦ 扫老师分享码?class=XXX进来自动预填班级码只需再输学号;自学模式加反向推荐斑斓汉字卡片(二维码可离线)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-187 ✦ PWA安装横幅做成三语切换(译文另起一行):桌面/iOS/电脑Chrome兜底提示+安装按钮全覆盖,跟语言切换器走','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5998,7 +5998,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-185';
+  const VERSION = '部件联动-187';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7199,8 +7199,9 @@ try{
       var _cls = new URLSearchParams(location.search).get('class');
       if(_cls && _cls.trim()){
         _cls = _cls.trim().slice(0, 20);
-        setTimeout(function(){ openJoinDialog(_cls); }, 300);
         try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}  // 清掉 ?class,刷新不再重复弹
+        // 质检红队:只对「还没进班」的新学生自动弹加入框;已进班的不弹(否则会和验密码弹窗叠层)
+        if(!state.studentCode){ setTimeout(function(){ openJoinDialog(_cls); }, 300); }
       }
     } catch(e){ console.warn('[BLS] 读 ?class 参数失败', e); }
   }
@@ -7507,6 +7508,8 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
   function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
   function dismiss(el){ try{ localStorage.setItem(LS_KEY, Date.now()); }catch(e){} if(el&&el.remove) el.remove(); }
   var deferredPrompt = null;
+  // 汉字-194/部件-187:安装横幅三语,译文另起一行(跟语言切换器走)
+  function tri(zh,en,ar){ return zh+'<span class="lang-en" style="display:block;opacity:.9;margin-top:2px;">'+en+'</span><span class="lang-ar" dir="rtl" style="display:block;opacity:.9;margin-top:2px;">'+ar+'</span>'; }
   window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt = e; });
 
   window.addEventListener('load', function(){
@@ -7526,15 +7529,15 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     var txt=document.createElement('div'); txt.style.cssText='flex:1;';
     var btns=document.createElement('div'); btns.style.cssText='display:flex;gap:8px;align-items:center;flex-shrink:0;';
     if (isIOS()) {
-      txt.innerHTML='把<b>'+APP+'</b>装到主屏:点屏幕底部 <b>分享</b> <span style="display:inline-block;border:1.5px solid #f3ead2;border-radius:4px;padding:0 5px;">⤴</span> → 选 <b>「添加到主屏幕」</b>。';
+      txt.innerHTML=tri('把<b>'+APP+'</b>装到主屏:点屏幕底部 <b>分享</b> <span style="display:inline-block;border:1.5px solid #f3ead2;border-radius:4px;padding:0 5px;">⤴</span> → 选 <b>「添加到主屏幕」</b>。', 'Add <b>'+APP+'</b> to your home screen: tap <b>Share</b> ⤴ at the bottom → <b>"Add to Home Screen"</b>.', 'أضف <b>'+APP+'</b> إلى الشاشة الرئيسية: اضغط <b>مشاركة</b> ⤴ في الأسفل ← <b>«إضافة إلى الشاشة الرئيسية»</b>.');
       btns.appendChild(closeBtn(w));
     } else {
-      txt.innerHTML='把<b>'+APP+'</b>装到桌面/主屏,像 App 一样用,断网也能开。';
-      var install=document.createElement('button'); install.textContent='安装';
+      txt.innerHTML=tri('把<b>'+APP+'</b>装到桌面/主屏,像 App 一样用,断网也能开。', 'Add <b>'+APP+'</b> to your home screen — use it like an app, works offline.', 'أضف <b>'+APP+'</b> إلى الشاشة الرئيسية — استخدمه كتطبيق، ويعمل دون إنترنت.');
+      var install=document.createElement('button'); install.innerHTML='安装<span class="lang-en" style="display:block;font-size:12px;font-weight:600;opacity:.92;">Install</span><span class="lang-ar" dir="rtl" style="display:block;font-size:12px;font-weight:600;opacity:.92;">تثبيت</span>';
       install.style.cssText='background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap;';
       install.onclick=function(){
         if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; dismiss(w); }); return; }
-        txt.innerHTML='在电脑 Chrome:点<b>地址栏右侧的安装图标</b>,或 <b>⋮ 菜单 → 安装'+APP+'</b>。';
+        txt.innerHTML=tri('在电脑 Chrome:点<b>地址栏右侧的安装图标</b>,或 <b>⋮ 菜单 → 安装'+APP+'</b>。', 'On desktop Chrome: click the <b>install icon in the address bar</b>, or <b>⋮ menu → Install '+APP+'</b>.', 'في Chrome على الكمبيوتر: اضغط <b>أيقونة التثبيت في شريط العنوان</b>، أو <b>القائمة ⋮ ← تثبيت '+APP+'</b>.');
         if (install.parentNode) install.parentNode.removeChild(install);
       };
       btns.appendChild(install); btns.appendChild(closeBtn(w));

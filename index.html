@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-189 (2026-07-06) — 自学反向卡片+头部扫码卡都套老师端分享弹窗样式:纸色#faf5e9、二维码白框(自学卡嵌斑斓汉字logo)、左右居中、下划线链接、加复制链接+关闭双语按钮(深墨绿+灰) -->
+<!-- 斑斓部件 · 部件联动-190 (2026-07-06) — 自学卡+头部扫码卡按钮译文改另起一行(中上译下);PWA安装按钮加min-width防切换语言时移位;自学反向卡去掉关闭记忆、每次打开网页都重新出现 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-189">
+<meta name="version" content="部件联动-190">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -179,6 +179,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .tj-btns button{flex:1;border:none;border-radius:10px;padding:11px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;line-height:1.3}
 .tj-btn-copy{background:#374a42;color:#fff;font-weight:700}
 .tj-btn-close{background:#c8d0cc;color:#374a42}
+.tj-btns button .lang-swap,.qr-pop-btns button .lang-swap{display:block;font-size:0.82em;font-weight:600;opacity:0.92;margin-top:1px}
 .tj-hanzi-card .tj-side{flex:1;min-width:0}
 .tj-hanzi-card .tj-desc{font-size:0.82rem;color:var(--ink-mid);line-height:1.5}
 .tj-hanzi-card .tj-desc .lang-en,.tj-hanzi-card .tj-desc .lang-ar{display:block;opacity:0.9}
@@ -1581,7 +1582,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-189 ✦ 自学反向卡片+头部扫码卡都套老师端分享弹窗样式:纸色#faf5e9、二维码白框(自学卡嵌斑斓汉字logo)、左右居中、下划线链接、加复制链接+关闭双语按钮(深墨绿+灰)','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-190 ✦ 自学卡+头部扫码卡按钮译文改另起一行(中上译下);PWA安装按钮加min-width防切换语言时移位;自学反向卡去掉关闭记忆、每次打开网页都重新出现','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2479,8 +2480,7 @@ function blPocketCopy(text, btn){
   else { _blFallbackCopy(text); flash(); }
 }
 function _blFallbackCopy(t){ try{ var a=document.createElement('textarea'); a.value=t; a.style.position='fixed'; a.style.opacity='0'; document.body.appendChild(a); a.select(); document.execCommand('copy'); document.body.removeChild(a); }catch(e){} }
-function tjCloseCard(){ var c=document.querySelector('.tj-hanzi-card'); if(c) c.style.display='none'; try{ localStorage.setItem('bl_tj_card_dismiss','1'); }catch(e){} }
-document.addEventListener('DOMContentLoaded', function(){ try{ if(localStorage.getItem('bl_tj_card_dismiss')==='1'){ var c=document.querySelector('.tj-hanzi-card'); if(c) c.style.display='none'; } }catch(e){} });
+function tjCloseCard(){ var c=document.querySelector('.tj-hanzi-card'); if(c) c.style.display='none'; }   /* 每次打开网页都重新出现,关闭只收起当前这次 */
 function toggleQR(){
   const pop=document.getElementById("qr-popover");
   const btn=document.getElementById("qr-btn");
@@ -6020,7 +6020,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-189';
+  const VERSION = '部件联动-190';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7556,7 +7556,7 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     } else {
       txt.innerHTML=tri('把<b>'+APP+'</b>装到桌面/主屏,像 App 一样用,断网也能开。', 'Add <b>'+APP+'</b> to your home screen — use it like an app, works offline.', 'أضف <b>'+APP+'</b> إلى الشاشة الرئيسية — استخدمه كتطبيق، ويعمل دون إنترنت.');
       var install=document.createElement('button'); install.innerHTML='安装<span class="lang-en" style="display:block;font-size:12px;font-weight:600;opacity:.92;">Install</span><span class="lang-ar" dir="rtl" style="display:block;font-size:12px;font-weight:600;opacity:.92;">تثبيت</span>';
-      install.style.cssText='background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap;';
+      install.style.cssText='background:#b5763a;border:none;color:#fff;font-weight:700;border-radius:9px;padding:9px 16px;font-size:14px;cursor:pointer;white-space:nowrap;min-width:82px;text-align:center;box-sizing:border-box;';
       install.onclick=function(){
         if (deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.finally(function(){ deferredPrompt=null; dismiss(w); }); return; }
         txt.innerHTML=tri('在电脑 Chrome:点<b>地址栏右侧的安装图标</b>,或 <b>⋮ 菜单 → 安装'+APP+'</b>。', 'On desktop Chrome: click the <b>install icon in the address bar</b>, or <b>⋮ menu → Install '+APP+'</b>.', 'في Chrome على الكمبيوتر: اضغط <b>أيقونة التثبيت في شريط العنوان</b>، أو <b>القائمة ⋮ ← تثبيت '+APP+'</b>.');

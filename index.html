@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-198 (2026-07-06) — 语言切换钮不悬浮改随页滚动、缩一号卡进两行英文中间上下等距;两行间距16→13收拢;v1再左移 -->
+<!-- 斑斓部件 · 部件联动-199 (2026-07-06) — 语言切换钮改真机自量对中:iOS字体行高与桌面浏览器不同、固定top在真机错位,现在设备上实测两行英文走廊后自动垂直居中(上下等距),切语言/转屏/字体加载完都重校 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-198">
+<meta name="version" content="部件联动-199">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1601,7 +1601,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-198 ✦ 语言切换钮不悬浮改随页滚动、缩一号卡进两行英文中间上下等距;两行间距16→13收拢;v1再左移','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-199 ✦ 语言切换钮改真机自量对中:iOS字体行高与桌面浏览器不同、固定top在真机错位,现在设备上实测两行英文走廊后自动垂直居中(上下等距),切语言/转屏/字体加载完都重校','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6039,7 +6039,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-198';
+  const VERSION = '部件联动-199';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7609,6 +7609,36 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
 })();
 window.tt=function(zh,en,ar){var isAr=document.body.classList.contains('lang-mode-ar');return zh+'\n'+(isAr?ar:en);};
 window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-swap"><span class="lang-en">'+en+'</span><span class="lang-ar">'+ar+'</span></span>';};
+</script>
+<script>
+/* ★ 部件-199:手机端语言切换钮「自量对中」——iOS 真机字体行高比桌面浏览器高,固定 top 数字会错位(198 真机验出);
+   改为在设备上实测「副标题底边 ↔ 第二行顶边」走廊,把钮垂直居中放进去(上下等距)。桌面端(>768px)不跑、仍是 fixed。 */
+(function(){
+  function centerLangPill(){
+    if(!window.matchMedia('(max-width:768px)').matches) return;   // 只管手机端
+    var sw=document.querySelector('.lang-switcher'); if(!sw) return;
+    var eng=null,based=null;
+    document.querySelectorAll('.struct-bar-title span').forEach(function(el){
+      if(el.children.length===0){
+        if(/BRILLIANT/i.test(el.textContent)) eng=el;
+        if(/BASED ON HSK/i.test(el.textContent)) based=el;
+      }
+    });
+    if(!eng||!based) return;
+    var e=eng.getBoundingClientRect(), b=based.getBoundingClientRect(), s=sw.getBoundingClientRect();
+    if(b.top<=e.bottom+s.height) return;   // 走廊装不下就不动(留 CSS 兜底值)
+    var top=window.scrollY + e.bottom + ((b.top-e.bottom)-s.height)/2;   // 居中=上下等距
+    sw.style.setProperty('top', top.toFixed(1)+'px', 'important');       // CSS 里是 !important,要同级覆盖
+  }
+  function run(){ centerLangPill(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run); else run();
+  window.addEventListener('load', run);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(run,50); });   // 内嵌字体(BLKai)加载完行高才定型
+  setTimeout(run,800); setTimeout(run,2000);   // 兜底再校两次
+  window.addEventListener('resize', run);
+  window.addEventListener('orientationchange', function(){ setTimeout(run,120); });
+  window.addEventListener('banlan-lang-changed', function(){ setTimeout(run,60); });   // 切语言后文字变、重校
+})();
 </script>
 </body>
 </html>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-199 (2026-07-06) — 语言切换钮改真机自量对中:iOS字体行高与桌面浏览器不同、固定top在真机错位,现在设备上实测两行英文走廊后自动垂直居中(上下等距),切语言/转屏/字体加载完都重校 -->
+<!-- 斑斓部件 · 部件联动-200 (2026-07-06) — v1角标下移与语言切换钮中线等高对齐(自量脚本跟着钮走、真机不偏),字体字号改跟BRILLIANT副标题同款Georgia -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-199">
+<meta name="version" content="部件联动-200">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1061,7 +1061,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 语言切换钮:不悬浮(随页面滚动)、再缩一号塞进两行英文中间、上下等距(各约3.4px) */
   .lang-switcher{position:absolute !important;top:32px !important;transform:scale(0.48);transform-origin:top right;}
   /* v1 角标移到「斑斓练字」右下角空隙 */
-  #banlan-user-ver{position:absolute !important;left:158px;top:24px;right:auto;bottom:auto;font-size:12px;color:rgba(255,255,255,0.5);z-index:5;}   /* 部件-198:左移 172→158 */
+  #banlan-user-ver{position:absolute !important;left:158px;top:24px;right:auto;bottom:auto;color:rgba(255,255,255,0.5);z-index:5;font-family:Georgia,serif;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;}   /* 部件-200:字体字号跟 BRILLIANT 副标题一致;top 是兜底,实际由自量脚本对齐切换钮中线 */
   /* 释义框上移(给底部 fixed 进度条留位)+ 进度条抬离屏底 */
   .practice-layout.wizard > .card.char-panel{padding-bottom:90px !important;}
   #wizard-nav{bottom:12px !important;}
@@ -1601,7 +1601,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-199 ✦ 语言切换钮改真机自量对中:iOS字体行高与桌面浏览器不同、固定top在真机错位,现在设备上实测两行英文走廊后自动垂直居中(上下等距),切语言/转屏/字体加载完都重校','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-200 ✦ v1角标下移与语言切换钮中线等高对齐(自量脚本跟着钮走、真机不偏),字体字号改跟BRILLIANT副标题同款Georgia','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6039,7 +6039,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-199';
+  const VERSION = '部件联动-200';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7629,6 +7629,13 @@ window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-swap"><span class
     if(b.top<=e.bottom+s.height) return;   // 走廊装不下就不动(留 CSS 兜底值)
     var top=window.scrollY + e.bottom + ((b.top-e.bottom)-s.height)/2;   // 居中=上下等距
     sw.style.setProperty('top', top.toFixed(1)+'px', 'important');       // CSS 里是 !important,要同级覆盖
+    /* 部件-200:v1 角标跟切换钮中线对齐(v1 是 .struct-bar-title 内 absolute,换算成 title 内坐标) */
+    var ver=document.getElementById('banlan-user-ver');
+    var title=document.querySelector('.struct-bar-title');
+    if(ver&&title){
+      var s2=sw.getBoundingClientRect(), vR=ver.getBoundingClientRect(), tR=title.getBoundingClientRect();
+      ver.style.setProperty('top', ((s2.top+s2.height/2)-vR.height/2-tR.top).toFixed(1)+'px', 'important');
+    }
   }
   function run(){ centerLangPill(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run); else run();

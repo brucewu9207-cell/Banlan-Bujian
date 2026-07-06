@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-191 (2026-07-06) — 两卡按钮译文行加固定line-height,切阿语/英文时中文与译文间隙一致;自学反向卡宽度560→680px,跟下面HSK三格整体等宽 -->
+<!-- 斑斓部件 · 部件联动-192 (2026-07-06) — 彻底修按钮译文间隙随语言变:译文行改固定高度15px+flex垂直居中,阿语/英文都在同一小盒里,间隙一致 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-191">
+<meta name="version" content="部件联动-192">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -179,7 +179,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .tj-btns button{flex:1;border:none;border-radius:10px;padding:11px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;line-height:1.3}
 .tj-btn-copy{background:#374a42;color:#fff;font-weight:700}
 .tj-btn-close{background:#c8d0cc;color:#374a42}
-.tj-btns button .lang-swap,.qr-pop-btns button .lang-swap{display:block;font-size:0.82em;font-weight:600;opacity:0.92;line-height:1.1;margin-top:2px}
+.tj-btns button .lang-swap,.qr-pop-btns button .lang-swap{display:flex;align-items:center;justify-content:center;height:15px;margin-top:3px;font-size:0.8em;font-weight:600;opacity:0.92;line-height:1;overflow:visible}
 .tj-hanzi-card .tj-side{flex:1;min-width:0}
 .tj-hanzi-card .tj-desc{font-size:0.82rem;color:var(--ink-mid);line-height:1.5}
 .tj-hanzi-card .tj-desc .lang-en,.tj-hanzi-card .tj-desc .lang-ar{display:block;opacity:0.9}
@@ -1582,7 +1582,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-191 ✦ 两卡按钮译文行加固定line-height,切阿语/英文时中文与译文间隙一致;自学反向卡宽度560→680px,跟下面HSK三格整体等宽','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-192 ✦ 彻底修按钮译文间隙随语言变:译文行改固定高度15px+flex垂直居中,阿语/英文都在同一小盒里,间隙一致','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6020,7 +6020,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-191';
+  const VERSION = '部件联动-192';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

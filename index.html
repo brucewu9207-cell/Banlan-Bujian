@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-192 (2026-07-06) — 彻底修按钮译文间隙随语言变:译文行改固定高度15px+flex垂直居中,阿语/英文都在同一小盒里,间隙一致 -->
+<!-- 斑斓部件 · 部件联动-193 (2026-07-06) — 两卡按钮改flex竖排居中,译文水平居中对齐中文 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-192">
+<meta name="version" content="部件联动-193">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -176,7 +176,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .tj-hanzi-card .tj-qrbox{width:120px;height:120px;flex-shrink:0;border-radius:10px;background:#fff;padding:9px;box-sizing:border-box;box-shadow:inset 0 0 0 4px rgba(228,238,233,0.42)}
 .tj-hanzi-card .tj-qr{display:block;width:100%;height:100%;object-fit:contain}
 .tj-btns{display:flex;gap:10px;margin-top:14px}
-.tj-btns button{flex:1;border:none;border-radius:10px;padding:11px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;line-height:1.3}
+.tj-btns button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:none;border-radius:10px;padding:11px;font-weight:600;cursor:pointer;font-family:inherit;font-size:14px;line-height:1.3}
 .tj-btn-copy{background:#374a42;color:#fff;font-weight:700}
 .tj-btn-close{background:#c8d0cc;color:#374a42}
 .tj-btns button .lang-swap,.qr-pop-btns button .lang-swap{display:flex;align-items:center;justify-content:center;height:15px;margin-top:3px;font-size:0.8em;font-weight:600;opacity:0.92;line-height:1;overflow:visible}
@@ -491,7 +491,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .qr-img{display:block;width:182px;height:182px;border-radius:8px;margin:0 auto}
 .qr-url{display:block;font-family:Georgia,serif;font-size:0.78rem;color:#b5763a;font-weight:700;margin-top:8px;letter-spacing:0.03em;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .qr-pop-btns{display:flex;gap:8px;margin-top:12px}
-.qr-pop-btns button{flex:1;border:none;border-radius:10px;padding:9px 6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px}
+.qr-pop-btns button{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border:none;border-radius:10px;padding:9px 6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:13px}
 .qr-pop-copy{background:#374a42;color:#fff}
 .qr-pop-close{background:#c8d0cc;color:#374a42}
 .qr-url:hover{color:#c84b2f}
@@ -1582,7 +1582,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-192 ✦ 彻底修按钮译文间隙随语言变:译文行改固定高度15px+flex垂直居中,阿语/英文都在同一小盒里,间隙一致','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-193 ✦ 两卡按钮改flex竖排居中,译文水平居中对齐中文','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6020,7 +6020,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-192';
+  const VERSION = '部件联动-193';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

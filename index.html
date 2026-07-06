@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-201 (2026-07-06) — 步骤标题①②③④防溢出自量:华为电脑Windows字体更宽致 书写练习WRITING PRACTICE 溢出标题框(内部反馈),现每台设备自己量、超宽自动缩字号到装下,装得下的设备不动 -->
+<!-- 斑斓部件 · 部件联动-202 (2026-07-06) — 手机端进度条贴合底边加高(内容留安全区);练习卡高度自量压到进度条上沿留8px缝不再重叠(矮屏兜底);安装弹窗关闭改记1年+localStorage与cookie双保险,不再次次弹 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-201">
+<meta name="version" content="部件联动-202">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1062,9 +1062,11 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .lang-switcher{position:absolute !important;top:32px !important;transform:scale(0.48);transform-origin:top right;}
   /* v1 角标移到「斑斓练字」右下角空隙 */
   #banlan-user-ver{position:absolute !important;left:158px;top:24px;right:auto;bottom:auto;color:rgba(255,255,255,0.5);z-index:5;font-family:Georgia,serif;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;}   /* 部件-200:字体字号跟 BRILLIANT 副标题一致;top 是兜底,实际由自量脚本对齐切换钮中线 */
-  /* 释义框上移(给底部 fixed 进度条留位)+ 进度条抬离屏底 */
-  .practice-layout.wizard > .card.char-panel{padding-bottom:90px !important;}
-  #wizard-nav{bottom:12px !important;}
+  /* 部件-202:进度条贴合手机底边(197 曾悬空 12px,真机缝里露出卡片显得重叠)+ 加高;
+     内边距底部叠加 iPhone 安全区(env),小白条挡不住按钮 */
+  #wizard-nav{bottom:0 !important;padding-top:12px !important;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)) !important;}
+  /* 练习卡内容与底边留缝:卡高由自量脚本压到进度条上沿(见 fitPracticeHeight),这里只留小内边距 */
+  .practice-layout.wizard > .card.char-panel{padding-bottom:16px !important;}
 }
 </style>
 <style>
@@ -1601,7 +1603,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-201 ✦ 步骤标题①②③④防溢出自量:华为电脑Windows字体更宽致 书写练习WRITING PRACTICE 溢出标题框(内部反馈),现每台设备自己量、超宽自动缩字号到装下,装得下的设备不动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-202 ✦ 手机端进度条贴合底边加高(内容留安全区);练习卡高度自量压到进度条上沿留8px缝不再重叠(矮屏兜底);安装弹窗关闭改记1年+localStorage与cookie双保险,不再次次弹','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6039,7 +6041,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-201';
+  const VERSION = '部件联动-202';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7544,10 +7546,20 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
   }
   var APP = '斑斓练字', LS_KEY = 'bls_install_dismiss', BG = '#3c4f45';
-  function dismissedRecently(){ try{ var t=+localStorage.getItem(LS_KEY)||0; return (Date.now()-t)<7*24*3600*1000; }catch(e){ return false; } }
+  /* 部件-202:关闭从「记7天、只存localStorage」改「记1年、localStorage+cookie 双保险」——
+     墨舟真机反馈关了还次次弹:部分浏览器(隐私模式/禁本地存储)setItem 静默失败,弹窗就记不住;cookie 兜底 */
+  function dismissedRecently(){
+    try{ var t=+localStorage.getItem(LS_KEY)||0; if(t && (Date.now()-t)<365*24*3600*1000) return true; }catch(e){}
+    try{ if(document.cookie.indexOf('bls_inst_dis=1')>-1) return true; }catch(e){}
+    return false;
+  }
   function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
   function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }
-  function dismiss(el){ try{ localStorage.setItem(LS_KEY, Date.now()); }catch(e){} if(el&&el.remove) el.remove(); }
+  function dismiss(el){
+    try{ localStorage.setItem(LS_KEY, Date.now()); }catch(e){}
+    try{ document.cookie='bls_inst_dis=1;max-age=31536000;path=/'; }catch(e){}
+    if(el&&el.remove) el.remove();
+  }
   var deferredPrompt = null;
   // 汉字-194/部件-187:安装横幅三语,译文另起一行(跟语言切换器走)
   function tri(zh,en,ar){ return zh+'<span class="lang-en" style="display:block;opacity:.9;margin-top:2px;">'+en+'</span><span class="lang-ar" dir="rtl" style="display:block;opacity:.9;margin-top:2px;">'+ar+'</span>'; }
@@ -7663,7 +7675,21 @@ window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-swap"><span class
       }
     });
   }
-  function run(){ fitStepTitles(); }
+  /* ★ 部件-202:练习卡高度自量——卡的基准高 calc(100vh-100px) 天生比屏幕长(iOS 100vh 还含地址栏),
+     卡底伸到进度条后面看着「重叠」。改为实测:卡底压到进度条上沿留 8px 缝;矮屏兜底不低于 500px(宁可像旧版伸到条后,也不挤坏内容)。 */
+  function fitPracticeHeight(){
+    if(!window.matchMedia('(max-width:768px)').matches) return;   // 只管手机端
+    var layout=document.querySelector('.practice-layout');
+    var nav=document.getElementById('wizard-nav');
+    if(!layout||!nav) return;
+    var ps=document.getElementById('practice-screen');
+    if(!ps||ps.style.display==='none'){ layout.style.removeProperty('height'); return; }
+    layout.style.removeProperty('height');              // 先还原基准再量(防越缩越小)
+    var top=layout.getBoundingClientRect().top + window.scrollY;
+    var h=window.innerHeight - nav.offsetHeight - 8 - top;
+    if(h>=500) layout.style.setProperty('height', h.toFixed(0)+'px', 'important');
+  }
+  function run(){ fitStepTitles(); fitPracticeHeight(); }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run); else run();
   window.addEventListener('load', run);
   if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(run,50); });

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-197 (2026-07-06) — 手机端顶栏改斑斓练字/Brilliant Hanzi Practice、第二行两端对齐+切换钮上提、v1移入标题右下、释义框上移进度条抬起 -->
+<!-- 斑斓部件 · 部件联动-198 (2026-07-06) — 语言切换钮不悬浮改随页滚动、缩一号卡进两行英文中间上下等距;两行间距16→13收拢;v1再左移 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-197">
+<meta name="version" content="部件联动-198">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1056,12 +1056,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .struct-bar-title{text-align:left !important;position:relative;}
   .struct-bar-title > div:nth-child(1){justify-content:flex-start !important;gap:8px !important;}
   /* 第二行两端对齐:CREATED 左对齐图标、BASED ON HSK 右对齐副标题;整行下移与切换钮错开 */
-  .struct-bar-title > div:nth-child(2){justify-content:space-between !important;width:100% !important;margin-top:16px !important;}
+  .struct-bar-title > div:nth-child(2){justify-content:space-between !important;width:100% !important;margin-top:13px !important;}   /* 部件-198:两行间距 16→13 收拢 */
   .struct-bar-zh{white-space:nowrap !important;}
-  /* 语言切换钮上提,避开下移后的第二行 */
-  .lang-switcher{top:32px !important;}
+  /* 语言切换钮:不悬浮(随页面滚动)、再缩一号塞进两行英文中间、上下等距(各约3.4px) */
+  .lang-switcher{position:absolute !important;top:32px !important;transform:scale(0.48);transform-origin:top right;}
   /* v1 角标移到「斑斓练字」右下角空隙 */
-  #banlan-user-ver{position:absolute !important;left:172px;top:24px;right:auto;bottom:auto;font-size:12px;color:rgba(255,255,255,0.5);z-index:5;}
+  #banlan-user-ver{position:absolute !important;left:158px;top:24px;right:auto;bottom:auto;font-size:12px;color:rgba(255,255,255,0.5);z-index:5;}   /* 部件-198:左移 172→158 */
   /* 释义框上移(给底部 fixed 进度条留位)+ 进度条抬离屏底 */
   .practice-layout.wizard > .card.char-panel{padding-bottom:90px !important;}
   #wizard-nav{bottom:12px !important;}
@@ -1601,7 +1601,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-197 ✦ 手机端顶栏改斑斓练字/Brilliant Hanzi Practice、第二行两端对齐+切换钮上提、v1移入标题右下、释义框上移进度条抬起','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-198 ✦ 语言切换钮不悬浮改随页滚动、缩一号卡进两行英文中间上下等距;两行间距16→13收拢;v1再左移','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6039,7 +6039,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-197';
+  const VERSION = '部件联动-198';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

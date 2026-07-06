@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-196 (2026-07-06) — 两卡按钮推倒重写,照PWA安装按钮同款套路:去掉所有flex/cp-col,改成text-align居中+译文block(中文上译文下、水平居中),和安装按钮/老师端弹窗一致;顺手清了残留cp-ico空样式 -->
+<!-- 斑斓部件 · 部件联动-197 (2026-07-06) — 手机端顶栏改斑斓练字/Brilliant Hanzi Practice、第二行两端对齐+切换钮上提、v1移入标题右下、释义框上移进度条抬起 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-196">
-<title>斑斓部件 · HSK 3.0</title>
+<meta name="version" content="部件联动-197">
+<title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch-icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="斑斓部件HSK3.0">
+<meta name="apple-mobile-web-app-title" content="斑斓练字HSK3.0">
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 <style>
@@ -1047,6 +1047,25 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 }
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
 @media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
+/* ★ 手机端顶栏与练习页版式调整(墨舟实地验收):副标题满字号一行放下、第二行两端对齐、v1移入标题、释义框上移、进度条抬起 */
+/* v1 版本角标:桌面右下角固定(手机端在下方媒体查询里改到标题右下) */
+#banlan-user-ver{position:fixed;right:8px;bottom:6px;z-index:900;font-size:24px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;}
+@media(max-width:768px){
+  /* 顶栏:整块左对齐(logo贴左给长副标题让位)、缩内边距/字间距防换行 */
+  .struct-bar-header{padding-left:6px !important;padding-right:6px !important;}
+  .struct-bar-title{text-align:left !important;position:relative;}
+  .struct-bar-title > div:nth-child(1){justify-content:flex-start !important;gap:8px !important;}
+  /* 第二行两端对齐:CREATED 左对齐图标、BASED ON HSK 右对齐副标题;整行下移与切换钮错开 */
+  .struct-bar-title > div:nth-child(2){justify-content:space-between !important;width:100% !important;margin-top:16px !important;}
+  .struct-bar-zh{white-space:nowrap !important;}
+  /* 语言切换钮上提,避开下移后的第二行 */
+  .lang-switcher{top:32px !important;}
+  /* v1 角标移到「斑斓练字」右下角空隙 */
+  #banlan-user-ver{position:absolute !important;left:172px;top:24px;right:auto;bottom:auto;font-size:12px;color:rgba(255,255,255,0.5);z-index:5;}
+  /* 释义框上移(给底部 fixed 进度条留位)+ 进度条抬离屏底 */
+  .practice-layout.wizard > .card.char-panel{padding-bottom:90px !important;}
+  #wizard-nav{bottom:12px !important;}
+}
 </style>
 <style>
 /* ⑧ 语言切换器 + 中/英/阿显隐 + 阿语RTL */
@@ -1195,8 +1214,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     </svg>
     <div style="display:flex;flex-direction:column;justify-content:center">
       <div style="display:flex;align-items:baseline;gap:14px">
-        <span style="font-size:3.45rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(44,36,22,0.7);letter-spacing:0.12em;line-height:1">斑斓部件</span>
-        <span style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic;letter-spacing:0.04em">Brilliant Components · HSK 3.0</span>
+        <span style="font-size:3.45rem;font-weight:700;color:transparent;-webkit-text-stroke:1.5px rgba(44,36,22,0.7);letter-spacing:0.12em;line-height:1">斑斓练字</span>
+        <span style="font-size:0.85rem;color:var(--ink-light);font-family:Georgia,serif;font-style:italic;letter-spacing:0.04em">Brilliant Hanzi Practice · HSK 3.0</span>
       </div>
     </div>
   </div>
@@ -1215,8 +1234,8 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     <div class="struct-bar-title" style="text-align:center">
       <div onclick="event.stopPropagation();showHome();" title="回到主页面 / Back to Home" style="display:flex;align-items:center;justify-content:center;gap:14px;cursor:pointer">
         <svg class="app-logo" style="height:30px" viewBox="0 0 34 30" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="斑斓部件 Logo"><rect x="2.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/><rect x="18.5" y="2.5" width="13" height="25" rx="4.5" fill="none" stroke="#ffffff" stroke-width="3"/></svg>
-        <span class="struct-bar-zh">斑斓部件</span>
-        <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT COMPONENTS</span>
+        <span class="struct-bar-zh">斑斓练字</span>
+        <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BRILLIANT HANZI PRACTICE</span>
       </div>
       <div style="display:flex;align-items:baseline;justify-content:center;gap:14px;margin-top:9px">
         <span style="color:#ffffff;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">CREATED &amp; DESIGNED: Mozhou</span>
@@ -1582,7 +1601,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-196 ✦ 两卡按钮推倒重写,照PWA安装按钮同款套路:去掉所有flex/cp-col,改成text-align居中+译文block(中文上译文下、水平居中),和安装按钮/老师端弹窗一致;顺手清了残留cp-ico空样式','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-197 ✦ 手机端顶栏改斑斓练字/Brilliant Hanzi Practice、第二行两端对齐+切换钮上提、v1移入标题右下、释义框上移进度条抬起','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6020,7 +6039,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-196';
+  const VERSION = '部件联动-197';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7487,8 +7506,8 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     var tag = document.createElement('div');
     tag.id = 'banlan-user-ver';
     tag.textContent = USER_VERSION;
-    tag.style.cssText = 'position:fixed;right:8px;bottom:6px;z-index:900;font-size:24px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;';   /* 部件-183:字号 11→24(墨舟要求放大 2.2 倍) */
-    document.body.appendChild(tag);
+    /* 部件-197:角标挂进标题(样式见 CSS #banlan-user-ver:桌面右下固定、手机移到标题右下) */
+    (document.querySelector('.struct-bar-title') || document.body).appendChild(tag);
   });
   // —— 新版本检测:悄悄拉线上 index.html 的 meta version 和自己身上的比 ——
   var MY = (document.querySelector('meta[name="version"]')||{}).content || '';
@@ -7524,7 +7543,7 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); });
   }
-  var APP = '斑斓部件', LS_KEY = 'bls_install_dismiss', BG = '#3c4f45';
+  var APP = '斑斓练字', LS_KEY = 'bls_install_dismiss', BG = '#3c4f45';
   function dismissedRecently(){ try{ var t=+localStorage.getItem(LS_KEY)||0; return (Date.now()-t)<7*24*3600*1000; }catch(e){ return false; } }
   function isStandalone(){ return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true; }
   function isIOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent); }

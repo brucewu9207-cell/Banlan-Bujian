@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-184 (2026-07-03) — 学生端三个进班弹窗统一美化:①确认本人弹窗姓名/学号标签盒等宽+值进等高盒;②设置密码去掉提示句、名字学号单独居中放大1.5倍、标题副标缩小;③加入班级弹窗改成同款左标签盒等宽右输入框对齐;④记住密码中上译下且阿语归位左对齐 -->
+<!-- 斑斓部件 · 部件联动-185 (2026-07-06) — 扫老师分享码?class=XXX进来自动预填班级码只需再输学号;自学模式加反向推荐斑斓汉字卡片(二维码可离线) -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-184">
+<meta name="version" content="部件联动-185">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -168,6 +168,15 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ★ v94:未解锁等级 — 用 🔒 锁头表示;卡片整体略淡以示区分 */
 .level-btn .level-lock{font-size:1.5rem;line-height:1;display:block;margin-top:10px}
 .level-btn.level-locked{opacity:0.6}
+/* 部件联动-185(汉字-193配套):自学模式反向推荐老师端斑斓汉字 —— 纸色卡片+竹黄描边,贴合纸墨风 */
+.tj-hanzi-card{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--bamboo);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;max-width:520px;margin:0 auto 16px;text-align:left}
+.tj-hanzi-card .tj-qr{width:88px;height:88px;flex-shrink:0;border-radius:8px;background:#fff;padding:4px;box-sizing:border-box}
+.tj-hanzi-card .tj-title{font-size:1rem;font-weight:700;color:#5a4326;line-height:1.35;margin-bottom:4px}
+.tj-hanzi-card .tj-title .lang-en,.tj-hanzi-card .tj-title .lang-ar{display:block;font-size:0.82rem;font-weight:600;opacity:0.9}
+.tj-hanzi-card .tj-desc{font-size:0.8rem;color:var(--ink-mid);line-height:1.5}
+.tj-hanzi-card .tj-desc .lang-en,.tj-hanzi-card .tj-desc .lang-ar{display:block;opacity:0.9}
+.tj-hanzi-card .tj-link{display:inline-block;margin-top:6px;font-size:0.74rem;color:var(--bamboo);font-family:Menlo,Consolas,monospace;text-decoration:none}
+@media(max-width:480px){.tj-hanzi-card{gap:10px;padding:12px}.tj-hanzi-card .tj-qr{width:74px;height:74px}}
 .level-btn.level-locked:hover{opacity:0.75;transform:translateY(-1px)}
 
 /* 练习布局 — 左右等高 */
@@ -1388,6 +1397,15 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     </div>
 
     <div id="level-select" class="card level-select-screen" style="display:none">
+      <!-- 部件联动-185(汉字-193配套):自学=没进班的学生,他老师可能还没用老师端 → 反向推荐斑斓汉字 -->
+      <div class="tj-hanzi-card">
+        <img class="tj-qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAIAAAAG+WgKAAADd0lEQVR42u3dzXEUQQwGUJkiIC4EQOQEwIWMlgC4THXpr3ffOxu8xl91o9KM9PV6vQLyfPNPgEghUogUiBQihUiBSCFSiBSIFLW+P/miH79+Dn7Ev7//pHye//+erJ+082/e9rtwSuHiQ6QQKRApbq/4zv7nf2a2ormxmtv2u3BK4eJDpBApEClur/g6u2NntdJZpZZVPc325mYrR6cULj5ECpECkeL9Kr5OTyqaJ9VcVv8uqwJ1SoFIIVKIFCIFKr6zCiurCjvr351Vjk4pEClECpFCpGBDxTdbrTz57meVWt3bdnXPec7+LpxSiBQihUiBSHF7xTc7X6Wuo1fXPaz7zNtm3TilEClECpECkWKNrxs3sJ9VT7F+MqenOkGkEClECpGCWLCP78YnJOumdz75PFn1Xd1U0qx/Q6cULj5ECpECkSIu7/F1TkqJZX3Aus7g7CfMqi6dUrj4EClECkSKuLzH17lnYVs/sW4TRGdfsm52qFMKFx8ihUiBSBFv1+OLxs0L0bjT4canXvX4cPGBSCFSiBQ8r/jqZlHG6M6+zj81+9Rr5zZApxQuPkQKkQKRImxgb5/KklXRzFaynbNlTG7BxYdIgUghUtjHl9vnqutGzc4FPfvudZM5nVK4+BApEClEChXfhumdT2qlutkp297Rq+t4ZtWJTilcfIgUIgUiRdjAfsnkybpNf/t7lyo+XHyIFIgUIkV4qnNB1VP3mffvf697a88phYsPkQKRQqQIszoX9ML2TwrtnLrZ2dFzSuHiQ6QQKRAp4vIeX9Z7YbNvyXXWgHWTbWa3PDilEClECkQKkeIzn+rs3FK3rcaJxi0PWV/jlMLFh0iBSCFShKc6V8qqaLZtPM+qZOsqPvv4cPEhUiBSiBTxdj2+2Z5R1vSSzo0SdbNTOqe7mNWJiw+RApFCpPjMpzr3Tybp/O5Z2wBnZ5lm1YBOKVx8iBQiBSLFJ2xg7+zfZXXisn7Sbc9n1s1WdUrh4kOkECkQKT6h4osL3+Orq9Rm9yzU7U/U48PFh0iBSCFSqPjulfWOXt27h9H4DqNTChcfIgUihUih4uvfj9BZ0dQ9/Zi1H3B2Ro1TChcfIoVIgUjxmfv4ovGpzieTUrJqt85t71nVXGc97pRCpBApRApEirCPD6cUiBQihUiBSCFSiBQiBSKFSCFScOIfGCtNn+cumikAAAAASUVORK5CYII=" alt="斑斓汉字老师端二维码">
+        <div class="tj-hanzi-body">
+          <div class="tj-title"><span class="es-zh">让老师用《斑斓汉字》给你留作业</span><span class="lang-en">Ask your teacher to use Brilliant Hanzi</span><span class="lang-ar" dir="rtl">اطلب من معلّمك استخدام «برلنت هانزي»</span></div>
+          <div class="tj-desc"><span class="es-zh">把二维码发给你的中文老师，他就能建班、布置任务给你。</span><span class="lang-en">Send this QR to your Chinese teacher — they can create a class and assign you homework.</span><span class="lang-ar" dir="rtl">أرسل هذا الرمز إلى معلّم اللغة الصينية — يمكنه إنشاء فصل وتعيين واجبات لك.</span></div>
+          <a class="tj-link" href="https://banlan-hanzi.vercel.app/" target="_blank" rel="noopener">banlan-hanzi.vercel.app</a>
+        </div>
+      </div>
       <div class="level-grid">
         <button class="level-btn" onclick="startLevel(1)"><span class="level-num">HSK 1</span><span class="level-count" data-lv="1"></span></button>
         <button class="level-btn" onclick="startLevel(2)"><span class="level-num">HSK 2</span><span class="level-count" data-lv="2"></span></button>
@@ -1549,7 +1567,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-184 ✦ 学生端三个进班弹窗统一美化:①确认本人弹窗姓名/学号标签盒等宽+值进等高盒;②设置密码去掉提示句、名字学号单独居中放大1.5倍、标题副标缩小;③加入班级弹窗改成同款左标签盒等宽右输入框对齐;④记住密码中上译下且阿语归位左对齐','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-185 ✦ 扫老师分享码?class=XXX进来自动预填班级码只需再输学号;自学模式加反向推荐斑斓汉字卡片(二维码可离线)','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5980,7 +5998,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-184';
+  const VERSION = '部件联动-185';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6525,8 +6543,8 @@ try{
   }
 
   // ─── 加入班级弹窗 ──────────────────────────────────────────
-  function openJoinDialog(){
-    console.log('[BLS] 打开加入班级弹窗');
+  function openJoinDialog(prefillCode){
+    console.log('[BLS] 打开加入班级弹窗' + (prefillCode ? ' · 预填班级码=' + prefillCode : ''));
     const html = `
       <div class="bls-modal bls-join2" role="dialog" aria-modal="true">
         <div class="bls-modal-header">
@@ -6572,7 +6590,13 @@ try{
         if(e.key === 'Enter') submitJoin();
       });
     });
-    setTimeout(function(){ codeInput.focus(); }, 60);
+    // 汉字-193 配套:扫老师分享码进来(?class=XXX)→ 班级码已带上,预填好、直接聚焦学号
+    if(prefillCode){
+      codeInput.value = prefillCode;
+      setTimeout(function(){ sidInput.focus(); }, 60);
+    } else {
+      setTimeout(function(){ codeInput.focus(); }, 60);
+    }
   }
 
   function showJoinError(msg){
@@ -7168,6 +7192,17 @@ try{
     } else {
       console.log('[BLS] 未登录,等用户点卡片加入班级');
     }
+
+    // 汉字-193 配套:老师分享码 banlan-bujian.vercel.app/?class=XXX → 自动打开加入弹窗、班级码预填
+    // 注意:PWA 装到桌面后 start_url 为 './',主屏启动会丢掉 ?class,只在首次浏览器扫码访问时生效(够用)
+    try {
+      var _cls = new URLSearchParams(location.search).get('class');
+      if(_cls && _cls.trim()){
+        _cls = _cls.trim().slice(0, 20);
+        setTimeout(function(){ openJoinDialog(_cls); }, 300);
+        try { history.replaceState(null, '', location.pathname + location.hash); } catch(e){}  // 清掉 ?class,刷新不再重复弹
+      }
+    } catch(e){ console.warn('[BLS] 读 ?class 参数失败', e); }
   }
 
   // ─── 暴露 API ──────────────────────────────────────────────

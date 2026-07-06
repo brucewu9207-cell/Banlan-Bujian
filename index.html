@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-187 (2026-07-06) — PWA安装横幅做成三语切换(译文另起一行):桌面/iOS/电脑Chrome兜底提示+安装按钮全覆盖,跟语言切换器走 -->
+<!-- 斑斓部件 · 部件联动-188 (2026-07-06) — 自学模式反向推荐卡片改版式:大标题左对齐置顶,二维码移到左下角,小标题放二维码右边,链接加下划线做成可点链接 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-187">
+<meta name="version" content="部件联动-188">
 <title>斑斓部件 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -169,14 +169,16 @@ body::before{content:'';position:fixed;inset:0;background:
 .level-btn .level-lock{font-size:1.5rem;line-height:1;display:block;margin-top:10px}
 .level-btn.level-locked{opacity:0.6}
 /* 部件联动-185(汉字-193配套):自学模式反向推荐老师端斑斓汉字 —— 纸色卡片+竹黄描边,贴合纸墨风 */
-.tj-hanzi-card{display:flex;gap:14px;align-items:center;background:var(--paper);border:2px solid var(--bamboo);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;max-width:520px;margin:0 auto 16px;text-align:left}
-.tj-hanzi-card .tj-qr{width:88px;height:88px;flex-shrink:0;border-radius:8px;background:#fff;padding:4px;box-sizing:border-box}
-.tj-hanzi-card .tj-title{font-size:1rem;font-weight:700;color:#5a4326;line-height:1.35;margin-bottom:4px}
+.tj-hanzi-card{background:var(--paper);border:2px solid var(--bamboo);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 18px;max-width:560px;margin:0 auto 16px;text-align:left}
+.tj-hanzi-card .tj-title{font-size:1.05rem;font-weight:700;color:#5a4326;line-height:1.3;margin-bottom:10px}
 .tj-hanzi-card .tj-title .lang-en,.tj-hanzi-card .tj-title .lang-ar{display:block;font-size:0.82rem;font-weight:600;opacity:0.9}
-.tj-hanzi-card .tj-desc{font-size:0.8rem;color:var(--ink-mid);line-height:1.5}
+.tj-hanzi-card .tj-row{display:flex;gap:14px;align-items:flex-end}
+.tj-hanzi-card .tj-qr{width:96px;height:96px;flex-shrink:0;border-radius:8px;background:#fff;padding:4px;box-sizing:border-box}
+.tj-hanzi-card .tj-side{flex:1;min-width:0}
+.tj-hanzi-card .tj-desc{font-size:0.82rem;color:var(--ink-mid);line-height:1.5}
 .tj-hanzi-card .tj-desc .lang-en,.tj-hanzi-card .tj-desc .lang-ar{display:block;opacity:0.9}
-.tj-hanzi-card .tj-link{display:inline-block;margin-top:6px;font-size:0.74rem;color:var(--bamboo);font-family:Menlo,Consolas,monospace;text-decoration:none}
-@media(max-width:480px){.tj-hanzi-card{gap:10px;padding:12px}.tj-hanzi-card .tj-qr{width:74px;height:74px}}
+.tj-hanzi-card .tj-link{display:inline-block;margin-top:7px;font-size:0.78rem;color:var(--bamboo);font-weight:600;font-family:Menlo,Consolas,monospace;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:480px){.tj-hanzi-card{padding:12px}.tj-hanzi-card .tj-qr{width:84px;height:84px}}
 .level-btn.level-locked:hover{opacity:0.75;transform:translateY(-1px)}
 
 /* 练习布局 — 左右等高 */
@@ -1399,11 +1401,13 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
     <div id="level-select" class="card level-select-screen" style="display:none">
       <!-- 部件联动-185(汉字-193配套):自学=没进班的学生,他老师可能还没用老师端 → 反向推荐斑斓汉字 -->
       <div class="tj-hanzi-card">
-        <img class="tj-qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAIAAAAG+WgKAAADd0lEQVR42u3dzXEUQQwGUJkiIC4EQOQEwIWMlgC4THXpr3ffOxu8xl91o9KM9PV6vQLyfPNPgEghUogUiBQihUiBSCFSiBSIFLW+P/miH79+Dn7Ev7//pHye//+erJ+082/e9rtwSuHiQ6QQKRApbq/4zv7nf2a2ormxmtv2u3BK4eJDpBApEClur/g6u2NntdJZpZZVPc325mYrR6cULj5ECpECkeL9Kr5OTyqaJ9VcVv8uqwJ1SoFIIVKIFCIFKr6zCiurCjvr351Vjk4pEClECpFCpGBDxTdbrTz57meVWt3bdnXPec7+LpxSiBQihUiBSHF7xTc7X6Wuo1fXPaz7zNtm3TilEClECpECkWKNrxs3sJ9VT7F+MqenOkGkEClECpGCWLCP78YnJOumdz75PFn1Xd1U0qx/Q6cULj5ECpECkSIu7/F1TkqJZX3Aus7g7CfMqi6dUrj4EClECkSKuLzH17lnYVs/sW4TRGdfsm52qFMKFx8ihUiBSBFv1+OLxs0L0bjT4canXvX4cPGBSCFSiBQ8r/jqZlHG6M6+zj81+9Rr5zZApxQuPkQKkQKRImxgb5/KklXRzFaynbNlTG7BxYdIgUghUtjHl9vnqutGzc4FPfvudZM5nVK4+BApEClEChXfhumdT2qlutkp297Rq+t4ZtWJTilcfIgUIgUiRdjAfsnkybpNf/t7lyo+XHyIFIgUIkV4qnNB1VP3mffvf697a88phYsPkQKRQqQIszoX9ML2TwrtnLrZ2dFzSuHiQ6QQKRAp4vIeX9Z7YbNvyXXWgHWTbWa3PDilEClECkQKkeIzn+rs3FK3rcaJxi0PWV/jlMLFh0iBSCFShKc6V8qqaLZtPM+qZOsqPvv4cPEhUiBSiBTxdj2+2Z5R1vSSzo0SdbNTOqe7mNWJiw+RApFCpPjMpzr3Tybp/O5Z2wBnZ5lm1YBOKVx8iBQiBSLFJ2xg7+zfZXXisn7Sbc9n1s1WdUrh4kOkECkQKT6h4osL3+Orq9Rm9yzU7U/U48PFh0iBSCFSqPjulfWOXt27h9H4DqNTChcfIgUihUih4uvfj9BZ0dQ9/Zi1H3B2Ro1TChcfIoVIgUjxmfv4ovGpzieTUrJqt85t71nVXGc97pRCpBApRApEirCPD6cUiBQihUiBSCFSiBQiBSKFSCFScOIfGCtNn+cumikAAAAASUVORK5CYII=" alt="斑斓汉字老师端二维码">
-        <div class="tj-hanzi-body">
-          <div class="tj-title"><span class="es-zh">让老师用《斑斓汉字》给你留作业</span><span class="lang-en">Ask your teacher to use Brilliant Hanzi</span><span class="lang-ar" dir="rtl">اطلب من معلّمك استخدام «برلنت هانزي»</span></div>
-          <div class="tj-desc"><span class="es-zh">把二维码发给你的中文老师，他就能建班、布置任务给你。</span><span class="lang-en">Send this QR to your Chinese teacher — they can create a class and assign you homework.</span><span class="lang-ar" dir="rtl">أرسل هذا الرمز إلى معلّم اللغة الصينية — يمكنه إنشاء فصل وتعيين واجبات لك.</span></div>
-          <a class="tj-link" href="https://banlan-hanzi.vercel.app/" target="_blank" rel="noopener">banlan-hanzi.vercel.app</a>
+        <div class="tj-title"><span class="es-zh">让老师用《斑斓汉字》给你留作业</span><span class="lang-en">Ask your teacher to use Brilliant Hanzi</span><span class="lang-ar" dir="rtl">اطلب من معلّمك استخدام «برلنت هانزي»</span></div>
+        <div class="tj-row">
+          <img class="tj-qr" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADGCAIAAAAG+WgKAAADd0lEQVR42u3dzXEUQQwGUJkiIC4EQOQEwIWMlgC4THXpr3ffOxu8xl91o9KM9PV6vQLyfPNPgEghUogUiBQihUiBSCFSiBSIFLW+P/miH79+Dn7Ev7//pHye//+erJ+082/e9rtwSuHiQ6QQKRApbq/4zv7nf2a2ormxmtv2u3BK4eJDpBApEClur/g6u2NntdJZpZZVPc325mYrR6cULj5ECpECkeL9Kr5OTyqaJ9VcVv8uqwJ1SoFIIVKIFCIFKr6zCiurCjvr351Vjk4pEClECpFCpGBDxTdbrTz57meVWt3bdnXPec7+LpxSiBQihUiBSHF7xTc7X6Wuo1fXPaz7zNtm3TilEClECpECkWKNrxs3sJ9VT7F+MqenOkGkEClECpGCWLCP78YnJOumdz75PFn1Xd1U0qx/Q6cULj5ECpECkSIu7/F1TkqJZX3Aus7g7CfMqi6dUrj4EClECkSKuLzH17lnYVs/sW4TRGdfsm52qFMKFx8ihUiBSBFv1+OLxs0L0bjT4canXvX4cPGBSCFSiBQ8r/jqZlHG6M6+zj81+9Rr5zZApxQuPkQKkQKRImxgb5/KklXRzFaynbNlTG7BxYdIgUghUtjHl9vnqutGzc4FPfvudZM5nVK4+BApEClEChXfhumdT2qlutkp297Rq+t4ZtWJTilcfIgUIgUiRdjAfsnkybpNf/t7lyo+XHyIFIgUIkV4qnNB1VP3mffvf697a88phYsPkQKRQqQIszoX9ML2TwrtnLrZ2dFzSuHiQ6QQKRAp4vIeX9Z7YbNvyXXWgHWTbWa3PDilEClECkQKkeIzn+rs3FK3rcaJxi0PWV/jlMLFh0iBSCFShKc6V8qqaLZtPM+qZOsqPvv4cPEhUiBSiBTxdj2+2Z5R1vSSzo0SdbNTOqe7mNWJiw+RApFCpPjMpzr3Tybp/O5Z2wBnZ5lm1YBOKVx8iBQiBSLFJ2xg7+zfZXXisn7Sbc9n1s1WdUrh4kOkECkQKT6h4osL3+Orq9Rm9yzU7U/U48PFh0iBSCFSqPjulfWOXt27h9H4DqNTChcfIgUihUih4uvfj9BZ0dQ9/Zi1H3B2Ro1TChcfIoVIgUjxmfv4ovGpzieTUrJqt85t71nVXGc97pRCpBApRApEirCPD6cUiBQihUiBSCFSiBQiBSKFSCFScOIfGCtNn+cumikAAAAASUVORK5CYII=" alt="斑斓汉字老师端二维码">
+          <div class="tj-side">
+            <div class="tj-desc"><span class="es-zh">把二维码发给你的中文老师，他就能进班布置任务给你</span><span class="lang-en">Send this QR to your Chinese teacher — they can set up a class and assign you homework.</span><span class="lang-ar" dir="rtl">أرسل هذا الرمز إلى معلّم اللغة الصينية — يمكنه إنشاء فصل وتعيين واجبات لك.</span></div>
+            <a class="tj-link" href="https://banlan-hanzi.vercel.app/" target="_blank" rel="noopener">banlan-hanzi.vercel.app</a>
+          </div>
         </div>
       </div>
       <div class="level-grid">
@@ -1567,7 +1571,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-187 ✦ PWA安装横幅做成三语切换(译文另起一行):桌面/iOS/电脑Chrome兜底提示+安装按钮全覆盖,跟语言切换器走','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-188 ✦ 自学模式反向推荐卡片改版式:大标题左对齐置顶,二维码移到左下角,小标题放二维码右边,链接加下划线做成可点链接','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -5998,7 +6002,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-187';
+  const VERSION = '部件联动-188';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-200 (2026-07-06) — v1角标下移与语言切换钮中线等高对齐(自量脚本跟着钮走、真机不偏),字体字号改跟BRILLIANT副标题同款Georgia -->
+<!-- 斑斓部件 · 部件联动-201 (2026-07-06) — 步骤标题①②③④防溢出自量:华为电脑Windows字体更宽致 书写练习WRITING PRACTICE 溢出标题框(内部反馈),现每台设备自己量、超宽自动缩字号到装下,装得下的设备不动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-200">
+<meta name="version" content="部件联动-201">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1601,7 +1601,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-200 ✦ v1角标下移与语言切换钮中线等高对齐(自量脚本跟着钮走、真机不偏),字体字号改跟BRILLIANT副标题同款Georgia','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-201 ✦ 步骤标题①②③④防溢出自量:华为电脑Windows字体更宽致 书写练习WRITING PRACTICE 溢出标题框(内部反馈),现每台设备自己量、超宽自动缩字号到装下,装得下的设备不动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6039,7 +6039,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-200';
+  const VERSION = '部件联动-201';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7645,6 +7645,44 @@ window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-swap"><span class
   window.addEventListener('resize', run);
   window.addEventListener('orientationchange', function(){ setTimeout(run,120); });
   window.addEventListener('banlan-lang-changed', function(){ setTimeout(run,60); });   // 切语言后文字变、重校
+})();
+</script>
+<script>
+/* ★ 部件-201:步骤标题(①②③④)防溢出自量——内部成员华为电脑上「③ 书写练习 WRITING PRACTICE」溢出标题框
+   (Windows 字体渲染比 Mac/手机宽,写死的字号+强制单行装不下)。通用兜底:每台设备自己量,
+   标题超出框宽就把字号 0.5px 一档往下缩到刚好装下;装得下的设备一像素不动(先还原再量,防越缩越小)。 */
+(function(){
+  function fitStepTitles(){
+    document.querySelectorAll('.step-title').forEach(function(el){
+      el.style.removeProperty('font-size');            // 先还原到样式表基准,再量真实宽度
+      if(el.clientWidth<=0) return;                    // 面板隐藏(display:none)时不量
+      var guard=24;                                    // 最多缩 12px,防意外死循环
+      while(el.scrollWidth>el.clientWidth && guard-->0){
+        var fs=parseFloat(getComputedStyle(el).fontSize);
+        el.style.setProperty('font-size',(fs-0.5)+'px','important');   // 行内 important 盖过手机端 0.8rem!important
+      }
+    });
+  }
+  function run(){ fitStepTitles(); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', run); else run();
+  window.addEventListener('load', run);
+  if(document.fonts&&document.fonts.ready) document.fonts.ready.then(function(){ setTimeout(run,50); });
+  setTimeout(run,800); setTimeout(run,2000);
+  window.addEventListener('resize', run);
+  window.addEventListener('orientationchange', function(){ setTimeout(run,120); });
+  window.addEventListener('banlan-lang-changed', function(){ setTimeout(run,60); });
+  /* 向导切步/进出练习页时面板才显形(隐藏时量不了),盯住这两处变化后重量 */
+  document.addEventListener('DOMContentLoaded', function(){
+    var t;
+    function later(){ clearTimeout(t); t=setTimeout(run,80); }
+    /* 注意:wizard 类是运行时才加的,不能选 .practice-layout.wizard(挂载时选不到);盯静态的 .practice-layout 全部属性变化 */
+    var layout=document.querySelector('.practice-layout');
+    var ps=document.getElementById('practice-screen');
+    try{
+      if(layout) new MutationObserver(later).observe(layout,{attributes:true});
+      if(ps) new MutationObserver(later).observe(ps,{attributes:true,attributeFilter:['style']});
+    }catch(e){}
+  });
 })();
 </script>
 </body>

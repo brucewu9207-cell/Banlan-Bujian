@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-202 (2026-07-06) — 手机端进度条贴合底边加高(内容留安全区);练习卡高度自量压到进度条上沿留8px缝不再重叠(矮屏兜底);安装弹窗关闭改记1年+localStorage与cookie双保险,不再次次弹 -->
+<!-- 斑斓部件 · 部件联动-203 (2026-07-07) — 半包围①可句卡加引导:呼吸光晕只罩结构图标+点我贴纸+箭头(手机在左/桌面在上,双语);身份面板修改密码退出登录好三按钮改中上译下去斜杠 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-202">
+<meta name="version" content="部件联动-203">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1047,6 +1047,32 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 }
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
 @media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
+/* ★ 部件-203:结构卡引导(墨舟指定只做半包围①「可、句」这张)——呼吸光晕(跟老师端「挥毫生成」同款朱砂红、只动box-shadow不缩放不抖)+「点我」贴纸+手绘箭头;两端通用 */
+@keyframes blGlowPulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(179,57,57,0);}
+  50%{box-shadow:0 0 15px 3px rgba(179,57,57,0.55);}
+}
+.struct-card-guide{position:relative;}
+/* 呼吸光晕只罩「汉字结构图标」,不罩结构标题(墨舟指定) */
+.struct-card-guide .struct-card-svg{border-radius:12px;animation:blGlowPulse 2.4s ease-in-out infinite;}
+@media (prefers-reduced-motion:reduce){.struct-card-guide .struct-card-svg{animation:none;box-shadow:0 0 12px 2px rgba(179,57,57,0.4);}}
+.struct-guide{position:absolute;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:0;}   /* 悬出卡片外(卡太小装不下);pointer-events:none→点贴纸=点卡片,不挡拼字弹窗 */
+.struct-guide-sticker{display:inline-block;background:#b33939;color:#fff;font-size:0.52rem;font-weight:700;padding:2px 6px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.28);letter-spacing:0.05em;line-height:1.15;text-align:center;transform:rotate(8deg);font-style:normal;}
+.struct-guide-sticker .lang-swap{display:block;font-size:0.78em;opacity:0.92;font-weight:600;font-family:Georgia,serif;}
+.struct-guide-arrow{width:15px;height:15px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));}
+/* 桌面:贴纸+箭头在图标正上方 */
+@media(min-width:769px){
+  .struct-guide{top:-30px;left:22px;right:auto;align-items:center;}
+  .struct-guide-arrow{margin:1px 0 0 2px;transform:rotate(-25deg);}
+}
+/* 手机:贴纸+箭头在卡片左侧,箭头镜像指向右下的图标 */
+@media(max-width:768px){
+  .struct-guide{top:-24px;left:-2px;right:auto;align-items:flex-start;}
+  .struct-guide-arrow{transform:scaleX(-1) rotate(-12deg);margin:1px 0 0 24px;}
+}
+/* ★ 部件-203:身份面板底部三按钮(修改密码/退出登录/好)改「中文上、译文下」竖排、去掉斜杠 */
+.bls-modal-footer .bls-btn{text-align:center;white-space:nowrap;}
+.bls-modal-footer .bls-btn .lang-swap-block{display:block;font-size:0.72em;opacity:0.85;font-weight:600;margin-top:2px;line-height:1.2;}
 /* ★ 手机端顶栏与练习页版式调整(墨舟实地验收):副标题满字号一行放下、第二行两端对齐、v1移入标题、释义框上移、进度条抬起 */
 /* v1 版本角标:桌面右下角固定(手机端在下方媒体查询里改到标题右下) */
 #banlan-user-ver{position:fixed;right:8px;bottom:6px;z-index:900;font-size:24px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;}
@@ -1299,7 +1325,9 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <div class="struct-card-name">上中下结构</div>
         <div class="lang-swap-block"><div class="struct-card-en lang-en">Upper-middle-lower</div><div class="struct-card-en lang-ar" dir="rtl">أعلى-وسط-أسفل</div></div>
         <div class="struct-card-ex">草、意</div></div></div></div>
-      <div class="sg" style="flex:6;background:#827560"><div class="sg-label">4 半包围<span class="lang-swap-block"><span class="lang-en">Semi-enclosed</span><span class="lang-ar" dir="rtl">شبه محاط</span></span></div><div class="sg-row"><div class="struct-card">
+      <div class="sg" style="flex:6;background:#827560"><div class="sg-label">4 半包围<span class="lang-swap-block"><span class="lang-en">Semi-enclosed</span><span class="lang-ar" dir="rtl">شبه محاط</span></span></div><div class="sg-row"><div class="struct-card struct-card-guide">
+        <!-- 部件-203:墨舟指定只给这张卡加「呼吸光晕+点我贴纸+箭头」引导(点卡片弹拼字演示,学生不知道能点) -->
+        <span class="struct-guide" aria-hidden="true"><span class="struct-guide-sticker">点我<span class="lang-swap"><span class="lang-en">Click me</span><span class="lang-ar" dir="rtl">اضغطني</span></span></span><svg class="struct-guide-arrow" viewBox="0 0 24 24"><path d="M19 3 C16 9 12 13 7 16" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M11 16.6 L6.2 16.9 L8.4 12.6" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div class="struct-card-num">①</div>
         <svg class="struct-card-svg" viewBox="0 0 48 48">
           <path d="M6,6 L42,6 L42,42" stroke="rgba(255,255,255,0.9)" stroke-width="3.2" fill="none" stroke-dasharray="3,2"/>
@@ -1603,7 +1631,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-202 ✦ 手机端进度条贴合底边加高(内容留安全区);练习卡高度自量压到进度条上沿留8px缝不再重叠(矮屏兜底);安装弹窗关闭改记1年+localStorage与cookie双保险,不再次次弹','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-203 ✦ 半包围①可句卡加引导:呼吸光晕只罩结构图标+点我贴纸+箭头(手机在左/桌面在上,双语);身份面板修改密码退出登录好三按钮改中上译下去斜杠','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6041,7 +6069,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-202';
+  const VERSION = '部件联动-203';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -6860,9 +6888,10 @@ try{
         <div class="bls-modal-footer">
           <!-- ★ 17: 已移除"离开班级"按钮(离开只能由老师移出) -->
           <!-- ★ pwd(179): 加「修改密码」「退出登录」;退出只清本机记忆,不动名单成绩 -->
-          <button class="bls-btn bls-btn-secondary bls-btn-green" id="bls-info-chpwd">修改密码<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Password</span><span class="lang-ar"><i class="bls-sep"> / </i>كلمة المرور</span></span></button>
-          <button class="bls-btn bls-btn-secondary bls-btn-danger" id="bls-info-logout">退出登录<span class="lang-swap"><span class="lang-en"><i class="bls-sep"> / </i>Log out</span><span class="lang-ar"><i class="bls-sep"> / </i>خروج</span></span></button>
-          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap"><span class="lang-en"> / OK</span><span class="lang-ar" dir="rtl"> حسناً / </span></span></button>
+          <!-- 部件-203:三按钮改「中文上、译文下」竖排,去掉斜杠(墨舟指定) -->
+          <button class="bls-btn bls-btn-secondary bls-btn-green" id="bls-info-chpwd">修改密码<span class="lang-swap-block"><span class="lang-en">Password</span><span class="lang-ar" dir="rtl">كلمة المرور</span></span></button>
+          <button class="bls-btn bls-btn-secondary bls-btn-danger" id="bls-info-logout">退出登录<span class="lang-swap-block"><span class="lang-en">Log out</span><span class="lang-ar" dir="rtl">خروج</span></span></button>
+          <button class="bls-btn bls-btn-primary" id="bls-info-ok">好<span class="lang-swap-block"><span class="lang-en">OK</span><span class="lang-ar" dir="rtl">حسناً</span></span></button>
         </div>
       </div>
     `;

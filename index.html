@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-204 (2026-07-07) — 结构卡引导升级:点我贴纸闪烁且与图标呼吸同步(2.4s同相位);光晕白圈打底更亮更明显;桌面贴纸放大1.3倍;手机贴纸挪到结构图标左侧箭头指右 -->
+<!-- 斑斓部件 · 部件联动-205 (2026-07-07) — 身份面板三按钮中/译间距统一:英阿译文改叠同一格(原各占一行,切阿语译文低一行间距变大),两语言都贴中文2px、按钮同高不移位 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-204">
+<meta name="version" content="部件联动-205">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1079,7 +1079,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 }
 /* ★ 部件-203:身份面板底部三按钮(修改密码/退出登录/好)改「中文上、译文下」竖排、去掉斜杠 */
 .bls-modal-footer .bls-btn{text-align:center;white-space:nowrap;}
-.bls-modal-footer .bls-btn .lang-swap-block{display:block;font-size:0.72em;opacity:0.85;font-weight:600;margin-top:2px;line-height:1.2;}
+/* 部件-205:译文改「英/阿叠同一格」(标准阿语防移位做法)——原先英阿各占一行,切阿语时译文低一行,中/译间距不一致(墨舟指出) */
+.bls-modal-footer .bls-btn .lang-swap-block{display:grid;font-size:0.72em;opacity:0.85;font-weight:600;margin-top:2px;line-height:1.2;}
+.bls-modal-footer .bls-btn .lang-swap-block > span{grid-area:1/1;}
 /* ★ 手机端顶栏与练习页版式调整(墨舟实地验收):副标题满字号一行放下、第二行两端对齐、v1移入标题、释义框上移、进度条抬起 */
 /* v1 版本角标:桌面右下角固定(手机端在下方媒体查询里改到标题右下) */
 #banlan-user-ver{position:fixed;right:8px;bottom:6px;z-index:900;font-size:24px;letter-spacing:.5px;color:rgba(55,74,66,0.45);pointer-events:none;font-family:Menlo,Consolas,monospace;}
@@ -1638,7 +1640,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-204 ✦ 结构卡引导升级:点我贴纸闪烁且与图标呼吸同步(2.4s同相位);光晕白圈打底更亮更明显;桌面贴纸放大1.3倍;手机贴纸挪到结构图标左侧箭头指右','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-205 ✦ 身份面板三按钮中/译间距统一:英阿译文改叠同一格(原各占一行,切阿语译文低一行间距变大),两语言都贴中文2px、按钮同高不移位','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6076,7 +6078,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-204';
+  const VERSION = '部件联动-205';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

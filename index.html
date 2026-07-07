@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-205 (2026-07-07) — 身份面板三按钮中/译间距统一:英阿译文改叠同一格(原各占一行,切阿语译文低一行间距变大),两语言都贴中文2px、按钮同高不移位 -->
+<!-- 斑斓部件 · 部件联动-206 (2026-07-07) — 修桌面端v1消失:200版把角标挂进顶栏标题,顶栏是层叠上下文、桌面被结构栏盖住;挂回body层恢复压最上,手机端对齐改页面坐标、位置效果不变 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-205">
+<meta name="version" content="部件联动-206">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1096,7 +1096,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 语言切换钮:不悬浮(随页面滚动)、再缩一号塞进两行英文中间、上下等距(各约3.4px) */
   .lang-switcher{position:absolute !important;top:32px !important;transform:scale(0.48);transform-origin:top right;}
   /* v1 角标移到「斑斓练字」右下角空隙 */
-  #banlan-user-ver{position:absolute !important;left:158px;top:24px;right:auto;bottom:auto;color:rgba(255,255,255,0.5);z-index:5;font-family:Georgia,serif;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;}   /* 部件-200:字体字号跟 BRILLIANT 副标题一致;top 是兜底,实际由自量脚本对齐切换钮中线 */
+  #banlan-user-ver{position:absolute !important;left:168px;top:30px;right:auto;bottom:auto;color:rgba(255,255,255,0.5);z-index:5;font-family:Georgia,serif;font-size:0.63rem;font-weight:700;letter-spacing:0.12em;}   /* 部件-200:字体字号跟 BRILLIANT 同款;部件-206:v1 挂回 body,这里是页面坐标兜底,实际由自量脚本对齐切换钮 */
   /* 部件-202:进度条贴合手机底边(197 曾悬空 12px,真机缝里露出卡片显得重叠)+ 加高;
      内边距底部叠加 iPhone 安全区(env),小白条挡不住按钮 */
   #wizard-nav{bottom:0 !important;padding-top:12px !important;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px)) !important;}
@@ -1640,7 +1640,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-205 ✦ 身份面板三按钮中/译间距统一:英阿译文改叠同一格(原各占一行,切阿语译文低一行间距变大),两语言都贴中文2px、按钮同高不移位','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-206 ✦ 修桌面端v1消失:200版把角标挂进顶栏标题,顶栏是层叠上下文、桌面被结构栏盖住;挂回body层恢复压最上,手机端对齐改页面坐标、位置效果不变','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6078,7 +6078,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-205';
+  const VERSION = '部件联动-206';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7546,8 +7546,9 @@ window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn
     var tag = document.createElement('div');
     tag.id = 'banlan-user-ver';
     tag.textContent = USER_VERSION;
-    /* 部件-197:角标挂进标题(样式见 CSS #banlan-user-ver:桌面右下固定、手机移到标题右下) */
-    (document.querySelector('.struct-bar-title') || document.body).appendChild(tag);
+    /* 部件-206:角标挂回 body——197 挂进标题后,标题所在顶栏是层叠上下文,桌面端 v1 被结构栏盖住「消失」;
+       挂 body 层 z-index:900 才真正压最上;手机端定位由自量脚本用页面坐标对齐切换钮 */
+    document.body.appendChild(tag);
   });
   // —— 新版本检测:悄悄拉线上 index.html 的 meta version 和自己身上的比 ——
   var MY = (document.querySelector('meta[name="version"]')||{}).content || '';
@@ -7679,12 +7680,13 @@ window.ttTitle=function(zh,en,ar){return zh+'<span class="lang-swap"><span class
     if(b.top<=e.bottom+s.height) return;   // 走廊装不下就不动(留 CSS 兜底值)
     var top=window.scrollY + e.bottom + ((b.top-e.bottom)-s.height)/2;   // 居中=上下等距
     sw.style.setProperty('top', top.toFixed(1)+'px', 'important');       // CSS 里是 !important,要同级覆盖
-    /* 部件-200:v1 角标跟切换钮中线对齐(v1 是 .struct-bar-title 内 absolute,换算成 title 内坐标) */
+    /* 部件-200:v1 角标跟切换钮中线对齐;部件-206:v1 改挂 body(修桌面被盖),这里改用页面坐标定位(top+left 都算) */
     var ver=document.getElementById('banlan-user-ver');
     var title=document.querySelector('.struct-bar-title');
     if(ver&&title){
       var s2=sw.getBoundingClientRect(), vR=ver.getBoundingClientRect(), tR=title.getBoundingClientRect();
-      ver.style.setProperty('top', ((s2.top+s2.height/2)-vR.height/2-tR.top).toFixed(1)+'px', 'important');
+      ver.style.setProperty('top', (window.scrollY + s2.top + s2.height/2 - vR.height/2).toFixed(1)+'px', 'important');
+      ver.style.setProperty('left', (window.scrollX + tR.left + 158).toFixed(1)+'px', 'important');   // 水平仍按「标题左缘+158」,跟 200 版视觉一致
     }
   }
   function run(){ centerLangPill(); }

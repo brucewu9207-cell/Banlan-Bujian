@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-203 (2026-07-07) — 半包围①可句卡加引导:呼吸光晕只罩结构图标+点我贴纸+箭头(手机在左/桌面在上,双语);身份面板修改密码退出登录好三按钮改中上译下去斜杠 -->
+<!-- 斑斓部件 · 部件联动-204 (2026-07-07) — 结构卡引导升级:点我贴纸闪烁且与图标呼吸同步(2.4s同相位);光晕白圈打底更亮更明显;桌面贴纸放大1.3倍;手机贴纸挪到结构图标左侧箭头指右 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-203">
+<meta name="version" content="部件联动-204">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1048,27 +1048,34 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 .home-entry-sub-zh{font-size:0.95rem;color:rgba(255,255,255,0.82);margin-bottom:16px;letter-spacing:0.04em}
 @media(max-width:768px){ .home-entry-sub-zh{font-size:0.62rem;margin-bottom:7px} }
 /* ★ 部件-203:结构卡引导(墨舟指定只做半包围①「可、句」这张)——呼吸光晕(跟老师端「挥毫生成」同款朱砂红、只动box-shadow不缩放不抖)+「点我」贴纸+手绘箭头;两端通用 */
+/* 部件-204:光晕加强(墨舟真机反馈原朱砂红在棕底上不明显)——白圈打底+朱砂红更亮更大 */
 @keyframes blGlowPulse{
-  0%,100%{box-shadow:0 0 0 0 rgba(179,57,57,0);}
-  50%{box-shadow:0 0 15px 3px rgba(179,57,57,0.55);}
+  0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0),0 0 0 0 rgba(200,75,47,0);}
+  50%{box-shadow:0 0 0 3px rgba(255,255,255,0.5),0 0 22px 9px rgba(200,75,47,0.95);}
 }
+/* 部件-204:「点我」贴纸闪烁——与图标呼吸同步(同 2.4s 同相位:光晕最亮时贴纸最实、光晕熄时贴纸最淡) */
+@keyframes blStickerBlink{0%,100%{opacity:0.35;}50%{opacity:1;}}
 .struct-card-guide{position:relative;}
 /* 呼吸光晕只罩「汉字结构图标」,不罩结构标题(墨舟指定) */
 .struct-card-guide .struct-card-svg{border-radius:12px;animation:blGlowPulse 2.4s ease-in-out infinite;}
-@media (prefers-reduced-motion:reduce){.struct-card-guide .struct-card-svg{animation:none;box-shadow:0 0 12px 2px rgba(179,57,57,0.4);}}
+@media (prefers-reduced-motion:reduce){
+  .struct-card-guide .struct-card-svg{animation:none;box-shadow:0 0 0 3px rgba(255,255,255,0.4),0 0 18px 6px rgba(200,75,47,0.7);}
+  .struct-guide-sticker{animation:none !important;}
+}
 .struct-guide{position:absolute;z-index:3;pointer-events:none;display:flex;flex-direction:column;gap:0;}   /* 悬出卡片外(卡太小装不下);pointer-events:none→点贴纸=点卡片,不挡拼字弹窗 */
-.struct-guide-sticker{display:inline-block;background:#b33939;color:#fff;font-size:0.52rem;font-weight:700;padding:2px 6px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.28);letter-spacing:0.05em;line-height:1.15;text-align:center;transform:rotate(8deg);font-style:normal;}
+.struct-guide-sticker{display:inline-block;background:#b33939;color:#fff;font-size:0.52rem;font-weight:700;padding:2px 6px;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,0.28);letter-spacing:0.05em;line-height:1.15;text-align:center;transform:rotate(8deg);font-style:normal;animation:blStickerBlink 2.4s ease-in-out infinite;}   /* 2.4s=与图标呼吸同周期 */
 .struct-guide-sticker .lang-swap{display:block;font-size:0.78em;opacity:0.92;font-weight:600;font-family:Georgia,serif;}
 .struct-guide-arrow{width:15px;height:15px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.3));}
-/* 桌面:贴纸+箭头在图标正上方 */
+/* 桌面:贴纸+箭头在图标正上方;部件-204:贴纸放大 1.3 倍(0.52→0.68rem) */
 @media(min-width:769px){
-  .struct-guide{top:-30px;left:22px;right:auto;align-items:center;}
+  .struct-guide{top:-38px;left:22px;right:auto;align-items:center;}
+  .struct-guide-sticker{font-size:0.68rem;padding:3px 8px;}
   .struct-guide-arrow{margin:1px 0 0 2px;transform:rotate(-25deg);}
 }
-/* 手机:贴纸+箭头在卡片左侧,箭头镜像指向右下的图标 */
+/* 手机:贴纸挪到结构图标左侧(部件-204,原在卡上方)、箭头指右 */
 @media(max-width:768px){
-  .struct-guide{top:-24px;left:-2px;right:auto;align-items:flex-start;}
-  .struct-guide-arrow{transform:scaleX(-1) rotate(-12deg);margin:1px 0 0 24px;}
+  .struct-guide{top:50%;left:-58px;right:auto;transform:translateY(-58%);flex-direction:row;align-items:center;}
+  .struct-guide-arrow{transform:scaleX(-1) rotate(55deg);margin:14px 0 0 2px;}
 }
 /* ★ 部件-203:身份面板底部三按钮(修改密码/退出登录/好)改「中文上、译文下」竖排、去掉斜杠 */
 .bls-modal-footer .bls-btn{text-align:center;white-space:nowrap;}
@@ -1631,7 +1638,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-203 ✦ 半包围①可句卡加引导:呼吸光晕只罩结构图标+点我贴纸+箭头(手机在左/桌面在上,双语);身份面板修改密码退出登录好三按钮改中上译下去斜杠','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-204 ✦ 结构卡引导升级:点我贴纸闪烁且与图标呼吸同步(2.4s同相位);光晕白圈打底更亮更明显;桌面贴纸放大1.3倍;手机贴纸挪到结构图标左侧箭头指右','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6069,7 +6076,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-203';
+  const VERSION = '部件联动-204';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

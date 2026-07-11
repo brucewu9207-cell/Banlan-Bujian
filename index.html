@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-207 (2026-07-08) — 学生端首页5处:①汉字基本结构(顶部结构卡)默认收起(HTML去open)②右上角汉字基本结构按钮加朱砂红呼吸光晕(复用blGlowPulse,提醒学生可展开)③模式卡(班级/自学/错题集)在页面垂直居中(home-screen撑满剩余视口+flex居中,用not([style含none])守卫避免强行显示)④模式卡放大(min-height210/padding/字号,桌面)⑤背景飘的部件加多(DECO_CFG.pairCount 42→55);均桌面,飘字fixed背景层不影响布局 -->
+<!-- 斑斓部件 · 部件联动-208 (2026-07-11) — 学生端首页三张模式卡(班级/自学/错题集)整排宽度桌面端放大到1.5倍(每卡约217→326px);仅桌面,手机端单列占满不动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-207">
+<meta name="version" content="部件联动-208">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1107,6 +1107,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 #toggle-struct-btn{ animation: blGlowPulse 2.4s ease-in-out infinite; }
 @media(min-width:769px){
   .home-screen:not([style*="none"]){ display:flex !important; flex-direction:column; align-items:center; justify-content:center; min-height: calc(100vh - 79px); }
+  .home-grid:not(.demo-on){ max-width:100%; width:1013px; }  /* ★ 部件-208:模式卡整排宽度×1.5(桌面 flex 居中把 grid 收成内容宽约687、max-width:940 用不上,故直接定宽 1013 = 每卡326×3 + gap18×2;max-width:100% 防窄窗溢出;:not(.demo-on) 避开4卡测试模式);仅桌面,手机端单列不动 */
   .home-grid .home-entry{ min-height:210px; padding:26px 34px; }
   .home-grid .home-entry-zh{ font-size:2.1rem; }
   .home-grid .home-entry-en{ font-size:1.15rem; }
@@ -1650,7 +1651,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-207 ✦ 学生端首页5处:①汉字基本结构(顶部结构卡)默认收起(HTML去open)②右上角汉字基本结构按钮加朱砂红呼吸光晕(复用blGlowPulse,提醒学生可展开)③模式卡(班级/自学/错题集)在页面垂直居中(home-screen撑满剩余视口+flex居中,用not([style含none])守卫避免强行显示)④模式卡放大(min-height210/padding/字号,桌面)⑤背景飘的部件加多(DECO_CFG.pairCount 42→55);均桌面,飘字fixed背景层不影响布局','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-208 ✦ 学生端首页三张模式卡(班级/自学/错题集)整排宽度桌面端放大到1.5倍(每卡约217→326px);仅桌面,手机端单列占满不动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6088,7 +6089,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-207';
+  const VERSION = '部件联动-208';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-208 (2026-07-11) — 学生端首页三张模式卡(班级/自学/错题集)整排宽度桌面端放大到1.5倍(每卡约217→326px);仅桌面,手机端单列占满不动 -->
+<!-- 斑斓部件 · 部件联动-218 (2026-08-26) — 手机端步骤标题同步固定为阿语模式高度，英文与阿语切换时标题框尺寸不再变化；保持手机端原有字号、宽度及整体布局；电脑端规则继续保留。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-208">
+<meta name="version" content="部件联动-218">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -274,6 +274,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .word-hint.show{display:flex;flex-direction:column;align-items:center;justify-content:center;animation:fadeIn .3s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .spacer{flex:1}
+.desktop-only{display:none}
 
 /* 右栏 */
 .structure-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:rgba(181,118,58,0.06);border-radius:8px;border:1.5px dashed var(--bamboo-light);margin-bottom:6px;flex-shrink:0}
@@ -518,7 +519,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .struct-bar-body.open .struct-grid{margin-top:16px}   /* 大标题↔6组 间距加大 */
   .sg-label{font-size:0.68rem !important}   /* 组小标题调小(0.8→0.68rem) */
   /* ★ 联动-138:Step 1/2/3/4 标题缩小+收紧字距→塞进标题框不溢出 */
-  .step-title{font-size:0.8rem !important;letter-spacing:0.01em;padding:5px 8px}   /* ★ 联动-139:固定0.8rem(不乘ui-scale,防被放大撑出框)+!important盖过base */
+  .step-title{font-size:0.8rem !important;letter-spacing:0.01em;padding:5px 8px;height:calc(1.35em + 12px);min-height:calc(1.35em + 12px);display:flex;align-items:center;justify-content:center}   /* ★ 联动-139:固定0.8rem(不乘ui-scale,防被放大撑出框)+!important盖过base；-218:手机端同步固定阿语模式高度 */
   .step-title-zh{letter-spacing:0.03em}
   .step-title-en{font-size:0.82em;letter-spacing:0.01em;margin-left:5px}
 }
@@ -943,18 +944,58 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
    ① 放大 step① 释义框；③ 例词改为单行横排：中文 拼音 英文
    ════════════════════════════════════════════════ */
 @media(min-width:769px){
-  /* ① 释义框整体放大约 1.5 倍（内层字号用 !important 盖过 JS 写死的内联值） */
-  #char-info{padding:10px 26px !important;border-radius:12px !important;margin-top:10px !important;line-height:1.35 !important}   /* 部件联动-77:缩小上下间距(竖向 20→10、margin 18→10) */
-  #char-info strong{font-size:3rem !important}     /* v60：在 v59 (2rem) 基础上再 ×1.5 */
-  #char-info span{font-size:1.95rem !important}    /* v60：在 v59 (1.3rem) 基础上再 ×1.5 */
+  .desktop-only{display:flex}
+  .mobile-only{display:none !important}
+  #char-info{display:none !important}
 
-  /* ③ 例词内框：竖排三行 → 单行横排（中文 拼音 英文底部对齐） */
-  .ex-word-inner{
-    flex-direction:row !important;
+  /* 电脑端①—⑤标题框固定采用阿语模式的高度；切换语言时外框不再跳动 */
+  .step-title{
+    height:calc(1.35em + 12px);
+    min-height:calc(1.35em + 12px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  /* 电脑端五步：②例词移到①下方，原④位置改为⑤电打汉字 */
+  .char-panel>.spacer{display:none}
+  .desktop-example-box{display:flex;flex-direction:column;margin-top:8px;padding-top:0;flex-shrink:0}
+  .desktop-example-body{min-height:94px;display:flex;align-items:center;justify-content:center;padding-top:14px}
+  .desktop-example-locked{font-size:1rem;color:rgba(255,255,255,.86);text-align:center}
+  .desktop-typing{flex:1;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
+  .desktop-typing-lock{font-size:1.08rem;text-align:center;line-height:1.5}
+  .typing-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(7px*var(--ui-scale));width:100%;max-width:none;min-height:calc(165px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(14px*var(--ui-scale)) calc(24px*var(--ui-scale));color:#243a30}
+  .typing-word-row{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.75rem*var(--ui-scale));line-height:1.1}
+  .typing-fixed-glyph{display:inline-flex;align-items:flex-end;justify-content:center;width:1em;height:1em;color:#243a30}
+  .typing-success-word{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(3.15rem*var(--ui-scale));color:var(--jade)}
+  .typing-success-glyph{display:inline-flex;width:1em;height:1em}
+  .typing-input-wrap{position:relative;width:calc(var(--typing-len,2)*3.5rem*var(--ui-scale));max-width:100%;height:calc(3.8rem*var(--ui-scale))}
+  .typing-slots{position:absolute;inset:0;display:flex;gap:calc(.35rem*var(--ui-scale));pointer-events:none}
+  .typing-slot{flex:1;border-bottom:3px solid #243a30}
+  .typing-input{position:absolute;inset:0;width:100%;height:100%;padding:0 0 0 calc(.25rem*var(--ui-scale));border:0;border-radius:0;background:transparent;color:#243a30;text-align:left;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:calc(3.15rem*var(--ui-scale));letter-spacing:calc(.35rem*var(--ui-scale));line-height:1;outline:none}
+  .typing-input-wrap:focus-within .typing-slot{border-bottom-color:var(--vermillion)}
+  .typing-input.correct{color:var(--jade);border-bottom-color:var(--jade)}
+  .typing-input.wrong{color:var(--vermillion);animation:shake .3s}
+  .typing-pinyin{font-size:calc(2.025rem*var(--ui-scale))}
+  .typing-translation{font-size:calc(1.575rem*var(--ui-scale));font-family:Georgia,serif;font-style:italic}
+  .typing-check{width:100%;margin-top:calc(12px*var(--ui-scale));padding:calc(10.5px*var(--ui-scale)) calc(33px*var(--ui-scale));border:1px solid rgba(255,255,255,.3);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:calc(1.425rem*var(--ui-scale));cursor:pointer}
+  .typing-feedback{min-height:1.4em;font-size:calc(1rem*var(--ui-scale));color:#fff}
+
+  /* ② 例词内框：汉字、拼音、翻译竖排，整体放大 1.5 倍 */
+  #desktop-example-hint .ex-word-inner{
+    flex-direction:column !important;
     align-items:center !important;
     flex-wrap:nowrap !important;
-    gap:calc(16px*var(--ui-scale)) !important;
+    gap:calc(7px*var(--ui-scale)) !important;
+    width:calc(420px*var(--ui-scale)) !important;
+    max-width:none;
+    min-height:calc(165px*var(--ui-scale));
+    justify-content:center !important;
+    padding:calc(12px*var(--ui-scale)) calc(28px*var(--ui-scale)) !important;
   }
+  #desktop-example-hint .ex-word-inner>span:nth-child(1){font-size:calc(3.15rem*var(--ui-scale)) !important}
+  #desktop-example-hint .ex-word-inner>span:nth-child(2){font-size:calc(2.025rem*var(--ui-scale)) !important}
+  #desktop-example-hint .ex-word-inner>span:nth-child(3){font-size:calc(1.575rem*var(--ui-scale)) !important}
 
   /* ★ v61：拼合成功后 step② 右侧弹出的「汉字」放大到 2 倍（SVG 用 1em，跟随 font-size） */
   .drag-right .result-char{font-size:calc(10rem*var(--ui-scale)) !important}
@@ -962,6 +1003,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* ★ v63：「下一个字 · Next」按钮配色对齐「返回 / Back」按钮（var(--bamboo) 橙褐 + 同款 hover） */
   .next-btn{background:var(--bamboo) !important;border:1px solid rgba(255,255,255,0.3) !important}
   .next-btn:hover{background:var(--bamboo-light) !important}
+  #next-btn-wrap{display:none !important}
 }
 
 /* ══ 错题本 (部件联动-18) ══ */
@@ -1236,6 +1278,13 @@ body.lang-mode-ar .lang-ar{direction:rtl;unicode-bidi:isolate}
 .bls-modal:has(.bls-field) .bls-input::placeholder{color:rgba(24,40,32,0.5)}
 body.lang-mode-en .lang-swap>.lang-ar,body.lang-mode-en .lang-swap-block>.lang-ar{display:block!important;visibility:hidden}
 body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-en{display:block!important;visibility:hidden}
+/* 步骤标题按当前可见译文重新计算宽度，英语/阿语都与中文组成一个居中整体 */
+body.lang-mode-en .step-title .lang-swap>.lang-ar{display:none!important;visibility:visible}
+body.lang-mode-ar .step-title .lang-swap>.lang-en{display:none!important;visibility:visible}
+body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibility:visible;text-align:start}
+/* 电脑/手机步骤标题严格隔离，避免双语占位规则把另一端标题撑出来 */
+@media(max-width:768px){.desktop-only,body.lang-mode-en .lang-swap>.desktop-only,body.lang-mode-ar .lang-swap>.desktop-only{display:none!important}}
+@media(min-width:769px){.mobile-only,body.lang-mode-en .lang-swap>.mobile-only,body.lang-mode-ar .lang-swap>.mobile-only{display:none!important}.step-title-zh.desktop-only,.step-title-en.desktop-only{display:inline!important}.desktop-example-box.desktop-only,.desktop-typing.desktop-only{display:flex!important}}
 @media print{.lang-switcher{display:none !important}}
 </style>
 </head>
@@ -1575,6 +1624,10 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           </div>
           <div class="spacer"></div>
           <div id="char-info" style="display:none;margin-top:14px;padding:20px 16px;background:#97a99f;border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);font-size:1.2rem;color:#243a30;line-height:1.7;text-align:center"></div>
+          <div class="desktop-example-box desktop-only" id="desktop-example-box">
+            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">② 例词</span><span class="lang-swap"><span class="step-title-en lang-en">Example Word</span><span class="step-title-en lang-ar" dir="rtl">كلمة مثال</span></span></div>
+            <div class="desktop-example-body" id="desktop-example-hint"><div class="desktop-example-locked">选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div></div>
+          </div>
           <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:var(--bamboo);color:#ffffff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
             <span class="lang-swap"><span class="lang-en">Skip</span><span class="lang-ar">تخطٍّ</span></span> · 我已认识 →
           </button>
@@ -1583,7 +1636,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         <div class="word-panel" id="word-panel">
           <!-- 上方框：书写练习 -->
           <div class="card write-box">
-            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">③ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></div>
+            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh mobile-only">③ 书写练习</span><span class="step-title-zh desktop-only">④ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></div>
             <!-- 锁定遮罩：拖拽成功前显示 -->
             <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;min-height:240px">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
@@ -1604,12 +1657,13 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
           </div>
           <!-- 下方框：例词（选对拼音后出现） -->
           <div class="card word-box">
-            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">④ 例词</span><span class="lang-swap"><span class="step-title-en lang-en">Example Word</span><span class="step-title-en lang-ar" dir="rtl">كلمة مثال</span></span></div>
-            <div class="word-hint show" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
-            <div id="word-locked" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
+            <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh mobile-only">④ 例词</span><span class="step-title-zh desktop-only">⑤ 电打汉字</span><span class="lang-swap"><span class="step-title-en lang-en mobile-only">Example Word</span><span class="step-title-en lang-en desktop-only">Type Hanzi</span><span class="step-title-en lang-ar mobile-only" dir="rtl">كلمة مثال</span><span class="step-title-en lang-ar desktop-only" dir="rtl">اكتب الحرف الصيني</span></span></div>
+            <div class="word-hint show mobile-only" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
+            <div id="word-locked" class="mobile-only" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
+            <div class="desktop-typing desktop-only" id="desktop-typing"><div class="desktop-typing-lock">🔒<br>先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></div></div>
             <div id="next-btn-wrap" style="display:none;padding:8px 0 2px;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
             </div>
@@ -1617,7 +1671,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
         </div>
         <!-- 右栏：Step 2 -->
         <div class="card structure-panel" id="structure-panel">
-          <h3 style="margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title" style="margin-bottom:0"><span class="step-title-zh">② 拖拽部件</span><span class="lang-swap"><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></span></span></h3>
+          <h3 style="margin-bottom:8px;letter-spacing:0.06em;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:8px"><span class="drag-hint-char" id="drag-hint-char" aria-hidden="true"></span><span class="step-title" style="margin-bottom:0"><span class="step-title-zh mobile-only">② 拖拽部件</span><span class="step-title-zh desktop-only">③ 拖拽部件</span><span class="lang-swap"><span class="step-title-en lang-en">Drag Components</span><span class="step-title-en lang-ar" dir="rtl">اسحب المكوّنات</span></span></span></h3>
           <div id="locked-overlay" style="text-align:center;padding:56px 20px;color:#fff;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center">
             <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
             <p style="font-size:1.32rem;text-align:center">先完成读音选择<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ① first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ① أولاً</span></span></p>
@@ -1651,7 +1705,7 @@ body.lang-mode-ar .lang-swap>.lang-en,body.lang-mode-ar .lang-swap-block>.lang-e
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-208 ✦ 学生端首页三张模式卡(班级/自学/错题集)整排宽度桌面端放大到1.5倍(每卡约217→326px);仅桌面,手机端单列占满不动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-218 ✦ 手机端步骤标题同步固定为阿语模式高度，英文与阿语切换时标题框尺寸不再变化；保持手机端原有字号、宽度及整体布局；电脑端规则继续保留。','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2994,6 +3048,7 @@ function loadStrokeOnlyChar(char){
 
   // 中栏: 永久 lock — "独体字无需拆部件"
   const wh=document.getElementById('word-hint');wh.classList.remove('show');wh.style.display='none';wh.innerHTML='';
+  resetDesktopFiveStep();
   const wl=document.getElementById('word-locked');
   if(wl){wl.style.display='flex';wl.innerHTML='<div style="font-size:2.2rem;margin-bottom:10px">🎨</div><p style="font-size:0.88rem;text-align:center">独体字无需拆部件<br><span style="font-family:Georgia;font-style:italic;font-size:0.78rem">No components to drag</span></p>';}
 
@@ -3071,6 +3126,7 @@ function loadCharacter(char){
   wh.classList.remove('show');
   wh.innerHTML='';
   wh.style.display='none';
+  resetDesktopFiveStep();
   const wl2=document.getElementById('word-locked');
   if(wl2) wl2.style.display='flex';
   document.getElementById('char-info').style.display='none';
@@ -3145,6 +3201,7 @@ function checkPinyin(btn,chosen,correct,data,char){
     }
     info.style.display='block';info.style.textAlign='center';info.style.borderRadius='10px';
     if(_isMobile){ const _zh=info.querySelector('.info-char-zh'); if(_zh) renderGlyphInto(_zh, char); }
+    renderDesktopExample(char);
     // ★ 释义框替代 Skip、占同样大小（单行）；米字格不再缩小（去掉原 char-boost 收缩循环）
     // ★ 联动-13: 手机端 wizard 模式释义被挡修复
     // char-panel overflow:hidden + 高度锁死,新增的拼音按钮 + char-info 超出一屏
@@ -4558,7 +4615,78 @@ function unlockWriting(){
   startWritingQuiz();
 }
 
-// 显示下方例词（拖拽合并成功后调用）
+// ══ 电脑端五步：②例词 + ⑤电打汉字（手机端原四步不变）══
+function getExampleWord(char){
+  const data=CHAR_DB[char];
+  if(!data||!data.words||data.words.length===0) return null;
+  let words=data.words.filter(w=>w.w!==char);
+  if(words.length===0) words=data.words;
+  return words[0]||null;
+}
+
+function desktopExampleMarkup(w){
+  const lvBadge=w.lv?`<span style="display:inline-block;padding:3px 12px;border-radius:40px;background:#97a99f;border:2px solid rgba(139,44,44,0.7);font-size:calc(1.05rem*var(--ui-scale));color:#243a30;font-family:Georgia,serif;font-weight:700;letter-spacing:.1em">HSK ${w.lv}</span>`:'';
+  return `<div style="text-align:center"><div style="margin-bottom:calc(6px*var(--ui-scale))">${lvBadge}</div>
+    <div class="ex-word-inner" style="display:inline-flex;align-items:center;justify-content:center;gap:calc(12px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(9px*var(--ui-scale)) calc(18px*var(--ui-scale))">
+      <span style="display:inline-flex;align-items:flex-end;gap:calc(3px*var(--ui-scale));font-size:calc(2.1rem*var(--ui-scale));color:#243a30;line-height:1.1">${[...w.w].map(c=>`<span class="ex-word-zh" data-glyph="${c}">${c}</span>`).join('')}</span>
+      <span style="font-size:calc(1.35rem*var(--ui-scale));color:#243a30">${w.py||''}</span>
+      <span style="font-size:calc(1.05rem*var(--ui-scale));color:#243a30;font-style:italic;font-family:Georgia,serif">${w.en||''}</span>
+    </div></div>`;
+}
+
+function resetDesktopFiveStep(){
+  const ex=document.getElementById('desktop-example-hint');
+  if(ex) ex.innerHTML='<div class="desktop-example-locked">选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div>';
+  const typing=document.getElementById('desktop-typing');
+  if(typing) typing.innerHTML='<div class="desktop-typing-lock">🔒<br>先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></div>';
+}
+
+function renderDesktopExample(char){
+  const hint=document.getElementById('desktop-example-hint');
+  const w=getExampleWord(char);
+  if(!hint||!w) return;
+  hint.innerHTML=desktopExampleMarkup(w);
+  hint.querySelectorAll('.ex-word-zh[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
+  requestAnimationFrame(fitPracticeUI);
+}
+
+function renderDesktopTyping(char){
+  const box=document.getElementById('desktop-typing');
+  const w=getExampleWord(char);
+  if(!box||!w) return;
+  const chars=[...w.w];
+  const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
+  box.innerHTML=`${w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:''}<div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
+  box.dataset.answer=w.w;
+  const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
+}
+
+function checkTypedHanzi(){
+  const box=document.getElementById('desktop-typing');
+  const input=document.getElementById('typing-input');
+  const feedback=document.getElementById('typing-feedback');
+  if(!box||!input||!feedback) return;
+  const ok=input.value.trim()===box.dataset.answer;
+  input.classList.remove('correct','wrong');
+  input.classList.add(ok?'correct':'wrong');
+  feedback.textContent=ok?'':'再试一次';
+  if(ok){
+    const row=input.parentElement;
+    const answer=box.dataset.answer;
+    row.innerHTML=`<span class="typing-success-word">${[...answer].map(c=>`<span class="typing-success-glyph" data-glyph="${c}">${c}</span>`).join('')}</span>`;
+    row.querySelectorAll('.typing-success-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
+    playCorrectSound();
+    celebrate();
+    // 电脑端⑤为最后一步：撒花播放完后自动进入下一个字，不再需要“下一个字”按钮。
+    setTimeout(()=>{
+      // 搜索演示模式会预先解锁全部步骤，尚未像正常拼合流程那样推进序号；只在这种情况下补推进一次。
+      if(state.teacherMode&&state.sessionChars[state.sessionIndex]===state.currentChar) state.sessionIndex++;
+      nextCharacter();
+    },2200);
+  } else { playWrongSound(); input.focus(); input.select(); }
+}
+
+// 显示例词；手机端用于④，电脑端同时解锁⑤电打汉字
 function showExampleWord(char){
   const data=CHAR_DB[char];
   const hint=document.getElementById('word-hint');
@@ -4584,6 +4712,8 @@ function showExampleWord(char){
   hint.style.display='flex';
   hint.classList.add('show');
   if(wl) wl.style.display='none';
+  renderDesktopExample(char);
+  renderDesktopTyping(char);
   // ★ v40：把例词里每个汉字都画成「米字格那种」笔画字形（无数据则保留文字回退）
   hint.querySelectorAll('.ex-word-zh[data-glyph]').forEach(sp=>renderGlyphInto(sp, sp.dataset.glyph));
   requestAnimationFrame(fitPracticeUI);
@@ -6089,7 +6219,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-208';
+  const VERSION = '部件联动-218';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

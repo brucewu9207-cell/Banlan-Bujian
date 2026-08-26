@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-219 (2026-08-26) — 手机端由原四步同步为五步流程：①选择拼音、②例词、③拖拽部件、④书写练习、⑤电打汉字；底部导航同步五个步骤；⑤输入完整词语，检查正确后撒花并自动进入下一个字；电脑端保持现状。 -->
+<!-- 斑斓部件 · 部件联动-220 (2026-08-26) — 手机端⑤输入汉字时改为实时笔画图形渲染，原生输入值继续用于键盘输入与答案检查；手机端①选对拼音后不再显示拼音选项下方的单字、拼音、释义框，例词统一在②展示；电脑端保持现状。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-219">
+<meta name="version" content="部件联动-220">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -275,7 +275,7 @@ body::before{content:'';position:fixed;inset:0;background:
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .spacer{flex:1}
 .desktop-only{display:none}
-.desktop-example-box,.desktop-typing{display:none}
+.desktop-example-box,.desktop-typing,.typing-live-word{display:none}
 
 /* 右栏 */
 .structure-diagram{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 16px;background:rgba(181,118,58,0.06);border-radius:8px;border:1.5px dashed var(--bamboo-light);margin-bottom:6px;flex-shrink:0}
@@ -928,6 +928,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .stroke-ctrl-btn{padding:5px 9px !important;font-size:0.7rem !important;flex-shrink:1;min-width:0}
   .stroke-ctrl-btn .ctrl-en{font-size:0.62rem}
   #char-info{padding:calc(18px*var(--ui-scale)) 16px !important;margin-top:calc(8px*var(--ui-scale)) !important;line-height:1.4 !important}   /* ★ 联动-139:结果框加大内边距/行高,框更大 */
+  #char-info{display:none!important}   /* 手机端①选对拼音后不再显示单字例字框；例词统一放到② */
   .practice-layout.wizard > .char-panel,
   .practice-layout.wizard > .structure-panel,
   .practice-layout.wizard > .word-panel{display:none}
@@ -962,6 +963,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="5"] .typing-slots{position:absolute;inset:0;display:flex;gap:calc(.35rem*var(--ui-scale));pointer-events:none}
   .practice-layout.wizard[data-step="5"] .typing-slot{flex:1;border-bottom:3px solid #243a30}
   .practice-layout.wizard[data-step="5"] .typing-input{position:absolute;inset:0;width:100%;height:100%;padding:0 0 0 calc(.25rem*var(--ui-scale));border:0;background:transparent;color:#243a30;text-align:left;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:calc(3.15rem*var(--ui-scale));letter-spacing:calc(.35rem*var(--ui-scale));line-height:1;outline:none}
+  .practice-layout.wizard[data-step="5"] .typing-input{color:transparent;caret-color:var(--vermillion)}
+  .practice-layout.wizard[data-step="5"] .typing-live-word{position:absolute;inset:0;display:flex;align-items:flex-end;gap:calc(.35rem*var(--ui-scale));pointer-events:none;font-size:calc(3.15rem*var(--ui-scale));color:#243a30;line-height:1}
+  .practice-layout.wizard[data-step="5"] .typing-live-glyph{display:flex;flex:1;align-items:flex-end;justify-content:center;min-width:0;height:1em}
   .practice-layout.wizard[data-step="5"] .typing-input-wrap:focus-within .typing-slot{border-bottom-color:var(--vermillion)}
   .practice-layout.wizard[data-step="5"] .typing-success-word{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(3.15rem*var(--ui-scale));color:var(--jade)}
   .practice-layout.wizard[data-step="5"] .typing-success-glyph{display:inline-flex;width:1em;height:1em}
@@ -1738,7 +1742,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-219 ✦ 手机端由原四步同步为五步流程：①选择拼音、②例词、③拖拽部件、④书写练习、⑤电打汉字；底部导航同步五个步骤；⑤输入完整词语，检查正确后撒花并自动进入下一个字；电脑端保持现状。','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-220 ✦ 手机端⑤输入汉字时改为实时笔画图形渲染，原生输入值继续用于键盘输入与答案检查；手机端①选对拼音后不再显示拼音选项下方的单字、拼音、释义框，例词统一在②展示；电脑端保持现状。','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4690,9 +4694,23 @@ function renderDesktopTyping(char){
   if(!box||!w) return;
   const chars=[...w.w];
   const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
-  box.innerHTML=`${w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:''}<div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
+  box.innerHTML=`${w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:''}<div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
   box.dataset.answer=w.w;
   const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
+}
+
+// 手机端⑤：键盘仍写入原生输入框，画面上把已输入汉字实时换成统一的笔画图形。
+function renderTypingLiveWord(){
+  const input=document.getElementById('typing-input');
+  const live=document.getElementById('typing-live-word');
+  if(!input||!live) return;
+  const chars=[...input.value].slice(0,Number(input.maxLength)||99);
+  live.textContent='';
+  chars.forEach(c=>{
+    const sp=document.createElement('span');
+    sp.className='typing-live-glyph';sp.dataset.glyph=c;sp.textContent=c;
+    live.appendChild(sp);renderGlyphInto(sp,c);
+  });
 }
 
 function checkTypedHanzi(){
@@ -6253,7 +6271,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-219';
+  const VERSION = '部件联动-220';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

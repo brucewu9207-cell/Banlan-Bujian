@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-222 (2026-08-26) — 手机端⑤笔画提示词从浅色输入框内部移到其上方，改成参考③提示字的白色圆角独立提示框；底部检查按钮与上一步按钮固定为相同宽度；输入、检查、撒花和自动下一字逻辑不变；电脑端不变。 -->
+<!-- 斑斓部件 · 部件联动-223 (2026-08-28) — 开放搜索模式并支持分享搜索练习 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-222">
+<meta name="version" content="部件联动-223">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -58,8 +58,7 @@ body::before{content:'';position:fixed;inset:0;background:
 /* ══ 首页：二选一入口 ══ */
 .home-screen{text-align:center;padding:28px 14px;max-width:1280px;margin:0 auto}  /* ★ 19: 1100→1280 容纳四张卡片并排 */
 .home-screen h2{font-size:1.5rem;color:#fff;margin-bottom:26px;letter-spacing:0.1em}
-.home-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;max-width:940px;margin:0 auto;position:relative;z-index:1}  /* ★ 19:四卡并排;联动-121:默认3列居中(搜索卡藏起→3卡不偏左);测试模式见 .demo-on */
-@media(min-width:769px){.home-grid.demo-on{grid-template-columns:1fr 1fr 1fr 1fr;max-width:1260px}}  /* 联动-121:测试模式4卡一行(仅桌面;手机端 demo 永不触发) */
+.home-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;max-width:1260px;margin:0 auto;position:relative;z-index:1}
 .home-entry{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px 22px;border:2px solid rgba(255,255,255,0.25);border-radius:16px;background:rgba(20,40,30,0.55);color:#fff;cursor:pointer;font-family:inherit;transition:all .25s;min-height:156px;text-align:center}
 .home-entry:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--bamboo-light);background:rgba(20,40,30,0.72)}
 /* v81：icon 绝对定位"浮"在中文标题左侧外,不占位 → 中文和英文按自身宽度居中,两行对齐 */
@@ -68,8 +67,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-entry-zh{font-size:1.6rem;font-weight:700;letter-spacing:0.08em;display:inline-block}
 .home-entry-en{font-size:0.95rem;font-family:Georgia,serif;font-style:italic;color:rgba(255,255,255,0.85);margin-bottom:16px}
 .home-entry-desc{font-size:0.82rem;color:rgba(255,255,255,0.72);line-height:1.6;margin-top:auto}.entry-sub{line-height:1.35;text-align:center}.entry-sub .es-zh{display:block}.entry-sub .lang-en,.entry-sub .lang-ar{display:block;font-style:italic;opacity:0.88}
-.home-entry-input{cursor:default;position:relative}
-@media(max-width:768px){.home-entry-input{display:none!important}}   /* 联动-120:搜索模式手机端彻底隐藏(连墨舟 ?demo=1 也不显示);桌面端门控不动 */
+.home-entry-input{cursor:default;position:relative;min-width:0}
 .demo-tag{position:absolute;left:50%;top:-34px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:#c84b2f;color:#fff;font-size:0.82rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(20,40,30,0.35);white-space:nowrap;cursor:pointer;z-index:5;letter-spacing:0.04em}  /* 联动-121:测试模式标签,浮在搜索卡正上方;点击退出 */
 .demo-tag:hover{background:#b33939}
 .home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
@@ -761,6 +759,7 @@ body::after{
   #header-actions-bar > div > .qr-wrap{order:6}
   #header-actions-bar > div > #feedback-btn{order:7}
   #header-actions-bar > div > #toggle-struct-btn{order:8}
+  #header-actions-bar > div > #search-share-btn{order:9}
   /* 第一排三主项均分填满整行→把折叠项挤到下一排,保证第一排只占一行 */
   #header-actions-bar > div > #nav-back-btn,
   #header-actions-bar > div > #gm-stat-bar,
@@ -768,12 +767,14 @@ body::after{
   /* 折叠项:展开时三项均分第二行(一排) */
   #header-actions-bar > div > .qr-wrap,
   #header-actions-bar > div > #feedback-btn,
-  #header-actions-bar > div > #toggle-struct-btn{flex:1 1 0;min-width:0;width:auto !important}
+  #header-actions-bar > div > #toggle-struct-btn,
+  #header-actions-bar > div > #search-share-btn{flex:1 1 0;min-width:0;width:auto !important}
   #header-actions-bar .qr-wrap > #qr-btn{width:100% !important}
   /* 默认收起:三个折叠项完全隐藏(点「⋯更多」才展开) */
   #header-actions-bar:not(.fold-open) > div > .qr-wrap,
   #header-actions-bar:not(.fold-open) > div > #feedback-btn,
-  #header-actions-bar:not(.fold-open) > div > #toggle-struct-btn{display:none !important}
+  #header-actions-bar:not(.fold-open) > div > #toggle-struct-btn,
+  #header-actions-bar:not(.fold-open) > div > #search-share-btn{display:none !important}
   .struct-action-btn{
     padding:7px 8px !important;
     font-size:0.65rem !important;
@@ -799,7 +800,8 @@ body::after{
   /* ★ 联动-125:第二行三按钮等高——取消固定 42px、同行拉伸到一致高度(align-items:stretch) */
   #header-actions-bar > div > .qr-wrap,
   #header-actions-bar > div > #feedback-btn,
-  #header-actions-bar > div > #toggle-struct-btn{height:auto !important;min-height:42px}
+  #header-actions-bar > div > #toggle-struct-btn,
+  #header-actions-bar > div > #search-share-btn{height:auto !important;min-height:42px}
   #header-actions-bar .qr-wrap > #qr-btn{height:100% !important;min-height:42px}
   /* ★ v95:手机端 QR popover 改为 fixed 居中,不再从父按钮位置左下展开 → 永远不会被挤出屏幕 */
   .qr-popover{
@@ -1191,7 +1193,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
 #toggle-struct-btn{ animation: blGlowPulse 2.4s ease-in-out infinite; }
 @media(min-width:769px){
   .home-screen:not([style*="none"]){ display:flex !important; flex-direction:column; align-items:center; justify-content:center; min-height: calc(100vh - 79px); }
-  .home-grid:not(.demo-on){ max-width:100%; width:1013px; }  /* ★ 部件-208:模式卡整排宽度×1.5(桌面 flex 居中把 grid 收成内容宽约687、max-width:940 用不上,故直接定宽 1013 = 每卡326×3 + gap18×2;max-width:100% 防窄窗溢出;:not(.demo-on) 避开4卡测试模式);仅桌面,手机端单列不动 */
+  .home-grid{ max-width:100%; width:1260px; }
   .home-grid .home-entry{ min-height:210px; padding:26px 34px; }
   .home-grid .home-entry-zh{ font-size:2.1rem; }
   .home-grid .home-entry-en{ font-size:1.15rem; }
@@ -1544,8 +1546,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
           <div class="home-entry-desc entry-sub"><div class="es-zh">HSK分级挑战</div><div class="lang-en">HSK Level Challenge</div><div class="lang-ar" dir="rtl">تحدّي مستويات HSK</div></div>
         </button>
         <!-- 入口 3：请输入字/词 -->
-        <div class="home-entry home-entry-input" style="display:none"><!-- 联动-118:搜索模式入口默认隐藏(仅墨舟测试用);带 ?demo=1 访问一次→本机记住显示;班级任务走底层机制、不受影响 -->
-          <div class="demo-tag" onclick="exitDemoMode()" title="点击退出测试模式 / Exit test mode">🔧 测试模式</div>
+        <div class="home-entry home-entry-input">
           <div class="home-entry-header">
             <span class="home-entry-icon">🔍</span>
             <span class="home-entry-zh">搜索模式</span>
@@ -1553,7 +1554,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
           <div class="lang-swap-block"><div class="home-entry-en lang-en">Search Mode</div><div class="home-entry-en lang-ar" dir="rtl">وضع البحث</div></div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
-            <button class="teacher-go" onclick="startTeacherSession()">演示<span class="lang-swap"><span class="lang-en"> · Demo</span><span class="lang-ar"> · عرض</span></span></button>
+            <button class="teacher-go" onclick="startTeacherSession()">搜索<span class="lang-swap"><span class="lang-en"> · Search</span><span class="lang-ar"> · بحث</span></span></button>
           </div>
         </div>
         <!-- ★ 部件联动-18: 入口 4 错题集 -->
@@ -1747,7 +1748,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-222 ✦ 手机端⑤笔画提示词从浅色输入框内部移到其上方，改成参考③提示字的白色圆角独立提示框；底部检查按钮与上一步按钮固定为相同宽度；输入、检查、撒花和自动下一字逻辑不变；电脑端不变。','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-223 ✦ 开放搜索模式并支持分享搜索练习','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2848,6 +2849,19 @@ function relocateHeaderButtons(){
   }
   const groups=window._hdrGroups;
   if(!groups.length) return;
+  // 搜索练习专属分享按钮：桌面放在左侧操作组，手机随按钮条自动重排。
+  if(!document.getElementById('search-share-btn')){
+    const leftGroup=groups.find(g=>g.querySelector('#nav-back-btn'));
+    const qr=leftGroup&&leftGroup.querySelector('.qr-wrap');
+    if(leftGroup){
+      const share=document.createElement('button');
+      share.id='search-share-btn'; share.type='button'; share.className='struct-action-btn';
+      share.style.cssText='display:none;background:var(--bamboo);border:1px solid rgba(255,255,255,0.3)';
+      share.innerHTML='分享网页<span class="lang-swap"><span class="lang-en"> / Share</span><span class="lang-ar"> / مشاركة</span></span>';
+      share.onclick=function(e){e.stopPropagation();shareSearchPage();};
+      leftGroup.insertBefore(share,qr||null);
+    }
+  }
   // 准备浅色区按钮条（紧跟 struct-bar 之后、main-content 之前）
   let bar=document.getElementById('header-actions-bar');
   if(!bar){
@@ -2981,6 +2995,7 @@ function showHome(){
   document.getElementById('practice-screen').style.display='none';
   var _wb=document.getElementById('wrongbook-screen'); if(_wb) _wb.style.display='none';
   if(typeof updateWrongBookBadge==='function') updateWrongBookBadge();
+  const share=document.getElementById('search-share-btn'); if(share) share.style.display='none';
   // ★ v94:返回按钮默认始终显示(首页时点击 navBack 走 no-op),不再特意在 showHome 中隐藏
 }
 function showLevelSelect(){
@@ -3028,6 +3043,7 @@ function startTeacherSession(){
   state.reviewMode=false;
   state.currentLevel=null;
   state.sessionChars=chars;     // ★ 不打乱，按输入顺序逐字演示
+  state.searchText=chars.join('');
   state.sessionIndex=0;
   state.failedQueue=[];
   state.currentCharFailed=false;
@@ -3035,7 +3051,41 @@ function startTeacherSession(){
   document.getElementById('level-select').style.display='none';
   document.getElementById('practice-screen').style.display='block';
   const nb=document.getElementById('nav-back-btn');if(nb)nb.style.display='block';
+  relocateHeaderButtons();
+  const share=document.getElementById('search-share-btn'); if(share) share.style.display='flex';
+  const hab=document.getElementById('header-actions-bar');
+  if(hab && window.matchMedia && window.matchMedia('(max-width:768px)').matches){
+    hab.classList.add('fold-open');
+    const more=document.getElementById('hab-more'); if(more) more.classList.add('open');
+  }
+  if(typeof updateStructHeight==='function') setTimeout(updateStructHeight,60);
   loadTeacherChar(chars[0]);
+}
+
+function searchShareUrl(){
+  const url=new URL(location.href);
+  url.search=''; url.hash='';
+  url.searchParams.set('hanzi',state.searchText||(state.sessionChars||[]).join(''));
+  return url.href;
+}
+async function shareSearchPage(){
+  const text=state.searchText||(state.sessionChars||[]).join('');
+  if(!text){showToast(tt('请先搜索汉字或词语','Search first','ابحث أولًا'),'error');return;}
+  const url=searchShareUrl();
+  try{
+    if(navigator.share){
+      await navigator.share({title:'斑斓练字',text:tt('一起练习：','Practise together: ','تدرّب معي: ')+text,url:url});
+      return;
+    }
+    if(navigator.clipboard&&navigator.clipboard.writeText) await navigator.clipboard.writeText(url);
+    else{
+      const ta=document.createElement('textarea');ta.value=url;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    }
+    showToast(tt('分享链接已复制','Share link copied','تم نسخ رابط المشاركة'),'success');
+  }catch(e){
+    if(e&&e.name==='AbortError') return;
+    showToast(tt('分享失败，请重试','Unable to share','تعذرت المشاركة'),'error');
+  }
 }
 // 路由：能练的走完整流程，不能练的（不在字库/独体字）只演示笔顺
 function loadTeacherChar(char){
@@ -6218,20 +6268,15 @@ window._origLocked = document.getElementById('locked-overlay').innerHTML;
 window._origWordLocked = document.getElementById('word-locked').innerHTML;
 switchMode('learn');
 showHome();
-// ★ 联动-118/121:搜索模式入口门控——仅墨舟测试用,默认对学生隐藏
-function exitDemoMode(){   // 点「测试模式」标签→退出本机测试模式
-  try{ localStorage.removeItem('bls_demo'); }catch(e){}
-  var _se=document.querySelector('.home-entry-input'); if(_se) _se.style.display='none';
-  var _sg=document.querySelector('.home-grid'); if(_sg) _sg.classList.remove('demo-on');
-  if(typeof showToast==='function') showToast('已退出测试模式','success');
-}
+// 分享链接带 hanzi 参数；打开后自动进入同一组搜索练习。
 try{
   var _sp=new URLSearchParams(location.search);
-  if(_sp.get('demo')==='1') localStorage.setItem('bls_demo','1');   // 带参访问一次→本机永久记住
-  if(_sp.get('demo')==='0') localStorage.removeItem('bls_demo');     // 联动-121:?demo=0 网址也能退出
-  if(localStorage.getItem('bls_demo')==='1'){
-    var _demoEntry=document.querySelector('.home-entry-input'); if(_demoEntry) _demoEntry.style.display='';   // 显示搜索卡
-    var _demoGrid=document.querySelector('.home-grid'); if(_demoGrid) _demoGrid.classList.add('demo-on');     // 切4卡布局
+  var _sharedHanzi=_sp.get('hanzi');
+  if(_sharedHanzi){
+    setTimeout(function(){
+      var _input=document.getElementById('teacher-input');
+      if(_input){_input.value=_sharedHanzi;startTeacherSession();}
+    },0);
   }
 }catch(e){}
 </script>
@@ -6282,7 +6327,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-222';
+  const VERSION = '部件联动-223';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

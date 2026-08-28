@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-236 (2026-08-28) — 手机端步骤四改用底部下一步检查 -->
+<!-- 斑斓部件 · 部件联动-238 (2026-08-28) — 电打积分按词语字数计算 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-236">
+<meta name="version" content="部件联动-238">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -221,6 +221,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
 .write-reset-btn{margin-top:22px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .write-reset-btn:hover{background:rgba(20,40,30,0.55);color:#fff;transform:translateY(-2px)}
+.typing-input-wrap.ime-composing .typing-input{caret-color:transparent!important}
+.typing-input-wrap.ime-composing::after{content:"";position:absolute;left:var(--ime-caret-left,25%);bottom:0;width:2px;height:100%;background:var(--vermillion);transform:translateX(-1px);pointer-events:none;z-index:3} /* 拼音组词期间使用固定光标，选字后才移动 */
 
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -1767,7 +1769,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-236 ✦ 手机端步骤四改用底部下一步检查','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-238 ✦ 电打积分按词语字数计算','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4753,10 +4755,27 @@ function renderDesktopTyping(char){
   const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
   const hintGlyphs=chars.map(c=>`<span class="typing-answer-glyph" data-glyph="${c}">${c}</span>`).join('');
   const badge=w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:'';
-  box.innerHTML=`<span class="mobile-only">${badge}</span><div class="typing-answer-hint mobile-only" aria-label="输入提示">${hintGlyphs}</div><div class="desktop-typing-top desktop-only"><div class="typing-answer-hint" aria-label="输入提示">${hintGlyphs}</div>${badge}</div><div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
+  box.innerHTML=`<span class="mobile-only">${badge}</span><div class="typing-answer-hint mobile-only" aria-label="输入提示">${hintGlyphs}</div><div class="desktop-typing-top desktop-only"><div class="typing-answer-hint" aria-label="输入提示">${hintGlyphs}</div>${badge}</div><div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oncompositionstart="typingCompositionStart(this)" oncompositionend="typingCompositionEnd(this)" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter'&&!event.isComposing&&this.dataset.composing!=='1')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
   box.dataset.answer=w.w;
   box.querySelectorAll('.typing-answer-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
   const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
+}
+
+// 拼音输入法组词期间固定光标；确认候选汉字后才让光标进入下一字位。
+function typingCompositionStart(input){
+  if(!input) return;
+  input.dataset.composing='1';
+  const wrap=input.closest('.typing-input-wrap'); if(!wrap) return;
+  const len=Math.max(1,Number(input.maxLength)||1);
+  const committed=Math.min(len-1,[...(input.value||'')].length);
+  wrap.style.setProperty('--ime-caret-left',(((committed+.5)/len)*100)+'%');
+  wrap.classList.add('ime-composing');
+}
+function typingCompositionEnd(input){
+  if(!input) return;
+  input.dataset.composing='0';
+  const wrap=input.closest('.typing-input-wrap'); if(wrap) wrap.classList.remove('ime-composing');
+  renderTypingLiveWord();
 }
 
 // 手机端④：键盘仍写入原生输入框，画面上把已输入汉字实时换成统一的笔画图形。
@@ -4764,6 +4783,7 @@ function renderTypingLiveWord(){
   const input=document.getElementById('typing-input');
   const live=document.getElementById('typing-live-word');
   if(!input||!live) return;
+  if(input.dataset.composing==='1') return; // 拼音字母组合期间保持字形与光标不动
   const chars=[...input.value].slice(0,Number(input.maxLength)||99);
   live.textContent='';
   chars.forEach(c=>{
@@ -4789,6 +4809,7 @@ function checkTypedHanzi(){
     row.querySelectorAll('.typing-success-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
     playCorrectSound();
     celebrate();
+    try{ Game.scoreType([...answer].length); }catch(_gmE){ console.warn('[Game] scoreType 失败',_gmE); }
     // ④输入正确后解锁⑤书写；手机端自动翻到下一步，电脑端保持当前布局。
     unlockWriting();
     if(wizMobile()) wizAdvance(5); else wizUnlock(5);
@@ -6323,7 +6344,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-236';
+  const VERSION = '部件联动-238';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
@@ -7610,7 +7631,7 @@ try{
 <script>
 /* ══════════════════════════════════════════════════════════
    ★ 游戏化(部件联动-28)：积分/连击/打卡/徽章 —— 纯前端 localStorage(BLS_GAME_v1)
-   挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · onComplete(写字+3 +连击/打卡/徽章)
+   挂点：checkPinyin(拼音+1) · mergeCharacter(部件+1) · checkTypedHanzi(电打每字+1) · onComplete(写字+3 +连击/打卡/徽章)
    ══════════════════════════════════════════════════════════ */
 const Game=(function(){
   const KEY='BLS_GAME_v1';
@@ -7684,6 +7705,7 @@ const Game=(function(){
   }
   function scorePinyin(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('pinyin-options'));_renderTop();}
   function scoreComp(){_checkin();S.points+=1;_save();popPlus(1,document.getElementById('structure-panel'));_renderTop();}
+  function scoreType(charCount){const n=Math.max(1,Number(charCount)||1);_checkin();S.points+=n;_save();popPlus(n,document.getElementById('desktop-typing'));_renderTop();}
   function scoreWrite(allCorrect, char){
     _checkin();
     S.points+=3;S.totalChars+=1;
@@ -7777,7 +7799,7 @@ const Game=(function(){
     if(sb&&!sb._wired){sb._wired=1;sb.addEventListener('click',function(ev){ev.stopPropagation();_toggleWall(sb);});}
     _renderTop();_renderCombo();
   }
-  return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
+  return {init:init,scorePinyin:scorePinyin,scoreComp:scoreComp,scoreType:scoreType,scoreWrite:scoreWrite,openWall:openWall,closeWall:closeWall,_data:function(){return S;}};
 })();
 window.addEventListener('load',function(){try{Game.init();}catch(e){console.warn('[Game] init 失败',e);}});
 </script>

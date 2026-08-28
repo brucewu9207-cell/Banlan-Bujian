@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-232 (2026-08-28) — 收紧电打间距并下移书写内容 -->
+<!-- 斑斓部件 · 部件联动-233 (2026-08-28) — 同步手机端步骤四五新流程 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-232">
+<meta name="version" content="部件联动-233">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -952,36 +952,36 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="2"] #desktop-example-hint .ex-word-inner>span:nth-child(1){font-size:calc(3.15rem*var(--ui-scale))!important}
   .practice-layout.wizard[data-step="2"] #desktop-example-hint .ex-word-inner>span:nth-child(2){font-size:calc(2.025rem*var(--ui-scale))!important}
   .practice-layout.wizard[data-step="2"] #desktop-example-hint .ex-word-inner>span:nth-child(3){font-size:calc(1.575rem*var(--ui-scale))!important}
-  /* 手机端④书写、⑤整词输入 */
-  .practice-layout.wizard[data-step="4"] .word-box{display:none}
-  .practice-layout.wizard[data-step="4"] .write-box{flex:1;min-height:0;justify-content:flex-start}
-  .practice-layout.wizard[data-step="4"] .write-stage{margin-top:auto}
-  .practice-layout.wizard[data-step="4"] .write-reset-btn{margin-bottom:auto}
-  .practice-layout.wizard[data-step="4"] #write-locked{margin:auto 0}
-  .practice-layout.wizard[data-step="5"] .write-box{display:none}
-  .practice-layout.wizard[data-step="5"] .word-box{display:flex}
-  .practice-layout.wizard[data-step="5"] #word-hint,
-  .practice-layout.wizard[data-step="5"] #word-locked{display:none!important}
-  .practice-layout.wizard[data-step="5"] #desktop-typing{display:flex!important;flex:1;width:100%;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
-  .practice-layout.wizard[data-step="5"] .typing-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(7px*var(--ui-scale));width:100%;min-height:calc(165px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(14px*var(--ui-scale)) calc(24px*var(--ui-scale));color:#243a30}
-  .practice-layout.wizard[data-step="5"] .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}   /* 仿③左上角提示字：白底圆角框，放在浅色输入框外 */
-  .practice-layout.wizard[data-step="5"] .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
-  .practice-layout.wizard[data-step="5"] .typing-word-row{display:flex;align-items:flex-end;justify-content:center;line-height:1.1}
-  .practice-layout.wizard[data-step="5"] .typing-input-wrap{position:relative;width:calc(var(--typing-len,2)*3.5rem*var(--ui-scale));max-width:100%;height:calc(3.8rem*var(--ui-scale))}
-  .practice-layout.wizard[data-step="5"] .typing-slots{position:absolute;inset:0;display:flex;gap:calc(.35rem*var(--ui-scale));pointer-events:none}
-  .practice-layout.wizard[data-step="5"] .typing-slot{flex:1;border-bottom:3px solid #243a30}
-  .practice-layout.wizard[data-step="5"] .typing-input{position:absolute;inset:0;width:100%;height:100%;padding:0 0 0 calc(.25rem*var(--ui-scale));border:0;background:transparent;color:#243a30;text-align:left;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:calc(3.15rem*var(--ui-scale));letter-spacing:calc(.35rem*var(--ui-scale));line-height:1;outline:none}
-  .practice-layout.wizard[data-step="5"] .typing-input{color:transparent;caret-color:var(--vermillion)}
-  .practice-layout.wizard[data-step="5"] .typing-live-word{position:absolute;inset:0;display:flex;align-items:flex-end;gap:calc(.35rem*var(--ui-scale));pointer-events:none;font-size:calc(3.15rem*var(--ui-scale));color:#243a30;line-height:1}
-  .practice-layout.wizard[data-step="5"] .typing-live-glyph{display:flex;flex:1;align-items:flex-end;justify-content:center;min-width:0;height:1em}
-  .practice-layout.wizard[data-step="5"] .typing-input-wrap:focus-within .typing-slot{border-bottom-color:var(--vermillion)}
-  .practice-layout.wizard[data-step="5"] .typing-success-word{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(3.15rem*var(--ui-scale));color:var(--jade)}
-  .practice-layout.wizard[data-step="5"] .typing-success-glyph{display:inline-flex;width:1em;height:1em}
-  .practice-layout.wizard[data-step="5"] .typing-pinyin{font-size:calc(2.025rem*var(--ui-scale))}
-  .practice-layout.wizard[data-step="5"] .typing-translation{font-size:calc(1.575rem*var(--ui-scale));font-family:Georgia,serif;font-style:italic}
-  .practice-layout.wizard[data-step="5"] .typing-check{width:100%;margin-top:calc(12px*var(--ui-scale));padding:calc(10.5px*var(--ui-scale)) calc(33px*var(--ui-scale));border:1px solid rgba(255,255,255,.3);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:calc(1.425rem*var(--ui-scale));cursor:pointer}
-  .practice-layout.wizard[data-step="5"] .typing-check{display:none!important}   /* 手机端⑤：检查动作移到底部原“下一步”按钮 */
-  .practice-layout.wizard[data-step="5"] .typing-feedback{min-height:1.4em;font-size:calc(1rem*var(--ui-scale));color:#fff}
+  /* 手机端同步电脑端新流程：④整词输入、⑤书写 */
+  .practice-layout.wizard[data-step="5"] .word-box{display:none}
+  .practice-layout.wizard[data-step="5"] .write-box{flex:1;min-height:0;justify-content:flex-start}
+  .practice-layout.wizard[data-step="5"] .write-stage{margin-top:auto}
+  .practice-layout.wizard[data-step="5"] .write-reset-btn{margin-bottom:auto}
+  .practice-layout.wizard[data-step="5"] #write-locked{margin:auto 0}
+  .practice-layout.wizard[data-step="4"] .write-box{display:none}
+  .practice-layout.wizard[data-step="4"] .word-box{display:flex}
+  .practice-layout.wizard[data-step="4"] #word-hint,
+  .practice-layout.wizard[data-step="4"] #word-locked{display:none!important}
+  .practice-layout.wizard[data-step="4"] #desktop-typing{display:flex!important;flex:1;width:100%;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
+  .practice-layout.wizard[data-step="4"] .typing-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(7px*var(--ui-scale));width:100%;min-height:calc(165px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(14px*var(--ui-scale)) calc(24px*var(--ui-scale));color:#243a30}
+  .practice-layout.wizard[data-step="4"] .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}
+  .practice-layout.wizard[data-step="4"] .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
+  .practice-layout.wizard[data-step="4"] .typing-word-row{display:flex;align-items:flex-end;justify-content:center;line-height:1.1}
+  .practice-layout.wizard[data-step="4"] .typing-input-wrap{position:relative;width:calc(var(--typing-len,2)*3.5rem*var(--ui-scale));max-width:100%;height:calc(3.8rem*var(--ui-scale))}
+  .practice-layout.wizard[data-step="4"] .typing-slots{position:absolute;inset:0;display:flex;gap:calc(.35rem*var(--ui-scale));pointer-events:none}
+  .practice-layout.wizard[data-step="4"] .typing-slot{flex:1;border-bottom:3px solid #243a30}
+  .practice-layout.wizard[data-step="4"] .typing-input{position:absolute;inset:0;width:100%;height:100%;padding:0 0 0 calc(.25rem*var(--ui-scale));border:0;background:transparent;color:#243a30;text-align:left;font-family:'Kaiti SC','STKaiti','KaiTi','楷体',serif;font-size:calc(3.15rem*var(--ui-scale));letter-spacing:calc(.35rem*var(--ui-scale));line-height:1;outline:none}
+  .practice-layout.wizard[data-step="4"] .typing-input{color:transparent;caret-color:var(--vermillion)}
+  .practice-layout.wizard[data-step="4"] .typing-live-word{position:absolute;inset:0;display:flex;align-items:flex-end;gap:calc(.35rem*var(--ui-scale));pointer-events:none;font-size:calc(3.15rem*var(--ui-scale));color:#243a30;line-height:1}
+  .practice-layout.wizard[data-step="4"] .typing-live-glyph{display:flex;flex:1;align-items:flex-end;justify-content:center;min-width:0;height:1em}
+  .practice-layout.wizard[data-step="4"] .typing-input-wrap:focus-within .typing-slot{border-bottom-color:var(--vermillion)}
+  .practice-layout.wizard[data-step="4"] .typing-success-word{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(3.15rem*var(--ui-scale));color:var(--jade)}
+  .practice-layout.wizard[data-step="4"] .typing-success-glyph{display:inline-flex;width:1em;height:1em}
+  .practice-layout.wizard[data-step="4"] .typing-pinyin{font-size:calc(2.025rem*var(--ui-scale))}
+  .practice-layout.wizard[data-step="4"] .typing-translation{font-size:calc(1.575rem*var(--ui-scale));font-family:Georgia,serif;font-style:italic}
+  .practice-layout.wizard[data-step="4"] .typing-check{width:100%;margin-top:calc(12px*var(--ui-scale));padding:calc(10.5px*var(--ui-scale)) calc(33px*var(--ui-scale));border:1px solid rgba(255,255,255,.3);border-radius:12px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:calc(1.425rem*var(--ui-scale));cursor:pointer}
+  .practice-layout.wizard[data-step="4"] .typing-check{display:none!important}
+  .practice-layout.wizard[data-step="4"] .typing-feedback{min-height:1.4em;font-size:calc(1rem*var(--ui-scale));color:#fff}
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
 
@@ -1698,11 +1698,11 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
         <div class="word-panel" id="word-panel">
           <!-- 上方框：书写练习 -->
           <div class="card write-box">
-            <div class="step-title" style="margin-bottom:6px"><span class="desktop-step-label"><span class="step-title-zh">⑤ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></span><span class="mobile-step-label"><span class="step-title-zh">④ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></span></div>
+            <div class="step-title" style="margin-bottom:6px"><span class="desktop-step-label"><span class="step-title-zh">⑤ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></span><span class="mobile-step-label"><span class="step-title-zh">⑤ 书写练习</span><span class="lang-swap"><span class="step-title-en lang-en">Writing Practice</span><span class="step-title-en lang-ar" dir="rtl">تدريب الكتابة</span></span></span></div>
             <!-- 锁定遮罩：拖拽成功前显示 -->
             <div id="write-locked" style="display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;min-height:240px">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-              <p class="desktop-step-label" style="font-size:1.32rem;text-align:center;line-height:1.5">先完成电打汉字<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></p><p class="mobile-step-label" style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
+              <p class="desktop-step-label" style="font-size:1.32rem;text-align:center;line-height:1.5">先完成电打汉字<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></p><p class="mobile-step-label" style="font-size:1.32rem;text-align:center;line-height:1.5">先完成电打汉字<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></p>
             </div>
             <div class="write-stage" id="write-stage" style="display:none" oncontextmenu="return false">
               <svg class="write-grid" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
@@ -1719,11 +1719,11 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
           </div>
           <!-- 下方框：例词（选对拼音后出现） -->
           <div class="card word-box">
-            <div class="step-title" style="margin-bottom:6px"><span class="desktop-step-label"><span class="step-title-zh">④ 电打汉字</span><span class="lang-swap"><span class="step-title-en lang-en">Type Hanzi</span><span class="step-title-en lang-ar" dir="rtl">اكتب الحرف الصيني</span></span></span><span class="mobile-step-label"><span class="step-title-zh">⑤ 电打汉字</span><span class="lang-swap"><span class="step-title-en lang-en">Type Hanzi</span><span class="step-title-en lang-ar" dir="rtl">اكتب الحرف الصيني</span></span></span></div>
+            <div class="step-title" style="margin-bottom:6px"><span class="desktop-step-label"><span class="step-title-zh">④ 电打汉字</span><span class="lang-swap"><span class="step-title-en lang-en">Type Hanzi</span><span class="step-title-en lang-ar" dir="rtl">اكتب الحرف الصيني</span></span></span><span class="mobile-step-label"><span class="step-title-zh">④ 电打汉字</span><span class="lang-swap"><span class="step-title-en lang-en">Type Hanzi</span><span class="step-title-en lang-ar" dir="rtl">اكتب الحرف الصيني</span></span></span></div>
             <div class="word-hint show mobile-only" id="word-hint" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;border:none;background:transparent;padding:0;margin:0"></div>
             <div id="word-locked" class="mobile-only" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff">
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
-              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
+              <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
             <div class="desktop-typing desktop-only" id="desktop-typing"><div class="desktop-typing-lock">🔒<br>先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></div></div>
             <div id="next-btn-wrap" style="display:none;padding:8px 0 2px;flex-shrink:0">
@@ -1767,7 +1767,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-232 ✦ 收紧电打间距并下移书写内容','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-233 ✦ 同步手机端步骤四五新流程','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2921,7 +2921,7 @@ window.addEventListener('load', function(){
 
 // ══════════════════════════════════════════════════════════
 // ★ 移动端「分步翻页向导」控制器（仅手机/平板生效；桌面三栏不动）
-//   步骤：① 拼音 → ② 例词 → ③ 部件 → ④ 书写 → ⑤ 电打汉字
+//   步骤：① 拼音 → ② 例词 → ③ 部件 → ④ 电打汉字 → ⑤ 书写
 // ══════════════════════════════════════════════════════════
 const _wiz={step:1, max:1};
 function wizMobile(){ return !!(window.matchMedia && window.matchMedia('(max-width:768px)').matches); }
@@ -2930,7 +2930,7 @@ function _wizTop(){ if(wizMobile()){ try{ window.scrollTo({top:0,behavior:'smoot
 function wizBuildNav(){
   if(document.getElementById('wizard-nav')) return;
   const ps=document.getElementById('practice-screen'); if(!ps) return;
-  const marks=['①','②','③','④','⑤'], zh=['拼音','例词','部件','书写','电打'];
+  const marks=['①','②','③','④','⑤'], zh=['拼音','例词','部件','电打','书写'];
   const dots=[1,2,3,4,5].map(n=>
     `<button class="wdot" data-s="${n}" onclick="wizGoto(${n})"><b>${marks[n-1]}</b><i>${zh[n-1]}</i></button>`
   ).join('');
@@ -2953,7 +2953,7 @@ function wizSync(){
   const next=document.getElementById('wiz-next');
   if(prev) prev.disabled=(_wiz.step<=1);
   if(next){
-    if(_wiz.step>=5){            // 最后一页：原“下一步”位置改为“检查”
+    if(_wiz.step===4){           // 电打页：原“下一步”位置改为“检查”
       next.style.visibility='visible';
       var _checkZh=next.querySelector('.wiz-zh'); if(_checkZh)_checkZh.textContent='检查';
       var _checkEn=next.querySelector('.wiz-tr .lang-en'); if(_checkEn)_checkEn.textContent='Check';
@@ -3321,9 +3321,8 @@ function checkPinyin(btn,chosen,correct,data,char){
         state.pinyinDone = true;
         _fitFrozen = false;
         state.sessionIndex++;   // ★ 联动-12: 模拟 mergeCharacter 的 sessionIndex++,让"下一个字"按钮能跳转
-        if(_isMobile) unlockWriting();
-        else showExampleWord(char);   // 电脑端独体字直接进入④电打汉字
-        wizUnlock(4);       // ②例词已解锁；③部件可跳过，④书写可进入
+        showExampleWord(char);        // 两端统一：独体字直接进入④电打汉字
+        wizUnlock(4);                 // ②例词已解锁；③部件可跳过，④电打可进入
       }, 250);   // ★ 联动-145:独体字解锁等待 600→250ms,「下一步」更快
     } else {
       // 合体字: 预渲染 step ② 部件,等笔画都画好(或兜底)再揭开,避免边揭开边加载(部件联动-79)
@@ -4268,9 +4267,8 @@ function mergeCharacter(){
   // ★ v64：电脑端「下一个字」按钮改到「写对汉字」后才点亮（见 startWritingQuiz 的 onComplete），此处不再立即显示
   // ✅ 拖拽成功：轻快提示音（撒花改到写对汉字后）
   playCorrectSound();
-  // 手机端保持原流程：③部件后解锁④书写；电脑端新流程：③部件后解锁④电打汉字。
-  if(wizMobile()) unlockWriting();
-  else showExampleWord(char);
+  // 两端统一：③部件完成后解锁④电打汉字。
+  showExampleWord(char);
   side.style.animation='none';
   void side.offsetWidth;
   side.style.animation='mergeIn .5s cubic-bezier(.34,1.56,.64,1)';
@@ -4715,7 +4713,7 @@ function unlockWriting(){
   startWritingQuiz();
 }
 
-// ══ 电脑端五步：②例词 + ⑤电打汉字（手机端原四步不变）══
+// ══ 两端统一五步：②例词 + ④电打汉字 + ⑤书写练习 ══
 function getExampleWord(char){
   const data=CHAR_DB[char];
   if(!data||!data.words||data.words.length===0) return null;
@@ -4765,7 +4763,7 @@ function renderDesktopTyping(char){
   const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
 }
 
-// 手机端⑤：键盘仍写入原生输入框，画面上把已输入汉字实时换成统一的笔画图形。
+// 手机端④：键盘仍写入原生输入框，画面上把已输入汉字实时换成统一的笔画图形。
 function renderTypingLiveWord(){
   const input=document.getElementById('typing-input');
   const live=document.getElementById('typing-live-word');
@@ -4795,21 +4793,13 @@ function checkTypedHanzi(){
     row.querySelectorAll('.typing-success-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
     playCorrectSound();
     celebrate();
-    if(wizMobile()){
-      // 手机端⑤仍为最后一步：撒花结束后进入下一个字。
-      setTimeout(()=>{
-        if(state.teacherMode&&state.sessionChars[state.sessionIndex]===state.currentChar) state.sessionIndex++;
-        nextCharacter();
-      },2200);
-    }else{
-      // 电脑端④输入正确后，解锁下方⑤书写练习。
-      unlockWriting();
-      wizUnlock(5);
-    }
+    // 两端统一：④输入正确后解锁⑤书写练习。
+    unlockWriting();
+    wizUnlock(5);
   } else { playWrongSound(); input.focus(); input.select(); }
 }
 
-// 显示例词；手机端用于④，电脑端同时解锁⑤电打汉字
+// 显示例词并准备④电打汉字
 function showExampleWord(char){
   const data=CHAR_DB[char];
   const hint=document.getElementById('word-hint');
@@ -4892,15 +4882,9 @@ function startWritingQuiz(){
         }
         try{ var _gmAll=(window._blsCurPy!==false)&&(window._blsCurComp!==false); Game.scoreWrite(_gmAll, state.currentChar); }catch(_gmE){ console.warn('[Game] scoreWrite 失败', _gmE); }
         const c = document.getElementById('write-check'); if(c) c.classList.add('show');
-        if(wizMobile()){
-          showExampleWord(state.currentChar); // 手机端：写对后准备⑤整词输入
-          celebrate();
-          wizUnlock(5);
-        }else{
-          // 电脑端⑤书写是最后一步：撒花结束后自动进入下一个字。
-          celebrate();
-          setTimeout(()=>nextCharacter(),2200);
-        }
+        // 两端统一：⑤书写是最后一步，撒花结束后自动进入下一个字。
+        celebrate();
+        setTimeout(()=>nextCharacter(),2200);
         // ★ v64：电脑端「下一个字」按钮改到此处才点亮（原本在 mergeCharacter 拼对部件后就亮，已改为只有写对汉字后才亮）
         const nbw=document.getElementById('next-btn-wrap'); if(nbw) nbw.style.display='block';
       },
@@ -6343,7 +6327,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-232';
+  const VERSION = '部件联动-233';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

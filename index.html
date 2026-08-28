@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-224 (2026-08-28) — 优化分享按钮与搜索卡尺寸 -->
+<!-- 斑斓部件 · 部件联动-225 (2026-08-28) — 分享按钮并入顶栏并统一查询解锁流程 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-224">
+<meta name="version" content="部件联动-225">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -76,7 +76,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .teacher-go{flex:1 1 0;width:0;min-width:0;padding:12px 8px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;cursor:pointer;white-space:normal;transition:all .2s}
 .teacher-go:hover{background:var(--bamboo-light)}
 #practice-screen{position:relative}
-#search-share-btn.search-share-page-btn{position:absolute;z-index:30;right:10px;top:8px;display:none;align-items:center;justify-content:center;text-align:center;line-height:1.15;min-width:112px;background:var(--bamboo);border:1px solid rgba(255,255,255,.3)}
+#search-share-btn.search-share-header-btn{display:none;align-items:center;justify-content:center;text-align:center;line-height:1.15;min-width:105px;background:var(--bamboo);border:1px solid rgba(255,255,255,.3)}
 
 /* ══ v67：首页漂浮部件装饰层 ══ */
 .deco-layer{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
@@ -757,11 +757,11 @@ body::after{
   #header-actions-bar > div > #gm-stat-bar{order:2}
   #header-actions-bar > div > #gm-combo-bar{order:3}
   #header-actions-bar > #hab-more{order:4;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
-  #header-actions-bar.fold-open::after{content:"";flex-basis:100%;width:100%;height:0;order:5}   /* ★ 联动-124:展开时强制换行→折叠三项整体落到第二行,第一行原封不动 */
-  #header-actions-bar > div > .qr-wrap{order:6}
-  #header-actions-bar > div > #feedback-btn{order:7}
-  #header-actions-bar > div > #toggle-struct-btn{order:8}
-  #header-actions-bar > div > #search-share-btn{order:9}
+  #header-actions-bar > div > #search-share-btn{order:5;flex:0 1 78px !important;min-width:0;width:auto !important}
+  #header-actions-bar.fold-open::after{content:"";flex-basis:100%;width:100%;height:0;order:6}   /* 展开时折叠项另起一行，分享始终留在第一行最右侧 */
+  #header-actions-bar > div > .qr-wrap{order:7}
+  #header-actions-bar > div > #feedback-btn{order:8}
+  #header-actions-bar > div > #toggle-struct-btn{order:9}
   /* 第一排三主项均分填满整行→把折叠项挤到下一排,保证第一排只占一行 */
   #header-actions-bar > div > #nav-back-btn,
   #header-actions-bar > div > #gm-stat-bar,
@@ -769,14 +769,12 @@ body::after{
   /* 折叠项:展开时三项均分第二行(一排) */
   #header-actions-bar > div > .qr-wrap,
   #header-actions-bar > div > #feedback-btn,
-  #header-actions-bar > div > #toggle-struct-btn,
-  #header-actions-bar > div > #search-share-btn{flex:1 1 0;min-width:0;width:auto !important}
+  #header-actions-bar > div > #toggle-struct-btn{flex:1 1 0;min-width:0;width:auto !important}
   #header-actions-bar .qr-wrap > #qr-btn{width:100% !important}
   /* 默认收起:三个折叠项完全隐藏(点「⋯更多」才展开) */
   #header-actions-bar:not(.fold-open) > div > .qr-wrap,
   #header-actions-bar:not(.fold-open) > div > #feedback-btn,
-  #header-actions-bar:not(.fold-open) > div > #toggle-struct-btn,
-  #header-actions-bar:not(.fold-open) > div > #search-share-btn{display:none !important}
+  #header-actions-bar:not(.fold-open) > div > #toggle-struct-btn{display:none !important}
   .struct-action-btn{
     padding:7px 8px !important;
     font-size:0.65rem !important;
@@ -1750,7 +1748,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-224 ✦ 优化分享按钮与搜索卡尺寸','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-225 ✦ 分享按钮并入顶栏并统一查询解锁流程','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2851,15 +2849,15 @@ function relocateHeaderButtons(){
   }
   const groups=window._hdrGroups;
   if(!groups.length) return;
-  // 搜索练习专属分享按钮：固定在练习页面右上角，不挤占顶部操作条。
+  // 搜索练习专属分享按钮：并入右侧操作组，排在同一行最右边。
   if(!document.getElementById('search-share-btn')){
-    const practice=document.getElementById('practice-screen');
-    if(practice){
+    const rightGroup=groups.find(g=>g.querySelector('#toggle-struct-btn'));
+    if(rightGroup){
       const share=document.createElement('button');
-      share.id='search-share-btn'; share.type='button'; share.className='struct-action-btn search-share-page-btn';
+      share.id='search-share-btn'; share.type='button'; share.className='struct-action-btn search-share-header-btn';
       share.innerHTML='<span class="tb-col"><span>分享网页</span><span class="lang-swap-block"><span class="lang-en">Share</span><span class="lang-ar" dir="rtl">مشاركة</span></span></span>';
       share.onclick=function(e){e.stopPropagation();shareSearchPage();};
-      practice.appendChild(share);
+      rightGroup.appendChild(share);
     }
   }
   // 准备浅色区按钮条（紧跟 struct-bar 之后、main-content 之前）
@@ -3236,15 +3234,7 @@ function loadCharacter(char){
   requestAnimationFrame(updateStructHeight);
   setTimeout(updateStructHeight, 200);
   wizReset();   // ★ 新字 → 把分步向导重置回 ① 拼音
-  // ★ 联动-166/172:仅【搜索模式】(墨舟测试)解开②③④全部锁;班级模块的 inTaskMode 在它自己的 state 上(主 state 读不到)→ 改查 body 的 bls-in-task-mode 类(班级任务时存在),这样班级任务不解锁
-  if(state.teacherMode && !document.body.classList.contains('bls-in-task-mode')){
-    try{
-      unlockDragSection(char, data);   // 揭锁 ② 拖拽部件(含兜底渲染)
-      unlockWriting();                 // 揭锁 ③ 书写练习
-      showExampleWord(char);           // 揭锁 ② 例词与⑤电打内容
-      wizUnlock(5);                    // 搜索演示模式解锁全部五步
-    }catch(_e){ console.warn('[搜索模式全解锁] 失败', _e); }
-  }
+  // 搜索／查询模式与自学、班级模式统一：从①拼音开始，完成当前步骤后再逐步解锁②—⑤。
 }
 
 function renderPinyinOptions(char,data){
@@ -6318,7 +6308,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-224';
+  const VERSION = '部件联动-225';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

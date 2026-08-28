@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-225 (2026-08-28) — 分享按钮并入顶栏并统一查询解锁流程 -->
+<!-- 斑斓部件 · 部件联动-226 (2026-08-28) — 移除搜索圆点并对齐搜索框高度 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-225">
+<meta name="version" content="部件联动-226">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -70,10 +70,10 @@ body::before{content:'';position:fixed;inset:0;background:
 .home-entry-input{cursor:default;position:relative;min-width:0}
 .demo-tag{position:absolute;left:50%;top:-34px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:#c84b2f;color:#fff;font-size:0.82rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(20,40,30,0.35);white-space:nowrap;cursor:pointer;z-index:5;letter-spacing:0.04em}  /* 联动-121:测试模式标签,浮在搜索卡正上方;点击退出 */
 .demo-tag:hover{background:#b33939}
-.home-input-row{display:flex;gap:10px;width:100%;max-width:300px;margin:4px 0 16px}
-.teacher-input{flex:1 1 0;width:0;min-width:0;padding:12px 14px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
+.home-input-row{display:flex;align-items:stretch;gap:10px;width:100%;max-width:300px;height:42px;margin:4px 0 16px}
+.teacher-input{box-sizing:border-box;flex:1 1 0;width:0;height:100%;min-width:0;padding:5px 10px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
 .teacher-input:focus{border-color:var(--bamboo-light)}
-.teacher-go{flex:1 1 0;width:0;min-width:0;padding:12px 8px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;cursor:pointer;white-space:normal;transition:all .2s}
+.teacher-go{box-sizing:border-box;flex:1 1 0;width:0;height:100%;min-width:0;padding:2px 8px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;line-height:1.12;cursor:pointer;white-space:normal;transition:all .2s}
 .teacher-go:hover{background:var(--bamboo-light)}
 #practice-screen{position:relative}
 #search-share-btn.search-share-header-btn{display:none;align-items:center;justify-content:center;text-align:center;line-height:1.15;min-width:105px;background:var(--bamboo);border:1px solid rgba(255,255,255,.3)}
@@ -438,7 +438,7 @@ body::before{content:'';position:fixed;inset:0;background:
   .home-entry-zh{font-size:1.17rem}                   /* ★ v86:0.9;联动-141:标题×1.3 → 1.17rem */
   .home-entry-desc{font-size:0.6rem}                  /* ★ 联动-141:标题下小字(A1班5个新任务/HSK分级挑战/暂无错题)缩小,明显小于标题 */
   .home-entry-en{font-size:0.6rem;margin-bottom:18px}  /* ★ v86:0.85→0.6;联动-140:7→18 拉开上半(标题)与下半(描述)间距 */
-  .home-input-row{margin:3px 0 6px;max-width:196px}   /* ★ v86:280→196 (×0.7) */
+  .home-input-row{margin:3px 0 6px;max-width:196px;height:30px}   /* 与手机端双语提示两行的总高度一致 */
   .teacher-input{padding:7px 9px;font-size:0.75rem}   /* ★ v86:9 12, 1.05→7 9, 0.75 (×0.7) */
   .teacher-go{padding:7px 9px;font-size:0.65rem}      /* ★ v86:9 12, 0.9→7 9, 0.65 (×0.7) */
   .top-nav{padding:11px 16px}
@@ -1554,7 +1554,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
           <div class="lang-swap-block"><div class="home-entry-en lang-en">Search Mode</div><div class="home-entry-en lang-ar" dir="rtl">وضع البحث</div></div>
           <div class="home-input-row">
             <input id="teacher-input" class="teacher-input" type="text" placeholder="如：你好吗" onkeydown="if(event.key==='Enter')startTeacherSession()">
-            <button class="teacher-go" onclick="startTeacherSession()">搜索<span class="lang-swap"><span class="lang-en"> · Search</span><span class="lang-ar"> · بحث</span></span></button>
+            <button class="teacher-go" onclick="startTeacherSession()"><span>搜索</span><span class="lang-swap-block"><span class="lang-en">Search</span><span class="lang-ar" dir="rtl">بحث</span></span></button>
           </div>
         </div>
         <!-- ★ 部件联动-18: 入口 4 错题集 -->
@@ -1748,7 +1748,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-225 ✦ 分享按钮并入顶栏并统一查询解锁流程','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-226 ✦ 移除搜索圆点并对齐搜索框高度','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6308,7 +6308,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-225';
+  const VERSION = '部件联动-226';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

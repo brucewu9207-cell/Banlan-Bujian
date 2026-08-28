@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-231 (2026-08-28) — 统一电脑端上下方框尺寸并优化电打布局 -->
+<!-- 斑斓部件 · 部件联动-232 (2026-08-28) — 收紧电打间距并下移书写内容 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-231">
+<meta name="version" content="部件联动-232">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1016,7 +1016,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .desktop-example-lock-icon{font-size:2rem;line-height:1;margin-bottom:7px}
   #skip-btn{position:sticky;bottom:calc(18px*var(--ui-scale));width:100%;margin-top:auto !important;margin-bottom:0 !important;flex-shrink:0;z-index:3}
   .desktop-typing{flex:1;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
-  .desktop-typing.typing-ready{padding-top:calc(28px*var(--ui-scale));gap:calc(16px*var(--ui-scale));justify-content:flex-start;box-sizing:border-box}
+  .desktop-typing.typing-ready{padding-top:calc(8px*var(--ui-scale));gap:calc(8px*var(--ui-scale));justify-content:flex-start;box-sizing:border-box}
   .desktop-typing-lock{font-size:1.08rem;text-align:center;line-height:1.5}
   .desktop-typing .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}
   .desktop-typing .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
@@ -1036,8 +1036,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .typing-input.wrong{color:var(--vermillion);animation:shake .3s}
   .typing-pinyin{font-size:calc(2.025rem*var(--ui-scale))}
   .typing-translation{font-size:calc(1.575rem*var(--ui-scale));font-family:Georgia,serif;font-style:italic}
-  .typing-check{width:auto;margin-top:22px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:.02em}
+  .typing-check{width:auto;margin-top:8px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:.02em;flex-shrink:0}
   .typing-check:hover{background:rgba(20,40,30,.55);color:#fff;transform:translateY(-2px)}
+  .write-box #write-stage{margin-top:calc(10px*var(--ui-scale))}
   .typing-feedback{min-height:1.4em;font-size:calc(1rem*var(--ui-scale));color:#fff}
 
   /* ② 例词内框：汉字、拼音、翻译竖排，整体放大 1.5 倍 */
@@ -1766,7 +1767,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-231 ✦ 统一电脑端上下方框尺寸并优化电打布局','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-232 ✦ 收紧电打间距并下移书写内容','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6342,7 +6343,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-231';
+  const VERSION = '部件联动-232';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

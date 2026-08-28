@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-230 (2026-08-28) — 调整HSK提示位置并统一检查按钮样式 -->
+<!-- 斑斓部件 · 部件联动-231 (2026-08-28) — 统一电脑端上下方框尺寸并优化电打布局 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-230">
+<meta name="version" content="部件联动-231">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1008,6 +1008,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   /* 电脑端五步：②例词移到①下方，原④位置改为⑤电打汉字 */
   .word-panel>.word-box{order:1}
   .word-panel>.write-box{order:2}
+  .word-panel>.word-box,.word-panel>.write-box{flex:1 1 0;min-height:0;box-sizing:border-box}
   .char-panel>.spacer{display:none}
   .desktop-example-box{display:flex;flex-direction:column;margin-top:8px;padding-top:0;flex-shrink:0}
   .desktop-example-body{min-height:94px;display:flex;align-items:center;justify-content:center;padding-top:14px}
@@ -1015,6 +1016,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .desktop-example-lock-icon{font-size:2rem;line-height:1;margin-bottom:7px}
   #skip-btn{position:sticky;bottom:calc(18px*var(--ui-scale));width:100%;margin-top:auto !important;margin-bottom:0 !important;flex-shrink:0;z-index:3}
   .desktop-typing{flex:1;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
+  .desktop-typing.typing-ready{padding-top:calc(28px*var(--ui-scale));gap:calc(16px*var(--ui-scale));justify-content:flex-start;box-sizing:border-box}
   .desktop-typing-lock{font-size:1.08rem;text-align:center;line-height:1.5}
   .desktop-typing .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}
   .desktop-typing .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
@@ -1764,7 +1766,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-230 ✦ 调整HSK提示位置并统一检查按钮样式','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-231 ✦ 统一电脑端上下方框尺寸并优化电打布局','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4735,7 +4737,7 @@ function resetDesktopFiveStep(){
   const ex=document.getElementById('desktop-example-hint');
   if(ex) ex.innerHTML='<div class="desktop-example-locked"><div class="desktop-example-lock-icon">🔒</div>选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div>';
   const typing=document.getElementById('desktop-typing');
-  if(typing) typing.innerHTML='<div class="desktop-typing-lock">🔒<br>先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></div>';
+  if(typing){ typing.classList.remove('typing-ready'); typing.innerHTML='<div class="desktop-typing-lock">🔒<br>先完成拖拽部件<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></div>'; }
 }
 
 function renderDesktopExample(char){
@@ -4751,6 +4753,7 @@ function renderDesktopTyping(char){
   const box=document.getElementById('desktop-typing');
   const w=getExampleWord(char);
   if(!box||!w) return;
+  box.classList.add('typing-ready');
   const chars=[...w.w];
   const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
   const hintGlyphs=chars.map(c=>`<span class="typing-answer-glyph" data-glyph="${c}">${c}</span>`).join('');
@@ -6339,7 +6342,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-230';
+  const VERSION = '部件联动-231';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

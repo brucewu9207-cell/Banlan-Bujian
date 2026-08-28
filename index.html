@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-227 (2026-08-28) — 修复电打解锁并优化顶部与搜索卡对齐 -->
+<!-- 斑斓部件 · 部件联动-228 (2026-08-28) — 优化Skip位置并补齐锁图标与电脑端提示词 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-227">
+<meta name="version" content="部件联动-228">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1007,8 +1007,12 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .desktop-example-box{display:flex;flex-direction:column;margin-top:8px;padding-top:0;flex-shrink:0}
   .desktop-example-body{min-height:94px;display:flex;align-items:center;justify-content:center;padding-top:14px}
   .desktop-example-locked{font-size:1rem;color:rgba(255,255,255,.86);text-align:center}
+  .desktop-example-lock-icon{font-size:2rem;line-height:1;margin-bottom:7px}
+  #skip-btn{position:sticky;bottom:calc(18px*var(--ui-scale));width:100%;margin-top:auto !important;margin-bottom:0 !important;flex-shrink:0;z-index:3}
   .desktop-typing{flex:1;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
   .desktop-typing-lock{font-size:1.08rem;text-align:center;line-height:1.5}
+  .desktop-typing .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}
+  .desktop-typing .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
   .typing-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(7px*var(--ui-scale));width:100%;max-width:none;min-height:calc(165px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(14px*var(--ui-scale)) calc(24px*var(--ui-scale));color:#243a30}
   .typing-word-row{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.75rem*var(--ui-scale));line-height:1.1}
   .typing-fixed-glyph{display:inline-flex;align-items:flex-end;justify-content:center;width:1em;height:1em;color:#243a30}
@@ -1200,6 +1204,9 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .home-grid .home-entry-en{ font-size:1.15rem; }
   .home-grid .home-entry-icon{ font-size:2.4rem; }
   .home-grid .home-entry-desc{ font-size:0.95rem; }
+}
+@media(min-width:769px) and (max-height:800px){
+  #skip-btn{position:relative;bottom:auto;margin-top:12px !important}
 }
 </style>
 <style>
@@ -1670,7 +1677,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
           <div id="char-info" style="display:none;margin-top:14px;padding:20px 16px;background:#97a99f;border-radius:10px;border:1.5px solid rgba(255,255,255,0.3);font-size:1.2rem;color:#243a30;line-height:1.7;text-align:center"></div>
           <div class="desktop-example-box" id="desktop-example-box">
             <div class="step-title" style="margin-bottom:6px"><span class="step-title-zh">② 例词</span><span class="lang-swap"><span class="step-title-en lang-en">Example Word</span><span class="step-title-en lang-ar" dir="rtl">كلمة مثال</span></span></div>
-            <div class="desktop-example-body" id="desktop-example-hint"><div class="desktop-example-locked">选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div></div>
+            <div class="desktop-example-body" id="desktop-example-hint"><div class="desktop-example-locked"><div class="desktop-example-lock-icon">🔒</div>选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div></div>
           </div>
           <button id="skip-btn" onclick="skipCharacter()" style="margin-top:12px;padding:14px 28px;background:var(--bamboo);color:#ffffff;border:1px solid rgba(255,255,255,0.3);border-radius:10px;font-family:inherit;font-size:1.35rem;letter-spacing:0.08em;cursor:pointer;transition:all .2s">
             <span class="lang-swap"><span class="lang-en">Skip</span><span class="lang-ar">تخطٍّ</span></span> · 我已认识 →
@@ -1749,7 +1756,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-227 ✦ 修复电打解锁并优化顶部与搜索卡对齐','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-228 ✦ 优化Skip位置并补齐锁图标与电脑端提示词','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4716,7 +4723,7 @@ function desktopExampleMarkup(w){
 
 function resetDesktopFiveStep(){
   const ex=document.getElementById('desktop-example-hint');
-  if(ex) ex.innerHTML='<div class="desktop-example-locked">选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div>';
+  if(ex) ex.innerHTML='<div class="desktop-example-locked"><div class="desktop-example-lock-icon">🔒</div>选对拼音后显示例词<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Choose the correct pinyin first</span><span class="lang-ar" dir="rtl">اختر البينيين الصحيح أولاً</span></span></div>';
   const typing=document.getElementById('desktop-typing');
   if(typing) typing.innerHTML='<div class="desktop-typing-lock">🔒<br>先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></div>';
 }
@@ -6309,7 +6316,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-227';
+  const VERSION = '部件联动-228';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

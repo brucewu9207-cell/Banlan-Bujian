@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-235 (2026-08-28) — 手机端检查按钮统一重写按钮样式 -->
+<!-- 斑斓部件 · 部件联动-236 (2026-08-28) — 手机端步骤四改用底部下一步检查 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-235">
+<meta name="version" content="部件联动-236">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -980,7 +980,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="4"] .typing-pinyin{font-size:calc(2.025rem*var(--ui-scale))}
   .practice-layout.wizard[data-step="4"] .typing-translation{font-size:calc(1.575rem*var(--ui-scale));font-family:Georgia,serif;font-style:italic}
   .practice-layout.wizard[data-step="4"] .typing-check{width:auto;margin-top:22px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:.02em;flex-shrink:0}   /* 与⑤“重写”按钮完全一致 */
-  .practice-layout.wizard[data-step="4"] .typing-check{display:block!important}   /* 手机端④：检查按钮恢复到输入内容下方 */
+  .practice-layout.wizard[data-step="4"] .typing-check{display:none!important}   /* 手机端④：使用底部“下一步”完成检查 */
   .practice-layout.wizard[data-step="4"] .typing-feedback{min-height:1.4em;font-size:calc(1rem*var(--ui-scale));color:#fff}
   .practice-layout.wizard #next-btn-wrap{display:none !important}  /* 「下一个字」交给底部导航统一处理 */
 }
@@ -1767,7 +1767,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-235 ✦ 手机端检查按钮统一重写按钮样式','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-236 ✦ 手机端步骤四改用底部下一步检查','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -2957,8 +2957,13 @@ function wizSync(){
     var _nz2=next.querySelector('.wiz-zh'); if(_nz2)_nz2.textContent='下一步 ›';
     var _nextEn=next.querySelector('.wiz-tr .lang-en'); if(_nextEn)_nextEn.textContent='Next';
     var _nextAr=next.querySelector('.wiz-tr .lang-ar'); if(_nextAr)_nextAr.textContent='التالي';
-    next.disabled=(_wiz.step>=_wiz.max);   // 只能前进到已解锁的步
-    next.onclick=()=>wizNext();
+    if(_wiz.step===4){
+      next.disabled=false;
+      next.onclick=()=>checkTypedHanzi();  // 手机端④：“下一步”先检查整词，正确后自动进入⑤
+    }else{
+      next.disabled=(_wiz.step>=_wiz.max); // 只能前进到已解锁的步
+      next.onclick=()=>wizNext();
+    }
   }
   document.querySelectorAll('#wizard-nav .wdot').forEach(d=>{
     const s=parseInt(d.dataset.s,10);
@@ -6318,7 +6323,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-235';
+  const VERSION = '部件联动-236';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

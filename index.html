@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-221 (2026-08-26) — 手机端①四个拼音选项整体下移，利用原下方空白；手机端⑤在输入横线上方新增正确词语的笔画图形提示，页面中间的大检查按钮移除，底部原下一步按钮改为检查；输入、撒花和自动下一字逻辑保持不变；电脑端不变。 -->
+<!-- 斑斓部件 · 部件联动-222 (2026-08-26) — 手机端⑤笔画提示词从浅色输入框内部移到其上方，改成参考③提示字的白色圆角独立提示框；底部检查按钮与上一步按钮固定为相同宽度；输入、检查、撒花和自动下一字逻辑不变；电脑端不变。 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-221">
+<meta name="version" content="部件联动-222">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -900,6 +900,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   }
   #wizard-nav{gap:3px}
   #wizard-nav .wiz-btn{padding:6px 8px;font-size:.85rem}
+  #wizard-nav #wiz-prev,#wizard-nav #wiz-next{flex:0 0 70px;width:70px;box-sizing:border-box;justify-content:center}   /* 手机端底部左右按钮固定等宽 */
   #wizard-nav .wizard-dots{gap:1px}
   #wizard-nav .wdot{min-width:36px;padding:4px 2px}
   /* 向导模式：一次只显示「一步」 */
@@ -959,7 +960,7 @@ button,.struct-action-btn,.stroke-ctrl-btn,.play-circle-btn,.pinyin-btn,.wiz-btn
   .practice-layout.wizard[data-step="5"] #word-locked{display:none!important}
   .practice-layout.wizard[data-step="5"] #desktop-typing{display:flex!important;flex:1;width:100%;flex-direction:column;align-items:center;justify-content:center;gap:calc(10px*var(--ui-scale));min-height:0}
   .practice-layout.wizard[data-step="5"] .typing-prompt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:calc(7px*var(--ui-scale));width:100%;min-height:calc(165px*var(--ui-scale));background:#97a99f;border:1.5px solid rgba(255,255,255,.3);border-radius:12px;padding:calc(14px*var(--ui-scale)) calc(24px*var(--ui-scale));color:#243a30}
-  .practice-layout.wizard[data-step="5"] .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(3.15rem*var(--ui-scale));color:#243a30;line-height:1;margin-bottom:calc(10px*var(--ui-scale))}
+  .practice-layout.wizard[data-step="5"] .typing-answer-hint{display:flex;align-items:flex-end;justify-content:center;gap:calc(3px*var(--ui-scale));font-size:calc(2.5rem*var(--ui-scale));color:#243a30;line-height:1;background:#fff;border:1.5px solid rgba(20,40,30,.25);border-radius:10px;padding:calc(6px*var(--ui-scale)) calc(14px*var(--ui-scale));margin-bottom:calc(2px*var(--ui-scale));flex-shrink:0}   /* 仿③左上角提示字：白底圆角框，放在浅色输入框外 */
   .practice-layout.wizard[data-step="5"] .typing-answer-glyph{display:inline-flex;width:1em;height:1em}
   .practice-layout.wizard[data-step="5"] .typing-word-row{display:flex;align-items:flex-end;justify-content:center;line-height:1.1}
   .practice-layout.wizard[data-step="5"] .typing-input-wrap{position:relative;width:calc(var(--typing-len,2)*3.5rem*var(--ui-scale));max-width:100%;height:calc(3.8rem*var(--ui-scale))}
@@ -1746,7 +1747,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-221 ✦ 手机端①四个拼音选项整体下移，利用原下方空白；手机端⑤在输入横线上方新增正确词语的笔画图形提示，页面中间的大检查按钮移除，底部原下一步按钮改为检查；输入、撒花和自动下一字逻辑保持不变；电脑端不变。','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-222 ✦ 手机端⑤笔画提示词从浅色输入框内部移到其上方，改成参考③提示字的白色圆角独立提示框；底部检查按钮与上一步按钮固定为相同宽度；输入、检查、撒花和自动下一字逻辑不变；电脑端不变。','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4703,7 +4704,7 @@ function renderDesktopTyping(char){
   if(!box||!w) return;
   const chars=[...w.w];
   const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
-  box.innerHTML=`${w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:''}<div class="typing-prompt"><div class="typing-answer-hint" aria-label="输入提示">${chars.map(c=>`<span class="typing-answer-glyph" data-glyph="${c}">${c}</span>`).join('')}</div><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
+  box.innerHTML=`${w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:''}<div class="typing-answer-hint" aria-label="输入提示">${chars.map(c=>`<span class="typing-answer-glyph" data-glyph="${c}">${c}</span>`).join('')}</div><div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
   box.dataset.answer=w.w;
   box.querySelectorAll('.typing-answer-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
   const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
@@ -6281,7 +6282,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-221';
+  const VERSION = '部件联动-222';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

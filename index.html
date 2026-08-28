@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-226 (2026-08-28) — 移除搜索圆点并对齐搜索框高度 -->
+<!-- 斑斓部件 · 部件联动-227 (2026-08-28) — 修复电打解锁并优化顶部与搜索卡对齐 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-226">
+<meta name="version" content="部件联动-227">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -71,6 +71,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .demo-tag{position:absolute;left:50%;top:-34px;transform:translateX(-50%);display:flex;align-items:center;gap:5px;background:#c84b2f;color:#fff;font-size:0.82rem;font-weight:700;padding:6px 14px;border-radius:999px;box-shadow:0 4px 14px rgba(20,40,30,0.35);white-space:nowrap;cursor:pointer;z-index:5;letter-spacing:0.04em}  /* 联动-121:测试模式标签,浮在搜索卡正上方;点击退出 */
 .demo-tag:hover{background:#b33939}
 .home-input-row{display:flex;align-items:stretch;gap:10px;width:100%;max-width:300px;height:42px;margin:4px 0 16px}
+.home-entry-input .home-input-row{margin-top:auto;margin-bottom:0}
 .teacher-input{box-sizing:border-box;flex:1 1 0;width:0;height:100%;min-width:0;padding:5px 10px;border:2px solid rgba(255,255,255,0.3);border-radius:10px;background:rgba(255,255,255,0.95);font-family:inherit;font-size:1.3rem;color:var(--ink-dark);text-align:center;outline:none;letter-spacing:0.08em;-webkit-ime-mode:active;ime-mode:active}
 .teacher-input:focus{border-color:var(--bamboo-light)}
 .teacher-go{box-sizing:border-box;flex:1 1 0;width:0;height:100%;min-width:0;padding:2px 8px;border:1px solid rgba(255,255,255,0.3);border-radius:10px;background:var(--bamboo);color:#fff;font-family:inherit;font-size:1rem;line-height:1.12;cursor:pointer;white-space:normal;transition:all .2s}
@@ -1383,7 +1384,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
         <span class="based-on-hsk" style="color:#8b2c2c;font-size:0.82rem;font-weight:700;letter-spacing:0.12em;font-family:Georgia,serif;font-style:normal">BASED ON HSK 3.0</span>
       </div>
     </div>
-    <div style="position:absolute;right:180px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;column-gap:6px">
+    <div style="position:absolute;right:145px;top:50%;transform:translateY(-50%);display:flex;align-items:center;gap:7px" onclick="event.stopPropagation()"><button id="feedback-btn" class="struct-action-btn" onclick="event.stopPropagation();openFeedback()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;column-gap:6px">
       <span class="tbw"><span class="tbw-r1"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>反馈</span><span class="lang-swap"><span class="lang-en"><span class="sl"> / </span>Feedback</span><span class="lang-ar"><span class="sl"> / </span>ملاحظات</span></span></span>
     </button>
     <button id="toggle-struct-btn" class="struct-action-btn" onclick="event.stopPropagation();toggleStructBar()" style="background:rgba(20,40,30,0.55);border:1px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;column-gap:6px"><span class="tbw">汉字基本结构<span class="lang-swap"><span class="lang-en"><span class="sl"> / </span>Basic Hanzi Structures</span><span class="lang-ar"><span class="sl"> / </span>البنى الأساسية للحروف</span></span></span></button></div>
@@ -1706,7 +1707,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
               <div style="font-size:3.3rem;margin-bottom:15px">🔒</div>
               <p style="font-size:1.32rem;text-align:center;line-height:1.5">先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:1.17rem"><span class="lang-en">Complete Step ③ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ③ أولاً</span></span></p>
             </div>
-            <div class="desktop-typing" id="desktop-typing"><div class="desktop-typing-lock">🔒<br>先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></div></div>
+            <div class="desktop-typing desktop-only" id="desktop-typing"><div class="desktop-typing-lock">🔒<br>先完成书写练习<br><span class="lang-swap-block" style="font-family:Georgia;font-style:italic;font-size:.86em"><span class="lang-en">Complete Step ④ first</span><span class="lang-ar" dir="rtl">أكمل الخطوة ④ أولاً</span></span></div></div>
             <div id="next-btn-wrap" style="display:none;padding:8px 0 2px;flex-shrink:0">
               <button class="next-btn" style="width:100%" onclick="nextCharacter()">下一个字<span class="lang-swap"><span class="lang-en"> · Next →</span><span class="lang-ar"> · التالي →</span></span></button>
             </div>
@@ -1748,7 +1749,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-226 ✦ 移除搜索圆点并对齐搜索框高度','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-227 ✦ 修复电打解锁并优化顶部与搜索卡对齐','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6308,7 +6309,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-226';
+  const VERSION = '部件联动-227';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-238 (2026-08-28) — 电打积分按词语字数计算 -->
+<!-- 斑斓部件 · 部件联动-239 (2026-08-30) — 拼音输入光标仅按已确认汉字移动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-238">
+<meta name="version" content="部件联动-239">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -1769,7 +1769,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-238 ✦ 电打积分按词语字数计算','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-239 ✦ 拼音输入光标仅按已确认汉字移动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4767,7 +4767,9 @@ function typingCompositionStart(input){
   input.dataset.composing='1';
   const wrap=input.closest('.typing-input-wrap'); if(!wrap) return;
   const len=Math.max(1,Number(input.maxLength)||1);
-  const committed=Math.min(len-1,[...(input.value||'')].length);
+  // iOS 拼音输入法触发 compositionstart 时，value 里可能已经带有首个拼音字母；
+  // 光标只能按“已确认的汉字”计数，不能把正在组合的拉丁字母算进去。
+  const committed=Math.min(len-1,[...(input.value||'')].filter(c=>/[\u3400-\u9fff\uf900-\ufaff]/.test(c)).length);
   wrap.style.setProperty('--ime-caret-left',(((committed+.5)/len)*100)+'%');
   wrap.classList.add('ime-composing');
 }
@@ -6344,7 +6346,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-238';
+  const VERSION = '部件联动-239';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

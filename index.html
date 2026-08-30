@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-239 (2026-08-30) — 拼音输入光标仅按已确认汉字移动 -->
+<!-- 斑斓部件 · 部件联动-240 (2026-08-30) — 光标始终仅按已确认汉字移动 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-239">
+<meta name="version" content="部件联动-240">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -221,8 +221,8 @@ body::before{content:'';position:fixed;inset:0;background:
 .write-tip{font-size:0.76rem;color:var(--ink-light);text-align:center;margin-top:8px;line-height:1.5}
 .write-reset-btn{margin-top:22px;padding:8px 19px;border-radius:8px;border:1px solid rgba(255,255,255,0.25);background:#97a99f;color:#243a30;font-family:inherit;font-size:1.02rem;cursor:pointer;transition:all .2s;letter-spacing:0.02em}
 .write-reset-btn:hover{background:rgba(20,40,30,0.55);color:#fff;transform:translateY(-2px)}
-.typing-input-wrap.ime-composing .typing-input{caret-color:transparent!important}
-.typing-input-wrap.ime-composing::after{content:"";position:absolute;left:var(--ime-caret-left,25%);bottom:0;width:2px;height:100%;background:var(--vermillion);transform:translateX(-1px);pointer-events:none;z-index:3} /* 拼音组词期间使用固定光标，选字后才移动 */
+.typing-input-wrap .typing-input{caret-color:transparent!important} /* iOS 各类键盘均隐藏会随字母移动的原生光标 */
+.typing-input-wrap:focus-within::after{content:"";position:absolute;left:var(--ime-caret-left,25%);bottom:0;width:2px;height:100%;background:var(--vermillion);transform:translateX(-1px);pointer-events:none;z-index:3} /* 固定光标只按已确认汉字数移动 */
 
 /* 左栏 */
 .char-display{text-align:center;padding:0;background:transparent;border-radius:10px;border:none;margin-bottom:6px;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -1769,7 +1769,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-239 ✦ 拼音输入光标仅按已确认汉字移动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-240 ✦ 光标始终仅按已确认汉字移动','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -4755,28 +4755,30 @@ function renderDesktopTyping(char){
   const slots=chars.map(()=>'<span class="typing-slot"></span>').join('');
   const hintGlyphs=chars.map(c=>`<span class="typing-answer-glyph" data-glyph="${c}">${c}</span>`).join('');
   const badge=w.lv?`<span class="hsk-level-badge">HSK ${w.lv}</span>`:'';
-  box.innerHTML=`<span class="mobile-only">${badge}</span><div class="typing-answer-hint mobile-only" aria-label="输入提示">${hintGlyphs}</div><div class="desktop-typing-top desktop-only"><div class="typing-answer-hint" aria-label="输入提示">${hintGlyphs}</div>${badge}</div><div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oncompositionstart="typingCompositionStart(this)" oncompositionend="typingCompositionEnd(this)" oninput="renderTypingLiveWord()" onkeydown="if(event.key==='Enter'&&!event.isComposing&&this.dataset.composing!=='1')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
+  box.innerHTML=`<span class="mobile-only">${badge}</span><div class="typing-answer-hint mobile-only" aria-label="输入提示">${hintGlyphs}</div><div class="desktop-typing-top desktop-only"><div class="typing-answer-hint" aria-label="输入提示">${hintGlyphs}</div>${badge}</div><div class="typing-prompt"><div class="typing-word-row"><div class="typing-input-wrap" style="--typing-len:${Math.max(2,chars.length)}"><div class="typing-slots" aria-hidden="true">${slots}</div><span class="typing-live-word" id="typing-live-word" aria-hidden="true"></span><input id="typing-input" class="typing-input" maxlength="${chars.length}" autocomplete="off" inputmode="text" aria-label="输入完整词语" oncompositionstart="typingCompositionStart(this)" oncompositionupdate="updateTypingCaret(this)" oncompositionend="typingCompositionEnd(this)" oninput="updateTypingCaret(this);renderTypingLiveWord()" onkeydown="if(event.key==='Enter'&&!event.isComposing&&this.dataset.composing!=='1')checkTypedHanzi()"></div></div><div class="typing-pinyin">${w.py||''}</div><div class="typing-translation">${w.en||''}</div></div><button class="typing-check" onclick="checkTypedHanzi()">检查 / <span class="lang-swap"><span class="lang-en">Check</span><span class="lang-ar">تحقق</span></span></button><div class="typing-feedback" id="typing-feedback"></div>`;
   box.dataset.answer=w.w;
   box.querySelectorAll('.typing-answer-glyph[data-glyph]').forEach(sp=>renderGlyphInto(sp,sp.dataset.glyph));
-  const input=document.getElementById('typing-input'); if(input) setTimeout(()=>input.focus(),80);
+  const input=document.getElementById('typing-input'); if(input){ updateTypingCaret(input); setTimeout(()=>input.focus(),80); }
 }
 
-// 拼音输入法组词期间固定光标；确认候选汉字后才让光标进入下一字位。
+// 固定光标只按已确认的汉字计数；拼音/英文字符永远不会推动光标。
+function updateTypingCaret(input){
+  if(!input) return;
+  const wrap=input.closest('.typing-input-wrap'); if(!wrap) return;
+  const len=Math.max(1,Number(input.maxLength)||1);
+  const confirmed=[...(input.value||'')].filter(c=>/[\u3400-\u9fff\uf900-\ufaff]/.test(c)).length;
+  const index=Math.min(len-1,confirmed);
+  wrap.style.setProperty('--ime-caret-left',(((index+.5)/len)*100)+'%');
+}
 function typingCompositionStart(input){
   if(!input) return;
   input.dataset.composing='1';
-  const wrap=input.closest('.typing-input-wrap'); if(!wrap) return;
-  const len=Math.max(1,Number(input.maxLength)||1);
-  // iOS 拼音输入法触发 compositionstart 时，value 里可能已经带有首个拼音字母；
-  // 光标只能按“已确认的汉字”计数，不能把正在组合的拉丁字母算进去。
-  const committed=Math.min(len-1,[...(input.value||'')].filter(c=>/[\u3400-\u9fff\uf900-\ufaff]/.test(c)).length);
-  wrap.style.setProperty('--ime-caret-left',(((committed+.5)/len)*100)+'%');
-  wrap.classList.add('ime-composing');
+  updateTypingCaret(input);
 }
 function typingCompositionEnd(input){
   if(!input) return;
   input.dataset.composing='0';
-  const wrap=input.closest('.typing-input-wrap'); if(wrap) wrap.classList.remove('ime-composing');
+  updateTypingCaret(input);
   renderTypingLiveWord();
 }
 
@@ -4786,7 +4788,7 @@ function renderTypingLiveWord(){
   const live=document.getElementById('typing-live-word');
   if(!input||!live) return;
   if(input.dataset.composing==='1') return; // 拼音字母组合期间保持字形与光标不动
-  const chars=[...input.value].slice(0,Number(input.maxLength)||99);
+  const chars=[...input.value].filter(c=>/[\u3400-\u9fff\uf900-\ufaff]/.test(c)).slice(0,Number(input.maxLength)||99);
   live.textContent='';
   chars.forEach(c=>{
     const sp=document.createElement('span');
@@ -6346,7 +6348,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-239';
+  const VERSION = '部件联动-240';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀

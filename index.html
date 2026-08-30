@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<!-- 斑斓部件 · 部件联动-240 (2026-08-30) — 光标始终仅按已确认汉字移动 -->
+<!-- 斑斓部件 · 部件联动-241 (2026-08-30) — 手机端HSK通知框高度缩至七成 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="version" content="部件联动-240">
+<meta name="version" content="部件联动-241">
 <title>斑斓练字 · HSK 3.0</title>
 <meta name="theme-color" content="#55675a">
 <link rel="manifest" href="manifest.webmanifest">
@@ -186,6 +186,18 @@ body::before{content:'';position:fixed;inset:0;background:
 .tj-hanzi-card .tj-desc .lang-en,.tj-hanzi-card .tj-desc .lang-ar{display:block;opacity:0.9}
 .tj-hanzi-card .tj-link{display:inline-block;margin-top:7px;font-size:0.78rem;color:var(--bamboo);font-weight:600;font-family:Menlo,Consolas,monospace;text-decoration:underline;text-underline-offset:3px}
 @media(max-width:480px){.tj-hanzi-card{padding:13px}.tj-hanzi-card .tj-qrbox{width:104px;height:104px}}
+/* 手机端：HSK 1–9 上方通知框整体高度压缩为原来的约 70%，宽度保持不变 */
+@media(max-width:768px){
+  .tj-hanzi-card{padding:9px 14px;margin-bottom:11px}
+  .tj-hanzi-card .tj-title{font-size:.735rem;line-height:1.3;margin-bottom:7px}
+  .tj-hanzi-card .tj-title .lang-en,.tj-hanzi-card .tj-title .lang-ar{font-size:.574rem}
+  .tj-hanzi-card .tj-row{gap:11px}
+  .tj-hanzi-card .tj-qrbox{width:73px;height:73px;padding:6px;border-radius:7px}
+  .tj-hanzi-card .tj-desc{font-size:.574rem;line-height:1.5}
+  .tj-hanzi-card .tj-link{margin-top:5px;font-size:.546rem}
+  .tj-btns{gap:7px;margin-top:10px}
+  .tj-btns button{border-radius:7px;padding:8px;font-size:10px;line-height:1.35}
+}
 .level-btn.level-locked:hover{opacity:0.75;transform:translateY(-1px)}
 
 /* 练习布局 — 左右等高 */
@@ -1769,7 +1781,7 @@ body.lang-mode-ar .step-title .lang-swap>.lang-ar{display:block!important;visibi
 
 
 <script>
-console.log('%c斑斓部件 · 部件联动-240 ✦ 光标始终仅按已确认汉字移动','color:#b5763a;font-weight:bold;font-size:13px');
+console.log('%c斑斓部件 · 部件联动-241 ✦ 手机端HSK通知框高度缩至七成','color:#b5763a;font-weight:bold;font-size:13px');
 // ============================================================
 // 汉字数据库 HSK1
 // ============================================================
@@ -6348,7 +6360,7 @@ try{
 (function(global){
   'use strict';
 
-  const VERSION = '部件联动-240';
+  const VERSION = '部件联动-241';
 
   // ─── 配置 ──────────────────────────────────────────────────
   const BLS_API_BASE = 'https://banlan-api.bruce-wu9207.workers.dev/api';  // ★ 带 /api 前缀
